@@ -4219,6 +4219,17 @@ second. `replay_links` adds an EMPTY `a.rl-v` after each replay link (drawn by i
 playhead; the technique, route, DPC and second-PC case links and the report's routes-techniques cells
 carry 「▶ 影片」. Video tier: never badged or counted, and a night without the file gets no link.
 
+**Seven nights have a video.json (since 2026-11-06, yachi: 「scan all live in that channel」).** The
+channel that streamed 11-05 has a live stream for 09-10, 09-18 (two streams; a match names its stream
+with `video`, an index into `video` + `more_videos`, and `check` resets the round clock per stream),
+09-19, 10-22, 10-29 and 11-01; no other night has one. Only 11-05 was downloaded and frame-snapped.
+The other six could not be downloaded from the container, so `pipeline/video_clock.py` writes them
+from two clocks (a replay's `ts` is the match end; the VOD starts at YouTube's `startDate`) with two
+constants fitted on 11-05 (`--selftest` measures them against 11-05's frame-snapped starts;
+`--check` that the committed files are what it writes). Their `alignment.kind` is `stream_clock`, and
+the 影片 section's closing sentence says the times are aligned from the clocks and never checked
+against frames.
+
 **Every player-round admits since 2026-10-31.** `TL_DEFAULTS` in `oracle-source.ts` had `clutch: false`;
 TETR.IO's own options list (tetr.io/js/tetrio.js, the 2026-10-23 build, read by hand that day; nothing
 of it committed, so a new build is not noticed) defaults it to true. With clutch the game walks a piece

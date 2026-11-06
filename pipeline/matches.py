@@ -80,13 +80,16 @@ def _race(facts, report_dir):
     href = None
     if data is not None:
         video_section.check(facts, data)
-        video, lead = data["video"], data["alignment"]["link_lead_s"]
+        from pipeline import video_links
+        lead = data["alignment"]["link_lead_s"]
         starts = {v["position"]: [r["play_start_s"] for r in v["rounds"]]
                   for v in data["matches"]}
+        vids = {v["position"]: video_links.video_of(data, v) for v in data["matches"]}
 
         def href(pos, j, rec):
             t = rec["rounds"][j]["play_start_s"] if rec is not None else starts[pos][j]
-            return video_section._href(video, t, lead).replace("&amp;", "&")
+            v = vids[pos if rec is None else rec["after_position"]]
+            return video_section._href(v, t, lead).replace("&amp;", "&")
     strip = report_charts.race_strip(facts, data.get("recovered") if data else None, href)
     note = ('線向上即係 ' + html.escape(facts["players"][0]) + ' 領先，向下即係 '
             + html.escape(facts["players"][1]) + ' 領先；每粒點係一局，顏色係嗰局邊個贏。')

@@ -28,6 +28,17 @@ TITLE = "喺直播影片睇呢一刻（影片時間係對齊出嚟，大約）"
 TEXT = "▶ 影片"
 
 
+def videos(data):
+    """Every video of the night, in order: `video`, then `more_videos` (a night streamed in two
+    parts). A match names its video by index in `video` (0, the default)."""
+    return [data["video"], *data.get("more_videos", [])]
+
+
+def video_of(data, match):
+    """The video dict that holds `match` (one entry of video.json's `matches`)."""
+    return videos(data)[match.get("video", 0)]
+
+
 class Video:
     def __init__(self, data):
         if data.get("schema") != SCHEMA:
@@ -36,17 +47,19 @@ class Video:
         self.lead = data["alignment"]["link_lead_s"]
         self.starts = {(m["position"], r["round"]): r["play_start_s"]
                        for m in data["matches"] for r in m["rounds"]}
+        self.urls = {(m["position"], r["round"]): video_of(data, m)["url"]
+                     for m in data["matches"] for r in m["rounds"]}
 
-    def at(self, seconds):
-        return f"{self.url}&t={max(0, int(seconds - self.lead))}s"
+    def at(self, seconds, url=None):
+        return f"{url or self.url}&t={max(0, int(seconds - self.lead))}s"
 
     def round_url(self, m, r):
         s = self.starts.get((m, r))
-        return None if s is None else self.at(s)
+        return None if s is None else self.at(s, self.urls[(m, r)])
 
     def moment_url(self, m, r, frames):
         s = self.starts.get((m, r))
-        return None if s is None else self.at(s + frames / FPS)
+        return None if s is None else self.at(s + frames / FPS, self.urls[(m, r)])
 
 
 @lru_cache(maxsize=None)
@@ -81,8 +94,16 @@ def _selftest():
                "alignment": {"link_lead_s": 5},
                "matches": [{"position": 1, "rounds": [{"round": 1, "play_start_s": 107.25},
                                                       {"round": 2, "play_start_s": 3.0}]}]})
+    two = Video({"schema": SCHEMA, "video": {"url": "https://www.youtube.com/watch?v=X"},
+                 "more_videos": [{"url": "https://www.youtube.com/watch?v=Y"}],
+                 "alignment": {"link_lead_s": 5},
+                 "matches": [{"position": 1, "rounds": [{"round": 1, "play_start_s": 50}]},
+                             {"position": 2, "video": 1,
+                              "rounds": [{"round": 1, "play_start_s": 20}]}]})
     bad = []
-    for got, want in [(v.round_url(1, 1), "https://www.youtube.com/watch?v=X&t=102s"),
+    for got, want in [(two.round_url(1, 1), "https://www.youtube.com/watch?v=X&t=45s"),
+                      (two.round_url(2, 1), "https://www.youtube.com/watch?v=Y&t=15s"),
+                      (two.moment_url(2, 1, 120), "https://www.youtube.com/watch?v=Y&t=17s"),(v.round_url(1, 1), "https://www.youtube.com/watch?v=X&t=102s"),
                       (v.round_url(1, 2), "https://www.youtube.com/watch?v=X&t=0s"),
                       (v.moment_url(1, 1, 600), "https://www.youtube.com/watch?v=X&t=112s"),
                       (v.round_url(2, 1), None), (anchor(None), "")]:
@@ -98,6 +119,9 @@ def _selftest():
     real = for_session("2026-11-05")
     if real is None or real.round_url(1, 1) is None:
         bad.append("2026-11-05 has no video links")
+    split = for_session("2026-09-18")
+    if split is None or "gP3P9vRwMOY" not in (split.round_url(18, 1) or ""):
+        bad.append("2026-09-18's second-part matches do not link the second video")
     if for_session("2026-07-22") is not None:
         bad.append("a session with no video.json got video links")
     for b in bad:
