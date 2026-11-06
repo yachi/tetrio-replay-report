@@ -259,6 +259,7 @@ CSS = """
 #intense-round .ir-cid { font-family: var(--font-mono); font-size: .6rem; color: var(--muted); }
 #intense-round .ir-find { margin: 1.2rem 0 0; font-size: .95rem; line-height: 1.9; }
 #intense-round .ir-split { margin: 1.1rem 0 0; font-size: .88rem; line-height: 1.85; }
+#intense-round .ir-method > summary { cursor: pointer; margin-top: 1rem; font-size: .85rem; color: var(--muted); }
 #intense-round .ir-note { margin: .9rem 0 0; font-size: .8rem; line-height: 1.8;
   color: var(--muted); }
 @media print {
@@ -399,6 +400,35 @@ def _vs_split(claim):
             "id": claim["id"], "verified": claim["verified"]}
 
 
+# 食 is left out of the bars: more of it is worse, so a longer bar would read as a lead.
+_BAR_SKIP = {"garbagereceived"}
+
+
+def _bars(players, cols, edges, win, rates):
+    """The table above drawn as paired bars (`report_charts.intense_bars`), with every value
+    and printed string taken from the same proved claims the table reads. 每粒棋攻擊 is added
+    from the pinned rate when the session carries it."""
+    from pipeline import report_charts
+    by = {c["player"]: c["fields"] for c in cols}
+    rows = []
+    for f, label, how in FIELDS:
+        if f in _BAR_SKIP or any(by[p].get(f) is None for p in by):
+            continue
+        rows.append((label, {p: by[p][f] for p in by}, {p: _fmt(by[p][f], how) for p in by},
+                     f in edges["behind"]))
+        r = rates.get("garbage_attack") if f == "garbage_attack" else None
+        if r and all(p in r["values"] for p in by):
+            rows.append(("每粒攻擊", dict(r["values"]),
+                         {p: _r3(r["values"][p]) for p in by},
+                         r["values"][win] < max(r["values"].values())))
+    if len(by) != 2 or not rows:
+        return []
+    return ['<style>' + report_charts.css("intense-round") + '</style>',
+            report_charts.intense_bars(players, rows, win),
+            '    <p class="rc-note">粗字嗰幾行係贏嗰個輸蝕嘅；每行實色嗰邊係數大啲嗰個。'
+            '「食」唔畫，因為食得多係壞事，條長啲會睇錯做領先。</p>']
+
+
 def collect(report_dir):
     """Everything the section prints, read out of the proved claims."""
     claims = claim_cards.load(report_dir)
@@ -442,31 +472,15 @@ def build(facts, report_dir):
            '    <div class="eyebrow">最癲一局 · THE ROUND BOTH SWUNG HARDEST</div>',
            f'    <h2 class="section-title">全晚打得最癲嘅一局：第 {ref["match"]} 場第 '
            f'{ref["round"]} 局</h2>',
-           '    <p class="section-lede">呢一局係成晚<strong>兩邊 VS 加埋最高</strong>嗰局——'
-           '即係雙方都攻得最狠嗰一局。'
-           '揀嘅時候淨係計打足一分鐘以上嘅局：VS 係「每分鐘」嘅速率，'
-           '短局個分母細，唔設下限嘅話贏嘅次次都係最短嗰局。'
-           '點解要專登揀最癲嗰局出嚟拆：'
-           '<strong>局打得越癲，越決定勝負嗰樣係「清走」，唔係攻擊</strong>。'
-           f'呢句唔係由下面呢一局睇出嚟嘅——係喺 {CORPUS["sessions"]} 個 session、{CORPUS["n"]} 局有勝負嘅局'
-           f'度量返嚟：將全部局按「兩邊 VS 加埋」由低到高分三份，'
-           f'每粒棋清走呢個速率分辨到邊個贏嘅準確度，'
-           f'由 {CORPUS["terciles"][0]}% 升到 {CORPUS["terciles"][1]}% '
-           f'再升到 {CORPUS["terciles"][2]}%（Spearman rho {_rho("cleared_pp/intensity")}），'
-           f'而攻擊同 APM 完全冇呢個升勢。'
-           f'<strong>個發現係「一路升」同埋佢自己個控制唔跟住升</strong>，'
-           f'唔係個 p 值：呢 {CORPUS["n"]} 局係喺同一場、同一晚、同兩個人身上打出嚟，'
-           f'唔係獨立嘅，所以呢度每個 p 都偏細。'
-           f'（旁證：raw p {CORPUS["tests"]["cleared_pp/intensity"]["raw"]}，'
-           f'成個 family {CORPUS["m"]} 個測試，Bonferroni 校正後 '
-           f'{CORPUS["tests"]["cleared_pp/intensity"]["adj"]}。'
-           f'用 Bonferroni 唔用 Holm，因為 Holm 校正出嚟嗰個數要成個 family 每個 raw p 先算到——'
-           f'第二條 column 換咗來源，你呢個數都會跟住郁；'
-           f'Bonferroni 係 m × p，兩個數都印咗喺度，讀者自己驗得返。）'
-           f'下面呢一局係<strong>個例子</strong>，唔係個證據——'
-           f'兩個控制實驗喺最尾嗰段。'
-           f'表入面每個數都係由 claim 本身證嗰條式度攞返嚟，'
-           f'唔係喺呢度重新計一次。</p>',
+           '    <p class="section-lede">呢一局係成晚<strong>兩邊 VS 加埋最高</strong>嗰局'
+           '（淨係計打足一分鐘以上嘅局）。'
+           f'{CORPUS["sessions"]} 個 session 以來都係咁：'
+           '<strong>局打得越癲，越係清走（清垃圾）快嗰個贏，攻擊多唔多反而冇咁準</strong>。'
+           f'將 {CORPUS["n"]} 局按「兩邊 VS 加埋」由低到高分三份，'
+           f'睇每粒棋清走邊個多就估邊個贏，準確度由 {CORPUS["terciles"][0]}% 升到 '
+           f'{CORPUS["terciles"][1]}% 再升到 {CORPUS["terciles"][2]}%，攻擊同 APM 冇呢個升勢。'
+           '下面呢一局係個例子，唔係證據；點計摺埋喺最尾。</p>',
+           *_bars(facts["players"], cols, edges, win, rates),
            '    <div class="ir-scroll">',
            '      <table class="ir-table">',
            '        <thead><tr><th>數據</th>'
@@ -579,10 +593,7 @@ def build(facts, report_dir):
             pairs = "、".join(f'{html.escape(p)} 約 {_r3(r["values"][p])}'
                              for p in [c["player"] for c in cols] if p in r["values"])
             bits.append(f'<strong>{label}</strong>：{pairs}')
-        out.append('    <p class="ir-split">' + "；".join(bits) + '。'
-                   '兩個率都係用「乘返上去」嘅方式證嘅——'
-                   'claim 裏面冇除數，所以比較係 <code>甲×乙嘅粒數</code> 對 '
-                   '<code>乙×甲嘅粒數</code>，印出嚟嗰三個位就係個界證住嘅數。</p>')
+        out.append('    <p class="ir-split">' + "；".join(bits) + '。</p>')
 
     # The VS split. This is the one place the section explains an inversion instead of
     # merely pointing at it, so it carries its own caveat: the identity is OBSERVED in
@@ -600,6 +611,17 @@ def build(facts, report_dir):
                    '「兩邊加埋同實際 VS 相差唔超過幾多」，'
                    '<strong>唔係「等於」</strong>。</p>')
 
+    out.append('    <details class="ir-method"><summary>點計（撳開）</summary>')
+    out.append('    <p class="ir-note">'
+               f'個升勢嘅 Spearman rho {_rho("cleared_pp/intensity")}。'
+               '個發現係「一路升」同埋佢自己個控制唔跟住升，唔係個 p 值：'
+               '啲局係喺同一場、同一晚、同兩個人身上打出嚟，唔係獨立嘅，所以呢度每個 p 都偏細。'
+               f'（旁證：raw p {CORPUS["tests"]["cleared_pp/intensity"]["raw"]}，'
+               f'成個 family {CORPUS["m"]} 個測試，Bonferroni 校正後 '
+               f'{CORPUS["tests"]["cleared_pp/intensity"]["adj"]}；Bonferroni 係 m × p，兩個數都印咗，驗得返。）'
+               '表入面每個數都係由 claim 本身證嗰條式度攞返嚟，唔係喺呢度重新計一次；'
+               '每粒嘅兩個率係用「乘返上去」嘅方式證嘅——claim 裏面冇除數，所以比較係 '
+               '<code>甲×乙嘅粒數</code> 對 <code>乙×甲嘅粒數</code>，印出嚟嗰三個位就係個界證住嘅數。</p>')
     out.append('    <p class="ir-note">'
                '讀呢節要記住：<strong>呢度得一局</strong>。'
                '一局可以話畀你聽「有件事發生咗」，'
@@ -641,6 +663,7 @@ def build(facts, report_dir):
                '呢啲數全部由 <code>analysis/corpus_stats.py</code> 度返嚟、'
                '<code>pipeline/check_intense_corpus.py</code> 睇住，'
                '唔係打上去嘅。</p>')
+    out.append('    </details>')
     out.append('    <p class="ir-note">Claim：'
                + html.escape(" · ".join(ids))
                + (" ⏳" if pending else " ✓") + '</p>')

@@ -217,9 +217,8 @@ def break_even(ctx):
         if cross is not None and tonight != cross:
             s += "，喺打和線" + ("贏面嗰邊" if tonight > cross else "輸面嗰邊")
         sents.append(s)
-    note = _note("；".join(sents) + "。呢個係截至呢晚為止成個 corpus 嘅量度，唔係證明；之後先加嘅 session 唔會改呢份報告。"
-                 "APP 同贏局係相關，唔係因果：輸家最後嗰幾粒係頂住壓力落嘅，本身就會拉低佢嗰局嘅 APP，"
-                 "所以唔好讀成「APP 提高幾多就會贏幾多」。")
+    note = _note("；".join(sents) + "。之後先加嘅 session 唔會改呢份報告。"
+                 "唔好讀成「APP 提高幾多就會贏幾多」。")
     return block("APP 差幾多先打和？", EYEBROW, body, note, block_id="breakeven")
 
 

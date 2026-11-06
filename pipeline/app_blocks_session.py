@@ -1,6 +1,6 @@
 """Blocks 1, 4a, 4b of 每粒攻擊 — the session-level APP blocks. Contract: pipeline/app_section.py.
 
-    scoreboard(ctx)  block 1  APP 計分板: both players' session APP, the ratio gap, 每 100 粒打幾多行,
+    scoreboard(ctx)  block 1  APP 計分板: both players' session APP, the ratio gap,
                               and the volume meter (the lower-APP player's piece surplus against the
                               surplus that would have covered the gap — the shortfall).
     per_match(ctx)   block 4a 逐場 APP: one dumbbell per match, winner ringed, score at the right.
@@ -144,71 +144,30 @@ def scoreboard(ctx):
                f'{_badge_if(g042)}</span></div>')
     figs = f'<div class="ap-figs">{side(0)}{mid}{side(1)}</div>'
 
-    body = [figs, _per100(ctx, hi, lo, site)]
-    meter, meter_note = _meter(ctx, hi, lo, site)
+    body = [figs]
+    meter = _meter(ctx, hi, lo, site)
     if meter:
         body.append(meter)
 
-    note = ("APP 係攻擊行數除以方塊數，兩邊嘅原數就寫喺個數下面。"
-            "「每 100 粒方塊打幾多行」係同一個數乘一百，讀落比較有手感。")
-    if meter_note:
-        note += meter_note
-    note += "差距係比率：高嗰個嘅 APP 除以低嗰個，減一。所有小數都係捨去（約數），唔係四捨五入。"
+    note = "差距係比率：高嗰個嘅 APP 除以低嗰個，減一。"
     return block("APP 計分板", "每粒攻擊 · 成晚", "\n".join(body), _note(note), block_id="score")
 
 
-def _per100(ctx, hi, lo, site):
-    vals = [_app(ctx, i) for i in (0, 1)]
-    top = max(a * 100 / p for a, p in vals) * 1.3 or 1.0
-    L, R, row = 96, 70, 30
-    H = 2 * row + 12
-    sx = Scale(0, top, L, WN - R)
-    parts = []
-    for i, (a, p) in enumerate(vals):
-        y = 6 + row * i
-        v = a * 100 / p
-        parts.append(el("text", {"x": L - 10, "y": y + 15, "text-anchor": "end"},
-                        _tspan(ctx["players"][i], i, bold=True)))
-        parts.append(el("rect", {"class": "ap-ax", "x": L, "y": y + 3, "width": sx(top) - L,
-                                 "height": 16, "fill": "none"}))
-        parts.append(el("rect", {"class": f"ap-f{i + 1}", "x": L, "y": y + 3,
-                                 "width": max(sx(v) - L, 1), "height": 16},
-                        title(f"{ctx['players'][i]}：每 100 粒方塊 "
-                              f"{rate(a * 100, p, 1, site=f'{site}.per100')} 行")))
-        parts.append(el("text", {"x": sx(v) + 8, "y": y + 15, "text-anchor": "start"},
-                        text=f"{rate(a * 100, p, 1, site=f'{site}.per100')} 行"))
-    chart = _chart(svg(WN, H, parts, "每 100 粒方塊打幾多行"), narrow=True)
-    head = '<div class="ap-sub">每 100 粒方塊打幾多行</div>'
-    if hi is None:
-        cap = '<div class="ap-sub">每 100 粒方塊，兩個人打出一樣咁多行。</div>'
-    else:
-        (ah, ph), (al, pl) = _app(ctx, hi), _app(ctx, lo)
-        diff = rate((ah * pl - al * ph) * 100, ph * pl, 1, site=f"{site}.per100_diff")
-        cap = (f'<div class="ap-sub">每 100 粒方塊：{pname(ctx, hi)} 打多約 '
-               f'<span class="ap-num">{diff}</span> 行。</div>')
-    return head + chart + cap
-
-
 def _meter(ctx, hi, lo, site):
-    """The volume meter, or (None, note) when there is nothing to measure."""
+    """The volume meter, or None when there is nothing to measure."""
     if hi is None:
-        return None, ""
+        return None
     (ah, ph), (al, pl) = _app(ctx, hi), _app(ctx, lo)
     if al == 0:
-        return None, ""
+        return None
     L, H = pname(ctx, lo), pname(ctx, hi)
     gap = pct(ah * pl - al * ph, al * ph, 2, site=f"{site}.meter_gap")
     gap_f = 100 * (ah * pl - al * ph) / (al * ph)
     if pl <= ph:
         # the lower-APP player also placed no more pieces: no surplus to measure
-        less = ph - pl
-        note = (f"{L} 每粒輕過 {H}，粒數亦冇多過佢"
-                + (f"（少 <span class=\"ap-num\">{less}</span> 粒）" if less else "")
-                + "，所以冇得靠量追，量尺就唔畫。")
-        txt = (f'<div class="ap-sub">{L} 每粒輕啲，粒數亦冇多過 {H}，'
-               f'追平 APP 差要多放 +<span class="ap-num">{gap}</span>% 粒數，'
-               f'而佢一粒都冇多。總攻擊差 <span class="ap-num">{ah - al}</span> 行。</div>')
-        return txt, note
+        return (f'<div class="ap-sub">{L} 每粒輕啲，粒數亦冇多過 {H}，'
+                f'追平 APP 差要多放 +<span class="ap-num">{gap}</span>% 粒數，'
+                f'而佢一粒都冇多。總攻擊差 <span class="ap-num">{ah - al}</span> 行。</div>')
     sur = pct(pl - ph, ph, 2, site=f"{site}.meter_surplus")
     sur_f = 100 * (pl - ph) / ph
     # shortfall = gap - surplus = 100·pl·(ah - al) / (al·ph), exactly
@@ -248,9 +207,7 @@ def _meter(ctx, hi, lo, site):
     chart = _chart(svg(WN, y0 + h + 30, parts, "粒數多咗幾多，對比追平 APP 差所需"), narrow=True)
     head = (f'<div class="ap-sub">靠量追：{L} 每粒輕啲，但如果落多啲方塊，'
             f'總攻擊都可以追返。實心係佢多放咗嘅粒數，虛線係追平要多放幾多。</div>')
-    note = (f"量尺嘅意思：{H} 嘅 APP 高過 {L} 約 {gap}%，所以 {L} 要多放約 {gap}% 嘅方塊，總攻擊先追得平；"
-            f"佢實際多放咗約 {sur}%。兩個數之差就係冇追到（或者追過咗頭）嘅部分。")
-    return head + chart + f'<div class="ap-sub">{cap}</div>', note
+    return head + chart + f'<div class="ap-sub">{cap}</div>'
 
 
 # ------------------------------------------------------------------ block 4a
@@ -308,8 +265,7 @@ def per_match(ctx):
             f"APP 高嗰個贏咗 <span class=\"ap-num\">{lead}</span> / "
             f"<span class=\"ap-num\">{decided}</span> 場"
             + (f"（另外 <span class=\"ap-num\">{tie}</span> 場兩個人 APP 一樣）" if tie else "")
-            + "。APP 高同贏場係有相關，唔係因果：輸家最尾幾粒係頂住壓力落嘅，本身會拉低佢嘅 APP；"
-            "一場亦可以靠快、靠量贏返。")
+            + "。一場亦可以靠快、靠量贏返。")
     return block("逐場 APP", "每粒攻擊 · 逐場", body, _note(note), block_id="match")
 
 
@@ -415,7 +371,6 @@ def won_lost(ctx):
         cross.append(f"{word} {pname(ctx, h)} 高約 <span class=\"ap-num\">{g}</span>%")
     note = (lead + "".join(sents)
             + (("兩個人之間比：" + "，".join(cross) + "。") if cross else "")
-            + "贏局同輸局邊一邊差得遠啲，就睇得出今晚兩個人嘅分別係喺打得好定打得差嘅時候。"
-            "注意輸局嘅 APP 本身會偏低：輸家最尾嗰幾粒係頂住垃圾落嘅，所以呢個係相關，唔係因果。")
+            + "贏局同輸局邊一邊差得遠啲，就睇得出今晚兩個人嘅分別係喺打得好定打得差嘅時候。")
     return block("贏局 vs 輸局嘅 APP", "每粒攻擊 · 贏輸分開", body, _note(note),
                  block_id="wonlost")

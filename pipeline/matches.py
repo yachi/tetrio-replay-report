@@ -71,7 +71,34 @@ def load_prose(report_dir, facts):
 SECTION_FIELDS = ("eyebrow", "title", "lede")
 
 
-def section(facts, prose):
+def _race(facts, report_dir):
+    """The race strip above the cards (`report_charts.race_strip`). On a night with a
+    video.json each dot links to its round in the video and the video-only match is drawn in
+    place, dashed; without one the strip has no links and no extra row."""
+    from pipeline import report_charts, video_section
+    data = video_section.load(report_dir) if report_dir else None
+    href = None
+    if data is not None:
+        video_section.check(facts, data)
+        video, lead = data["video"], data["alignment"]["link_lead_s"]
+        starts = {v["position"]: [r["play_start_s"] for r in v["rounds"]]
+                  for v in data["matches"]}
+
+        def href(pos, j, rec):
+            t = rec["rounds"][j]["play_start_s"] if rec is not None else starts[pos][j]
+            return video_section._href(video, t, lead).replace("&amp;", "&")
+    strip = report_charts.race_strip(facts, data.get("recovered") if data else None, href)
+    note = ('線向上即係 ' + html.escape(facts["players"][0]) + ' 領先，向下即係 '
+            + html.escape(facts["players"][1]) + ' 領先；每粒點係一局，顏色係嗰局邊個贏。')
+    if data is not None:
+        note += '撳粒點會開影片嗰局。'
+        if data.get("recovered"):
+            note += '虛線點嗰行係冇 replay、由影片讀返嘅一場，唔計入任何數。'
+    return ['<style>' + report_charts.css("matches") + '</style>', strip,
+            f'    <p class="rc-note">{note}</p>']
+
+
+def section(facts, prose, report_dir=None):
     """The 戰況 section itself — the frame the timeline renders into.
 
     The cards come from the island below and are assembled in the browser; what
@@ -96,6 +123,7 @@ def section(facts, prose):
            f'    <div class="eyebrow">{html.escape(prose["eyebrow"])}</div>',
            f'    <h2 class="section-title">{html.escape(prose["title"])}</h2>',
            f'    <p class="section-lede">{prose["lede"]}</p>',
+           *_race(facts, report_dir),
            '',
            '    <div class="timeline" id="timeline"></div>']
     if (prose.get("closer") or "").strip():

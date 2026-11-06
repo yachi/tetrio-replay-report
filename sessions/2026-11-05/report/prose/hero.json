@@ -1,10 +1,10 @@
 {
   "kicker": "第二十二回合",
-  "title": "6 比 2、37 比 30——\n<span class=\"hl-p\">贏局重一成二</span>，<span class=\"hl-y\">輸局反而係 yachi 重</span>",
+  "title": "6 比 2，\n<span class=\"hl-p\">但近過個比數</span>",
   "tags": {
     "yachi": "快 · 落得多 · 輸局每粒重啲",
     "pinglamb": "贏局重一成二 · 三場 5 比 4 · EFFICIENCY"
   },
-  "lede": "有 replay 嘅八場 match、67 局。<strong>pinglamb 6 比 2 攞低個系列</strong><span class=\"badge\" data-claim=\"G001\"></span><span class=\"badge\" data-claim=\"C001\"></span>，逐局計 37 比 30<span class=\"badge\" data-claim=\"G002\"></span><span class=\"badge\" data-claim=\"C010\"></span>。頭三場 yachi 全輸，局數 9 比 15；尾五場贏兩場，局數 21 比 22<span class=\"badge\" data-claim=\"C010\"></span>。三場係 4 比 5 輸<span class=\"badge\" data-claim=\"G057\"></span>。成晚 pinglamb 每粒方塊嘅攻擊高 6.14%<span class=\"badge\" data-claim=\"C004\"></span>，yachi 多疊 392 粒、即係多 5.69%<span class=\"badge\" data-claim=\"C005\"></span><span class=\"badge\" data-claim=\"C009\"></span>，差少少先填得晒，總攻擊淨係少 18 條<span class=\"badge\" data-claim=\"C005\"></span>。<strong>拆開贏輸嚟睇係 corpus 第一次：贏局 pinglamb 高 12.73%，輸局反轉，係 yachi 高 1.91%</strong><span class=\"badge\" data-claim=\"C002\"></span>。另外第六同第七場中間仲打咗一場冇 replay 嘅，<a href=\"#video\">錄影</a>睇返係 yachi 5 比 2 贏，唔計入任何數。",
+  "lede": "有 replay 嘅八場、67 局，<strong>pinglamb 6 比 2</strong><span class=\"badge\" data-claim=\"G001\"></span><span class=\"badge\" data-claim=\"C001\"></span>，逐局 37 比 30<span class=\"badge\" data-claim=\"G002\"></span><span class=\"badge\" data-claim=\"C010\"></span>。比數一面倒，場波其實好近：三場打到第九局，yachi 都係 4 比 5 輸<span class=\"badge\" data-claim=\"G057\"></span>；成晚總攻擊 yachi 淨係少 18 條<span class=\"badge\" data-claim=\"C005\"></span>。pinglamb 每粒方塊嘅攻擊高 6.14%<span class=\"badge\" data-claim=\"C004\"></span>，yachi 多疊 392 粒、即係多 5.69%<span class=\"badge\" data-claim=\"C005\"></span><span class=\"badge\" data-claim=\"C009\"></span>，差少少就追得返。<strong>差距全部喺贏局</strong>：贏局 pinglamb 每粒高 12.73%，輸局反而係 yachi 高 1.91%<span class=\"badge\" data-claim=\"C002\"></span>，二十二晚嚟第一次。第六同第七場中間仲有一場冇 replay，<a href=\"#video\">錄影</a>睇返係 yachi 5 比 2 贏，唔計入任何數。",
   "score_claim": "G001"
 }

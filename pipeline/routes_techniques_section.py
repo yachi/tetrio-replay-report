@@ -253,8 +253,8 @@ def _route_cell(c, nrounds, session):
 def _tech_cell(c, spin, payoff):
     den = (f" / {c['den']} 個 TSD" if c["den"] is not None
            else f"（{spin}，今晚冇可核 {spin} 總數）")
-    shape = (f"<br><span class=\"rs-sub\">另外 {c['shape_only']} 次個形對到但唔算砌出嚟"
-             f"（唔係完整方塊、有垃圾、同另一個手法重疊或者係 DPC，規則見手法頁）</span>" if c.get("shape_only") else "")
+    shape = (f"<br><span class=\"rs-sub\">另外 {c['shape_only']} 次形似但唔算</span>"
+             if c.get("shape_only") else "")
     if not c["hits"]:
         return f'<td class="mono rs-zero">0{den}{shape}</td>'
     follow = "Tetris" if payoff else "第二個 T-spin"
@@ -273,14 +273,27 @@ def section(d):
     e = html.escape
     pl = d["players"]
     head = "".join(f"<th>{e(p)}</th>" for p in pl)
+    # A row both players left at zero is named once under its table instead of drawn as a row of
+    # greyed zeros; its shape-only count, if any, is on the technique page.
+    routes = [r for r in d["routes"] if any(r["cells"][p] for p in pl)]
+    techs = [t for t in d["techs"] if any(t["cells"][p]["hits"] for p in pl)]
     route_rows = "".join(
         f'<tr><td><a href="{e(r["href"])}">{e(r["name"])}</a></td>'
         + "".join(_route_cell(r["cells"][p], d["nrounds"], d["session"]) for p in pl) + "</tr>"
-        for r in d["routes"])
+        for r in routes)
     tech_rows = "".join(
         f'<tr><td><a href="{e(t["href"])}">{e(t["name"])}</a></td>'
         + "".join(_tech_cell(t["cells"][p], t["spin"], t["payoff"]) for p in pl) + "</tr>"
-        for t in d["techs"])
+        for t in techs)
+
+    def zero(rows, all_rows, what):
+        names = [x for x in all_rows if x not in rows]
+        if not names:
+            return ""
+        links = "、".join(f'<a href="{e(x["href"])}">{e(x["name"])}</a>' for x in names)
+        return f'\n    <p class="rs-sub">今晚兩位都冇{what}：{links}。</p>'
+    route_zero = zero(routes, d["routes"], "對到")
+    tech_zero = zero(techs, d["techs"], "砌出")
     strip_rows = []
     for p in pl:
         tds = []
@@ -308,14 +321,14 @@ def section(d):
     <div class="scroll-x"><table class="appendix-table">
       <thead><tr><th>定式</th>{head}</tr></thead>
       <tbody>{route_rows}</tbody>
-    </table></div>
+    </table></div>{route_zero}
 
     <h3>二 · 中盤手法</h3>
-    <div class="method-note"><p>每格係嗰位玩家今晚有幾多個 T-spin 落之前個形對到嗰個手法，分母係今晚可核嘅 TSD 總數（TSS 嘅形冇每晚嘅總數，就照講）。下面一行係有幾多次接到嗰頁畫嘅下一步（第二個 T-spin，或者欄干同階段嘅 Tetris）、冇接到嘅原因，同埋喺開局（頭 22 手）定中盤。連結直接開去重播頁、落嗰粒 T 之前嗰一刻。</p></div>
+    <div class="method-note"><p>每格係嗰位玩家今晚有幾多個 T-spin 落之前個形對到嗰個手法，分母係今晚可核嘅 TSD 總數（TSS 嘅形冇每晚嘅總數，就照講）。下面一行係有幾多次接到嗰頁畫嘅下一步（第二個 T-spin，或者欄干同階段嘅 Tetris）、冇接到嘅原因，同埋喺開局（頭 22 手）定中盤。「形似但唔算」係個形對到，但唔係用完整方塊砌、有垃圾、同另一個手法重疊或者係 DPC，冇計入個數（規則見手法頁）。連結開去重播頁、落嗰粒 T 之前嗰一刻。</p></div>
     <div class="scroll-x"><table class="appendix-table">
       <thead><tr><th>手法</th>{head}</tr></thead>
       <tbody>{tech_rows}</tbody>
-    </table></div>
+    </table></div>{tech_zero}
 
     <h3>三 · 逐場</h3>
     <div class="method-note"><p>每格係嗰場出現過嘅定式（<span class="rs-chip rs-o">開局</span>）同手法（<span class="rs-chip rs-t">中盤</span>）；底線係嗰場贏咗。「—」係冇對到，唔係冇打。</p></div>

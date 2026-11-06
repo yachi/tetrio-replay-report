@@ -49,14 +49,14 @@ def match_copy_section(ctx):
 
 def matches_section(ctx):
     return matches.section(ctx["facts"],
-                           matches.load_prose(ctx["report_dir"], ctx["facts"]))
+                           matches.load_prose(ctx["report_dir"], ctx["facts"]),
+                           ctx["report_dir"])
 
 
 def stats_sec(ctx):
-    from pipeline import routes_techniques_charts
-    return stats_section.build(ctx["facts"],
-                               stats_section.load_prose(ctx["report_dir"]),
-                               routes_techniques_charts.build(ctx["facts"], ctx["report_dir"]))
+    # The two simulator bar panels that used to close this section were dropped on 2026-11-06: they
+    # drew the same cells the 定式路線同中盤手法 table prints a few screens further down.
+    return stats_section.build(ctx["facts"], stats_section.load_prose(ctx["report_dir"]))
 
 
 def app_sec(ctx):
