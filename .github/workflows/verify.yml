@@ -716,6 +716,13 @@ jobs:
       # the recording; --selftest plants overlapping rounds, a wrong recovered score and the rest.
       - name: Check the video section
         run: python3 -m pipeline.video_section --selftest
+      # pipeline/video_clock.py writes the video.json of every night not frame-snapped (stream
+      # clock + replay ts); --check the committed files are its output, --selftest its fit on 11-05.
+      - name: Check the stream-clock video alignment
+        run: |
+          python3 -m pipeline.video_clock --check
+          python3 -m pipeline.video_clock --selftest
+          python3 -m pipeline.video_links --selftest
 
       # The replay pages' opener / technique labels are re-checked against each page's own
       # decode as build-docs renders them. --selftest plants a wrong lock, a wrong hand and a

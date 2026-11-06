@@ -34,7 +34,7 @@
   function videoAt(frames) {
     if (!videoA || !DATA.video || cur == null || cur.vs == null) return;
     var s = Math.max(0, Math.floor(cur.vs + frames / DATA.video.fps - DATA.video.lead));
-    var h = DATA.video.url + "&t=" + s + "s";
+    var h = (cur.vu || DATA.video.url) + "&t=" + s + "s";
     if (videoA.href !== h) videoA.href = h;
   }
   var labelsLead = labelsEl.textContent;

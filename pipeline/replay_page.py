@@ -277,6 +277,9 @@ def render(data, facts, report_href, labels=None):
             s0 = video.starts.get((int(mo.group(1)), int(mo.group(2))))
             _need(s0 is not None, f"{r['label']}: video.json has no start for this round")
             r["vs"] = s0
+            u = video.urls[(int(mo.group(1)), int(mo.group(2)))]
+            if u != video.url:
+                r["vu"] = u     # a round in a night's second video (video_links.videos)
         vblob = {"url": video.url, "lead": video.lead, "fps": VL.FPS}
     blob = json.dumps({"shared": shared, "rounds": rounds, "default": default, "video": vblob},
                       ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")

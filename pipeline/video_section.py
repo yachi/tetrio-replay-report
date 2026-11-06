@@ -27,8 +27,19 @@ from pathlib import Path
 
 from pipeline import report_charts
 from pipeline.claims.build_claims import SIMPLIFIED
+from pipeline.video_links import video_of, videos
 
 SCHEMA = "session-video/1"
+
+# The closing sentence says how the times were found, per `alignment.kind` (default "frames").
+NOTES = {
+    "frames": ("時間點係用 replay 每局嘅長度對返影片畫面得出嚟，每局相差唔夠 1 秒；"
+               "係影片對出嚟，唔係 replay 證出嚟，所以冇 claim 亦冇 ✓。"),
+    "stream_clock": ("呢晚嘅影片冇下載到，所以時間點唔係對畫面：係用每場 replay 記低嘅完場時間，"
+                     "減直播開始嘅時間，再用每局嘅長度倒推出嚟（pipeline/video_clock.py）。"
+                     "同一個方法放喺 11-05 對畫面嗰份上面，每局相差唔夠 1 秒，"
+                     "但呢晚冇畫面核對過，所以當佢大約；冇 claim 亦冇 ✓。"),
+}
 
 CSS = """
 <style>
@@ -75,12 +86,28 @@ def check(facts, data):
         raise ValueError(f"schema is {data.get('schema')!r}, expected {SCHEMA!r}")
     if data.get("report_eligible") is not False:
         raise ValueError("report_eligible must be false: video data is not replay data")
+    if data["alignment"].get("kind", "frames") not in NOTES:
+        raise ValueError(f"alignment kind {data['alignment']['kind']!r} is not one of {sorted(NOTES)}")
+    vids = videos(data)
     vm, fm = data["matches"], facts["matches"]
     if len(vm) != len(fm):
         raise ValueError(f"{len(vm)} video matches against {len(fm)} replay matches")
     prev_end = None
+    prev_vid = 0
     match_span = {}
     for v, m in zip(vm, fm):
+        k = v.get("video", 0)
+        if not (isinstance(k, int) and 0 <= k < len(vids)):
+            raise ValueError(f"m{v['position']}: no video {k!r} (the night has {len(vids)})")
+        if k < prev_vid:
+            raise ValueError(f"m{v['position']} is in video {k}, after a match in video {prev_vid}")
+        if k != prev_vid:
+            prev_end = None     # a new video's clock starts at 0
+        prev_vid = k
+        first, last = v["rounds"][0], v["rounds"][-1]
+        if first["play_start_s"] < 0 or last["play_start_s"] + last["replay_s"] > vids[k]["duration_s"]:
+            raise ValueError(f"m{v['position']} runs outside its video (0 to "
+                             f"{vids[k]['duration_s']} s)")
         if (v["position"], v["file"]) != (m["index"], m["file"]):
             raise ValueError(f"match {v['position']} {v['file']} is not facts.json's "
                              f"{m['index']} {m['file']}")
@@ -131,32 +158,51 @@ def build(facts, report_dir):
     if data is None:
         return None
     check(facts, data)
-    video, lead = data["video"], data["alignment"]["link_lead_s"]
+    lead = data["alignment"]["link_lead_s"]
+    vids = videos(data)
     players = facts["players"]
     recovered = {r["after_position"]: r for r in data.get("recovered", [])}
     n_rec = len(recovered)
+    vid_of = {v["position"]: video_of(data, v) for v in data["matches"]}
 
+    def link(v):
+        return (f'<a href="{html.escape(v["url"])}" target="_blank" rel="noopener">錄影</a>'
+                f'（長 {_clock(v["duration_s"])}）')
+    if len(vids) == 1:
+        intro = f'成晚有{link(vids[0])}。'
+    else:
+        intro = ('成晚嘅直播分咗 ' + str(len(vids)) + ' 段：'
+                 + '、'.join(f'第 {i + 1} 段{link(v)}' for i, v in enumerate(vids)) + '。')
     out = [CSS, '<section id="video">', '  <div class="wrap">',
            '    <div class="eyebrow">影片 · VIDEO</div>',
            '    <h2 class="section-title">每一局喺影片邊度</h2>',
-           '    <p class="section-lede">成晚有<a href="'
-           f'{html.escape(video["url"])}" target="_blank" rel="noopener">錄影</a>'
-           f'（長 {_clock(video["duration_s"])}）。時間軸上每條色線係一局，顏色係嗰局邊個贏，'
+           f'    <p class="section-lede">{intro}時間軸上每條色線係一局，顏色係嗰局邊個贏，'
            f'撳落去開影片嗰局，會早 {lead} 秒開始，等你睇到倒數；'
            f'下面每場連去佢第一局。戰況嗰張逐局圖每粒點都連到影片。</p>',
-           '<style>' + report_charts.css("video") + '</style>',
-           report_charts.video_timeline(
-               facts, data, lambda t: _href(video, t, lead).replace("&amp;", "&")),
-           '    <div class="vd-list">']
+           '<style>' + report_charts.css("video") + '</style>']
+    for i, vd in enumerate(vids):
+        part = dict(data, video=vd,
+                    matches=[v for v in data["matches"] if v.get("video", 0) == i])
+        part["recovered"] = [r for r in data.get("recovered", [])
+                             if vid_of[r["after_position"]] is vd]
+        pf = dict(facts, matches=[m for v, m in zip(data["matches"], facts["matches"])
+                                  if v.get("video", 0) == i])
+        if len(vids) > 1:
+            out.append(f'    <p class="vd-note">第 {i + 1} 段</p>')
+        out.append(report_charts.video_timeline(
+            pf, part, lambda t, vd=vd: _href(vd, t, lead).replace("&amp;", "&")))
+    out.append('    <div class="vd-list">')
     for v, m in zip(data["matches"], facts["matches"]):
         winners = [r["winner"] for r in m["rounds"]]
         first = v["rounds"][0]["play_start_s"]
+        video = vid_of[v["position"]]
+        part = f'第 {v.get("video", 0) + 1} 段 ' if len(vids) > 1 else ''
         out += ['      <div class="vd-match">',
                 '        <div class="vd-head">'
                 f'<a class="vd-name" href="{_href(video, first, lead)}" target="_blank" '
                 f'rel="noopener">m{v["position"]}</a>'
                 f'<span class="vd-score">{_score(winners, players)}</span>'
-                f'<span class="vd-tag">{_clock(first)}</span></div>', '      </div>']
+                f'<span class="vd-tag">{part}{_clock(first)}</span></div>', '      </div>']
         rec = recovered.get(v["position"])
         if rec:
             ws = [r["winner"] for r in rec["rounds"]]
@@ -173,8 +219,7 @@ def build(facts, report_dir):
         out.append('    <p class="vd-note"><strong>虛線嗰場冇 replay</strong>，每局邊個贏係由 TETR.IO '
                    '局與局之間嘅比數畫面讀出嚟。<strong>呢場唔計入呢份戰報任何一個數</strong>；'
                    'm 後面個號係 replay 嘅次序，佢之後嗰幾場當晚其實遲一場打。</p>')
-    out.append('    <p class="vd-note">時間點係用 replay 每局嘅長度對返影片畫面得出嚟，每局相差唔夠 1 秒；'
-               '係影片對出嚟，唔係 replay 證出嚟，所以冇 claim 亦冇 ✓。</p>')
+    out.append(f'    <p class="vd-note">{NOTES[data["alignment"].get("kind", "frames")]}</p>')
     out += ['  </div>', '</section>']
     markup = "\n".join(out)
     bad = sorted(set(markup) & SIMPLIFIED)
@@ -215,7 +260,16 @@ def selftest(report_dir):
             "play_start_s", d["matches"][0]["rounds"][0]["play_start_s"] + 1)),
         ("swap two matches", lambda d: d["matches"].__setitem__(
             slice(0, 2), d["matches"][1::-1])),
+        ("starts before the video", lambda d: d["matches"][0]["rounds"][0].__setitem__(
+            "play_start_s", -1)),
+        ("runs past the video's end", lambda d: d["matches"][-1]["rounds"][-1].__setitem__(
+            "replay_s", 1e7)),
+        ("no such video", lambda d: d["matches"][0].__setitem__("video", 9)),
+        ("unknown alignment kind", lambda d: d["alignment"].__setitem__("kind", "guess")),
     ]
+    if data.get("more_videos"):
+        mutants.append(("back into an earlier video", lambda d: d["matches"][-1].__setitem__(
+            "video", 0)))
     if first_rec(data):
         p0 = facts["players"][0]
         mutants += [
@@ -238,7 +292,8 @@ def selftest(report_dir):
 if __name__ == "__main__":
     args = sys.argv[1:]
     if args and args[0] == "--selftest":
-        selftest(args[1] if len(args) > 1 else "sessions/2026-11-05/report")
+        for rd in args[1:] or ["sessions/2026-11-05/report", "sessions/2026-09-18/report"]:
+            selftest(rd)
     else:
         rd = Path(args[0])
         print(build(json.loads((rd / "facts.json").read_text()), rd) or "(no video.json)")
