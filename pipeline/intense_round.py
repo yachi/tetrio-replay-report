@@ -399,6 +399,35 @@ def _vs_split(claim):
             "id": claim["id"], "verified": claim["verified"]}
 
 
+# 食 is left out of the bars: more of it is worse, so a longer bar would read as a lead.
+_BAR_SKIP = {"garbagereceived"}
+
+
+def _bars(players, cols, edges, win, rates):
+    """The table above drawn as paired bars (`report_charts.intense_bars`), with every value
+    and printed string taken from the same proved claims the table reads. 每粒棋攻擊 is added
+    from the pinned rate when the session carries it."""
+    from pipeline import report_charts
+    by = {c["player"]: c["fields"] for c in cols}
+    rows = []
+    for f, label, how in FIELDS:
+        if f in _BAR_SKIP or any(by[p].get(f) is None for p in by):
+            continue
+        rows.append((label, {p: by[p][f] for p in by}, {p: _fmt(by[p][f], how) for p in by},
+                     f in edges["behind"]))
+        r = rates.get("garbage_attack") if f == "garbage_attack" else None
+        if r and all(p in r["values"] for p in by):
+            rows.append(("每粒攻擊", dict(r["values"]),
+                         {p: _r3(r["values"][p]) for p in by},
+                         r["values"][win] < max(r["values"].values())))
+    if len(by) != 2 or not rows:
+        return []
+    return ['<style>' + report_charts.css("intense-round") + '</style>',
+            report_charts.intense_bars(players, rows, win),
+            '    <p class="rc-note">粗字嗰幾行係贏嗰個輸蝕嘅；每行實色嗰邊係數大啲嗰個。'
+            '「食」唔畫，因為食得多係壞事，條長啲會睇錯做領先。</p>']
+
+
 def collect(report_dir):
     """Everything the section prints, read out of the proved claims."""
     claims = claim_cards.load(report_dir)
@@ -467,6 +496,7 @@ def build(facts, report_dir):
            f'兩個控制實驗喺最尾嗰段。'
            f'表入面每個數都係由 claim 本身證嗰條式度攞返嚟，'
            f'唔係喺呢度重新計一次。</p>',
+           *_bars(facts["players"], cols, edges, win, rates),
            '    <div class="ir-scroll">',
            '      <table class="ir-table">',
            '        <thead><tr><th>數據</th>'

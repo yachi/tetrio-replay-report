@@ -49,7 +49,8 @@ def match_copy_section(ctx):
 
 def matches_section(ctx):
     return matches.section(ctx["facts"],
-                           matches.load_prose(ctx["report_dir"], ctx["facts"]))
+                           matches.load_prose(ctx["report_dir"], ctx["facts"]),
+                           ctx["report_dir"])
 
 
 def stats_sec(ctx):

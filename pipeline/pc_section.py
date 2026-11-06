@@ -193,6 +193,12 @@ def build(facts, report_dir):
             '          </tr>',
         ]
     out += ['        </tbody>', '      </table>', '    </div>']
+    solo_rows = [(r["player"], r["solo"], r["lost"]) for r in rows
+                 if r["solo"] is not None and r["lost"] is not None and r["solo"]]
+    if solo_rows:
+        from pipeline import report_charts
+        out += ['<style>' + report_charts.css("perfect-clear") + '</style>',
+                report_charts.pc_squares(facts["players"], solo_rows)]
 
     # The finding, stated as the count it is. Deliberately not a percentage: the
     # denominator is 3-12 rounds per player and a rate over that reads far more

@@ -25,6 +25,7 @@ import json
 import sys
 from pathlib import Path
 
+from pipeline import report_charts
 from pipeline.claims.build_claims import SIMPLIFIED
 
 SCHEMA = "session-video/1"
@@ -42,15 +43,7 @@ CSS = """
 #video .vd-score { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 #video .vd-tag { font-family: var(--font-mono); font-size: .62rem; letter-spacing: .06em;
   color: var(--muted); }
-#video .vd-rounds { display: flex; flex-wrap: wrap; gap: .35rem; margin: .55rem 0 0; }
-#video .vd-r { display: inline-flex; align-items: center; gap: .3rem; padding: .2rem .5rem;
-  border: 1px solid var(--border); border-radius: 999px; font-size: .78rem;
-  font-variant-numeric: tabular-nums; text-decoration: none; color: inherit; }
-#video .vd-r:hover { border-color: var(--muted); }
-#video .vd-dot { width: .45rem; height: .45rem; border-radius: 50%; flex: none; }
-/* Positional class, legacy token (the --yachi/--pinglamb aliases every report's :root defines). */
-#video .vd-dot.is-p1 { background: var(--yachi); }
-#video .vd-dot.is-p2 { background: var(--pinglamb); }
+#video .vd-list { grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); }
 #video .vd-note { margin: .9rem 0 0; font-size: .8rem; line-height: 1.8; color: var(--muted); }
 </style>
 """
@@ -140,22 +133,20 @@ def build(facts, report_dir):
     check(facts, data)
     video, lead = data["video"], data["alignment"]["link_lead_s"]
     players = facts["players"]
-    dot = {players[0]: "is-p1", players[1]: "is-p2"}
     recovered = {r["after_position"]: r for r in data.get("recovered", [])}
     n_rec = len(recovered)
-
-    def chip(t, n, winner):
-        return (f'<a class="vd-r" href="{_href(video, t, lead)}" target="_blank" rel="noopener">'
-                f'<span class="vd-dot {dot[winner]}"></span>{n} · {_clock(t)}</a>')
 
     out = [CSS, '<section id="video">', '  <div class="wrap">',
            '    <div class="eyebrow">影片 · VIDEO</div>',
            '    <h2 class="section-title">每一局喺影片邊度</h2>',
            '    <p class="section-lede">成晚有<a href="'
            f'{html.escape(video["url"])}" target="_blank" rel="noopener">錄影</a>'
-           f'（長 {_clock(video["duration_s"])}）。下面每一場、每一局都連去影片嗰一刻，'
-           f'會早 {lead} 秒開始，等你睇到倒數。圓點係嗰局邊個贏，'
-           f'左邊係 {html.escape(players[0])}，右邊係 {html.escape(players[1])}。</p>',
+           f'（長 {_clock(video["duration_s"])}）。時間軸上每條色線係一局，顏色係嗰局邊個贏，'
+           f'撳落去開影片嗰局，會早 {lead} 秒開始，等你睇到倒數；'
+           f'下面每場連去佢第一局。戰況嗰張逐局圖每粒點都連到影片。</p>',
+           '<style>' + report_charts.css("video") + '</style>',
+           report_charts.video_timeline(
+               facts, data, lambda t: _href(video, t, lead).replace("&amp;", "&")),
            '    <div class="vd-list">']
     for v, m in zip(data["matches"], facts["matches"]):
         winners = [r["winner"] for r in m["rounds"]]
@@ -165,10 +156,7 @@ def build(facts, report_dir):
                 f'<a class="vd-name" href="{_href(video, first, lead)}" target="_blank" '
                 f'rel="noopener">m{v["position"]}</a>'
                 f'<span class="vd-score">{_score(winners, players)}</span>'
-                f'<span class="vd-tag">{_clock(first)}</span></div>',
-                '        <div class="vd-rounds">'
-                + "".join(chip(r["play_start_s"], r["round"], w) for r, w in zip(v["rounds"], winners))
-                + '</div>', '      </div>']
+                f'<span class="vd-tag">{_clock(first)}</span></div>', '      </div>']
         rec = recovered.get(v["position"])
         if rec:
             ws = [r["winner"] for r in rec["rounds"]]
@@ -179,9 +167,7 @@ def build(facts, report_dir):
                     'rel="noopener">冇 replay 嗰場</a>'
                     f'<span class="vd-score">{_score(ws, players)}</span>'
                     f'<span class="vd-tag">{_clock(t0)} · 由影片讀返</span></div>',
-                    '        <div class="vd-rounds">'
-                    + "".join(chip(r["play_start_s"], r["round"], r["winner"]) for r in rec["rounds"])
-                    + '</div>', '      </div>']
+                    '      </div>']
     out.append('    </div>')
     if n_rec:
         out.append('    <p class="vd-note"><strong>虛線嗰場冇 replay</strong>，影片有、'

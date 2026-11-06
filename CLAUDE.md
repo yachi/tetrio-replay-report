@@ -5983,7 +5983,7 @@ report 重 render 全部照綠,因為佢出嘅嘢一個 byte 都冇變。`foreca
 被記錄、唔可以被 enforce:一條規則住喺六個地方就有六個 site,而佢哋一致與否冇嘢守住。全部
 consolidate 之後七份 artefact、七份 report 同 ledger **全部 byte-identical**,呢個就係 control。
 
-一次 sweep 行晒全部 session,行到 **<!--round:figures-->71458<!--/round:figures--> 個
+一次 sweep 行晒全部 session,行到 **<!--round:figures-->71634<!--/round:figures--> 個
 quantized figure、<!--round:sites-->94<!--/round:sites--> 對 (site, helper)**:
 <!--round:enforced-->70<!--/round:enforced--> 個有 corpus 撐住,
 <!--round:ontrust-->24<!--/round:ontrust--> 個至少有一對規則分唔開。四個 `_pct` 兩個方向都靠信,
