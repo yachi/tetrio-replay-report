@@ -4237,10 +4237,8 @@
      ]
     }
    ],
-   "reasons": [
-    "fragment"
-   ],
-   "verdict": "rejected"
+   "reasons": [],
+   "verdict": "qualifies"
   },
   {
    "board": "L342.67",
@@ -4342,10 +4340,8 @@
      ]
     }
    ],
-   "reasons": [
-    "fragment"
-   ],
-   "verdict": "rejected"
+   "reasons": [],
+   "verdict": "qualifies"
   },
   {
    "board": "L676.17",
@@ -4507,10 +4503,8 @@
      0
     ]
    ],
-   "reasons": [
-    "kaidan_window"
-   ],
-   "verdict": "rejected"
+   "reasons": [],
+   "verdict": "qualifies"
   },
   {
    "board": "L850.47",
@@ -4689,10 +4683,8 @@
      ]
     }
    ],
-   "reasons": [
-    "fragment"
-   ],
-   "verdict": "rejected"
+   "reasons": [],
+   "verdict": "qualifies"
   },
   {
    "board": "L942.03",
@@ -5170,7 +5162,6 @@
     }
    ],
    "reasons": [
-    "fragment",
     "l_not_one_piece"
    ],
    "verdict": "rejected"
@@ -6015,10 +6006,8 @@
      3
     ]
    ],
-   "reasons": [
-    "kaidan_window"
-   ],
-   "verdict": "rejected"
+   "reasons": [],
+   "verdict": "qualifies"
   },
   {
    "board": "Y745.27",
@@ -6180,10 +6169,8 @@
      8
     ]
    ],
-   "reasons": [
-    "fragment"
-   ],
-   "verdict": "rejected"
+   "reasons": [],
+   "verdict": "qualifies"
   },
   {
    "board": "M44.8",
@@ -6225,11 +6212,8 @@
      4
     ]
    ],
-   "reasons": [
-    "fragment",
-    "kaidan_window"
-   ],
-   "verdict": "rejected"
+   "reasons": [],
+   "verdict": "qualifies"
   },
   {
    "board": "M44.8",
@@ -6287,7 +6271,6 @@
     }
    ],
    "reasons": [
-    "fragment",
     "z_not_one_piece"
    ],
    "verdict": "rejected"
@@ -6332,11 +6315,8 @@
      6
     ]
    ],
-   "reasons": [
-    "fragment",
-    "kaidan_window"
-   ],
-   "verdict": "rejected"
+   "reasons": [],
+   "verdict": "qualifies"
   },
   {
    "board": "M227.43",
@@ -6394,7 +6374,6 @@
     }
    ],
    "reasons": [
-    "fragment",
     "z_not_one_piece"
    ],
    "verdict": "rejected"

@@ -5929,7 +5929,11 @@ agreement set** — nobody in the corpus played these games, and the section say
 most boards of a tutorial and is not filed here (its video boards are its own `cross_source`).
 
 What the video cannot give is piece ownership, so 「built」 is an APPROXIMATION and the section says that too: a key
-cell whose same-colour connected region is not a multiple of four is a fragment, and a PC within 7 s either side
+cell is whole only if disjoint placements of its own letter's tetromino inside its same-colour region cover
+the key cells (since 2026-11-07; the multiple-of-four test before it failed whole pieces touching a remnant —
+yachi on the めぞん 社畜 boards, an independent Fable reading agreeing), a 社畜トレイン is read as a 階段 only
+when the 階段 window fires AND its stood Z is one whole piece there (the 階段 readings of those boards stay
+rejected: their 「Z」 cells are a hook and a flat piece), and a PC within 7 s either side
 stands for 14 locks. `pipeline/openers/check_video_examples.py` re-derives every verdict and DPC field with each `?`
 read empty AND filled (an example is filed only when both agree), and `--selftest` plants its mutants;
 `video-examples.test.ts` ties each `whole_board` to `technique-wholeshape.ts` and each `key_cells` to the page's own
