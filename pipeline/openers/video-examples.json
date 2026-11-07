@@ -114,6 +114,28 @@
    "reading": "every frame at 30 fps, the board palette-sampled at each cell's centre (cells 24.4 px square; x0 493 and y0 278 before 52.5 s, x0 524 and y0 272 from 53 to 69.5 s, x0 601 and y0 274.5 from 71 s, each measured off the board's white border); the ghost piece, a dark outline, reads empty. This game shows no flash: a line clear holds its full rows for a few frames and then drops them, so each board is the last frame with the full rows standing, and the T is the purple piece that appeared just before it; `?` is a cell matching no colour. The reader is a scratch script and is NOT committed: nothing re-reads these boards.",
    "terms": "nothing of the video is committed or published: no frame, no clip; every example links the video at its time",
    "requested": "yachi, 2026-11-07: 「加埋 https://youtu.be/Xr66MSi_PJQ」"
+  },
+  {
+   "key": "elepo-dt-cannon",
+   "kind": "youtube",
+   "video": "CzW5f4q1fVQ",
+   "url": "https://www.youtube.com/watch?v=CzW5f4q1fVQ",
+   "title": "【テトリス講座】DT砲を使ったTスピンの組み合わせ方～積載DT編～【ゆっくり解説】",
+   "duration_s": 488,
+   "players": {
+    "D": "elepo"
+   },
+   "player_names_note": "a tutorial by one player (channel elepo) on building DT Cannons mid-game; the side key D is ours",
+   "pieces": "one board at a time; the clips alternate between ぷよぷよテトリス2 games and a training tool whose preset terrain is drawn grey, beside chalkboard diagrams that are not read",
+   "fetched": "2026-11-07, 1080p MP4 (itag 137) with yt-dlp through a Tailscale exit node",
+   "file": {
+    "format": "MP4, 1920x1080",
+    "sha256": "55634ed8b27d64ce17be700eca9bfeb4b183bce3704368cc9a7727c34271886f",
+    "bytes": 65765838
+   },
+   "reading": "every frame at 30 fps, the board palette-sampled at each cell's centre at one of two fixed geometries, each checked with a grid overlay: the game clips at cells 40 px square from x0 309, y0 158, and the training tool at cells 42.5 px square from x0 293.5, y0 147; a frame is read as the training tool when a patch beside the board is flat grey. In the game clips each board is the last frame before the line-clear flash; the training tool shows no flash, so each board is the last frame with the full rows standing. The T is the purple piece that appeared just before it; `?` is a cell matching no colour. The training tool's preset terrain is grey and is read as garbage (G), so an example whose key cells sit in it is rejected as garbage in the shape. A clip shown twice is filed once, at its first showing. The reader is a scratch script and is NOT committed: nothing re-reads these boards.",
+   "terms": "nothing of the video is committed or published: no frame, no clip; every example links the video at its time",
+   "requested": "yachi, 2026-11-07: 「https://youtu.be/CzW5f4q1fVQ 加中盤」"
   }
  ],
  "pc_times": {
@@ -146,7 +168,8 @@
   "M": [],
   "K": [],
   "H": [],
-  "E": []
+  "E": [],
+  "D": []
  },
  "pc_times_note": "every Perfect Clear by each player, read off the PERFECT CLEAR banner and checked by eye for an empty board; two banner reads at 605.1 and 1052.6 (right) left pieces on the board and are not Perfect Clears; the tutorial (Y) and the three compilations (M, K, H, E) show no Perfect Clear: every empty board in them is a cut between clips",
  "pc_window_s": 7,
@@ -4118,6 +4141,807 @@
     "IIZZJJSSL.",
     "IIJZZSSSL."
    ]
+  },
+  {
+   "id": "D39.37",
+   "side": "D",
+   "t": 39.37,
+   "lines": 2,
+   "cleared": [
+    13,
+    14
+   ],
+   "t_cells": [
+    [
+     13,
+     6
+    ],
+    [
+     13,
+     7
+    ],
+    [
+     13,
+     8
+    ],
+    [
+     14,
+     7
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    ".......ZZ.",
+    ".......SZZ",
+    ".......SSJ",
+    "I..S....SJ",
+    "IOOSSJJ.JJ",
+    "IOOSSJ..LL",
+    "IZZSSJTTTL",
+    "OOZZSOOTSL",
+    "OOLZZOO.SS",
+    "OOITZJ.JJL",
+    "OOIZZJ.JSL",
+    "JZZOOL.LSS",
+    "LOOZSS.LLI"
+   ]
+  },
+  {
+   "id": "D47.83",
+   "side": "D",
+   "t": 47.83,
+   "lines": 2,
+   "cleared": [
+    12,
+    13
+   ],
+   "t_cells": [
+    [
+     12,
+     2
+    ],
+    [
+     12,
+     3
+    ],
+    [
+     12,
+     4
+    ],
+    [
+     13,
+     3
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..GG..GGGG",
+    "GGG...GGGG",
+    "GGG.GGGGGG",
+    "GGG..GGGGG",
+    "GGTTTGGGGG",
+    "GGGTGGGGGG",
+    "GGG.GGGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG"
+   ]
+  },
+  {
+   "id": "D72.37",
+   "side": "D",
+   "t": 72.37,
+   "lines": 2,
+   "cleared": [
+    12,
+    13
+   ],
+   "t_cells": [
+    [
+     12,
+     6
+    ],
+    [
+     12,
+     7
+    ],
+    [
+     12,
+     8
+    ],
+    [
+     13,
+     7
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "......JJ..",
+    ".....ZJ...",
+    "....ZZJ.LL",
+    "....ZSS..L",
+    "IIIISSTTTL",
+    "GGGGGGGTOO",
+    "GGGGGGG.OO",
+    "GGGGGGGG.G",
+    "GGGGGGGG.G",
+    "GGGGGGGG.G",
+    "GGGGGGGG.G",
+    "GGGGGGGG.G"
+   ]
+  },
+  {
+   "id": "D110.07",
+   "side": "D",
+   "t": 110.07,
+   "lines": 2,
+   "cleared": [
+    11,
+    12
+   ],
+   "t_cells": [
+    [
+     11,
+     2
+    ],
+    [
+     11,
+     3
+    ],
+    [
+     11,
+     4
+    ],
+    [
+     12,
+     3
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "...L......",
+    "JLLL......",
+    "JJJ.......",
+    "LLL.ZZIIII",
+    "LSS..ZZJJJ",
+    "SSTTTZOOSJ",
+    "JJZTZZOOSS",
+    "JZZ.ZIIIIS",
+    "OOOO.ZZZSS",
+    "LLLS.ZJIOO",
+    "SSSI.JJZZL",
+    "SSJI.JTZOO",
+    "ISJI.JTTOO",
+    "JJSS.LJZZI"
+   ]
+  },
+  {
+   "id": "D136.23",
+   "side": "D",
+   "t": 136.23,
+   "lines": 2,
+   "cleared": [
+    12,
+    13
+   ],
+   "t_cells": [
+    [
+     12,
+     3
+    ],
+    [
+     12,
+     4
+    ],
+    [
+     12,
+     5
+    ],
+    [
+     13,
+     4
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    ".........I",
+    ".........I",
+    "L........I",
+    "L..SS....I",
+    "LLSS.....J",
+    "OOOO.ZZ..J",
+    "OOOO..ZZJJ",
+    "GGGTTTZGGG",
+    "GGGGTZZGGG",
+    "GGGG.ZGGGG",
+    "GGGGG.GGGG",
+    "GGGGG.GGGG",
+    "GGGGG.GGGG",
+    "GGGGG.GGGG",
+    "GGGGG.GGGG"
+   ]
+  },
+  {
+   "id": "D176.3",
+   "side": "D",
+   "t": 176.3,
+   "lines": 2,
+   "cleared": [
+    12,
+    13
+   ],
+   "t_cells": [
+    [
+     12,
+     2
+    ],
+    [
+     12,
+     3
+    ],
+    [
+     12,
+     4
+    ],
+    [
+     13,
+     3
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "I.........",
+    "I..ZZ...OO",
+    "I...ZZ..OO",
+    "ISS.LLLLLL",
+    "SS..LOOLZJ",
+    "ISTTTOOZZJ",
+    "ISSTJZZZJJ",
+    "ILS.JSZZOO",
+    "IL.JJSSJOO",
+    "OO.LJTTTZI",
+    "LS.JJJLLLJ",
+    "II.ZSSZZOO",
+    "II.SSTZLOO"
+   ]
+  },
+  {
+   "id": "D188.13",
+   "side": "D",
+   "t": 188.13,
+   "lines": 2,
+   "cleared": [
+    12,
+    13
+   ],
+   "t_cells": [
+    [
+     12,
+     3
+    ],
+    [
+     12,
+     4
+    ],
+    [
+     12,
+     5
+    ],
+    [
+     13,
+     4
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "...JJ.....",
+    "I..J......",
+    "I..J.LLGGG",
+    "I.SS..LGGG",
+    "ISSTTTLGGG",
+    "GGGLTGGGGG",
+    "GGGL.GGGGG",
+    "GGGLL.GGGG",
+    "GGGGG.GGGG",
+    "GGGGG.GGGG",
+    "GGGGG.GGGG",
+    "GGGGG.GGGG"
+   ]
+  },
+  {
+   "id": "D226.8",
+   "side": "D",
+   "t": 226.8,
+   "lines": 2,
+   "cleared": [
+    14,
+    15
+   ],
+   "t_cells": [
+    [
+     14,
+     6
+    ],
+    [
+     14,
+     7
+    ],
+    [
+     14,
+     8
+    ],
+    [
+     15,
+     7
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    ".......S..",
+    ".......SS.",
+    "........SZ",
+    "JJJS.JJ.ZZ",
+    "OOJSSJ..ZJ",
+    "OOZZSJTTTJ",
+    "OOSZZLLTJJ",
+    "OOSSJJL.OO",
+    "IOOSJLL.OO",
+    "IJJJIS..ZZ",
+    "LLLJISS.ZZ"
+   ]
+  },
+  {
+   "id": "D233.17",
+   "side": "D",
+   "t": 233.17,
+   "lines": 2,
+   "cleared": [
+    14,
+    15
+   ],
+   "t_cells": [
+    [
+     14,
+     3
+    ],
+    [
+     14,
+     4
+    ],
+    [
+     14,
+     5
+    ],
+    [
+     15,
+     4
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "....GG....",
+    ".....G....",
+    "GGGG.GGGGG",
+    "GGG..GGGGG",
+    "GGGTTTGGGG",
+    "GGGGTGGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGG..GGGGG",
+    "GGGG.GGGGG"
+   ]
+  },
+  {
+   "id": "D251.83",
+   "side": "D",
+   "t": 251.83,
+   "lines": 2,
+   "cleared": [
+    14,
+    15
+   ],
+   "t_cells": [
+    [
+     14,
+     3
+    ],
+    [
+     14,
+     4
+    ],
+    [
+     14,
+     5
+    ],
+    [
+     15,
+     4
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "....LL....",
+    ".....L....",
+    "GGJJ.L.SLL",
+    "GGJ..ZZSSL",
+    "GGJTTTZZSL",
+    "GGOOTGGGGG",
+    "GGOO.GGGGG",
+    "GGGG.GGGGG",
+    "GGG..GGGGG",
+    "GGGG.GGGGG"
+   ]
+  },
+  {
+   "id": "D300.93",
+   "side": "D",
+   "t": 300.93,
+   "lines": 2,
+   "cleared": [
+    10,
+    11
+   ],
+   "t_cells": [
+    [
+     10,
+     5
+    ],
+    [
+     10,
+     6
+    ],
+    [
+     10,
+     7
+    ],
+    [
+     11,
+     6
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    ".........I",
+    ".....S...I",
+    "....SSS..I",
+    ".OO.SSS..I",
+    "JOOOOS...I",
+    "JJJOOZ.LLI",
+    "SLLIZZ..LI",
+    "SSLIZTTTLI",
+    "SSLIOOTJJZ",
+    "SSJIOO.JZZ",
+    "JSJJJL.JZZ",
+    "JJJLLL..ZZ",
+    "LLLISS.ZZJ",
+    "IOOLJS.ITZ",
+    "IOOLJJ.IZZ",
+    "GGGGG.GGGG",
+    "GGGGG.GGGG"
+   ]
+  },
+  {
+   "id": "D325.7",
+   "side": "D",
+   "t": 325.7,
+   "lines": 2,
+   "cleared": [
+    12,
+    13
+   ],
+   "t_cells": [
+    [
+     12,
+     3
+    ],
+    [
+     12,
+     4
+    ],
+    [
+     12,
+     5
+    ],
+    [
+     13,
+     4
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "....S....I",
+    "....SS...I",
+    ".....SZOOI",
+    "GGJJ.ZZOOI",
+    "GGJ..ZGGGG",
+    "GGJTTTGGGG",
+    "GGLLTGGGGG",
+    "GGGL.GGGGG",
+    "GGGL.GGGGG",
+    "GGG..GGGGG",
+    "GGG...GGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG"
+   ]
+  },
+  {
+   "id": "D327.63",
+   "side": "D",
+   "t": 327.63,
+   "lines": 2,
+   "cleared": [
+    17,
+    18
+   ],
+   "t_cells": [
+    [
+     17,
+     3
+    ],
+    [
+     17,
+     4
+    ],
+    [
+     17,
+     5
+    ],
+    [
+     18,
+     4
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "....S....I",
+    "....SS...I",
+    ".....SZOOI",
+    "GGGL.GGGGG",
+    "GGG..GGGGG",
+    "GGGTTTGGGG",
+    "GGGGTGGGGG",
+    "GGGG.GGGGG"
+   ]
+  },
+  {
+   "id": "D347.9",
+   "side": "D",
+   "t": 347.9,
+   "lines": 2,
+   "cleared": [
+    8,
+    9
+   ],
+   "t_cells": [
+    [
+     8,
+     6
+    ],
+    [
+     8,
+     7
+    ],
+    [
+     8,
+     8
+    ],
+    [
+     9,
+     7
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    ".......JJ.",
+    "I..LL..JS.",
+    "IS.LL..JSS",
+    "ISSLL...TS",
+    "IZSLLJJ.TT",
+    "ZZIOOJ..TJ",
+    "ZZIOOJTTTJ",
+    "ZZIOOLLTJJ",
+    "ZSIOOZL.OO",
+    "ISSIZZL.OO",
+    "ISSIZZ..LL",
+    "ISSIZZ..JL",
+    "ILLLZS.LJI",
+    "SJSSOO.ZZI",
+    "LJJZTI.LOO",
+    "IOOTTI.SJI",
+    "ITTTLL.TTJ",
+    "ILJJJT.ZZT"
+   ]
+  },
+  {
+   "id": "D351.67",
+   "side": "D",
+   "t": 351.67,
+   "lines": 3,
+   "cleared": [
+    8,
+    9,
+    10
+   ],
+   "t_cells": [
+    [
+     8,
+     7
+    ],
+    [
+     9,
+     6
+    ],
+    [
+     9,
+     7
+    ],
+    [
+     10,
+     7
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    ".Z.......I",
+    "ZZOO.....I",
+    "ZSOO...JJI",
+    "ISSLL..JSI",
+    "ISSLL..JSS",
+    "ISSLL...TS",
+    "IZSLLJJTTT",
+    "ZZIOOJTTTJ",
+    "ZSIOOZLTOO",
+    "ISSIZZL.OO",
+    "ISSIZZ..LL",
+    "ISSIZZ..JL",
+    "ILLLZS.LJI",
+    "SJSSOO.ZZI",
+    "LJJZTI.LOO",
+    "IOOTTI.SJI",
+    "ITTTLL.TTJ",
+    "ILJJJT.ZZT"
+   ]
+  },
+  {
+   "id": "D431.4",
+   "side": "D",
+   "t": 431.4,
+   "lines": 2,
+   "cleared": [
+    16,
+    17
+   ],
+   "t_cells": [
+    [
+     16,
+     3
+    ],
+    [
+     16,
+     4
+    ],
+    [
+     16,
+     5
+    ],
+    [
+     17,
+     4
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "S.........",
+    "SS........",
+    "IS........",
+    "I......LLL",
+    "I......LLL",
+    "IZ..ZZ.OOL",
+    "ZZ...ZZOOL",
+    "ZZJJ.OOSLL",
+    "ZZJ..OOSSL",
+    "ZTJTTTIJSL",
+    "LTTZTJIJJJ",
+    "LTZZ.JIOOI",
+    "LLZ.JJIOOI"
+   ]
   }
  ],
  "technique_examples": [
@@ -6629,6 +7453,254 @@
     [
      6,
      7
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "D39.37",
+   "page": "dtcannon",
+   "variant": "dtcannon",
+   "mirrored": false,
+   "whole_board": "jhook.build",
+   "key_cells": [
+    [
+     9,
+     7
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "D47.83",
+   "page": "dtcannon",
+   "variant": "dtcannon",
+   "mirrored": true,
+   "whole_board": "done.build",
+   "key_cells": [
+    [
+     8,
+     3
+    ]
+   ],
+   "reasons": [
+    "garbage_in_shape"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "D72.37",
+   "page": "dtcannon",
+   "variant": "dtcannon",
+   "mirrored": true,
+   "whole_board": "done.build",
+   "key_cells": [
+    [
+     8,
+     7
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "D110.07",
+   "page": "dtcannon",
+   "variant": "dtcannon",
+   "mirrored": true,
+   "whole_board": "jhook.build",
+   "key_cells": [
+    [
+     7,
+     3
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "D136.23",
+   "page": "dtcannon",
+   "variant": "dtcannon",
+   "mirrored": true,
+   "whole_board": "done.build",
+   "key_cells": [
+    [
+     8,
+     4
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "D176.3",
+   "page": "dtcannon",
+   "variant": "dtcannon",
+   "mirrored": false,
+   "whole_board": "done.build",
+   "key_cells": [
+    [
+     8,
+     3
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "D188.13",
+   "page": "dtcannon",
+   "variant": "dtcannon",
+   "mirrored": true,
+   "whole_board": "roof.build",
+   "key_cells": [
+    [
+     8,
+     4
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "D226.8",
+   "page": "dtcannon",
+   "variant": "dtcannon",
+   "mirrored": false,
+   "whole_board": "done.build",
+   "key_cells": [
+    [
+     10,
+     7
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "D233.17",
+   "page": "dtcannon",
+   "variant": "dtcannon",
+   "mirrored": false,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     10,
+     4
+    ]
+   ],
+   "reasons": [
+    "garbage_in_shape"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "D251.83",
+   "page": "dtcannon",
+   "variant": "dtcannon",
+   "mirrored": false,
+   "whole_board": "roof.build",
+   "key_cells": [
+    [
+     10,
+     4
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "D300.93",
+   "page": "dtcannon",
+   "variant": "dtcannon",
+   "mirrored": true,
+   "whole_board": "jhook.build",
+   "key_cells": [
+    [
+     6,
+     6
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "D325.7",
+   "page": "dtcannon",
+   "variant": "dtcannon",
+   "mirrored": false,
+   "whole_board": "done.build",
+   "key_cells": [
+    [
+     8,
+     4
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "D327.63",
+   "page": "dtcannon",
+   "variant": "dtcannon",
+   "mirrored": false,
+   "whole_board": "done.build",
+   "key_cells": [
+    [
+     13,
+     4
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "D347.9",
+   "page": "dtcannon",
+   "variant": "dtcannon",
+   "mirrored": false,
+   "whole_board": "jhook.build",
+   "key_cells": [
+    [
+     4,
+     7
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "D351.67",
+   "page": "kingcrimson",
+   "variant": "kingcrimson",
+   "mirrored": true,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     6,
+     8
+    ],
+    [
+     6,
+     7
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "D431.4",
+   "page": "dtcannon",
+   "variant": "dtcannon",
+   "mirrored": false,
+   "whole_board": "done.build",
+   "key_cells": [
+    [
+     12,
+     4
     ]
    ],
    "reasons": [],
