@@ -5906,15 +5906,22 @@ Run Dafny and Lean one at a time: the Dafny mutants' limits are wall-clock.
 
 ## 影片實戰例子 — boards read off one match video, drawn beside the source drawings
 
-`pipeline/openers/video-examples.json` holds 49 boards read off kazu's PPT2 video `Pjn05duM_gQ` (720p via snapyt,
-sha256 in `source`; palette sampling, the last frame before each line-clear flash, an unmatched cell read `?`), the
-Perfect Clear times, and the examples filed per page: every T-spin whose board a technique page's whole drawn shape
-stands on (`technique_examples`, with the page's own key cells and a verdict) and the first T-spin after each PC
-(`dpc_examples`, compared with とんぼ's catalogue the way `dpc-facts.ts` compares). yachi asked for them all
-(2026-11-05). `pipeline/video_examples.py` draws them as a 「影片實戰例子」 section on `docs/dpc.html` and on each
-technique page that has one, every card linked to the video three seconds early; the page audits require the
-section's sentences and each example exactly once. **They are not corpus data and are in no count, window or
-agreement set** — nobody in the corpus played these games, and the section says so.
+`pipeline/openers/video-examples.json` (schema `video-examples/2`) holds boards read off YouTube videos, listed in
+`sources`; each source owns the board sides it shows (`players`), so a board's `side` names its video. Two so far:
+kazu's PPT2 match `Pjn05duM_gQ` (sides L and R; 720p via snapyt, one fixed geometry, yachi 2026-11-05) and the
+T-spin tutorial `cFcBAIvuQjU` 「空中で組めるTスピンテンプレ＆組み方紹介」 (side Y; 1080p via snapyt, yachi 2026-11-06:
+「Add more 中盤 from …」). The tutorial cuts clips together at different board sizes, so its reader fitted the cell
+pitch and origin per clip (the grid lines' period and the cyan border), and a clip shown twice is filed once. Both
+reads: palette sampling, the last frame before each line-clear flash, an unmatched cell read `?`; sha256s in
+`sources`. The file holds the Perfect Clear times per side and the examples filed per page: every T-spin whose board
+a technique page's whole drawn shape stands on (`technique_examples`, with the page's own key cells and a verdict)
+and the first T-spin after each PC (`dpc_examples`, compared with とんぼ's catalogue the way `dpc-facts.ts`
+compares). `pipeline/video_examples.py` draws them as a 「影片實戰例子」 section on `docs/dpc.html` and on each
+technique page that has one, naming each video that has an example there (`video_examples_prose.json` `sources`),
+every card linked to its own video three seconds early; the page audits require the section's sentences, each
+named video's sentence and each example exactly once. **They are not corpus data and are in no count, window or
+agreement set** — nobody in the corpus played these games, and the section says so. 基本的なドネイト's rule fires on
+most boards of a tutorial and is not filed here (its video boards are its own `cross_source`).
 
 What the video cannot give is piece ownership, so 「built」 is an APPROXIMATION and the section says that too: a key
 cell whose same-colour connected region is not a multiple of four is a fragment, and a PC within 7 s either side
