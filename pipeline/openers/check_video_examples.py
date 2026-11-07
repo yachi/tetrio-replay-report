@@ -37,7 +37,9 @@ corpus `qualify` rules, said so on every page:
     whole piece touching a one- or two-cell remnant of its own colour and passed four cells no piece of
     that letter fits (yachi on the めぞん boards, checked by an independent reading);
   * `garbage_in_shape`: a key cell is garbage;
-  * `z_not_one_piece` (階段のドネイト): the stood Z's four cells are not one same-colour region;
+  * `z_not_one_piece` (階段のドネイト) is NOT applied since 2026-11-07: yachi on M227.43, whose 「Z」 cells
+    are an S and an L, 「SSL are all full pieces, should be counted」. The cells only need whole pieces of
+    any letter, which `fragment` already checks; the corpus rule (technique-qualify.ts) is unchanged;
   * `dpc`: a Perfect Clear by the same player within `pc_window_s` seconds either side of the T (the
     corpus rule is 14 locks; a time is all a video gives);
   * `kaidan_window` (社畜トレイン): the 階段のドネイト window fires at the same T, in either hand, AND its stood
@@ -268,6 +270,8 @@ def technique_reasons(doc, ex, b, unread):
     if any(not whole_cover(rows, frozenset(g) - lock, k) for g, k in keys.values()):
         out.append("fragment")
     for g in ex.get("one_piece", []):
+        if ex["page"] == "kaidan" and g["name"] == "z":
+            continue  # see the docstring: whole pieces of any letter count
         if len({id(reg.get(tuple(x))) for x in g["cells"]}) != 1 or any(tuple(x) not in reg for x in g["cells"]):
             out.append(f"{g['name']}_not_one_piece")
     if near_pc(doc, b["side"], b["t"]):
@@ -437,6 +441,9 @@ def selftest():
     kd = next(e for e in doc["technique_examples"] if e["page"] == "shachikutrain" and "kaidan_window" in e["reasons"])
     rule("a 社畜 whose 階段 Z IS one piece let through",
          "kaidan_window" in technique_reasons(doc, kd, board_of(doc, kd["board"]), False))
+    m = next(e for e in doc["technique_examples"] if e["board"] == "M227.43" and e["page"] == "kaidan")
+    rule("a 階段 whose stood-Z cells are an S and an L (whole pieces) rejected",
+         technique_reasons(doc, m, board_of(doc, m["board"]), False) == [])
     q = next(e for e in doc["technique_examples"] if e["verdict"] == "qualifies")
     r = next(e for e in doc["technique_examples"] if "fragment" in e["reasons"])
     dm = next(e for e in doc["dpc_examples"] if e["kind"] == "matched")
