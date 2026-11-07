@@ -1,10 +1,12 @@
-"""The 「影片實戰例子」 section: the boards read off one match video (`pipeline/openers/video-examples.json`), drawn on
+"""The 「影片實戰例子」 section: the boards read off YouTube videos (`pipeline/openers/video-examples.json`), drawn on
 the DPC page and on each technique page that has one, beside the source drawings and never mixed into them.
 
     python3 -m pipeline.video_examples --selftest   # plant the corruptions the audit must catch
 
 `section(page)` renders the section for one page key (`dpc`, or a technique page's prefix) and returns no lines
-when the page has no example. `audit(html, page)` checks a rendered page: the section's sentences are there,
+when the page has no example. A board's `side` names its video (each source in `sources` owns its sides), and
+the section names each video that has an example on the page. `audit(html, page)` checks a rendered page: the
+section's sentences (and each of those videos' own sentence) are there,
 every example filed under the page is drawn exactly once (`data-vexample`) with its own video link, and nothing
 else is. The data is gated by `pipeline/openers/check_video_examples.py` and `video-examples.test.ts`; this
 module only draws it. Strings are in `video_examples_prose.json`.
@@ -38,8 +40,19 @@ def mmss(t):
     return f"{t // 60}:{t % 60:02d}"
 
 
-def link(doc, t):
-    return f"https://youtu.be/{doc['source']['video']}?t={max(0, int(t) - 3)}"
+def source_of(doc, side):
+    return next(s for s in doc["sources"] if side in s["players"])
+
+
+def link(doc, b):
+    return f"https://youtu.be/{source_of(doc, b['side'])['video']}?t={max(0, int(b['t']) - 3)}"
+
+
+def videos_on(doc, page):
+    """The videos with an example on the page, in `sources` order."""
+    boards = {b["id"]: b for b in doc["boards"]}
+    used = {source_of(doc, boards[e["board"]]["side"])["video"] for _, e in examples_for(doc, page)}
+    return [s["video"] for s in doc["sources"] if s["video"] in used]
 
 
 def board_rows(b, extra=()):
@@ -68,7 +81,7 @@ def _card(doc, P, ex_id, b, head, tags, extra=()):
     bits = [f'    <div class="scp-node" data-vexample="{_esc(ex_id)}"><h4 class="scp-name">{_esc(name)}</h4>',
             RT.board_svg(board_rows(b, extra), f"{name} {head}", RT.PIECE_CLASS)]
     bits += [f'<p class="scp-tag">{_esc(t)}</p>' for t in tags]
-    bits.append(f'<p class="scp-tag"><a href="{_esc(link(doc, b["t"]))}">{_esc(P["link"].format(mmss=mmss(b["t"])))}</a></p></div>')
+    bits.append(f'<p class="scp-tag"><a href="{_esc(link(doc, b))}">{_esc(P["link"].format(mmss=mmss(b["t"])))}</a></p></div>')
     return "".join(bits)
 
 
@@ -81,7 +94,8 @@ def section(page, doc=None, P=None):
     boards = {b["id"]: b for b in doc["boards"]}
     S = P["sentences"]
     out = ['  <section class="scp-sec" id="video-examples">', f'    <h2>{_esc(P["title"])}</h2>']
-    out += [f"    <p>{_esc(S[k])}</p>" for k in ("source", "quarantine", "approx", "unread")]
+    out += [f"    <p>{_esc(P['sources'][v])}</p>" for v in videos_on(doc, page)]
+    out += [f"    <p>{_esc(S[k])}</p>" for k in ("quarantine", "approx", "unread")]
     if page == "dpc":
         out.append(f"    <p>{_esc(P['dpc_sentence'])}</p>")
         names = {s["id"]: s["heading"][0] for s in _load(SETUPS)["setups"]}
@@ -139,10 +153,13 @@ def audit(page_html, page, doc=None, P=None):
         for k, s in P["sentences"].items():
             if _esc(s) not in page_html:
                 bad.append(f"the video section's {k} sentence is missing")
+        for v in videos_on(doc, page):
+            if _esc(P["sources"][v]) not in page_html:
+                bad.append(f"the video section's sentence for {v} is missing")
         boards = {b["id"]: b for b in doc["boards"]}
         for i, e in examples_for(doc, page):
             m = re.search(r'data-vexample="' + re.escape(_esc(i)) + r'">.*?</div>', page_html, re.S)
-            if m and f'href="{_esc(link(doc, boards[e["board"]]["t"]))}"' not in m.group(0):
+            if m and f'href="{_esc(link(doc, boards[e["board"]]))}"' not in m.group(0):
                 bad.append(f"{i}: drawn without its video link")
     return bad
 
@@ -166,7 +183,11 @@ def selftest():
         ("a video link one second off", "stmbcave", h.replace(card, card.replace(m.group(0), f"?t={int(m.group(1)) + 1}"))),
         ("a sentence deleted", "stmbcave", h.replace(_esc(P["sentences"]["quarantine"]), "")),
         ("one page's section on another page", "stsd", h),
-        ("the section on a page with no example", "doubledagger", h),
+        ("the section on a page with no example", "btcannon", h),
+        ("a video's own sentence deleted", "stsd",
+         "\n".join(section("stsd", doc, P)).replace(_esc(P["sources"]["cFcBAIvuQjU"]), "")),
+        ("a card linked to the other video", "stsd",
+         "\n".join(section("stsd", doc, P)).replace("youtu.be/cFcBAIvuQjU", "youtu.be/Pjn05duM_gQ", 1)),
     ]
     for label, pg, x in cases:
         caught = bool(audit(x, pg, doc, P))

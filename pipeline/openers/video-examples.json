@@ -1,29 +1,54 @@
 {
- "schema": "video-examples/1",
+ "schema": "video-examples/2",
  "report_eligible": false,
- "means": "Boards read off one Puyo Puyo Tetris 2 match video: the 中盤 technique and DPC examples it shows. Not corpus data: nothing here enters a count, a claim or a report.",
- "source": {
-  "kind": "youtube",
-  "video": "Pjn05duM_gQ",
-  "url": "https://www.youtube.com/watch?v=Pjn05duM_gQ",
-  "title": "vs kazuさん 15先×2 Part1【ぷよぷよテトリス２】",
-  "duration_s": 1625.77,
-  "players": {
-   "L": "kazu",
-   "R": "syakegohan"
+ "means": "Boards read off YouTube videos (a Puyo Puyo Tetris 2 match, and a T-spin tutorial): the 中盤 technique and DPC examples they show. Not corpus data: nothing here enters a count, a claim or a report.",
+ "sources": [
+  {
+   "key": "kazu",
+   "kind": "youtube",
+   "video": "Pjn05duM_gQ",
+   "url": "https://www.youtube.com/watch?v=Pjn05duM_gQ",
+   "title": "vs kazuさん 15先×2 Part1【ぷよぷよテトリス２】",
+   "duration_s": 1625.77,
+   "players": {
+    "L": "kazu",
+    "R": "syakegohan"
+   },
+   "player_names_note": "yachi asked for the left player to be named kazu (2026-11-05); the in-game name shown on the board is 一、一",
+   "pieces": "both players are dealt the same piece sequence",
+   "fetched": "2026-11-05, 720p MP4 through www.snapyt.app (force_download fmt=2; yt-dlp is refused in this sandbox)",
+   "file": {
+    "format": "MP4, 1280x720",
+    "sha256": "097b9729d788d6179452c2de5e4504c16480ee1360080d6fdab02646d2235c8b",
+    "bytes": 380825907
+   },
+   "reading": "every frame at 30 fps, both boards palette-sampled at each cell's centre (left board x0 212.5, right 829.0, cells 23.75 px wide, y0 110.5, 23.7 px tall); a line clear flashes its rows white, so each board is the last frame before the flash; `?` is a cell matching no colour. The reader is a scratch script and is NOT committed: nothing re-reads these boards.",
+   "terms": "nothing of the video is committed or published: no frame, no clip; every example links the video at its time",
+   "requested": "yachi, 2026-11-05: 「Find all new 中盤 example … Especially new DPC pattern examples」, then 「Add them all」"
   },
-  "player_names_note": "yachi asked for the left player to be named kazu (2026-11-05); the in-game name shown on the board is 一、一",
-  "pieces": "both players are dealt the same piece sequence",
-  "fetched": "2026-11-05, 720p MP4 through www.snapyt.app (force_download fmt=2; yt-dlp is refused in this sandbox)",
-  "file": {
-   "format": "MP4, 1280x720",
-   "sha256": "097b9729d788d6179452c2de5e4504c16480ee1360080d6fdab02646d2235c8b",
-   "bytes": 380825907
-  },
-  "reading": "every frame at 30 fps, both boards palette-sampled at each cell's centre (left board x0 212.5, right 829.0, cells 23.75 px wide, y0 110.5, 23.7 px tall); a line clear flashes its rows white, so each board is the last frame before the flash; `?` is a cell matching no colour. The reader is a scratch script and is NOT committed: nothing re-reads these boards.",
-  "terms": "nothing of the video is committed or published: no frame, no clip; every example links the video at its time",
-  "requested": "yachi, 2026-11-05: 「Find all new 中盤 example … Especially new DPC pattern examples」, then 「Add them all」"
- },
+  {
+   "key": "tspin-templates",
+   "kind": "youtube",
+   "video": "cFcBAIvuQjU",
+   "url": "https://www.youtube.com/watch?v=cFcBAIvuQjU",
+   "title": "【ゆっくり解説】空中で組めるTスピンテンプレ＆組み方紹介【テトリス講座】",
+   "duration_s": 869.77,
+   "players": {
+    "Y": "解說片"
+   },
+   "player_names_note": "a tutorial: one board, played by the video's author, who is not named on it; the side key Y is ours",
+   "pieces": "one board; the clips are cut together, and some are shown twice (a repeated board is filed once, at its first showing)",
+   "fetched": "2026-11-06, 1080p MP4 through www.snapyt.app (fmt=1, itag 137; yt-dlp is refused in this sandbox)",
+   "file": {
+    "format": "MP4, 1920x1080",
+    "sha256": "282a26d1c22ecffa0c30b96bea5a33760f9b25f231e18f4f7e08961b16127769",
+    "bytes": 94892347
+   },
+   "reading": "every frame of every half-second the board was found, palette-sampled at each cell's centre; the clips place the board at different sizes, so the cell pitch and origin were fitted per clip (the period of the grid lines and the board's cyan border); a line clear flashes its rows white, so each board is the last frame before the flash; `?` is a cell matching no colour. The reader is a scratch script and is NOT committed: nothing re-reads these boards.",
+   "terms": "nothing of the video is committed or published: no frame, no clip; every example links the video at its time",
+   "requested": "yachi, 2026-11-06: 「Add more 中盤 from https://youtu.be/cFcBAIvuQjU」"
+  }
+ ],
  "pc_times": {
   "L": [
    153.2,
@@ -49,9 +74,10 @@
    961.5,
    1161.5,
    1374.4
-  ]
+  ],
+  "Y": []
  },
- "pc_times_note": "every Perfect Clear by each player, read off the PERFECT CLEAR banner and checked by eye for an empty board; two banner reads at 605.1 and 1052.6 (right) left pieces on the board and are not Perfect Clears",
+ "pc_times_note": "every Perfect Clear by each player, read off the PERFECT CLEAR banner and checked by eye for an empty board; two banner reads at 605.1 and 1052.6 (right) left pieces on the board and are not Perfect Clears; the tutorial (Y) shows no Perfect Clear",
  "pc_window_s": 7,
  "dpc_gap_s": 6,
  "boards": [
@@ -2520,6 +2546,806 @@
     "GGGGG.GGGG",
     ".GGGGGGGGG"
    ]
+  },
+  {
+   "id": "Y61.57",
+   "side": "Y",
+   "t": 61.57,
+   "lines": 2,
+   "cleared": [
+    13,
+    14
+   ],
+   "t_cells": [
+    [
+     13,
+     4
+    ],
+    [
+     13,
+     5
+    ],
+    [
+     13,
+     6
+    ],
+    [
+     14,
+     5
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "......S...",
+    "OO....SS..",
+    "OOZZTTTSLL",
+    "IIIZZTJJJL",
+    "IIIS...ZJL",
+    "IIISS.ZZOO",
+    "IIILS.ZJOO",
+    "ILLOO.SSZJ",
+    "IOOLS.SSZJ"
+   ]
+  },
+  {
+   "id": "Y72.7",
+   "side": "Y",
+   "t": 72.7,
+   "lines": 2,
+   "cleared": [
+    12,
+    13
+   ],
+   "t_cells": [
+    [
+     12,
+     4
+    ],
+    [
+     12,
+     5
+    ],
+    [
+     12,
+     6
+    ],
+    [
+     13,
+     5
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "I.........",
+    "I.........",
+    "I.....S...",
+    "IL....SSJJ",
+    "ILZZTTTSJJ",
+    "ILLZZTLLJJ",
+    "ISZZ...LJJ",
+    "ISSZZ.SLOO",
+    "OOS...SSOO",
+    "IIILS.ZJOO",
+    "ILLOO.SSZJ",
+    "IOOLS.SSZJ"
+   ]
+  },
+  {
+   "id": "Y78.03",
+   "side": "Y",
+   "t": 78.03,
+   "lines": 2,
+   "cleared": [
+    11,
+    12
+   ],
+   "t_cells": [
+    [
+     11,
+     4
+    ],
+    [
+     11,
+     5
+    ],
+    [
+     11,
+     6
+    ],
+    [
+     12,
+     5
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "I.........",
+    "I.........",
+    "I.........",
+    "I.......OO",
+    "I.....LLOO",
+    "ISZZTTTLOO",
+    "ISSZZTSLOO",
+    "ILS...SSJJ",
+    "ISZZ...LJJ",
+    "ISSZZ.SLOO",
+    "OOS...SSOO",
+    "IIILS.ZJOO",
+    "ILLOO.SSZJ",
+    "IOOLS.SSZJ"
+   ]
+  },
+  {
+   "id": "Y278.73",
+   "side": "Y",
+   "t": 278.73,
+   "lines": 2,
+   "cleared": [
+    13,
+    14
+   ],
+   "t_cells": [
+    [
+     13,
+     3
+    ],
+    [
+     13,
+     4
+    ],
+    [
+     13,
+     5
+    ],
+    [
+     14,
+     4
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    ".ZZ.......",
+    "OOZZ....LL",
+    "OOSS....LL",
+    "ISSTTTLLLL",
+    "IJJZTJJJOO",
+    "IJZZ...JOO",
+    "OOJL..ZZJI",
+    "LJJLL.ZLLI",
+    "IJSSS.OOTI",
+    "JJLOO.ZLZZ"
+   ]
+  },
+  {
+   "id": "Y321.33",
+   "side": "Y",
+   "t": 321.33,
+   "lines": 2,
+   "cleared": [
+    13,
+    14
+   ],
+   "t_cells": [
+    [
+     13,
+     5
+    ],
+    [
+     14,
+     5
+    ],
+    [
+     14,
+     6
+    ],
+    [
+     15,
+     5
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..L.......",
+    "LLLZZ.....",
+    "IOOSZZ....",
+    "IOOSS.....",
+    "ILLSSTLLOO",
+    "IZLSSTTLOO",
+    "ZZLJST.LJJ",
+    "ZZZJJJ.IJI",
+    "OOZZZZ.IJI",
+    "LSSJOO.III",
+    "SSLJJJ.III"
+   ]
+  },
+  {
+   "id": "Y332.3",
+   "side": "Y",
+   "t": 332.3,
+   "lines": 2,
+   "cleared": [
+    9,
+    10
+   ],
+   "t_cells": [
+    [
+     9,
+     5
+    ],
+    [
+     9,
+     6
+    ],
+    [
+     9,
+     7
+    ],
+    [
+     10,
+     6
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    ".........J",
+    ".........J",
+    "........JJ",
+    "........SS",
+    ".......SSI",
+    "OOLLLTTTZI",
+    "OOLLLLTZZI",
+    "ILSL...ZSI",
+    "ILSS..ZZSS",
+    "ILLS..JZZS",
+    "OOZZ.ZOOLL",
+    "TSLJ.IIZOO",
+    "TTOO.IZZOO",
+    "TSOO.IZJJJ",
+    "IJJJ.ITJZZ",
+    "IJJJ.ILLZZ"
+   ]
+  },
+  {
+   "id": "Y391.93",
+   "side": "Y",
+   "t": 391.93,
+   "lines": 2,
+   "cleared": [
+    7,
+    8
+   ],
+   "t_cells": [
+    [
+     7,
+     4
+    ],
+    [
+     7,
+     5
+    ],
+    [
+     7,
+     6
+    ],
+    [
+     8,
+     5
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    ".......S..",
+    ".......SSJ",
+    "OO....LLSJ",
+    "OOZZTTTLJJ",
+    "ZZLZZTTSSJ",
+    "IZZ...SSJJ",
+    "IOO...JJJI",
+    "IOO...LLJI",
+    "SSS..ZZJJZ",
+    "LLL.OOJJJI",
+    "IZZ.SJZZSS",
+    "ILL.IIIISS",
+    "ILL.OOJSSL",
+    "ILL.OOJLLL",
+    "IST.ZJLJTT",
+    "ZSS.LLLSSJ"
+   ]
+  },
+  {
+   "id": "Y521.67",
+   "side": "Y",
+   "t": 521.67,
+   "lines": 2,
+   "cleared": [
+    8,
+    9
+   ],
+   "t_cells": [
+    [
+     8,
+     7
+    ],
+    [
+     9,
+     6
+    ],
+    [
+     9,
+     7
+    ],
+    [
+     10,
+     7
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "........SS",
+    ".......SSL",
+    ".......LLL",
+    "........OO",
+    "LLLIIIITOO",
+    "LOOJJJTTJI",
+    "IOOL.J.TJI",
+    "ILLL...JJI",
+    "SSSOO..ZTT",
+    "SSSOO...TT",
+    "ISTTTI.JZL",
+    "TZZTSI.LLL",
+    "TTZZSS.IOO",
+    "TSSZZS.IOO",
+    "SSLJZZ.IOO",
+    "LLLJJJ.IOO"
+   ]
+  },
+  {
+   "id": "Y602.33",
+   "side": "Y",
+   "t": 602.33,
+   "lines": 2,
+   "cleared": [
+    11,
+    12
+   ],
+   "t_cells": [
+    [
+     11,
+     6
+    ],
+    [
+     12,
+     5
+    ],
+    [
+     12,
+     6
+    ],
+    [
+     13,
+     6
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "........?.",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "........OO",
+    "......ZZOO",
+    "S......ZZL",
+    "SSIIIITLLL",
+    "ISJJJTTJOO",
+    "IOO.J.TJOO",
+    "IOO...JJSS",
+    "ZZZ.ZSLLOO",
+    "SSI.LOOLOO",
+    "SSI.LLLSOO",
+    "JSI.LLLSSJ",
+    "TTT.ZZTZJJ"
+   ]
+  },
+  {
+   "id": "Y611.0",
+   "side": "Y",
+   "t": 611.0,
+   "lines": 2,
+   "cleared": [
+    13,
+    14
+   ],
+   "t_cells": [
+    [
+     13,
+     3
+    ],
+    [
+     14,
+     3
+    ],
+    [
+     14,
+     4
+    ],
+    [
+     15,
+     3
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "........JJ",
+    ".SSZ....JJ",
+    "SSZZ....JJ",
+    "ZZZ.....JJ",
+    "IZZTIIIIOO",
+    "IOOTTLLLOO",
+    "IOOT.L.SLL",
+    "ILLL...SSL",
+    "ILOO...ZSL",
+    "IIOO..ZZSS",
+    "IIJJ..ZSSI"
+   ]
+  },
+  {
+   "id": "Y623.57",
+   "side": "Y",
+   "t": 623.57,
+   "lines": 2,
+   "cleared": [
+    13,
+    14
+   ],
+   "t_cells": [
+    [
+     13,
+     4
+    ],
+    [
+     13,
+     5
+    ],
+    [
+     13,
+     6
+    ],
+    [
+     14,
+     5
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    ".........I",
+    ".........I",
+    ".........I",
+    ".........I",
+    "I.......OO",
+    "I.Z.....OO",
+    "IZZ....SLL",
+    "IZJJ...SSL",
+    "LLII...SSJ",
+    "ILII..SSOO",
+    "ILIITTTJOO",
+    "ISSLZTTTLL",
+    "JZZZ.SSOOL",
+    "OOLS.ZJJJI",
+    "LSTT.ZJSSL",
+    "LZZT.OOJSL",
+    "LLZZ.OOJJJ"
+   ]
+  },
+  {
+   "id": "Y635.87",
+   "side": "Y",
+   "t": 635.87,
+   "lines": 2,
+   "cleared": [
+    9,
+    10
+   ],
+   "t_cells": [
+    [
+     9,
+     3
+    ],
+    [
+     10,
+     3
+    ],
+    [
+     10,
+     4
+    ],
+    [
+     11,
+     3
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    ".SS.......",
+    "SSOO.....Z",
+    "JJOO....ZZ",
+    "JSLL....ZI",
+    "JSSL....JI",
+    "OOSL....JI",
+    "OOZ....JJI",
+    "IZZTIIIIOO",
+    "IZZTTLLLOO",
+    "IZZT.L.SLL",
+    "IZJJ...SSL",
+    "LLII...SSJ",
+    "ILII..SSOO",
+    "JZZZ.SSOOL",
+    "OOLS.ZJJJI",
+    "LSTT.ZJSSL",
+    "LZZT.OOJSL",
+    "LLZZ.OOJJJ"
+   ]
+  },
+  {
+   "id": "Y670.83",
+   "side": "Y",
+   "t": 670.83,
+   "lines": 2,
+   "cleared": [
+    6,
+    7
+   ],
+   "t_cells": [
+    [
+     6,
+     3
+    ],
+    [
+     7,
+     3
+    ],
+    [
+     7,
+     4
+    ],
+    [
+     8,
+     3
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..OO......",
+    "..OO.....I",
+    "..SS.....I",
+    ".SS......I",
+    "JJZTZZJJJI",
+    "JZZTTZZLJI",
+    "JZLT.LLL.I",
+    "LLLZ...OOI",
+    "OOZZ...OOI",
+    "IZZJL..ZJJ",
+    "LJSSS..OOL",
+    "LJJJS...OO",
+    "ITTSSZ.JOO",
+    "IZSSZZ.JJJ",
+    "ZZSSZT.LLL",
+    "ZSSZTT.LOO",
+    "OOZZTT.JOO",
+    "OOZTTI.JJJ"
+   ]
+  },
+  {
+   "id": "Y732.97",
+   "side": "Y",
+   "t": 732.97,
+   "lines": 2,
+   "cleared": [
+    10,
+    11
+   ],
+   "t_cells": [
+    [
+     10,
+     5
+    ],
+    [
+     10,
+     6
+    ],
+    [
+     10,
+     7
+    ],
+    [
+     11,
+     6
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    ".Z........",
+    "ZZ.....S..",
+    "ZLL....SSI",
+    "OOLOOTTTSI",
+    "OOLOOITSSI",
+    "OOLL.ISSZI",
+    "OOLL.IIZZI",
+    "LLLL.IIZLI",
+    "SSOO.JIJJJ",
+    "SSOO.JIJJJ",
+    "IJLL.SZZOO",
+    "IOOJ.ZZOOI",
+    "OOZZ.LZZSS"
+   ]
+  },
+  {
+   "id": "Y745.27",
+   "side": "Y",
+   "t": 745.27,
+   "lines": 2,
+   "cleared": [
+    8,
+    9
+   ],
+   "t_cells": [
+    [
+     8,
+     3
+    ],
+    [
+     8,
+     4
+    ],
+    [
+     8,
+     5
+    ],
+    [
+     9,
+     4
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..OO......",
+    "I.OO......",
+    "IJJTTTZZLL",
+    "IJOOTSSZZL",
+    "IJOOSS...L",
+    "JJLLLT....",
+    "JSLTTT....",
+    "JSSTTT....",
+    "LSSTOO....",
+    "LSSJOOZZ..",
+    "LLSJJJZZZ.",
+    "OOLLLZZLL.",
+    "OOLSSZOOL.",
+    "ZZSSIJOOL."
+   ]
+  },
+  {
+   "id": "Y778.73",
+   "side": "Y",
+   "t": 778.73,
+   "lines": 2,
+   "cleared": [
+    9,
+    10
+   ],
+   "t_cells": [
+    [
+     9,
+     2
+    ],
+    [
+     9,
+     3
+    ],
+    [
+     9,
+     4
+    ],
+    [
+     10,
+     3
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "IOO.......",
+    "IOO......L",
+    "ISTTTZZLLL",
+    "ISSTSSZZOO",
+    "LLSSS...OO",
+    "LLJJJ...OO",
+    "LLILJ...OO",
+    "LLIL...ZOO",
+    "OOILL.ZZOO",
+    "OOIZZ.ZSSI",
+    "ILLOO.JJJJ",
+    "IJJOO.JJJJ",
+    "IZLOO.ZZSS"
+   ]
   }
  ],
  "technique_examples": [
@@ -4027,6 +4853,520 @@
    ],
    "reasons": [],
    "verdict": "qualifies"
+  },
+  {
+   "board": "Y61.57",
+   "page": "doubledagger",
+   "variant": "doubledagger",
+   "mirrored": true,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     12,
+     7
+    ],
+    [
+     12,
+     6
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "Y72.7",
+   "page": "doubledagger",
+   "variant": "doubledagger",
+   "mirrored": true,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     11,
+     7
+    ],
+    [
+     11,
+     6
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "Y78.03",
+   "page": "stmbcave",
+   "variant": "stmbcave",
+   "mirrored": true,
+   "whole_board": "basic.build",
+   "key_cells": [
+    [
+     11,
+     3
+    ],
+    [
+     11,
+     2
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "Y278.73",
+   "page": "stmbcave",
+   "variant": "stmbcave",
+   "mirrored": false,
+   "whole_board": "basic.build",
+   "key_cells": [
+    [
+     13,
+     6
+    ],
+    [
+     13,
+     7
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "Y321.33",
+   "page": "stsd",
+   "variant": "stsd",
+   "mirrored": true,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     11,
+     5
+    ],
+    [
+     11,
+     4
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "Y332.3",
+   "page": "stmbcave",
+   "variant": "stmbcave",
+   "mirrored": true,
+   "whole_board": "basic.build",
+   "key_cells": [
+    [
+     9,
+     4
+    ],
+    [
+     9,
+     3
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "Y391.93",
+   "page": "stmbcave",
+   "variant": "stmbcave",
+   "mirrored": true,
+   "whole_board": "basic.build",
+   "key_cells": [
+    [
+     7,
+     3
+    ],
+    [
+     7,
+     2
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "Y521.67",
+   "page": "stsd",
+   "variant": "stsd",
+   "mirrored": false,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     6,
+     7
+    ],
+    [
+     6,
+     8
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "Y602.33",
+   "page": "stsd",
+   "variant": "stsd",
+   "mirrored": false,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     9,
+     6
+    ],
+    [
+     9,
+     7
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "Y611.0",
+   "page": "stsd",
+   "variant": "stsd",
+   "mirrored": true,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     11,
+     3
+    ],
+    [
+     11,
+     2
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "Y623.57",
+   "page": "parapet",
+   "variant": "parapet",
+   "mirrored": false,
+   "whole_board": "tsd.spin",
+   "key_cells": [
+    [
+     12,
+     3
+    ],
+    [
+     12,
+     6
+    ],
+    [
+     12,
+     7
+    ],
+    [
+     13,
+     3
+    ],
+    [
+     14,
+     3
+    ],
+    [
+     14,
+     4
+    ]
+   ],
+   "one_piece": [
+    {
+     "name": "l",
+     "cells": [
+      [
+       12,
+       3
+      ],
+      [
+       13,
+       3
+      ],
+      [
+       14,
+       3
+      ],
+      [
+       14,
+       4
+      ]
+     ]
+    }
+   ],
+   "reasons": [
+    "fragment",
+    "l_not_one_piece"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "Y635.87",
+   "page": "stsd",
+   "variant": "stsd",
+   "mirrored": true,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     7,
+     3
+    ],
+    [
+     7,
+     2
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "Y670.83",
+   "page": "stsd",
+   "variant": "stsd",
+   "mirrored": true,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     4,
+     3
+    ],
+    [
+     4,
+     2
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "Y732.97",
+   "page": "kaidan",
+   "variant": "kaidan",
+   "mirrored": true,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     9,
+     8
+    ],
+    [
+     9,
+     7
+    ],
+    [
+     10,
+     4
+    ],
+    [
+     11,
+     5
+    ],
+    [
+     11,
+     4
+    ],
+    [
+     12,
+     5
+    ]
+   ],
+   "one_piece": [
+    {
+     "name": "z",
+     "cells": [
+      [
+       10,
+       4
+      ],
+      [
+       11,
+       5
+      ],
+      [
+       11,
+       4
+      ],
+      [
+       12,
+       5
+      ]
+     ]
+    }
+   ],
+   "reasons": [
+    "z_not_one_piece"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "Y732.97",
+   "page": "shachikutrain",
+   "variant": "shachikutrain",
+   "mirrored": true,
+   "whole_board": "w4.build",
+   "key_cells": [
+    [
+     10,
+     4
+    ],
+    [
+     10,
+     3
+    ],
+    [
+     11,
+     5
+    ],
+    [
+     11,
+     4
+    ],
+    [
+     11,
+     3
+    ],
+    [
+     12,
+     6
+    ],
+    [
+     12,
+     5
+    ],
+    [
+     12,
+     3
+    ]
+   ],
+   "reasons": [
+    "kaidan_window"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "Y745.27",
+   "page": "kaidan",
+   "variant": "kaidan",
+   "mirrored": false,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     7,
+     2
+    ],
+    [
+     7,
+     3
+    ],
+    [
+     8,
+     6
+    ],
+    [
+     9,
+     5
+    ],
+    [
+     9,
+     6
+    ],
+    [
+     10,
+     5
+    ]
+   ],
+   "one_piece": [
+    {
+     "name": "z",
+     "cells": [
+      [
+       8,
+       6
+      ],
+      [
+       9,
+       5
+      ],
+      [
+       9,
+       6
+      ],
+      [
+       10,
+       5
+      ]
+     ]
+    }
+   ],
+   "reasons": [
+    "z_not_one_piece"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "Y778.73",
+   "page": "kaidan",
+   "variant": "kaidan",
+   "mirrored": false,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     8,
+     1
+    ],
+    [
+     8,
+     2
+    ],
+    [
+     9,
+     5
+    ],
+    [
+     10,
+     4
+    ],
+    [
+     10,
+     5
+    ],
+    [
+     11,
+     4
+    ]
+   ],
+   "one_piece": [
+    {
+     "name": "z",
+     "cells": [
+      [
+       9,
+       5
+      ],
+      [
+       10,
+       4
+      ],
+      [
+       10,
+       5
+      ],
+      [
+       11,
+       4
+      ]
+     ]
+    }
+   ],
+   "reasons": [
+    "z_not_one_piece"
+   ],
+   "verdict": "rejected"
   }
  ],
  "dpc_examples": [

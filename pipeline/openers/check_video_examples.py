@@ -1,22 +1,25 @@
-"""Gate the boards read off one match video (`video-examples.json`): the 中盤 and DPC examples it shows.
+"""Gate the boards read off YouTube videos (`video-examples.json`): the 中盤 and DPC examples they show.
 
     python3 -m pipeline.openers.check_video_examples              # verify the committed file (offline, CI)
     python3 -m pipeline.openers.check_video_examples --selftest   # prove the verifier has teeth
 
-THE SOURCE is one YouTube video, 「vs kazuさん 15先×2 Part1【ぷよぷよテトリス２】」 (`Pjn05duM_gQ`), a
-Puyo Puyo Tetris 2 match: two Tetris boards side by side, both players dealt the same pieces. It is NOT
-corpus data. Nobody in the corpus played it, nothing here enters a count, a claim or a report, and the
-file says `report_eligible: false`. It is here because yachi asked for the 中盤 and DPC examples in it
-(2026-11-05), and the site shows them on each technique page and the DPC page in a section of their own,
-beside the source drawings and never mixed into them: the windows, the whole-shape rule and every corpus
-figure are unchanged by this file.
+THE SOURCES (`sources`) are YouTube videos, each naming the board sides it holds (`players`; a side key
+belongs to one video, so a board's `side` says which video it is from):
+  * 「vs kazuさん 15先×2 Part1【ぷよぷよテトリス２】」 (`Pjn05duM_gQ`), a Puyo Puyo Tetris 2 match, sides L and R:
+    two boards side by side, both players dealt the same pieces (yachi, 2026-11-05);
+  * 「【ゆっくり解説】空中で組めるTスピンテンプレ＆組み方紹介【テトリス講座】」 (`cFcBAIvuQjU`), a T-spin tutorial,
+    side Y: one board, clips cut together, some shown twice — a repeated board is filed once (yachi, 2026-11-06).
+None of it is corpus data. Nobody in the corpus played these games, nothing here enters a count, a claim or
+a report, and the file says `report_eligible: false`. The site shows them on each technique page and the
+DPC page in a section of their own, beside the source drawings and never mixed into them: the windows, the
+whole-shape rule and every corpus figure are unchanged by this file.
 
-NOTHING OF THE VIDEO IS COMMITTED (no frame, no clip). It was downloaded through www.snapyt.app (yt-dlp is
-refused here), so `source.file`'s sha256 is ours alone. The boards were read off the frames by a scratch
-reader (palette sampling of both boards at 30 fps; each line clear flashes its rows white, so a board is
-read on the last frame before the flash) that is NOT committed: nothing re-reads them, which is an open
-item. A cell the reader matched to no colour (a sparkle, a flash, an effect over the garbage) is `?`, and
-every verdict below is computed TWICE, with every `?` read empty and read filled, and must not change.
+NOTHING OF A VIDEO IS COMMITTED (no frame, no clip). Each was downloaded through www.snapyt.app (yt-dlp is
+refused here), so a source's `file` sha256 is ours alone. The boards were read off the frames by scratch
+readers (palette sampling; each line clear flashes its rows white, so a board is read on the last frame
+before the flash) that are NOT committed: nothing re-reads them, which is an open item. A cell the reader
+matched to no colour (a sparkle, a flash, an effect over the garbage) is `?`, and every verdict below is
+computed TWICE, with every `?` read empty and read filled, and must not change.
 
 WHAT IS CHECKED, per board (`boards`): 20 rows of 10 (`.` empty, `G` garbage, the seven pieces, `?`
 unread), with any cell corrected by hand listed in `hand_reads` (what was read, what it is, and why); `t_cells` is a T, drawn `T`; the rows full on the board are exactly `cleared` and the T has a cell
@@ -158,7 +161,7 @@ def fires(key, variant, rows, lock, mirrored, unread):
 
 
 def near_pc(doc, side, t):
-    return [p for p in doc["pc_times"][side] if abs(t - p) < doc["pc_window_s"]]
+    return [p for p in doc["pc_times"].get(side, []) if abs(t - p) < doc["pc_window_s"]]
 
 
 def technique_reasons(doc, ex, b, unread):
@@ -238,13 +241,25 @@ def dpc_fields(doc, ex, b):
 
 def verify(doc):
     bad = []
-    if doc.get("schema") != "video-examples/1" or doc.get("report_eligible") is not False:
-        bad.append("schema must be video-examples/1 and report_eligible false")
+    if doc.get("schema") != "video-examples/2" or doc.get("report_eligible") is not False:
+        bad.append("schema must be video-examples/2 and report_eligible false")
+    owner = {}
+    for src in doc.get("sources", []):
+        for side in src.get("players", {}):
+            if side in owner:
+                bad.append(f"side {side} named by two sources")
+            owner[side] = src.get("video")
+        if not src.get("video") or not src.get("title"):
+            bad.append(f"source {src.get('key')}: no video id or title")
+    if set(doc["pc_times"]) != set(owner):
+        bad.append(f"pc_times sides {sorted(doc['pc_times'])} are not the sources' sides {sorted(owner)}")
     ids = [b["id"] for b in doc["boards"]]
     if len(set(ids)) != len(ids):
         bad.append("a board id twice")
     for b in doc["boards"]:
         bad += board_problems(b)
+        if b["side"] not in owner:
+            bad.append(f"{b['id']}: side {b['side']} belongs to no source")
         if b["id"] != f"{b['side']}{b['t']}":
             bad.append(f"{b['id']}: the id is not side+time")
     used = set()
@@ -341,6 +356,15 @@ def selftest():
     expect("an unread cell inside a window read as a stack cell",
            lambda d: setcell(d, q["board"], *_window_empty_cell(doc, q), "?"))
     expect("report_eligible flipped", lambda d: d.update(report_eligible=True))
+    def unowned(d):
+        b = board_of(d, q["board"])
+        new = f"Q{b['t']}"
+        for e in d["technique_examples"] + d["dpc_examples"]:
+            if e["board"] == b["id"]:
+                e["board"] = new
+        b.update(side="Q", id=new)
+    expect("a board on a side no source names", unowned)
+    expect("a source's side dropped", lambda d: d["sources"][-1]["players"].clear())
     expect("a board no example uses", lambda d: d["boards"].append(dict(board_of(doc, q["board"]), id="L9999.0", t=9999.0)))
     print(f"{len(fails)} survivor(s)")
     return 1 if fails else 0
