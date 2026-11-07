@@ -8,7 +8,8 @@
  *      `technique-qualify.ts`'s `keyOffsets` with `QUALIFY_OPTIONS`, or 欄干's and 社畜トレイン's own
  *      `shapeOffsets` — placed at the T's lowest cell, mirrored with the hand. The Python gate recomputes the
  *      reasons from those cells, so this is what ties its approximation to the corpus rule's cells;
- *   3. a mutant: an example's hand flipped, or its T read one column over, breaks (1).
+ *   3. a mutant: an example's hand flipped breaks (2) wherever the page's key cells are not all in the T's column, and
+ *      its T read one column over breaks (1).
  */
 import { test, expect } from 'bun:test';
 import { readFileSync } from 'node:fs';
@@ -33,6 +34,13 @@ function before(b: any, unreadFilled: boolean, t: RC[]): string[] {
 function whole(ex: any, t: RC[]) {
   const S = wholeShapes(tr(ex.page)).get(ex.variant)!;
   return [false, true].map(u => wholeShapeMatch(before(boardOf(ex.board), u, t), t.map(([row, col]) => ({ row, col })), S));
+}
+
+function offsets(ex: any): { dr: number; dc: number }[] {
+  const T = tr(ex.page);
+  if (ex.page === 'parapet') return parapetOffsets(T);
+  if (ex.page === 'shachikutrain') return shachikuOffsets(T);
+  return keyOffsets(T, QUALIFY_OPTIONS[ex.page] ?? {}).get(ex.variant)!.key;
 }
 
 function expectedKeys(ex: any): { key: RC[]; groups: { name: string; cells: RC[] }[] } {
@@ -72,13 +80,17 @@ test('every example\'s key cells are the cells its page\'s qualify module names'
 });
 
 test('mutants: a T read one column over, and a key cell list read in the other hand, are caught', () => {
-  let moved = 0, flipped = 0;
+  // a page whose key cells all sit in the T's own column (途中DT砲's one overhang cell) reads the same in either hand,
+  // so the hand there is checked by the whole drawn shape (the first test), not by the key cells
+  let moved = 0, flipped = 0, handed = 0;
   for (const ex of doc.technique_examples) {
+    if (offsets(ex).some(x => x.dc !== 0)) handed++;
     const t: RC[] = boardOf(ex.board).t_cells.map(([r, c]: RC) => [r, c + 1] as RC);
     if (t.every(([, c]) => c < 10) && whole(ex, t).some(m => m === null || m.board !== ex.whole_board)) moved++;
     const other = expectedKeys({ ...ex, mirrored: !ex.mirrored });
     if (key(other.key) !== key(ex.key_cells)) flipped++;
   }
   expect(moved).toBeGreaterThan(0);
-  expect(flipped).toBe(doc.technique_examples.length);
+  expect(handed).toBeGreaterThan(0);
+  expect(flipped).toBe(handed);
 });

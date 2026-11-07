@@ -5911,7 +5911,12 @@ Run Dafny and Lean one at a time: the Dafny mutants' limits are wall-clock.
 kazu's PPT2 match `Pjn05duM_gQ` (sides L and R; 720p via snapyt, one fixed geometry, yachi 2026-11-05) and the
 T-spin tutorial `cFcBAIvuQjU` 「空中で組めるTスピンテンプレ＆組み方紹介」 (side Y; 1080p via snapyt, yachi 2026-11-06:
 「Add more 中盤 from …」). The tutorial cuts clips together at different board sizes, so its reader fitted the cell
-pitch and origin per clip (the grid lines' period and the cyan border), and a clip shown twice is filed once. Both
+pitch and origin per clip (the grid lines' period and the cyan border), and a clip shown twice is filed once. Three
+compilations followed on 2026-11-07 (yachi: 「Add more 中盤 from …」, then 「加埋」 twice): めぞん's `HkB5n5sg1jM` (side M),
+kazu ris's `TI165iHjt6k` (sides K and H, the left and right boards, because the players change from clip to clip) and
+elepo's `Xr66MSi_PJQ` (side E), the last two downloaded with yt-dlp through a Tailscale exit node after snapyt's links
+returned 403. elepo's game shows no line-clear flash, so its boards are the last frame with the full rows standing,
+read at three per-clip geometries measured off the board's white border, with the ghost piece read empty. Both
 reads: palette sampling, the last frame before each line-clear flash, an unmatched cell read `?`; sha256s in
 `sources`. The file holds the Perfect Clear times per side and the examples filed per page: every T-spin whose board
 a technique page's whole drawn shape stands on (`technique_examples`, with the page's own key cells and a verdict)

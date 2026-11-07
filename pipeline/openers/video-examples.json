@@ -1,7 +1,7 @@
 {
  "schema": "video-examples/2",
  "report_eligible": false,
- "means": "Boards read off YouTube videos (a Puyo Puyo Tetris 2 match, and a T-spin tutorial): the 中盤 technique and DPC examples they show. Not corpus data: nothing here enters a count, a claim or a report.",
+ "means": "Boards read off YouTube videos (a Puyo Puyo Tetris 2 match, a T-spin tutorial, and three donation compilations): the 中盤 technique and DPC examples they show. Not corpus data: nothing here enters a count, a claim or a report.",
  "sources": [
   {
    "key": "kazu",
@@ -47,6 +47,73 @@
    "reading": "every frame of every half-second the board was found, palette-sampled at each cell's centre; the clips place the board at different sizes, so the cell pitch and origin were fitted per clip (the period of the grid lines and the board's cyan border); a line clear flashes its rows white, so each board is the last frame before the flash; `?` is a cell matching no colour. The reader is a scratch script and is NOT committed: nothing re-reads these boards.",
    "terms": "nothing of the video is committed or published: no frame, no clip; every example links the video at its time",
    "requested": "yachi, 2026-11-06: 「Add more 中盤 from https://youtu.be/cFcBAIvuQjU」"
+  },
+  {
+   "key": "mezon-donations",
+   "kind": "youtube",
+   "video": "HkB5n5sg1jM",
+   "url": "https://www.youtube.com/watch?v=HkB5n5sg1jM",
+   "title": "T-spinドネイト56連発【ぷよぷよテトリス2】",
+   "duration_s": 284.53,
+   "players": {
+    "M": "めぞん"
+   },
+   "player_names_note": "a compilation of one player's donation T-spins (channel めぞん, @MeZoN664); the side key M is ours",
+   "pieces": "one board; the clips are cut together",
+   "fetched": "2026-11-07, 1080p MP4 through www.snapyt.app (fmt=1, itag 299; yt-dlp is refused in this sandbox)",
+   "file": {
+    "format": "MP4, 1920x1080",
+    "sha256": "8416d1558e9b2b70a7d3b13326b76b7ce79eb47bdf47b8cb926f044881fd424b",
+    "bytes": 81802489
+   },
+   "reading": "every frame at 30 fps, the board palette-sampled at each cell's centre (x0 778, cells 36 px wide, y0 148, 36.5 px tall, the same in every clip); a line clear flashes its rows white, so each board is the last frame before the flash, and the T is the purple piece that appeared just before it; `?` is a cell matching no colour. The reader is a scratch script and is NOT committed: nothing re-reads these boards.",
+   "terms": "nothing of the video is committed or published: no frame, no clip; every example links the video at its time",
+   "requested": "yachi, 2026-11-07: 「Add more 中盤 from https://youtu.be/HkB5n5sg1jM」"
+  },
+  {
+   "key": "kazuris-recoveries",
+   "kind": "youtube",
+   "video": "TI165iHjt6k",
+   "url": "https://www.youtube.com/watch?v=TI165iHjt6k",
+   "title": "ドネイト全一によるスーパードネイト・リカバリー集【ぷよぷよテトリス】【puyopuyotetris】",
+   "duration_s": 235.97,
+   "players": {
+    "K": "左邊",
+    "H": "右邊"
+   },
+   "player_names_note": "a compilation of versus clips (channel kazu ris); the players' names change from clip to clip, so the sides are the left and right boards, and the keys K and H are ours",
+   "pieces": "two boards; the clips are cut together",
+   "fetched": "2026-11-07, 1080p MP4 (itag 137) with yt-dlp through a Tailscale exit node; snapyt's links returned 403",
+   "file": {
+    "format": "MP4, 1920x1080",
+    "sha256": "060b34b18fec43f15a7d3ebd126ce19160df1c2f7995fa58c4b7e30f95884768",
+    "bytes": 63565879
+   },
+   "reading": "every frame at 30 fps, each board palette-sampled at each cell's centre (left x0 308, right x0 1251, cells 36 px wide, y0 159, 36 px tall, the same in every clip); a line clear flashes its rows white, so each board is the last frame before the flash, and the T is the purple piece that appeared just before it; `?` is a cell matching no colour. The reader is a scratch script and is NOT committed: nothing re-reads these boards.",
+   "terms": "nothing of the video is committed or published: no frame, no clip; every example links the video at its time",
+   "requested": "yachi, 2026-11-07: 「加埋 https://youtu.be/TI165iHjt6k」"
+  },
+  {
+   "key": "elepo-edge-donations",
+   "kind": "youtube",
+   "video": "Xr66MSi_PJQ",
+   "url": "https://www.youtube.com/watch?v=Xr66MSi_PJQ",
+   "title": "【テトリス】端空けドネイト集【テンプレ】",
+   "duration_s": 295.93,
+   "players": {
+    "E": "elepo"
+   },
+   "player_names_note": "a compilation of one player's edge-well donations (channel elepo); the side key E is ours",
+   "pieces": "one board; the clips are cut together, beside a panel of drawn templates that is not read",
+   "fetched": "2026-11-07, 1080p MP4 (itag 137) with yt-dlp through a Tailscale exit node; snapyt's links returned 403",
+   "file": {
+    "format": "MP4, 1920x1080",
+    "sha256": "96777ae245bbfc1c894dac1a403958c5acdf8f75b146f25ac246e738a79d9c16",
+    "bytes": 16517579
+   },
+   "reading": "every frame at 30 fps, the board palette-sampled at each cell's centre (cells 24.4 px square; x0 493 and y0 278 before 52.5 s, x0 524 and y0 272 from 53 to 69.5 s, x0 601 and y0 274.5 from 71 s, each measured off the board's white border); the ghost piece, a dark outline, reads empty. This game shows no flash: a line clear holds its full rows for a few frames and then drops them, so each board is the last frame with the full rows standing, and the T is the purple piece that appeared just before it; `?` is a cell matching no colour. The reader is a scratch script and is NOT committed: nothing re-reads these boards.",
+   "terms": "nothing of the video is committed or published: no frame, no clip; every example links the video at its time",
+   "requested": "yachi, 2026-11-07: 「加埋 https://youtu.be/Xr66MSi_PJQ」"
   }
  ],
  "pc_times": {
@@ -75,9 +142,13 @@
    1161.5,
    1374.4
   ],
-  "Y": []
+  "Y": [],
+  "M": [],
+  "K": [],
+  "H": [],
+  "E": []
  },
- "pc_times_note": "every Perfect Clear by each player, read off the PERFECT CLEAR banner and checked by eye for an empty board; two banner reads at 605.1 and 1052.6 (right) left pieces on the board and are not Perfect Clears; the tutorial (Y) shows no Perfect Clear",
+ "pc_times_note": "every Perfect Clear by each player, read off the PERFECT CLEAR banner and checked by eye for an empty board; two banner reads at 605.1 and 1052.6 (right) left pieces on the board and are not Perfect Clears; the tutorial (Y) and the three compilations (M, K, H, E) show no Perfect Clear: every empty board in them is a cut between clips",
  "pc_window_s": 7,
  "dpc_gap_s": 6,
  "boards": [
@@ -3346,6 +3417,707 @@
     "IJJOO.JJJJ",
     "IZLOO.ZZSS"
    ]
+  },
+  {
+   "id": "M41.03",
+   "side": "M",
+   "t": 41.03,
+   "lines": 2,
+   "cleared": [
+    17,
+    18
+   ],
+   "t_cells": [
+    [
+     17,
+     4
+    ],
+    [
+     17,
+     5
+    ],
+    [
+     17,
+     6
+    ],
+    [
+     18,
+     5
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "OOJJZ.....",
+    "OOJZZ....L",
+    "LLJZTTTLLL",
+    "ILTTTTSSOO",
+    "ILTTSSS.OO"
+   ]
+  },
+  {
+   "id": "M44.8",
+   "side": "M",
+   "t": 44.8,
+   "lines": 2,
+   "cleared": [
+    5,
+    6
+   ],
+   "t_cells": [
+    [
+     5,
+     6
+    ],
+    [
+     5,
+     7
+    ],
+    [
+     5,
+     8
+    ],
+    [
+     6,
+     7
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "........OO",
+    "........OO",
+    ".ZZ.....LL",
+    "OOZZJJTTTL",
+    "OOJJJZZTSL",
+    "LLJ.J.ZZSS",
+    "LLJ.T.SZZS",
+    "GGG.GGGGGG",
+    "GGG.GGGGGG",
+    "GGG.GGGGGG",
+    "GGG.GGGGGG",
+    "GGGG.GGGGG",
+    "GGGGG.GGGG",
+    "GGGGGG.GGG",
+    "GGGGGGGG.G",
+    "GGGGGGGG.G",
+    "GGGGGGGG.G",
+    "GGGGGGGG.G"
+   ]
+  },
+  {
+   "id": "M227.43",
+   "side": "M",
+   "t": 227.43,
+   "lines": 2,
+   "cleared": [
+    3,
+    4
+   ],
+   "t_cells": [
+    [
+     3,
+     2
+    ],
+    [
+     3,
+     3
+    ],
+    [
+     3,
+     4
+    ],
+    [
+     4,
+     3
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    ".SS.......",
+    "SSTTTLLJJZ",
+    "OOLTSSLJZZ",
+    "OOLSS.LJZI",
+    "JSLLS.LLOO",
+    "LLLLT.ZZZT",
+    "GGGGGG.GGG",
+    "GGGGGG.GGG",
+    "GGG.GGGGGG",
+    "GG.GGGGGGG",
+    "GGG.GGGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGGG.GGGG",
+    "GGGGG.GGGG",
+    "GGGGG.GGGG",
+    "G.GGGGGGGG",
+    "GGG.GGGGGG"
+   ]
+  },
+  {
+   "id": "M260.6",
+   "side": "M",
+   "t": 260.6,
+   "lines": 2,
+   "cleared": [
+    17,
+    18
+   ],
+   "t_cells": [
+    [
+     17,
+     2
+    ],
+    [
+     18,
+     1
+    ],
+    [
+     18,
+     2
+    ],
+    [
+     19,
+     2
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    ".....I....",
+    "..S..I.LLL",
+    "..SS.I.LOO",
+    "...SZIZZOO",
+    "JJTZZOOZZL",
+    "JTTZTOOLLL",
+    "J.TTTJJOOI"
+   ]
+  },
+  {
+   "id": "K140.0",
+   "side": "K",
+   "t": 140.0,
+   "lines": 2,
+   "cleared": [
+    8,
+    9
+   ],
+   "t_cells": [
+    [
+     8,
+     2
+    ],
+    [
+     9,
+     1
+    ],
+    [
+     9,
+     2
+    ],
+    [
+     10,
+     2
+    ]
+   ],
+   "rows": [
+    "..........",
+    ".........Z",
+    "........ZZ",
+    "........ZJ",
+    ".....IIIIJ",
+    ".....OOSJJ",
+    "..LLSOOSSJ",
+    "...LSSOOSJ",
+    "JJTLZSOOJJ",
+    "JTTZZLLLOO",
+    "J.TZLLSSOO",
+    "I.OOSSZJSL",
+    "I.OOLZZJSS",
+    "I.OOLZJZZS",
+    "I.OOLLJJZZ",
+    "GGGGGGGGG.",
+    "GGGGGGGGG.",
+    "GGGGGGGGG.",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG"
+   ]
+  },
+  {
+   "id": "K162.53",
+   "side": "K",
+   "t": 162.53,
+   "lines": 3,
+   "cleared": [
+    7,
+    8,
+    9
+   ],
+   "t_cells": [
+    [
+     7,
+     3
+    ],
+    [
+     8,
+     2
+    ],
+    [
+     8,
+     3
+    ],
+    [
+     9,
+     3
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "I.........",
+    "I.........",
+    "I..S......",
+    "I..SSOOJJJ",
+    "I...SOOZZJ",
+    "IJJTOOLLZZ",
+    "IJTTOOZLOO",
+    "IJSTIZZLOO",
+    "ISS.IJLLLI",
+    "OO..ZZTJJJ",
+    "JJ..ZLLZZJ",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGGGGGGG."
+   ]
+  },
+  {
+   "id": "K164.27",
+   "side": "K",
+   "t": 164.27,
+   "lines": 2,
+   "cleared": [
+    10,
+    11
+   ],
+   "t_cells": [
+    [
+     10,
+     3
+    ],
+    [
+     11,
+     2
+    ],
+    [
+     11,
+     3
+    ],
+    [
+     12,
+     3
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "I.........",
+    "I.........",
+    "I..S......",
+    "I..SSOOJJJ",
+    "I...SOOZZJ",
+    "ISSTIJLLLI",
+    "OOTTZZTJJJ",
+    "JJ.TZLLZZJ",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGGGGGGG."
+   ]
+  },
+  {
+   "id": "H148.0",
+   "side": "H",
+   "t": 148.0,
+   "lines": 2,
+   "cleared": [
+    17,
+    18
+   ],
+   "t_cells": [
+    [
+     17,
+     1
+    ],
+    [
+     17,
+     2
+    ],
+    [
+     17,
+     3
+    ],
+    [
+     18,
+     2
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..LL....SS",
+    "...LZZ.SSI",
+    "JJ.LTZZOOI",
+    "J..TTTIOOI",
+    "JTTTZJILSI",
+    "OOTZZJILSS",
+    "OO.ZJJILLS"
+   ]
+  },
+  {
+   "id": "H159.6",
+   "side": "H",
+   "t": 159.6,
+   "lines": 2,
+   "cleared": [
+    13,
+    14
+   ],
+   "t_cells": [
+    [
+     13,
+     1
+    ],
+    [
+     13,
+     2
+    ],
+    [
+     13,
+     3
+    ],
+    [
+     14,
+     2
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "........SS",
+    "....JJJSSL",
+    "JJ..OOJLLL",
+    "JTTTOOIIII",
+    "LLTLZZZSSI",
+    "GGG.GGGGGG",
+    "GGG.GGGGGG",
+    "GGG.GGGGGG",
+    "GGGGG.GGGG",
+    "GGGGG.GGGG"
+   ]
+  },
+  {
+   "id": "E30.3",
+   "side": "E",
+   "t": 30.3,
+   "lines": 2,
+   "cleared": [
+    6,
+    7
+   ],
+   "t_cells": [
+    [
+     6,
+     4
+    ],
+    [
+     6,
+     5
+    ],
+    [
+     6,
+     6
+    ],
+    [
+     7,
+     5
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "L...J.....",
+    "L...J.....",
+    "LLSJJ.....",
+    "JJSOTTTSSZ",
+    "JOOSZTSSZZ",
+    "JOOZZ...Z.",
+    "TZZZTTTOO.",
+    "TTZZSTJOO.",
+    "TIZZSSJJJ.",
+    "IIJZZSLLL.",
+    "IIJJJTLOO.",
+    "IISSZTTOO.",
+    "ISSZZTLLL.",
+    "LLLZOOLSS.",
+    "LIJJOOSST.",
+    "IIJZZLLTT.",
+    "IIJJZZLST."
+   ]
+  },
+  {
+   "id": "E75.07",
+   "side": "E",
+   "t": 75.07,
+   "lines": 2,
+   "cleared": [
+    12,
+    13
+   ],
+   "t_cells": [
+    [
+     12,
+     5
+    ],
+    [
+     12,
+     6
+    ],
+    [
+     12,
+     7
+    ],
+    [
+     13,
+     6
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..J.......",
+    "..J.......",
+    "JJJI......",
+    "JJJI......",
+    "LLLIOO....",
+    "LOOIOO....",
+    "TOOZZTTTLL",
+    "TTSSZZTSSL",
+    "TSSOOLSS.L",
+    "SLLOOLJJJ.",
+    "SSLZZLLSJ.",
+    "ISLTZZTSS.",
+    "IITTTTTTS.",
+    "IIOOJJJOO."
+   ]
+  },
+  {
+   "id": "E93.23",
+   "side": "E",
+   "t": 93.23,
+   "lines": 2,
+   "cleared": [
+    10,
+    11
+   ],
+   "t_cells": [
+    [
+     10,
+     5
+    ],
+    [
+     11,
+     5
+    ],
+    [
+     11,
+     6
+    ],
+    [
+     12,
+     5
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "JJOO......",
+    "JSOO.Z....",
+    "JSSIZZ....",
+    "OOSIZZ..L.",
+    "OOLIZZ..L.",
+    "LLLIZ...LL",
+    "STTTITZZLL",
+    "SSTTITTZZL",
+    "JSTTIT.OOL",
+    "JJJTIZZOO.",
+    "ITTTSSZZL.",
+    "IJTSSTLLL.",
+    "IJJJTTIOO.",
+    "ISSZZTIOO.",
+    "SSLJZZIOO.",
+    "LLLJJJIOO."
+   ]
+  },
+  {
+   "id": "E101.4",
+   "side": "E",
+   "t": 101.4,
+   "lines": 2,
+   "cleared": [
+    10,
+    11
+   ],
+   "t_cells": [
+    [
+     10,
+     6
+    ],
+    [
+     11,
+     6
+    ],
+    [
+     11,
+     7
+    ],
+    [
+     12,
+     6
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    ".ZZ.......",
+    "ISZZ......",
+    "ISSS......",
+    "IJSSSOO...",
+    "IJJJSOO...",
+    "JJOOLLL...",
+    "JSOOLZ....",
+    "JSSIZZTJJJ",
+    "OOSIZZTTLJ",
+    "OOLIZZT.L.",
+    "JJJTIZZOO.",
+    "ITTTSSZZL.",
+    "IJTSSTLLL.",
+    "IJJJTTIOO.",
+    "ISSZZTIOO.",
+    "SSLJZZIOO.",
+    "LLLJJJIOO."
+   ]
+  },
+  {
+   "id": "E246.03",
+   "side": "E",
+   "t": 246.03,
+   "lines": 2,
+   "cleared": [
+    8,
+    9
+   ],
+   "t_cells": [
+    [
+     8,
+     6
+    ],
+    [
+     9,
+     5
+    ],
+    [
+     9,
+     6
+    ],
+    [
+     10,
+     6
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "I.........",
+    "I.........",
+    "I.........",
+    "IZ........",
+    "ZZTI..ZZ..",
+    "ZTTI...ZZL",
+    "OOTIJJTLLL",
+    "OOLIJTTJJJ",
+    "LLLLJ.TSSJ",
+    "JLLLZ.SS..",
+    "JJJZZSSOO.",
+    "LOOZSSTOO.",
+    "LOOZZTTTT.",
+    "LLSSZZTTT.",
+    "JSSOOJTTT.",
+    "JJJOOJTLL.",
+    "IIZZJJSSL.",
+    "IIJZZSSSL."
+   ]
   }
  ],
  "technique_examples": [
@@ -5367,6 +6139,536 @@
     "z_not_one_piece"
    ],
    "verdict": "rejected"
+  },
+  {
+   "board": "M41.03",
+   "page": "shachikutrain",
+   "variant": "shachikutrain",
+   "mirrored": false,
+   "whole_board": "w4.build",
+   "key_cells": [
+    [
+     17,
+     7
+    ],
+    [
+     17,
+     8
+    ],
+    [
+     18,
+     6
+    ],
+    [
+     18,
+     7
+    ],
+    [
+     18,
+     8
+    ],
+    [
+     19,
+     5
+    ],
+    [
+     19,
+     6
+    ],
+    [
+     19,
+     8
+    ]
+   ],
+   "reasons": [
+    "fragment"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "M44.8",
+   "page": "shachikutrain",
+   "variant": "shachikutrain",
+   "mirrored": true,
+   "whole_board": "w4.build",
+   "key_cells": [
+    [
+     5,
+     5
+    ],
+    [
+     5,
+     4
+    ],
+    [
+     6,
+     6
+    ],
+    [
+     6,
+     5
+    ],
+    [
+     6,
+     4
+    ],
+    [
+     7,
+     7
+    ],
+    [
+     7,
+     6
+    ],
+    [
+     7,
+     4
+    ]
+   ],
+   "reasons": [
+    "fragment",
+    "kaidan_window"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "M44.8",
+   "page": "kaidan",
+   "variant": "kaidan",
+   "mirrored": true,
+   "whole_board": "s3.s",
+   "key_cells": [
+    [
+     4,
+     9
+    ],
+    [
+     4,
+     8
+    ],
+    [
+     5,
+     5
+    ],
+    [
+     6,
+     6
+    ],
+    [
+     6,
+     5
+    ],
+    [
+     7,
+     6
+    ]
+   ],
+   "one_piece": [
+    {
+     "name": "z",
+     "cells": [
+      [
+       5,
+       5
+      ],
+      [
+       6,
+       6
+      ],
+      [
+       6,
+       5
+      ],
+      [
+       7,
+       6
+      ]
+     ]
+    }
+   ],
+   "reasons": [
+    "fragment",
+    "z_not_one_piece"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "M227.43",
+   "page": "shachikutrain",
+   "variant": "shachikutrain",
+   "mirrored": false,
+   "whole_board": "w4.build",
+   "key_cells": [
+    [
+     3,
+     5
+    ],
+    [
+     3,
+     6
+    ],
+    [
+     4,
+     4
+    ],
+    [
+     4,
+     5
+    ],
+    [
+     4,
+     6
+    ],
+    [
+     5,
+     3
+    ],
+    [
+     5,
+     4
+    ],
+    [
+     5,
+     6
+    ]
+   ],
+   "reasons": [
+    "fragment",
+    "kaidan_window"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "M227.43",
+   "page": "kaidan",
+   "variant": "kaidan",
+   "mirrored": false,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     2,
+     1
+    ],
+    [
+     2,
+     2
+    ],
+    [
+     3,
+     5
+    ],
+    [
+     4,
+     4
+    ],
+    [
+     4,
+     5
+    ],
+    [
+     5,
+     4
+    ]
+   ],
+   "one_piece": [
+    {
+     "name": "z",
+     "cells": [
+      [
+       3,
+       5
+      ],
+      [
+       4,
+       4
+      ],
+      [
+       4,
+       5
+      ],
+      [
+       5,
+       4
+      ]
+     ]
+    }
+   ],
+   "reasons": [
+    "fragment",
+    "z_not_one_piece"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "M260.6",
+   "page": "stsd",
+   "variant": "stsd",
+   "mirrored": false,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     15,
+     2
+    ],
+    [
+     15,
+     3
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "K140.0",
+   "page": "stsd",
+   "variant": "stsd",
+   "mirrored": false,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     6,
+     2
+    ],
+    [
+     6,
+     3
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "K162.53",
+   "page": "kingcrimson",
+   "variant": "kingcrimson",
+   "mirrored": true,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     5,
+     4
+    ],
+    [
+     5,
+     3
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "K164.27",
+   "page": "stsd",
+   "variant": "stsd",
+   "mirrored": false,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     8,
+     3
+    ],
+    [
+     8,
+     4
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "H148.0",
+   "page": "dtcannon",
+   "variant": "dtcannon",
+   "mirrored": false,
+   "whole_board": "done.build",
+   "key_cells": [
+    [
+     13,
+     2
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "H159.6",
+   "page": "parapet",
+   "variant": "parapet",
+   "mirrored": true,
+   "whole_board": "tsd.spin",
+   "key_cells": [
+    [
+     12,
+     4
+    ],
+    [
+     12,
+     1
+    ],
+    [
+     12,
+     0
+    ],
+    [
+     13,
+     4
+    ],
+    [
+     14,
+     4
+    ],
+    [
+     14,
+     3
+    ]
+   ],
+   "one_piece": [
+    {
+     "name": "l",
+     "cells": [
+      [
+       12,
+       4
+      ],
+      [
+       13,
+       4
+      ],
+      [
+       14,
+       4
+      ],
+      [
+       14,
+       3
+      ]
+     ]
+    }
+   ],
+   "reasons": [
+    "fragment",
+    "l_not_one_piece"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "E30.3",
+   "page": "stmbcave",
+   "variant": "stmbcave",
+   "mirrored": false,
+   "whole_board": "basic.build",
+   "key_cells": [
+    [
+     6,
+     7
+    ],
+    [
+     6,
+     8
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "E75.07",
+   "page": "shachikutrain",
+   "variant": "shachikutrain",
+   "mirrored": false,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     12,
+     8
+    ],
+    [
+     12,
+     9
+    ],
+    [
+     13,
+     7
+    ],
+    [
+     13,
+     8
+    ],
+    [
+     13,
+     9
+    ],
+    [
+     14,
+     6
+    ],
+    [
+     14,
+     7
+    ],
+    [
+     14,
+     9
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "E93.23",
+   "page": "stsd",
+   "variant": "stsd",
+   "mirrored": true,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     8,
+     5
+    ],
+    [
+     8,
+     4
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "E101.4",
+   "page": "stsd",
+   "variant": "stsd",
+   "mirrored": true,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     8,
+     6
+    ],
+    [
+     8,
+     5
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "E246.03",
+   "page": "stsd",
+   "variant": "stsd",
+   "mirrored": false,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     6,
+     6
+    ],
+    [
+     6,
+     7
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
   }
  ],
  "dpc_examples": [
