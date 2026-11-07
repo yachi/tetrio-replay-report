@@ -5907,7 +5907,7 @@ Run Dafny and Lean one at a time: the Dafny mutants' limits are wall-clock.
 ## 影片實戰例子 — boards read off one match video, drawn beside the source drawings
 
 `pipeline/openers/video-examples.json` (schema `video-examples/2`) holds boards read off YouTube videos, listed in
-`sources`; each source owns the board sides it shows (`players`), so a board's `side` names its video. Two so far:
+`sources`; each source owns the board sides it shows (`players`), so a board's `side` names its video. In order of arrival:
 kazu's PPT2 match `Pjn05duM_gQ` (sides L and R; 720p via snapyt, one fixed geometry, yachi 2026-11-05) and the
 T-spin tutorial `cFcBAIvuQjU` 「空中で組めるTスピンテンプレ＆組み方紹介」 (side Y; 1080p via snapyt, yachi 2026-11-06:
 「Add more 中盤 from …」). The tutorial cuts clips together at different board sizes, so its reader fitted the cell
@@ -5916,8 +5916,10 @@ compilations followed on 2026-11-07 (yachi: 「Add more 中盤 from …」, then
 kazu ris's `TI165iHjt6k` (sides K and H, the left and right boards, because the players change from clip to clip) and
 elepo's `Xr66MSi_PJQ` (side E), the last two downloaded with yt-dlp through a Tailscale exit node after snapyt's links
 returned 403. elepo's game shows no line-clear flash, so its boards are the last frame with the full rows standing,
-read at three per-clip geometries measured off the board's white border, with the ghost piece read empty. Both
-reads: palette sampling, the last frame before each line-clear flash, an unmatched cell read `?`; sha256s in
+read at three per-clip geometries measured off the board's white border, with the ghost piece read empty. The same
+day elepo's DT Cannon tutorial `CzW5f4q1fVQ` (side D; yachi: 「加中盤」, same download route) added two fixed geometries,
+its PPT2 game clips and a training tool whose grey preset terrain is read as garbage, so an example whose key cells
+sit in that terrain is rejected as `garbage_in_shape`. Every read: palette sampling, the last frame before each line-clear flash, an unmatched cell read `?`; sha256s in
 `sources`. The file holds the Perfect Clear times per side and the examples filed per page: every T-spin whose board
 a technique page's whole drawn shape stands on (`technique_examples`, with the page's own key cells and a verdict)
 and the first T-spin after each PC (`dpc_examples`, compared with とんぼ's catalogue the way `dpc-facts.ts`
