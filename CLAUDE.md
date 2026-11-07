@@ -5911,7 +5911,12 @@ Run Dafny and Lean one at a time: the Dafny mutants' limits are wall-clock.
 kazu's PPT2 match `Pjn05duM_gQ` (sides L and R; 720p via snapyt, one fixed geometry, yachi 2026-11-05) and the
 T-spin tutorial `cFcBAIvuQjU` 「空中で組めるTスピンテンプレ＆組み方紹介」 (side Y; 1080p via snapyt, yachi 2026-11-06:
 「Add more 中盤 from …」). The tutorial cuts clips together at different board sizes, so its reader fitted the cell
-pitch and origin per clip (the grid lines' period and the cyan border), and a clip shown twice is filed once. Both
+pitch and origin per clip (the grid lines' period and the cyan border), and a clip shown twice is filed once. Three
+compilations followed on 2026-11-07 (yachi: 「Add more 中盤 from …」, then 「加埋」 twice): めぞん's `HkB5n5sg1jM` (side M),
+kazu ris's `TI165iHjt6k` (sides K and H, the left and right boards, because the players change from clip to clip) and
+elepo's `Xr66MSi_PJQ` (side E), the last two downloaded with yt-dlp through a Tailscale exit node after snapyt's links
+returned 403. elepo's game shows no line-clear flash, so its boards are the last frame with the full rows standing,
+read at three per-clip geometries measured off the board's white border, with the ghost piece read empty. Both
 reads: palette sampling, the last frame before each line-clear flash, an unmatched cell read `?`; sha256s in
 `sources`. The file holds the Perfect Clear times per side and the examples filed per page: every T-spin whose board
 a technique page's whole drawn shape stands on (`technique_examples`, with the page's own key cells and a verdict)
@@ -5924,7 +5929,12 @@ agreement set** — nobody in the corpus played these games, and the section say
 most boards of a tutorial and is not filed here (its video boards are its own `cross_source`).
 
 What the video cannot give is piece ownership, so 「built」 is an APPROXIMATION and the section says that too: a key
-cell whose same-colour connected region is not a multiple of four is a fragment, and a PC within 7 s either side
+cell is whole only if disjoint placements of its own letter's tetromino inside its same-colour region cover
+the key cells (since 2026-11-07; the multiple-of-four test before it failed whole pieces touching a remnant —
+yachi on the めぞん 社畜 boards, an independent Fable reading agreeing), a 社畜トレイン is read as a 階段 only
+when the 階段 window fires AND its stood Z is one whole piece there, a 階段's stood-Z cells need only be
+whole pieces of any letter (yachi 2026-11-07 on M227.43, an S and an L: 「all full pieces, should be counted」;
+the corpus `z_not_one_piece` is unchanged), and a PC within 7 s either side
 stands for 14 locks. `pipeline/openers/check_video_examples.py` re-derives every verdict and DPC field with each `?`
 read empty AND filled (an example is filed only when both agree), and `--selftest` plants its mutants;
 `video-examples.test.ts` ties each `whole_board` to `technique-wholeshape.ts` and each `key_cells` to the page's own

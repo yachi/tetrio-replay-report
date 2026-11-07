@@ -30,13 +30,22 @@ the corpus predicate's Python twin) fires at that T in the recorded hand; and th
 recomputed from the board. The video gives no piece ownership, so the reasons are an APPROXIMATION of the
 corpus `qualify` rules, said so on every page:
   * `fragment`: a key cell (`key_cells`, the cells technique-qualify.ts names for the variant, placed on the
-    board; the bun test `video-examples.test.ts` re-derives them from that file) whose same-colour
-    connected region is not a multiple of four cells — part of a piece a clear cut;
+    board; the bun test `video-examples.test.ts` re-derives them from that file) that no whole piece covers:
+    the key cells of each same-colour connected region must be covered by pairwise disjoint placements of
+    THAT letter's tetromino inside the region, and the region's other cells are remnants a clear cut
+    (`whole_cover`). Until 2026-11-07 the rule was 「the region is a multiple of four cells」, which failed a
+    whole piece touching a one- or two-cell remnant of its own colour and passed four cells no piece of
+    that letter fits (yachi on the めぞん boards, checked by an independent reading);
   * `garbage_in_shape`: a key cell is garbage;
-  * `z_not_one_piece` (階段のドネイト): the stood Z's four cells are not one same-colour region;
+  * `z_not_one_piece` (階段のドネイト) is NOT applied since 2026-11-07: yachi on M227.43, whose 「Z」 cells
+    are an S and an L, 「SSL are all full pieces, should be counted」. The cells only need whole pieces of
+    any letter, which `fragment` already checks; the corpus rule (technique-qualify.ts) is unchanged;
   * `dpc`: a Perfect Clear by the same player within `pc_window_s` seconds either side of the T (the
     corpus rule is 14 locks; a time is all a video gives);
-  * `kaidan_window` (社畜トレイン): the 階段のドネイト window fires at the same T, in either hand.
+  * `kaidan_window` (社畜トレイン): the 階段のドネイト window fires at the same T, in either hand, AND its stood
+    Z passes the one-piece test there. The window alone fires on every 社畜トレイン built over a hole (it reads
+    only the cell under the second nub, which the 社畜 window does not); the two piece tests cannot both pass,
+    since the cell over the Z is the L/J hook for a 社畜 and the Z's own colour for a 階段.
 A `verdict` of `qualifies` means no reason. Whether the whole drawn shape stands (`whole_board`) is the TS
 rule (`technique-wholeshape.ts`) and is checked by the bun test, not here.
 
@@ -114,6 +123,88 @@ def regions(rows):
     return seen
 
 
+_BASE = {"I": [(0, 0), (0, 1), (0, 2), (0, 3)], "O": [(0, 0), (0, 1), (1, 0), (1, 1)],
+         "T": [(0, 1), (1, 0), (1, 1), (1, 2)], "S": [(0, 1), (0, 2), (1, 0), (1, 1)],
+         "Z": [(0, 0), (0, 1), (1, 1), (1, 2)], "J": [(0, 0), (1, 0), (1, 1), (1, 2)],
+         "L": [(0, 2), (1, 0), (1, 1), (1, 2)]}
+
+
+def _rotations(cells):
+    out, cur = set(), cells
+    for _ in range(4):
+        mr, mc = min(r for r, _ in cur), min(c for _, c in cur)
+        out.add(tuple(sorted((r - mr, c - mc) for r, c in cur)))
+        cur = [(c, -r) for r, c in cur]
+    return out
+
+
+SHAPES = {k: _rotations(v) for k, v in _BASE.items()}
+
+
+def placements(region, letter, cell):
+    """Every placement of `letter`'s tetromino lying inside `region` and covering `cell`."""
+    out = []
+    for s in SHAPES[letter]:
+        for ar, ac in s:
+            p = frozenset((cell[0] - ar + dr, cell[1] - ac + dc) for dr, dc in s)
+            if p <= region and p not in out:
+                out.append(p)
+    return out
+
+
+def whole_cover(rows, region, keys):
+    """True iff the key cells of one same-colour region are covered by pairwise disjoint placements of that
+    colour's tetromino inside the region (an exact cover of the keys, the rest of the region left over)."""
+    letter = rows[next(iter(region))[0]][next(iter(region))[1]]
+
+    def go(todo, used):
+        if not todo:
+            return True
+        k = todo[0]
+        if k in used:
+            return go(todo[1:], used)
+        return any(go(todo[1:], used | p) for p in placements(region, letter, k) if not (p & used))
+    return go(sorted(keys), frozenset())
+
+
+def _low(lock):
+    return max(lock)
+
+
+def kaidan_z_offsets(doc=None):
+    """The stood Z of 階段のドネイト as offsets (dr, dc) from the T's lowest cell, as drawn. Read off the file's
+    own 階段 examples, whose `one_piece` groups the bun test ties to technique-qualify.ts; every one must
+    give the same offsets, so this is that module's cells, not a second copy."""
+    doc = doc or load()
+    seen = set()
+    for ex in doc["technique_examples"]:
+        if ex["page"] != "kaidan":
+            continue
+        b = board_of(doc, ex["board"])
+        lr, lc = _low({tuple(x) for x in b["t_cells"]})
+        sg = -1 if ex["mirrored"] else 1
+        g = next(g for g in ex["one_piece"] if g["name"] == "z")
+        seen.add(tuple(sorted((r - lr, sg * (c - lc)) for r, c in g["cells"])))
+    assert len(seen) == 1, f"the 階段 examples disagree on the stood Z: {seen}"
+    return next(iter(seen))
+
+
+_KZ = []
+
+
+def kaidan_z_whole(rows, lock, mirrored):
+    """The 階段 stood Z's four cells, placed at this T in this hand, are one whole Z (or S, mirrored)."""
+    if not _KZ:
+        _KZ.append(kaidan_z_offsets())
+    lr, lc = _low(lock)
+    sg = -1 if mirrored else 1
+    cells = frozenset((lr + dr, lc + sg * dc) for dr, dc in _KZ[0])
+    if any(not (0 <= r < H and 0 <= c < W) for r, c in cells):
+        return False
+    letters = {rows[r][c] for r, c in cells}
+    return len(letters) == 1 and letters <= {"Z", "S"} and any(cells == p for p in placements(cells, letters.pop(), min(cells)))
+
+
 def filled_fn(rows, lock, unread_filled):
     def f(R, C):
         if (R, C) in lock:
@@ -167,22 +258,27 @@ def near_pc(doc, side, t):
 def technique_reasons(doc, ex, b, unread):
     rows, lock = b["rows"], {tuple(x) for x in b["t_cells"]}
     reg = regions(rows)
-    out = []
+    out, keys = [], {}
     for r, c in ex["key_cells"]:
         ch = rows[r][c]
         if ch == "G":
             out.append("garbage_in_shape")
         elif ch in ".?" or (r, c) in lock:
             out.append("shape_cell_empty")
-        elif len(reg[(r, c)]) % 4:
-            out.append("fragment")
+        else:
+            keys.setdefault(id(reg[(r, c)]), (reg[(r, c)], set()))[1].add((r, c))
+    if any(not whole_cover(rows, frozenset(g) - lock, k) for g, k in keys.values()):
+        out.append("fragment")
     for g in ex.get("one_piece", []):
+        if ex["page"] == "kaidan" and g["name"] == "z":
+            continue  # see the docstring: whole pieces of any letter count
         if len({id(reg.get(tuple(x))) for x in g["cells"]}) != 1 or any(tuple(x) not in reg for x in g["cells"]):
             out.append(f"{g['name']}_not_one_piece")
     if near_pc(doc, b["side"], b["t"]):
         out.append("dpc")
     if ex["page"] == "shachikutrain" and any(
-            fires("kaidan", "kaidan", rows, lock, m, unread) is True for m in (False, True)):
+            fires("kaidan", "kaidan", rows, lock, m, unread) is True and kaidan_z_whole(rows, lock, m)
+            for m in (False, True)):
         out.append("kaidan_window")
     return sorted(set(out))
 
@@ -317,6 +413,37 @@ def selftest():
         print("  the committed file fails its own check")
         return 1
     print("  control: the committed file passes")
+
+    def rule(label, ok):
+        print(f"  {'caught' if ok else 'SURVIVED'}: {label}")
+        if not ok:
+            fails.append(label)
+    blank = ["." * W] * H
+    def grid(cells, ch):
+        g = [list(r) for r in blank]
+        for r, c in cells:
+            g[r][c] = ch
+        return ["".join(r) for r in g]
+    s_rem = [(18, 6), (18, 7), (19, 5), (19, 6), (19, 4)]
+    rule("an S beside a one-cell S remnant read as a fragment",
+         whole_cover(grid(s_rem, "S"), frozenset(s_rem), {(18, 6), (19, 5)}))
+    rule("the remnant itself read as whole",
+         not whole_cover(grid(s_rem, "S"), frozenset(s_rem), {(19, 4)}))
+    bar = [(7, 0), (7, 1), (7, 2), (7, 3)]
+    rule("four L cells in a bar read as an L", not whole_cover(grid(bar, "L"), frozenset(bar), {(7, 0)}))
+    two = [(5, 0), (5, 1), (6, 0), (6, 1), (7, 0), (7, 1), (8, 0), (8, 1)]
+    rule("two key cells of one O sharing one placement read as two pieces",
+         whole_cover(grid(two, "O"), frozenset(two), {(5, 0), (8, 1)})
+         and not whole_cover(grid(two[:6], "O"), frozenset(two[:6]), {(5, 0), (7, 1)}))
+    sh = next(e for e in doc["technique_examples"] if e["board"] == "M44.8" and e["page"] == "shachikutrain")
+    rule("a 社畜 whose 階段 Z is not one piece rejected as kaidan_window",
+         "kaidan_window" not in technique_reasons(doc, sh, board_of(doc, sh["board"]), False))
+    kd = next(e for e in doc["technique_examples"] if e["page"] == "shachikutrain" and "kaidan_window" in e["reasons"])
+    rule("a 社畜 whose 階段 Z IS one piece let through",
+         "kaidan_window" in technique_reasons(doc, kd, board_of(doc, kd["board"]), False))
+    m = next(e for e in doc["technique_examples"] if e["board"] == "M227.43" and e["page"] == "kaidan")
+    rule("a 階段 whose stood-Z cells are an S and an L (whole pieces) rejected",
+         technique_reasons(doc, m, board_of(doc, m["board"]), False) == [])
     q = next(e for e in doc["technique_examples"] if e["verdict"] == "qualifies")
     r = next(e for e in doc["technique_examples"] if "fragment" in e["reasons"])
     dm = next(e for e in doc["dpc_examples"] if e["kind"] == "matched")
