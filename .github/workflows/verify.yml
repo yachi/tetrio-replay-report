@@ -491,6 +491,19 @@ jobs:
             python3 -m pipeline.check_finesse_section "$W" --selftest
           fi
 
+      # 行錯咗嗰一步, the sixth quarantined section: the placement after which a Perfect Clear was no
+      # longer possible, from sim/pc-miss-facts.json. The region must be exactly a re-render, carry
+      # every sentence in pc_miss_section.REQUIRED and no badge; the gate also recomputes every
+      # category and replays every plan. --selftest plants each corruption.
+      - name: Check the simulator-derived pc-miss section
+        run: |
+          set -euo pipefail
+          W="sessions/${{ matrix.session }}/report"
+          python3 -m pipeline.check_pc_miss_section "$W"
+          if [ -f "sessions/${{ matrix.session }}/sim/pc-miss-facts.json" ]; then
+            python3 -m pipeline.check_pc_miss_section "$W" --selftest
+          fi
+
       # 定式路線同中盤手法: the night's slice of the opener route and mid-game technique artefacts,
       # placed early in the report, and 建議's tagged 「未經證明」 items written from it. The region
       # must be exactly a re-render, carry its quarantine sentences and no badge; every tagged item
@@ -1082,6 +1095,9 @@ jobs:
 
       - name: Check the Second PC page audit catches its corruptions
         run: python3 -m pipeline.secondpc_page --selftest
+
+      - name: Check the pc-miss page audit catches its corruptions
+        run: python3 -m pipeline.pc_miss_page --selftest
 
       # 影片實戰例子: boards read off one match video (pipeline/openers/video-examples.json), drawn on
       # the DPC page and on each technique page beside the source drawings, never in any count. The

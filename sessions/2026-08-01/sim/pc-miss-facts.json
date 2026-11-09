@@ -1,0 +1,5624 @@
+{
+ "schema": "pc-miss-facts/1",
+ "session": "2026-08-01",
+ "report_eligible": false,
+ "not_eligible_because": [
+  "one solver over one simulator board: which placement lost the Perfect Clear has no second implementation"
+ ],
+ "rule": "a placement miss: a PC was possible before the lock (hindsight, the round's dealt sequence, frame <= 6 rows) and not after it (re-checked with the engine's own movegen, 180 included), the lock did not itself perfect-clear and the next lock brought no garbage. Reported when in_preview (a PC existed using only the current piece, the hold and the 5-piece preview) and verified (the next lock is inside the verified prefix).",
+ "categories": {
+  "hole": "the placement covered an empty cell",
+  "over": "the stack after the placement is taller than the frame of the solver's PC",
+  "hold": "the solver's first piece is not the piece placed",
+  "spot": "the same piece, placed somewhere else"
+ },
+ "caveat": "a PC being possible does not mean the player was building one",
+ "maxh": 6,
+ "span": 12,
+ "preview": 5,
+ "nodes": 3000000,
+ "md5": {
+  "replay_facts": "4677b48ff08b91deeb973b77c146c5d0",
+  "pipeline/sim/pc-miss.ts": "6a992f7aec9dba28eb3c7241bc231da6",
+  "pipeline/sim/pc-solver.ts": "49f59c21e63294641a3d71c82aaf123a",
+  "pipeline/sim/pc-engine-gen.ts": "43ca4e0bbc7843f0d8212ff721df4740"
+ },
+ "rounds": [
+  {
+   "match": 1,
+   "round": 0,
+   "file": "replay-2026-08-01-2.ttrm",
+   "user": "pinglamb",
+   "verified_to": 65,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "not_evaluated",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 1,
+   "round": 0,
+   "file": "replay-2026-08-01-2.ttrm",
+   "user": "yachi",
+   "verified_to": 66,
+   "windows": []
+  },
+  {
+   "match": 1,
+   "round": 1,
+   "file": "replay-2026-08-01-2.ttrm",
+   "user": "yachi",
+   "verified_to": 68,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 18,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": false,
+       "state": {
+        "grid": [
+         "IZZJ.LLLOO",
+         "ZZZZ.LLLOO",
+         ".ZZ.....OO",
+         "..........",
+         "..........",
+         ".........."
+        ],
+        "cur": "S",
+        "hold": "J",
+        "next": "ILOSJ",
+        "piece": "S",
+        "held": false,
+        "cells": [
+         26,
+         27,
+         37,
+         38
+        ],
+        "lines": 0
+       },
+       "after": [
+        "IZZJ.LLLOO",
+        "ZZZZ.LLLOO",
+        ".ZZ...SSOO",
+        ".......SS.",
+        "..........",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "S",
+         "cells": [
+          31,
+          32,
+          42,
+          43
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          20,
+          30,
+          40,
+          41
+         ],
+         "held": true
+        },
+        {
+         "piece": "L",
+         "cells": [
+          23,
+          33,
+          34,
+          35
+         ],
+         "held": false
+        },
+        {
+         "piece": "O",
+         "cells": [
+          38,
+          39,
+          48,
+          49
+         ],
+         "held": false
+        },
+        {
+         "piece": "S",
+         "cells": [
+          25,
+          26,
+          36,
+          37
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          27,
+          35,
+          36,
+          37
+         ],
+         "held": false
+        },
+        {
+         "piece": "I",
+         "cells": [
+          4,
+          14,
+          24,
+          34
+         ],
+         "held": true
+        }
+       ],
+       "plan_H": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 1,
+   "round": 1,
+   "file": "replay-2026-08-01-2.ttrm",
+   "user": "pinglamb",
+   "verified_to": 60,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 17,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": false,
+       "state": {
+        "grid": [
+         ".JOOLLZZ.I",
+         ".JOOLOO..I",
+         "....LOO...",
+         "..........",
+         "..........",
+         ".........."
+        ],
+        "cur": "J",
+        "hold": "Z",
+        "next": "SILOS",
+        "piece": "J",
+        "held": false,
+        "cells": [
+         8,
+         18,
+         28,
+         29
+        ],
+        "lines": 0
+       },
+       "after": [
+        ".JOOLLZZJI",
+        ".JOOLOO.JI",
+        "....LOO.JJ",
+        "..........",
+        "..........",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "J",
+         "cells": [
+          22,
+          30,
+          31,
+          32
+         ],
+         "held": false
+        },
+        {
+         "piece": "S",
+         "cells": [
+          8,
+          17,
+          18,
+          27
+         ],
+         "held": false
+        },
+        {
+         "piece": "Z",
+         "cells": [
+          23,
+          33,
+          34,
+          44
+         ],
+         "held": true
+        },
+        {
+         "piece": "I",
+         "cells": [
+          40,
+          41,
+          42,
+          43
+         ],
+         "held": true
+        },
+        {
+         "piece": "O",
+         "cells": [
+          35,
+          36,
+          45,
+          46
+         ],
+         "held": false
+        },
+        {
+         "piece": "S",
+         "cells": [
+          28,
+          37,
+          38,
+          47
+         ],
+         "held": false
+        },
+        {
+         "piece": "L",
+         "cells": [
+          29,
+          39,
+          48,
+          49
+         ],
+         "held": true
+        },
+        {
+         "piece": "J",
+         "cells": [
+          0,
+          10,
+          20,
+          21
+         ],
+         "held": true
+        }
+       ],
+       "plan_H": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 1,
+   "round": 2,
+   "file": "replay-2026-08-01-2.ttrm",
+   "user": "yachi",
+   "verified_to": 163,
+   "windows": []
+  },
+  {
+   "match": 1,
+   "round": 2,
+   "file": "replay-2026-08-01-2.ttrm",
+   "user": "pinglamb",
+   "verified_to": 156,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "not_evaluated",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 1,
+   "round": 3,
+   "file": "replay-2026-08-01-2.ttrm",
+   "user": "pinglamb",
+   "verified_to": 94,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 15,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": true,
+       "state": {
+        "grid": [
+         "ILLST.JJOO",
+         "IOOS...ZZI",
+         "IJSS..ZZ.I",
+         "IJS......I",
+         "IJJ.......",
+         ".........."
+        ],
+        "cur": "S",
+        "hold": "Z",
+        "next": "JLOTO",
+        "piece": "S",
+        "held": false,
+        "cells": [
+         35,
+         36,
+         46,
+         47
+        ],
+        "lines": 0
+       },
+       "after": [
+        "ILLST.JJOO",
+        "IOOS...ZZI",
+        "IJSS..ZZ.I",
+        "IJS..SS..I",
+        "IJJ...SS..",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "S",
+         "cells": [
+          24,
+          33,
+          34,
+          43
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          28,
+          38,
+          48,
+          49
+         ],
+         "held": false
+        },
+        {
+         "piece": "L",
+         "cells": [
+          25,
+          35,
+          44,
+          45
+         ],
+         "held": false
+        },
+        {
+         "piece": "O",
+         "cells": [
+          26,
+          27,
+          36,
+          37
+         ],
+         "held": false
+        },
+        {
+         "piece": "T",
+         "cells": [
+          5,
+          14,
+          15,
+          16
+         ],
+         "held": false
+        }
+       ],
+       "plan_H": 5,
+       "category": "hole"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 1,
+   "round": 3,
+   "file": "replay-2026-08-01-2.ttrm",
+   "user": "yachi",
+   "verified_to": 82,
+   "windows": []
+  },
+  {
+   "match": 1,
+   "round": 4,
+   "file": "replay-2026-08-01-2.ttrm",
+   "user": "pinglamb",
+   "verified_to": 225,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 17,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": false,
+       "state": {
+        "grid": [
+         "S..ZJJOOJI",
+         ".....JOOJI",
+         ".....JIIII",
+         "..........",
+         "..........",
+         ".........."
+        ],
+        "cur": "Z",
+        "hold": "L",
+        "next": "SOIJO",
+        "piece": "L",
+        "held": true,
+        "cells": [
+         2,
+         12,
+         13,
+         14
+        ],
+        "lines": 0
+       },
+       "after": [
+        "S.LZJJOOJI",
+        "..LLLJOOJI",
+        ".....JIIII",
+        "..........",
+        "..........",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "Z",
+         "cells": [
+          1,
+          2,
+          10,
+          11
+         ],
+         "held": false
+        },
+        {
+         "piece": "S",
+         "cells": [
+          13,
+          14,
+          24,
+          25
+         ],
+         "held": false
+        },
+        {
+         "piece": "O",
+         "cells": [
+          26,
+          27,
+          36,
+          37
+         ],
+         "held": false
+        },
+        {
+         "piece": "I",
+         "cells": [
+          32,
+          33,
+          34,
+          35
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          10,
+          20,
+          30,
+          31
+         ],
+         "held": false
+        },
+        {
+         "piece": "O",
+         "cells": [
+          28,
+          29,
+          38,
+          39
+         ],
+         "held": false
+        },
+        {
+         "piece": "S",
+         "cells": [
+          2,
+          11,
+          12,
+          21
+         ],
+         "held": false
+        },
+        {
+         "piece": "Z",
+         "cells": [
+          3,
+          4,
+          12,
+          13
+         ],
+         "held": false
+        }
+       ],
+       "plan_H": 5
+      },
+      {
+       "i": 21,
+       "verified": true,
+       "lost_to": "garbage"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 1,
+   "round": 4,
+   "file": "replay-2026-08-01-2.ttrm",
+   "user": "yachi",
+   "verified_to": 225,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 17,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": false,
+       "state": {
+        "grid": [
+         "JSOO..LJJI",
+         "JJOO....JI",
+         "........JI",
+         ".........I",
+         ".........I",
+         ".........."
+        ],
+        "cur": "Z",
+        "hold": "L",
+        "next": "SOIJO",
+        "piece": "Z",
+        "held": false,
+        "cells": [
+         5,
+         15,
+         16,
+         26
+        ],
+        "lines": 0
+       },
+       "after": [
+        "JSOO.ZLJJI",
+        "JJOO.ZZ.JI",
+        "......Z.JI",
+        ".........I",
+        ".........I",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "Z",
+         "cells": [
+          27,
+          37,
+          38,
+          48
+         ],
+         "held": false
+        },
+        {
+         "piece": "S",
+         "cells": [
+          35,
+          36,
+          46,
+          47
+         ],
+         "held": false
+        },
+        {
+         "piece": "O",
+         "cells": [
+          20,
+          21,
+          30,
+          31
+         ],
+         "held": false
+        },
+        {
+         "piece": "I",
+         "cells": [
+          40,
+          41,
+          42,
+          43
+         ],
+         "held": false
+        },
+        {
+         "piece": "L",
+         "cells": [
+          22,
+          32,
+          33,
+          34
+         ],
+         "held": true
+        },
+        {
+         "piece": "O",
+         "cells": [
+          4,
+          5,
+          14,
+          15
+         ],
+         "held": false
+        },
+        {
+         "piece": "S",
+         "cells": [
+          13,
+          14,
+          24,
+          25
+         ],
+         "held": false
+        },
+        {
+         "piece": "Z",
+         "cells": [
+          6,
+          7,
+          15,
+          16
+         ],
+         "held": false
+        }
+       ],
+       "plan_H": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 1,
+   "round": 5,
+   "file": "replay-2026-08-01-2.ttrm",
+   "user": "yachi",
+   "verified_to": 37,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 16,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": false,
+       "state": {
+        "grid": [
+         "OOJJ.ZLSSI",
+         ".....ZZ.SS",
+         "......Z...",
+         "..........",
+         "..........",
+         ".........."
+        ],
+        "cur": "O",
+        "hold": "I",
+        "next": "SJLZO",
+        "piece": "I",
+        "held": true,
+        "cells": [
+         10,
+         11,
+         12,
+         13
+        ],
+        "lines": 0
+       },
+       "after": [
+        "OOJJ.ZLSSI",
+        "IIII.ZZ.SS",
+        "......Z...",
+        "..........",
+        "..........",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "O",
+         "cells": [
+          36,
+          37,
+          46,
+          47
+         ],
+         "held": false
+        },
+        {
+         "piece": "S",
+         "cells": [
+          4,
+          13,
+          14,
+          23
+         ],
+         "held": false
+        },
+        {
+         "piece": "I",
+         "cells": [
+          2,
+          12,
+          22,
+          32
+         ],
+         "held": true
+        },
+        {
+         "piece": "L",
+         "cells": [
+          7,
+          17,
+          18,
+          19
+         ],
+         "held": false
+        },
+        {
+         "piece": "Z",
+         "cells": [
+          14,
+          15,
+          23,
+          24
+         ],
+         "held": false
+        },
+        {
+         "piece": "O",
+         "cells": [
+          28,
+          29,
+          38,
+          39
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          25,
+          33,
+          34,
+          35
+         ],
+         "held": true
+        },
+        {
+         "piece": "T",
+         "cells": [
+          1,
+          10,
+          11,
+          21
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          0,
+          10,
+          20,
+          21
+         ],
+         "held": false
+        }
+       ],
+       "plan_H": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 1,
+   "round": 5,
+   "file": "replay-2026-08-01-2.ttrm",
+   "user": "pinglamb",
+   "verified_to": 14,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "not_evaluated",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 1,
+   "round": 6,
+   "file": "replay-2026-08-01-2.ttrm",
+   "user": "yachi",
+   "verified_to": 142,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 16,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": true,
+       "state": {
+        "grid": [
+         "IJJJ.ZZTOO",
+         "OOJ...LLLI",
+         "OOJJ..LSSI",
+         "OO.....LSS",
+         "OO.....LLL",
+         ".........."
+        ],
+        "cur": "S",
+        "hold": "J",
+        "next": "ITZJI",
+        "piece": "J",
+        "held": true,
+        "cells": [
+         58,
+         59,
+         69,
+         79
+        ],
+        "lines": 0
+       },
+       "after": [
+        "IJJJ.ZZTOO",
+        "OOJ...LLLI",
+        "OOJJ..LSSI",
+        "OO.....LSS",
+        "OO.....LLL",
+        "........JJ"
+       ],
+       "plan": [
+        {
+         "piece": "S",
+         "cells": [
+          24,
+          25,
+          35,
+          36
+         ],
+         "held": false
+        },
+        {
+         "piece": "I",
+         "cells": [
+          33,
+          34,
+          35,
+          36
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          22,
+          23,
+          24,
+          32
+         ],
+         "held": true
+        },
+        {
+         "piece": "T",
+         "cells": [
+          4,
+          13,
+          14,
+          15
+         ],
+         "held": true
+        }
+       ],
+       "plan_H": 5,
+       "category": "over"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 1,
+   "round": 6,
+   "file": "replay-2026-08-01-2.ttrm",
+   "user": "pinglamb",
+   "verified_to": 105,
+   "windows": []
+  },
+  {
+   "match": 1,
+   "round": 7,
+   "file": "replay-2026-08-01-2.ttrm",
+   "user": "yachi",
+   "verified_to": 67,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 18,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": false,
+       "state": {
+        "grid": [
+         "IOOJS.OOZL",
+         ".OOSS.OOLL",
+         "...S..IIII",
+         "..........",
+         "..........",
+         ".........."
+        ],
+        "cur": "Z",
+        "hold": "J",
+        "next": "LJLST",
+        "piece": "J",
+        "held": true,
+        "cells": [
+         38,
+         39,
+         49,
+         59
+        ],
+        "lines": 0
+       },
+       "after": [
+        "IOOJS.OOZL",
+        ".OOSS.OOLL",
+        "...S..IIII",
+        "........JJ",
+        ".........J",
+        ".........J"
+       ],
+       "plan": [
+        {
+         "piece": "Z",
+         "cells": [
+          22,
+          32,
+          33,
+          43
+         ],
+         "held": false
+        },
+        {
+         "piece": "L",
+         "cells": [
+          5,
+          15,
+          24,
+          25
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          24,
+          25,
+          26,
+          34
+         ],
+         "held": false
+        },
+        {
+         "piece": "L",
+         "cells": [
+          27,
+          28,
+          29,
+          39
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          0,
+          10,
+          20,
+          21
+         ],
+         "held": true
+        },
+        {
+         "piece": "T",
+         "cells": [
+          1,
+          10,
+          11,
+          12
+         ],
+         "held": false
+        },
+        {
+         "piece": "I",
+         "cells": [
+          5,
+          6,
+          7,
+          8
+         ],
+         "held": false
+        }
+       ],
+       "plan_H": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 1,
+   "round": 7,
+   "file": "replay-2026-08-01-2.ttrm",
+   "user": "pinglamb",
+   "verified_to": 44,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_other",
+     "misses": [
+      {
+       "i": 14,
+       "verified": true,
+       "lost_to": "garbage"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 2,
+   "round": 0,
+   "file": "replay-2026-08-01-3.ttrm",
+   "user": "pinglamb",
+   "verified_to": 27,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "not_evaluated",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 2,
+   "round": 0,
+   "file": "replay-2026-08-01-3.ttrm",
+   "user": "yachi",
+   "verified_to": 23,
+   "windows": []
+  },
+  {
+   "match": 2,
+   "round": 1,
+   "file": "replay-2026-08-01-3.ttrm",
+   "user": "pinglamb",
+   "verified_to": 214,
+   "windows": []
+  },
+  {
+   "match": 2,
+   "round": 1,
+   "file": "replay-2026-08-01-3.ttrm",
+   "user": "yachi",
+   "verified_to": 199,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_other",
+     "misses": [
+      {
+       "i": 19,
+       "verified": true,
+       "lost_to": "garbage"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 2,
+   "round": 2,
+   "file": "replay-2026-08-01-3.ttrm",
+   "user": "pinglamb",
+   "verified_to": 79,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "not_evaluated",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 2,
+   "round": 2,
+   "file": "replay-2026-08-01-3.ttrm",
+   "user": "yachi",
+   "verified_to": 84,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 15,
+     "end": 27,
+     "pcLock": null,
+     "outcome": "never",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 2,
+   "round": 3,
+   "file": "replay-2026-08-01-3.ttrm",
+   "user": "yachi",
+   "verified_to": 116,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 17,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": false,
+       "state": {
+        "grid": [
+         "OOJJ.ZLSSI",
+         "IIII.ZZ.SS",
+         "......Z...",
+         "..........",
+         "..........",
+         ".........."
+        ],
+        "cur": "S",
+        "hold": "O",
+        "next": "JLTJS",
+        "piece": "O",
+        "held": true,
+        "cells": [
+         21,
+         22,
+         31,
+         32
+        ],
+        "lines": 0
+       },
+       "after": [
+        "OOJJ.ZLSSI",
+        "IIII.ZZ.SS",
+        ".OO...Z...",
+        ".OO.......",
+        "..........",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "O",
+         "cells": [
+          36,
+          37,
+          46,
+          47
+         ],
+         "held": true
+        },
+        {
+         "piece": "J",
+         "cells": [
+          4,
+          14,
+          24,
+          25
+         ],
+         "held": false
+        },
+        {
+         "piece": "L",
+         "cells": [
+          7,
+          17,
+          18,
+          19
+         ],
+         "held": false
+        },
+        {
+         "piece": "S",
+         "cells": [
+          2,
+          3,
+          13,
+          14
+         ],
+         "held": true
+        },
+        {
+         "piece": "J",
+         "cells": [
+          15,
+          23,
+          24,
+          25
+         ],
+         "held": false
+        },
+        {
+         "piece": "S",
+         "cells": [
+          0,
+          1,
+          11,
+          12
+         ],
+         "held": false
+        },
+        {
+         "piece": "L",
+         "cells": [
+          0,
+          10,
+          11,
+          12
+         ],
+         "held": false
+        },
+        {
+         "piece": "O",
+         "cells": [
+          8,
+          9,
+          18,
+          19
+         ],
+         "held": false
+        }
+       ],
+       "plan_H": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 2,
+   "round": 3,
+   "file": "replay-2026-08-01-3.ttrm",
+   "user": "pinglamb",
+   "verified_to": 92,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_other",
+     "misses": [
+      {
+       "i": 16,
+       "verified": true,
+       "lost_to": "garbage"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 2,
+   "round": 4,
+   "file": "replay-2026-08-01-3.ttrm",
+   "user": "yachi",
+   "verified_to": 15,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 14,
+     "end": 19,
+     "pcLock": 19,
+     "outcome": "pc",
+     "misses": []
+    },
+    {
+     "kind": "pc",
+     "start": 19,
+     "end": 24,
+     "pcLock": null,
+     "outcome": "lost_other",
+     "misses": [
+      {
+       "i": 22,
+       "verified": false,
+       "lost_to": "unknown"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 2,
+   "round": 4,
+   "file": "replay-2026-08-01-3.ttrm",
+   "user": "pinglamb",
+   "verified_to": -1,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 19,
+     "pcLock": null,
+     "outcome": "not_evaluated",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 2,
+   "round": 5,
+   "file": "replay-2026-08-01-3.ttrm",
+   "user": "yachi",
+   "verified_to": 145,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "possible_to_end",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 2,
+   "round": 5,
+   "file": "replay-2026-08-01-3.ttrm",
+   "user": "pinglamb",
+   "verified_to": 124,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 19,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": true,
+       "state": {
+        "grid": [
+         "OOJJ..LSZI",
+         "JJJ...SSZZ",
+         "J.....SLLZ",
+         ".......LOO",
+         ".......LOO",
+         ".........."
+        ],
+        "cur": "S",
+        "hold": "I",
+        "next": "ZTIJS",
+        "piece": "S",
+        "held": false,
+        "cells": [
+         4,
+         13,
+         14,
+         23
+        ],
+        "lines": 0
+       },
+       "after": [
+        "OOJJS.LSZI",
+        "JJJSS.SSZZ",
+        "J..S..SLLZ",
+        ".......LOO",
+        ".......LOO",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "S",
+         "cells": [
+          21,
+          30,
+          31,
+          40
+         ],
+         "held": false
+        },
+        {
+         "piece": "Z",
+         "cells": [
+          32,
+          33,
+          41,
+          42
+         ],
+         "held": false
+        },
+        {
+         "piece": "I",
+         "cells": [
+          43,
+          44,
+          45,
+          46
+         ],
+         "held": true
+        },
+        {
+         "piece": "I",
+         "cells": [
+          22,
+          23,
+          24,
+          25
+         ],
+         "held": false
+        },
+        {
+         "piece": "T",
+         "cells": [
+          13,
+          14,
+          15,
+          24
+         ],
+         "held": true
+        },
+        {
+         "piece": "S",
+         "cells": [
+          4,
+          5,
+          15,
+          16
+         ],
+         "held": false
+        }
+       ],
+       "plan_H": 5,
+       "category": "spot"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 2,
+   "round": 6,
+   "file": "replay-2026-08-01-3.ttrm",
+   "user": "pinglamb",
+   "verified_to": 103,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 14,
+     "end": 26,
+     "pcLock": null,
+     "outcome": "not_evaluated",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 2,
+   "round": 6,
+   "file": "replay-2026-08-01-3.ttrm",
+   "user": "yachi",
+   "verified_to": 107,
+   "windows": []
+  },
+  {
+   "match": 2,
+   "round": 7,
+   "file": "replay-2026-08-01-3.ttrm",
+   "user": "pinglamb",
+   "verified_to": 36,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 16,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": true,
+       "state": {
+        "grid": [
+         "ILLST.JJOO",
+         "SSZZ...JJI",
+         "SZZZ..OOJI",
+         "ZZJ...OOJI",
+         "JJJ.......",
+         ".........."
+        ],
+        "cur": "I",
+        "hold": "O",
+        "next": "SLTTL",
+        "piece": "I",
+        "held": false,
+        "cells": [
+         50,
+         60,
+         70,
+         80
+        ],
+        "lines": 0
+       },
+       "after": [
+        "ILLST.JJOO",
+        "SSZZ...JJI",
+        "SZZZ..OOJI",
+        "ZZJ...OOJI",
+        "JJJ.......",
+        "I........."
+       ],
+       "plan": [
+        {
+         "piece": "I",
+         "cells": [
+          46,
+          47,
+          48,
+          49
+         ],
+         "held": false
+        },
+        {
+         "piece": "S",
+         "cells": [
+          24,
+          33,
+          34,
+          43
+         ],
+         "held": false
+        },
+        {
+         "piece": "L",
+         "cells": [
+          25,
+          35,
+          44,
+          45
+         ],
+         "held": false
+        },
+        {
+         "piece": "T",
+         "cells": [
+          5,
+          14,
+          15,
+          16
+         ],
+         "held": false
+        }
+       ],
+       "plan_H": 5,
+       "category": "over"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 2,
+   "round": 7,
+   "file": "replay-2026-08-01-3.ttrm",
+   "user": "yachi",
+   "verified_to": 22,
+   "windows": []
+  },
+  {
+   "match": 3,
+   "round": 0,
+   "file": "replay-2026-08-01-4.ttrm",
+   "user": "yachi",
+   "verified_to": 140,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 18,
+     "end": 30,
+     "pcLock": null,
+     "outcome": "not_evaluated",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 3,
+   "round": 0,
+   "file": "replay-2026-08-01-4.ttrm",
+   "user": "pinglamb",
+   "verified_to": 143,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "never",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 3,
+   "round": 1,
+   "file": "replay-2026-08-01-4.ttrm",
+   "user": "pinglamb",
+   "verified_to": 31,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 14,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": true,
+       "state": {
+        "grid": [
+         "OOTSS.IIII",
+         "LL.J...ZZI",
+         "LL.J..ZZ.I",
+         "OO.......I",
+         "OO........",
+         ".........."
+        ],
+        "cur": "O",
+        "hold": "S",
+        "next": "TIZLJ",
+        "piece": "S",
+        "held": true,
+        "cells": [
+         35,
+         36,
+         46,
+         47
+        ],
+        "lines": 0
+       },
+       "after": [
+        "OOTSS.IIII",
+        "LL.J...ZZI",
+        "LL.J..ZZ.I",
+        "OO...SS..I",
+        "OO....SS..",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "O",
+         "cells": [
+          36,
+          37,
+          46,
+          47
+         ],
+         "held": false
+        },
+        {
+         "piece": "T",
+         "cells": [
+          5,
+          14,
+          15,
+          16
+         ],
+         "held": false
+        },
+        {
+         "piece": "I",
+         "cells": [
+          2,
+          12,
+          22,
+          32
+         ],
+         "held": false
+        },
+        {
+         "piece": "S",
+         "cells": [
+          4,
+          13,
+          14,
+          23
+         ],
+         "held": true
+        },
+        {
+         "piece": "L",
+         "cells": [
+          5,
+          15,
+          24,
+          25
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          8,
+          18,
+          28,
+          29
+         ],
+         "held": false
+        }
+       ],
+       "plan_H": 5,
+       "category": "hole"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 3,
+   "round": 1,
+   "file": "replay-2026-08-01-4.ttrm",
+   "user": "yachi",
+   "verified_to": 27,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 14,
+     "end": 26,
+     "pcLock": null,
+     "outcome": "lost_other",
+     "misses": [
+      {
+       "i": 19,
+       "verified": true,
+       "lost_to": "garbage"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 3,
+   "round": 2,
+   "file": "replay-2026-08-01-4.ttrm",
+   "user": "pinglamb",
+   "verified_to": 88,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 19,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": true,
+       "state": {
+        "grid": [
+         "GGGGG.GGGG",
+         "GGGGG.GGGG",
+         "OOJJ..LSSI",
+         "OO....SSSS",
+         "OO.....SSJ",
+         ".......JJJ"
+        ],
+        "cur": "L",
+        "hold": "Z",
+        "next": "SJOLZ",
+        "piece": "L",
+        "held": false,
+        "cells": [
+         67,
+         68,
+         69,
+         79
+        ],
+        "lines": 0
+       },
+       "after": [
+        "GGGGG.GGGG",
+        "GGGGG.GGGG",
+        "OOJJ..LSSI",
+        "OO....SSSS",
+        "OO.....SSJ",
+        ".......JJJ"
+       ],
+       "plan": [
+        {
+         "piece": "L",
+         "cells": [
+          5,
+          15,
+          24,
+          25
+         ],
+         "held": false
+        },
+        {
+         "piece": "S",
+         "cells": [
+          2,
+          3,
+          13,
+          14
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          12,
+          20,
+          21,
+          22
+         ],
+         "held": false
+        },
+        {
+         "piece": "O",
+         "cells": [
+          15,
+          16,
+          25,
+          26
+         ],
+         "held": false
+        },
+        {
+         "piece": "Z",
+         "cells": [
+          4,
+          5,
+          13,
+          14
+         ],
+         "held": true
+        }
+       ],
+       "plan_H": 6,
+       "category": "over"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 3,
+   "round": 2,
+   "file": "replay-2026-08-01-4.ttrm",
+   "user": "yachi",
+   "verified_to": 88,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_other",
+     "misses": [
+      {
+       "i": 16,
+       "verified": true,
+       "lost_to": "garbage"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 3,
+   "round": 3,
+   "file": "replay-2026-08-01-4.ttrm",
+   "user": "yachi",
+   "verified_to": 67,
+   "windows": []
+  },
+  {
+   "match": 3,
+   "round": 3,
+   "file": "replay-2026-08-01-4.ttrm",
+   "user": "pinglamb",
+   "verified_to": 47,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_other",
+     "misses": [
+      {
+       "i": 24,
+       "verified": true,
+       "lost_to": "garbage"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 3,
+   "round": 4,
+   "file": "replay-2026-08-01-4.ttrm",
+   "user": "pinglamb",
+   "verified_to": 92,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 12,
+     "end": 24,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 15,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": true,
+       "state": {
+        "grid": [
+         "OOTSS.IIII",
+         "LOOL...JJJ",
+         "JZLL..IIII",
+         "JZZ.......",
+         "JJZ.......",
+         ".........."
+        ],
+        "cur": "Z",
+        "hold": "I",
+        "next": "LOSTJ",
+        "piece": "I",
+        "held": true,
+        "cells": [
+         36,
+         37,
+         38,
+         39
+        ],
+        "lines": 0
+       },
+       "after": [
+        "OOTSS.IIII",
+        "LOOL...JJJ",
+        "JZLL..IIII",
+        "JZZ...IIII",
+        "JJZ.......",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "Z",
+         "cells": [
+          24,
+          25,
+          33,
+          34
+         ],
+         "held": false
+        },
+        {
+         "piece": "L",
+         "cells": [
+          25,
+          26,
+          27,
+          37
+         ],
+         "held": false
+        },
+        {
+         "piece": "O",
+         "cells": [
+          28,
+          29,
+          38,
+          39
+         ],
+         "held": false
+        },
+        {
+         "piece": "I",
+         "cells": [
+          23,
+          24,
+          25,
+          26
+         ],
+         "held": true
+        },
+        {
+         "piece": "T",
+         "cells": [
+          5,
+          14,
+          15,
+          16
+         ],
+         "held": false
+        }
+       ],
+       "plan_H": 5,
+       "category": "hold"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 3,
+   "round": 4,
+   "file": "replay-2026-08-01-4.ttrm",
+   "user": "yachi",
+   "verified_to": 85,
+   "windows": []
+  },
+  {
+   "match": 3,
+   "round": 5,
+   "file": "replay-2026-08-01-4.ttrm",
+   "user": "yachi",
+   "verified_to": 106,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 15,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": true,
+       "state": {
+        "grid": [
+         "ILSS..JJ..",
+         "ILLL......",
+         "..........",
+         "..........",
+         "..........",
+         ".........."
+        ],
+        "cur": "S",
+        "hold": "L",
+        "next": "ZOIJO",
+        "piece": "S",
+        "held": false,
+        "cells": [
+         17,
+         18,
+         28,
+         29
+        ],
+        "lines": 0
+       },
+       "after": [
+        "ILSS..JJ..",
+        "ILLL...SS.",
+        "........SS",
+        "..........",
+        "..........",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "S",
+         "cells": [
+          4,
+          5,
+          15,
+          16
+         ],
+         "held": false
+        },
+        {
+         "piece": "Z",
+         "cells": [
+          8,
+          9,
+          17,
+          18
+         ],
+         "held": false
+        },
+        {
+         "piece": "L",
+         "cells": [
+          4,
+          14,
+          15,
+          16
+         ],
+         "held": true
+        },
+        {
+         "piece": "I",
+         "cells": [
+          10,
+          11,
+          12,
+          13
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          9,
+          17,
+          18,
+          19
+         ],
+         "held": false
+        }
+       ],
+       "plan_H": 3,
+       "category": "hole"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 3,
+   "round": 5,
+   "file": "replay-2026-08-01-4.ttrm",
+   "user": "pinglamb",
+   "verified_to": -1,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 19,
+     "pcLock": 19,
+     "outcome": "pc",
+     "misses": []
+    },
+    {
+     "kind": "pc",
+     "start": 19,
+     "end": 31,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 22,
+       "verified": false,
+       "lost_to": "placement",
+       "in_preview": false,
+       "state": {
+        "grid": [
+         ".OO....OO.",
+         ".OO....OO.",
+         "..........",
+         "..........",
+         "..........",
+         ".........."
+        ],
+        "cur": "J",
+        "hold": "L",
+        "next": "ITZSI",
+        "piece": "J",
+        "held": false,
+        "cells": [
+         19,
+         27,
+         28,
+         29
+        ],
+        "lines": 0
+       },
+       "after": [
+        ".OO....OO.",
+        ".OO....OOJ",
+        ".......JJJ",
+        "..........",
+        "..........",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "J",
+         "cells": [
+          22,
+          23,
+          24,
+          32
+         ],
+         "held": false
+        },
+        {
+         "piece": "I",
+         "cells": [
+          0,
+          10,
+          20,
+          30
+         ],
+         "held": false
+        },
+        {
+         "piece": "T",
+         "cells": [
+          33,
+          43,
+          44,
+          53
+         ],
+         "held": false
+        },
+        {
+         "piece": "L",
+         "cells": [
+          21,
+          31,
+          40,
+          41
+         ],
+         "held": true
+        },
+        {
+         "piece": "S",
+         "cells": [
+          28,
+          37,
+          38,
+          47
+         ],
+         "held": false
+        },
+        {
+         "piece": "I",
+         "cells": [
+          9,
+          19,
+          29,
+          39
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          42,
+          50,
+          51,
+          52
+         ],
+         "held": false
+        },
+        {
+         "piece": "T",
+         "cells": [
+          25,
+          34,
+          35,
+          36
+         ],
+         "held": false
+        },
+        {
+         "piece": "Z",
+         "cells": [
+          26,
+          27,
+          35,
+          36
+         ],
+         "held": true
+        },
+        {
+         "piece": "O",
+         "cells": [
+          28,
+          29,
+          38,
+          39
+         ],
+         "held": false
+        },
+        {
+         "piece": "Z",
+         "cells": [
+          3,
+          13,
+          14,
+          24
+         ],
+         "held": false
+        },
+        {
+         "piece": "S",
+         "cells": [
+          4,
+          5,
+          15,
+          16
+         ],
+         "held": true
+        },
+        {
+         "piece": "T",
+         "cells": [
+          6,
+          15,
+          16,
+          17
+         ],
+         "held": false
+        }
+       ],
+       "plan_H": 6
+      },
+      {
+       "i": 30,
+       "verified": false,
+       "lost_to": "garbage"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 3,
+   "round": 6,
+   "file": "replay-2026-08-01-4.ttrm",
+   "user": "yachi",
+   "verified_to": 73,
+   "windows": []
+  },
+  {
+   "match": 3,
+   "round": 6,
+   "file": "replay-2026-08-01-4.ttrm",
+   "user": "pinglamb",
+   "verified_to": 55,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 15,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": true,
+       "state": {
+        "grid": [
+         "ILLST.JJOO",
+         "SSZZ...JJI",
+         "SZZZ..OOJI",
+         "ZZ....OOJI",
+         "..........",
+         ".........."
+        ],
+        "cur": "S",
+        "hold": "L",
+        "next": "JIOTS",
+        "piece": "L",
+        "held": true,
+        "cells": [
+         33,
+         34,
+         43,
+         53
+        ],
+        "lines": 0
+       },
+       "after": [
+        "ILLST.JJOO",
+        "SSZZ...JJI",
+        "SZZZ..OOJI",
+        "ZZ.LL.OOJI",
+        "...L......",
+        "...L......"
+       ],
+       "plan": [
+        {
+         "piece": "S",
+         "cells": [
+          24,
+          33,
+          34,
+          43
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          32,
+          40,
+          41,
+          42
+         ],
+         "held": false
+        },
+        {
+         "piece": "I",
+         "cells": [
+          46,
+          47,
+          48,
+          49
+         ],
+         "held": false
+        },
+        {
+         "piece": "L",
+         "cells": [
+          25,
+          35,
+          44,
+          45
+         ],
+         "held": true
+        },
+        {
+         "piece": "T",
+         "cells": [
+          5,
+          14,
+          15,
+          16
+         ],
+         "held": false
+        }
+       ],
+       "plan_H": 5,
+       "category": "hole"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 3,
+   "round": 7,
+   "file": "replay-2026-08-01-4.ttrm",
+   "user": "yachi",
+   "verified_to": 49,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 15,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": true,
+       "state": {
+        "grid": [
+         "OOTSS.LLLI",
+         "IJJJ...ZZL",
+         "IS.J..OOZL",
+         "SS....OOLL",
+         "S.........",
+         ".........."
+        ],
+        "cur": "Z",
+        "hold": "J",
+        "next": "TLIOJ",
+        "piece": "J",
+        "held": true,
+        "cells": [
+         48,
+         49,
+         59,
+         69
+        ],
+        "lines": 0
+       },
+       "after": [
+        "OOTSS.LLLI",
+        "IJJJ...ZZL",
+        "IS.J..OOZL",
+        "SS....OOLL",
+        "S.......JJ",
+        ".........J"
+       ],
+       "plan": [
+        {
+         "piece": "Z",
+         "cells": [
+          24,
+          25,
+          33,
+          34
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          35,
+          43,
+          44,
+          45
+         ],
+         "held": true
+        },
+        {
+         "piece": "L",
+         "cells": [
+          22,
+          32,
+          41,
+          42
+         ],
+         "held": false
+        },
+        {
+         "piece": "I",
+         "cells": [
+          26,
+          27,
+          28,
+          29
+         ],
+         "held": false
+        },
+        {
+         "piece": "T",
+         "cells": [
+          5,
+          14,
+          15,
+          16
+         ],
+         "held": true
+        }
+       ],
+       "plan_H": 5,
+       "category": "over"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 3,
+   "round": 7,
+   "file": "replay-2026-08-01-4.ttrm",
+   "user": "pinglamb",
+   "verified_to": 40,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "never",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 4,
+   "round": 0,
+   "file": "replay-2026-08-01-5.ttrm",
+   "user": "yachi",
+   "verified_to": 282,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_other",
+     "misses": [
+      {
+       "i": 17,
+       "verified": true,
+       "lost_to": "garbage"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 4,
+   "round": 0,
+   "file": "replay-2026-08-01-5.ttrm",
+   "user": "pinglamb",
+   "verified_to": 231,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "not_evaluated",
+     "misses": []
+    },
+    {
+     "kind": "pc",
+     "start": 119,
+     "end": 131,
+     "pcLock": null,
+     "outcome": "lost_other",
+     "misses": [
+      {
+       "i": 122,
+       "verified": true,
+       "lost_to": "garbage"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 4,
+   "round": 1,
+   "file": "replay-2026-08-01-5.ttrm",
+   "user": "pinglamb",
+   "verified_to": 132,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "not_evaluated",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 4,
+   "round": 1,
+   "file": "replay-2026-08-01-5.ttrm",
+   "user": "yachi",
+   "verified_to": 128,
+   "windows": []
+  },
+  {
+   "match": 4,
+   "round": 2,
+   "file": "replay-2026-08-01-5.ttrm",
+   "user": "pinglamb",
+   "verified_to": 30,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "not_evaluated",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 4,
+   "round": 2,
+   "file": "replay-2026-08-01-5.ttrm",
+   "user": "yachi",
+   "verified_to": 27,
+   "windows": []
+  },
+  {
+   "match": 4,
+   "round": 3,
+   "file": "replay-2026-08-01-5.ttrm",
+   "user": "yachi",
+   "verified_to": 45,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "possible_to_end",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 4,
+   "round": 3,
+   "file": "replay-2026-08-01-5.ttrm",
+   "user": "pinglamb",
+   "verified_to": 35,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "never",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 4,
+   "round": 4,
+   "file": "replay-2026-08-01-5.ttrm",
+   "user": "pinglamb",
+   "verified_to": 120,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "never",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 4,
+   "round": 4,
+   "file": "replay-2026-08-01-5.ttrm",
+   "user": "yachi",
+   "verified_to": 107,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_other",
+     "misses": [
+      {
+       "i": 22,
+       "verified": true,
+       "lost_to": "garbage"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 4,
+   "round": 5,
+   "file": "replay-2026-08-01-5.ttrm",
+   "user": "pinglamb",
+   "verified_to": 17,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 19,
+     "pcLock": 19,
+     "outcome": "pc",
+     "misses": []
+    },
+    {
+     "kind": "pc",
+     "start": 19,
+     "end": 31,
+     "pcLock": null,
+     "outcome": "lost_other",
+     "misses": [
+      {
+       "i": 23,
+       "verified": false,
+       "lost_to": "garbage"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 4,
+   "round": 5,
+   "file": "replay-2026-08-01-5.ttrm",
+   "user": "yachi",
+   "verified_to": 79,
+   "windows": []
+  },
+  {
+   "match": 4,
+   "round": 6,
+   "file": "replay-2026-08-01-5.ttrm",
+   "user": "yachi",
+   "verified_to": 17,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 19,
+     "pcLock": 19,
+     "outcome": "pc",
+     "misses": []
+    },
+    {
+     "kind": "pc",
+     "start": 19,
+     "end": 27,
+     "pcLock": null,
+     "outcome": "lost_other",
+     "misses": [
+      {
+       "i": 22,
+       "verified": false,
+       "lost_to": "unknown"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 4,
+   "round": 6,
+   "file": "replay-2026-08-01-5.ttrm",
+   "user": "pinglamb",
+   "verified_to": 20,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 21,
+     "pcLock": null,
+     "outcome": "never",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 4,
+   "round": 7,
+   "file": "replay-2026-08-01-5.ttrm",
+   "user": "yachi",
+   "verified_to": 54,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 16,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": true,
+       "state": {
+        "grid": [
+         "I..J..OOZL",
+         "......OOLL",
+         "......IIII",
+         "..........",
+         "..........",
+         ".........."
+        ],
+        "cur": "O",
+        "hold": "L",
+        "next": "JZSJZ",
+        "piece": "O",
+        "held": false,
+        "cells": [
+         12,
+         13,
+         22,
+         23
+        ],
+        "lines": 0
+       },
+       "after": [
+        "I..J..OOZL",
+        "..OO..OOLL",
+        "..OO..IIII",
+        "..........",
+        "..........",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "O",
+         "cells": [
+          4,
+          5,
+          14,
+          15
+         ],
+         "held": false
+        },
+        {
+         "piece": "L",
+         "cells": [
+          13,
+          23,
+          24,
+          25
+         ],
+         "held": true
+        },
+        {
+         "piece": "Z",
+         "cells": [
+          1,
+          2,
+          10,
+          11
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          2,
+          10,
+          11,
+          12
+         ],
+         "held": true
+        }
+       ],
+       "plan_H": 3,
+       "category": "hole"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 4,
+   "round": 7,
+   "file": "replay-2026-08-01-5.ttrm",
+   "user": "pinglamb",
+   "verified_to": -1,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 19,
+     "pcLock": 19,
+     "outcome": "pc",
+     "misses": []
+    },
+    {
+     "kind": "pc",
+     "start": 19,
+     "end": 31,
+     "pcLock": null,
+     "outcome": "lost_other",
+     "misses": [
+      {
+       "i": 22,
+       "verified": false,
+       "lost_to": "garbage"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 4,
+   "round": 8,
+   "file": "replay-2026-08-01-5.ttrm",
+   "user": "pinglamb",
+   "verified_to": 108,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 14,
+     "end": 26,
+     "pcLock": null,
+     "outcome": "never",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 4,
+   "round": 8,
+   "file": "replay-2026-08-01-5.ttrm",
+   "user": "yachi",
+   "verified_to": 100,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 14,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": true,
+       "state": {
+        "grid": [
+         "OOTSS.LLLI",
+         "IJJJ...LOO",
+         "IZZJ..LLOO",
+         "ZZ........",
+         "..........",
+         ".........."
+        ],
+        "cur": "S",
+        "hold": "I",
+        "next": "JOLTZ",
+        "piece": "I",
+        "held": true,
+        "cells": [
+         36,
+         37,
+         38,
+         39
+        ],
+        "lines": 0
+       },
+       "after": [
+        "OOTSS.LLLI",
+        "IJJJ...LOO",
+        "IZZJ..LLOO",
+        "ZZ....IIII",
+        "..........",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "S",
+         "cells": [
+          24,
+          33,
+          34,
+          43
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          32,
+          40,
+          41,
+          42
+         ],
+         "held": false
+        },
+        {
+         "piece": "O",
+         "cells": [
+          38,
+          39,
+          48,
+          49
+         ],
+         "held": false
+        },
+        {
+         "piece": "L",
+         "cells": [
+          25,
+          35,
+          36,
+          37
+         ],
+         "held": false
+        },
+        {
+         "piece": "T",
+         "cells": [
+          5,
+          14,
+          15,
+          16
+         ],
+         "held": false
+        },
+        {
+         "piece": "I",
+         "cells": [
+          4,
+          5,
+          6,
+          7
+         ],
+         "held": true
+        }
+       ],
+       "plan_H": 5,
+       "category": "hold"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 5,
+   "round": 0,
+   "file": "replay-2026-08-01-6.ttrm",
+   "user": "yachi",
+   "verified_to": 49,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 14,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": true,
+       "state": {
+        "grid": [
+         "OOTSS.LLLI",
+         "IJJJ...LOO",
+         "IZZJ..LLOO",
+         "ZZ........",
+         "..........",
+         ".........."
+        ],
+        "cur": "Z",
+        "hold": "S",
+        "next": "ILJOT",
+        "piece": "Z",
+        "held": false,
+        "cells": [
+         32,
+         33,
+         41,
+         42
+        ],
+        "lines": 0
+       },
+       "after": [
+        "OOTSS.LLLI",
+        "IJJJ...LOO",
+        "IZZJ..LLOO",
+        "ZZZZ......",
+        ".ZZ.......",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "Z",
+         "cells": [
+          24,
+          25,
+          33,
+          34
+         ],
+         "held": false
+        },
+        {
+         "piece": "I",
+         "cells": [
+          33,
+          34,
+          35,
+          36
+         ],
+         "held": false
+        },
+        {
+         "piece": "L",
+         "cells": [
+          25,
+          26,
+          27,
+          37
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          22,
+          30,
+          31,
+          32
+         ],
+         "held": false
+        },
+        {
+         "piece": "O",
+         "cells": [
+          28,
+          29,
+          38,
+          39
+         ],
+         "held": false
+        },
+        {
+         "piece": "T",
+         "cells": [
+          5,
+          14,
+          15,
+          16
+         ],
+         "held": false
+        }
+       ],
+       "plan_H": 5,
+       "category": "spot"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 5,
+   "round": 0,
+   "file": "replay-2026-08-01-6.ttrm",
+   "user": "pinglamb",
+   "verified_to": 33,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 19,
+     "pcLock": 19,
+     "outcome": "pc",
+     "misses": []
+    },
+    {
+     "kind": "pc",
+     "start": 19,
+     "end": 31,
+     "pcLock": null,
+     "outcome": "lost_other",
+     "misses": [
+      {
+       "i": 20,
+       "verified": true,
+       "lost_to": "garbage"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 5,
+   "round": 1,
+   "file": "replay-2026-08-01-6.ttrm",
+   "user": "yachi",
+   "verified_to": 89,
+   "windows": []
+  },
+  {
+   "match": 5,
+   "round": 1,
+   "file": "replay-2026-08-01-6.ttrm",
+   "user": "pinglamb",
+   "verified_to": 14,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 19,
+     "pcLock": 19,
+     "outcome": "pc",
+     "misses": []
+    },
+    {
+     "kind": "pc",
+     "start": 19,
+     "end": 31,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 20,
+       "verified": false,
+       "lost_to": "placement",
+       "in_preview": false,
+       "state": {
+        "grid": [
+         "..........",
+         "..........",
+         "..........",
+         "..........",
+         "..........",
+         ".........."
+        ],
+        "cur": "J",
+        "hold": "Z",
+        "next": "OLZIS",
+        "piece": "Z",
+        "held": true,
+        "cells": [
+         8,
+         18,
+         19,
+         29
+        ],
+        "lines": 0
+       },
+       "after": [
+        "........Z.",
+        "........ZZ",
+        ".........Z",
+        "..........",
+        "..........",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "J",
+         "cells": [
+          3,
+          4,
+          5,
+          13
+         ],
+         "held": false
+        },
+        {
+         "piece": "O",
+         "cells": [
+          8,
+          9,
+          18,
+          19
+         ],
+         "held": false
+        },
+        {
+         "piece": "Z",
+         "cells": [
+          6,
+          7,
+          15,
+          16
+         ],
+         "held": true
+        },
+        {
+         "piece": "L",
+         "cells": [
+          17,
+          27,
+          28,
+          29
+         ],
+         "held": true
+        },
+        {
+         "piece": "I",
+         "cells": [
+          2,
+          12,
+          22,
+          32
+         ],
+         "held": false
+        },
+        {
+         "piece": "S",
+         "cells": [
+          14,
+          23,
+          24,
+          33
+         ],
+         "held": false
+        },
+        {
+         "piece": "T",
+         "cells": [
+          1,
+          10,
+          11,
+          21
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          0,
+          10,
+          20,
+          21
+         ],
+         "held": false
+        },
+        {
+         "piece": "Z",
+         "cells": [
+          5,
+          6,
+          14,
+          15
+         ],
+         "held": false
+        },
+        {
+         "piece": "I",
+         "cells": [
+          6,
+          7,
+          8,
+          9
+         ],
+         "held": false
+        }
+       ],
+       "plan_H": 4
+      },
+      {
+       "i": 29,
+       "verified": false,
+       "lost_to": "garbage"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 5,
+   "round": 2,
+   "file": "replay-2026-08-01-6.ttrm",
+   "user": "pinglamb",
+   "verified_to": 54,
+   "windows": []
+  },
+  {
+   "match": 5,
+   "round": 2,
+   "file": "replay-2026-08-01-6.ttrm",
+   "user": "yachi",
+   "verified_to": 44,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 15,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": true,
+       "state": {
+        "grid": [
+         "OOLL.TZJJI",
+         "ILL...SSZZ",
+         "ILOO..S..Z",
+         "ILOO......",
+         "IIII......",
+         ".........."
+        ],
+        "cur": "J",
+        "hold": "L",
+        "next": "TOSZZ",
+        "piece": "J",
+        "held": false,
+        "cells": [
+         38,
+         39,
+         49,
+         59
+        ],
+        "lines": 0
+       },
+       "after": [
+        "OOLL.TZJJI",
+        "ILL...SSZZ",
+        "ILOO..S..Z",
+        "ILOO....JJ",
+        "IIII.....J",
+        ".........J"
+       ],
+       "plan": [
+        {
+         "piece": "L",
+         "cells": [
+          27,
+          28,
+          37,
+          47
+         ],
+         "held": true
+        },
+        {
+         "piece": "T",
+         "cells": [
+          4,
+          13,
+          14,
+          15
+         ],
+         "held": false
+        },
+        {
+         "piece": "O",
+         "cells": [
+          18,
+          19,
+          28,
+          29
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          14,
+          15,
+          16,
+          24
+         ],
+         "held": true
+        },
+        {
+         "piece": "S",
+         "cells": [
+          4,
+          5,
+          15,
+          16
+         ],
+         "held": true
+        }
+       ],
+       "plan_H": 5,
+       "category": "hole"
+      },
+      {
+       "i": 17,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": false,
+       "state": {
+        "grid": [
+         "ILOO..S..Z",
+         "ILOO....JJ",
+         "IIII.....J",
+         ".........J",
+         "..........",
+         ".........."
+        ],
+        "cur": "O",
+        "hold": "L",
+        "next": "SZZIJ",
+        "piece": "O",
+        "held": false,
+        "cells": [
+         30,
+         31,
+         40,
+         41
+        ],
+        "lines": 0
+       },
+       "after": [
+        "ILOO..S..Z",
+        "ILOO....JJ",
+        "IIII.....J",
+        "OO.......J",
+        "OO........",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "O",
+         "cells": [
+          4,
+          5,
+          14,
+          15
+         ],
+         "held": false
+        },
+        {
+         "piece": "L",
+         "cells": [
+          30,
+          40,
+          41,
+          42
+         ],
+         "held": true
+        },
+        {
+         "piece": "Z",
+         "cells": [
+          7,
+          8,
+          16,
+          17
+         ],
+         "held": false
+        },
+        {
+         "piece": "S",
+         "cells": [
+          17,
+          18,
+          28,
+          29
+         ],
+         "held": true
+        },
+        {
+         "piece": "I",
+         "cells": [
+          11,
+          12,
+          13,
+          14
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          6,
+          7,
+          8,
+          16
+         ],
+         "held": false
+        },
+        {
+         "piece": "L",
+         "cells": [
+          15,
+          25,
+          26,
+          27
+         ],
+         "held": false
+        },
+        {
+         "piece": "Z",
+         "cells": [
+          4,
+          5,
+          13,
+          14
+         ],
+         "held": true
+        }
+       ],
+       "plan_H": 5
+      },
+      {
+       "i": 22,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": false,
+       "state": {
+        "grid": [
+         "IIIILZZ..J",
+         "OOIIIIZ..J",
+         "OO........",
+         "..........",
+         "..........",
+         ".........."
+        ],
+        "cur": "J",
+        "hold": "S",
+        "next": "LSOTJ",
+        "piece": "J",
+        "held": false,
+        "cells": [
+         8,
+         18,
+         28,
+         29
+        ],
+        "lines": 0
+       },
+       "after": [
+        "IIIILZZ.JJ",
+        "OOIIIIZ.JJ",
+        "OO......JJ",
+        "..........",
+        "..........",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "J",
+         "cells": [
+          22,
+          23,
+          24,
+          32
+         ],
+         "held": false
+        },
+        {
+         "piece": "L",
+         "cells": [
+          7,
+          8,
+          17,
+          27
+         ],
+         "held": false
+        },
+        {
+         "piece": "S",
+         "cells": [
+          15,
+          16,
+          26,
+          27
+         ],
+         "held": false
+        },
+        {
+         "piece": "O",
+         "cells": [
+          20,
+          21,
+          30,
+          31
+         ],
+         "held": false
+        },
+        {
+         "piece": "T",
+         "cells": [
+          23,
+          32,
+          33,
+          34
+         ],
+         "held": false
+        },
+        {
+         "piece": "S",
+         "cells": [
+          24,
+          25,
+          35,
+          36
+         ],
+         "held": true
+        },
+        {
+         "piece": "O",
+         "cells": [
+          18,
+          19,
+          28,
+          29
+         ],
+         "held": false
+        },
+        {
+         "piece": "T",
+         "cells": [
+          8,
+          17,
+          18,
+          19
+         ],
+         "held": false
+        }
+       ],
+       "plan_H": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 5,
+   "round": 3,
+   "file": "replay-2026-08-01-6.ttrm",
+   "user": "pinglamb",
+   "verified_to": 144,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "never",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 5,
+   "round": 3,
+   "file": "replay-2026-08-01-6.ttrm",
+   "user": "yachi",
+   "verified_to": 155,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 12,
+     "end": 24,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 14,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": true,
+       "state": {
+        "grid": [
+         "IIII.ZZTOO",
+         "JSS...OOLJ",
+         "JJSS..OO..",
+         "IIII......",
+         "..........",
+         ".........."
+        ],
+        "cur": "J",
+        "hold": "Z",
+        "next": "TLISO",
+        "piece": "J",
+        "held": false,
+        "cells": [
+         28,
+         29,
+         39,
+         49
+        ],
+        "lines": 0
+       },
+       "after": [
+        "IIII.ZZTOO",
+        "JSS...OOLJ",
+        "JJSS..OOJJ",
+        "IIII.....J",
+        ".........J",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "Z",
+         "cells": [
+          28,
+          29,
+          37,
+          38
+         ],
+         "held": true
+        },
+        {
+         "piece": "T",
+         "cells": [
+          4,
+          13,
+          14,
+          15
+         ],
+         "held": false
+        },
+        {
+         "piece": "L",
+         "cells": [
+          4,
+          5,
+          14,
+          24
+         ],
+         "held": false
+        },
+        {
+         "piece": "I",
+         "cells": [
+          10,
+          11,
+          12,
+          13
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          9,
+          17,
+          18,
+          19
+         ],
+         "held": true
+        },
+        {
+         "piece": "O",
+         "cells": [
+          5,
+          6,
+          15,
+          16
+         ],
+         "held": false
+        }
+       ],
+       "plan_H": 5,
+       "category": "hold"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 5,
+   "round": 4,
+   "file": "replay-2026-08-01-6.ttrm",
+   "user": "yachi",
+   "verified_to": 83,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 14,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": true,
+       "state": {
+        "grid": [
+         "ILLST.JJOO",
+         "SSZZ...JJI",
+         "S..Z..OOJI",
+         "......OOJI",
+         "..........",
+         ".........."
+        ],
+        "cur": "J",
+        "hold": "O",
+        "next": "STILZ",
+        "piece": "O",
+        "held": true,
+        "cells": [
+         21,
+         22,
+         31,
+         32
+        ],
+        "lines": 0
+       },
+       "after": [
+        "ILLST.JJOO",
+        "SSZZ...JJI",
+        "SOOZ..OOJI",
+        ".OO...OOJI",
+        "..........",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "J",
+         "cells": [
+          21,
+          22,
+          32,
+          42
+         ],
+         "held": false
+        },
+        {
+         "piece": "S",
+         "cells": [
+          24,
+          33,
+          34,
+          43
+         ],
+         "held": false
+        },
+        {
+         "piece": "O",
+         "cells": [
+          30,
+          31,
+          40,
+          41
+         ],
+         "held": true
+        },
+        {
+         "piece": "I",
+         "cells": [
+          46,
+          47,
+          48,
+          49
+         ],
+         "held": false
+        },
+        {
+         "piece": "L",
+         "cells": [
+          25,
+          35,
+          44,
+          45
+         ],
+         "held": false
+        },
+        {
+         "piece": "T",
+         "cells": [
+          5,
+          14,
+          15,
+          16
+         ],
+         "held": true
+        }
+       ],
+       "plan_H": 5,
+       "category": "hold"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 5,
+   "round": 4,
+   "file": "replay-2026-08-01-6.ttrm",
+   "user": "pinglamb",
+   "verified_to": 66,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 15,
+     "end": 27,
+     "pcLock": null,
+     "outcome": "not_evaluated",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 5,
+   "round": 5,
+   "file": "replay-2026-08-01-6.ttrm",
+   "user": "yachi",
+   "verified_to": 29,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 16,
+     "end": 28,
+     "pcLock": null,
+     "outcome": "not_evaluated",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 5,
+   "round": 5,
+   "file": "replay-2026-08-01-6.ttrm",
+   "user": "pinglamb",
+   "verified_to": 13,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 24,
+     "pcLock": null,
+     "outcome": "lost_other",
+     "misses": [
+      {
+       "i": 16,
+       "verified": false,
+       "lost_to": "garbage"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 5,
+   "round": 6,
+   "file": "replay-2026-08-01-6.ttrm",
+   "user": "yachi",
+   "verified_to": 200,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 16,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": true,
+       "state": {
+        "grid": [
+         "S..Z..OOJI",
+         "......OOJI",
+         "......IIII",
+         "..........",
+         "..........",
+         ".........."
+        ],
+        "cur": "S",
+        "hold": "J",
+        "next": "OZLSJ",
+        "piece": "S",
+        "held": false,
+        "cells": [
+         1,
+         2,
+         12,
+         13
+        ],
+        "lines": 0
+       },
+       "after": [
+        "SSSZ..OOJI",
+        "..SS..OOJI",
+        "......IIII",
+        "..........",
+        "..........",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "S",
+         "cells": [
+          4,
+          13,
+          14,
+          23
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          1,
+          2,
+          12,
+          22
+         ],
+         "held": true
+        },
+        {
+         "piece": "O",
+         "cells": [
+          10,
+          11,
+          20,
+          21
+         ],
+         "held": true
+        },
+        {
+         "piece": "L",
+         "cells": [
+          5,
+          15,
+          24,
+          25
+         ],
+         "held": false
+        }
+       ],
+       "plan_H": 3,
+       "category": "spot"
+      },
+      {
+       "i": 22,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": false,
+       "state": {
+        "grid": [
+         ".LSSOOOOJI",
+         ".LLLZZIIII",
+         "...ZZ.SSJJ",
+         ".......SSJ",
+         ".........J",
+         ".........."
+        ],
+        "cur": "Z",
+        "hold": "J",
+        "next": "LTIOZ",
+        "piece": "J",
+        "held": true,
+        "cells": [
+         20,
+         21,
+         22,
+         30
+        ],
+        "lines": 0
+       },
+       "after": [
+        ".LSSOOOOJI",
+        ".LLLZZIIII",
+        "JJJZZ.SSJJ",
+        "J......SSJ",
+        ".........J",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "Z",
+         "cells": [
+          46,
+          47,
+          55,
+          56
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          33,
+          41,
+          42,
+          43
+         ],
+         "held": true
+        },
+        {
+         "piece": "T",
+         "cells": [
+          48,
+          57,
+          58,
+          59
+         ],
+         "held": false
+        },
+        {
+         "piece": "I",
+         "cells": [
+          0,
+          10,
+          20,
+          30
+         ],
+         "held": false
+        },
+        {
+         "piece": "L",
+         "cells": [
+          20,
+          30,
+          31,
+          32
+         ],
+         "held": true
+        },
+        {
+         "piece": "Z",
+         "cells": [
+          24,
+          25,
+          33,
+          34
+         ],
+         "held": false
+        },
+        {
+         "piece": "O",
+         "cells": [
+          1,
+          2,
+          11,
+          12
+         ],
+         "held": false
+        },
+        {
+         "piece": "T",
+         "cells": [
+          5,
+          14,
+          15,
+          16
+         ],
+         "held": false
+        }
+       ],
+       "plan_H": 6
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 5,
+   "round": 6,
+   "file": "replay-2026-08-01-6.ttrm",
+   "user": "pinglamb",
+   "verified_to": 187,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "never",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 6,
+   "round": 0,
+   "file": "replay-2026-08-01-7.ttrm",
+   "user": "pinglamb",
+   "verified_to": 165,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "never",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 6,
+   "round": 0,
+   "file": "replay-2026-08-01-7.ttrm",
+   "user": "yachi",
+   "verified_to": 157,
+   "windows": []
+  },
+  {
+   "match": 6,
+   "round": 1,
+   "file": "replay-2026-08-01-7.ttrm",
+   "user": "pinglamb",
+   "verified_to": 278,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "not_evaluated",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 6,
+   "round": 1,
+   "file": "replay-2026-08-01-7.ttrm",
+   "user": "yachi",
+   "verified_to": 216,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 14,
+     "end": 26,
+     "pcLock": null,
+     "outcome": "never",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 6,
+   "round": 2,
+   "file": "replay-2026-08-01-7.ttrm",
+   "user": "yachi",
+   "verified_to": 17,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 19,
+     "pcLock": 19,
+     "outcome": "pc",
+     "misses": []
+    },
+    {
+     "kind": "pc",
+     "start": 19,
+     "end": 31,
+     "pcLock": null,
+     "outcome": "lost_other",
+     "misses": [
+      {
+       "i": 26,
+       "verified": false,
+       "lost_to": "garbage"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 6,
+   "round": 2,
+   "file": "replay-2026-08-01-7.ttrm",
+   "user": "pinglamb",
+   "verified_to": 49,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_other",
+     "misses": [
+      {
+       "i": 15,
+       "verified": true,
+       "lost_to": "garbage"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 6,
+   "round": 3,
+   "file": "replay-2026-08-01-7.ttrm",
+   "user": "pinglamb",
+   "verified_to": 34,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 15,
+     "end": 27,
+     "pcLock": null,
+     "outcome": "not_evaluated",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 6,
+   "round": 3,
+   "file": "replay-2026-08-01-7.ttrm",
+   "user": "yachi",
+   "verified_to": 8,
+   "windows": [
+    {
+     "kind": "pc",
+     "start": 9,
+     "end": 21,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 18,
+       "verified": false,
+       "lost_to": "placement",
+       "in_preview": true,
+       "state": {
+        "grid": [
+         "JJJZZ..IOO",
+         "JSZZL..IOO",
+         "SSZZL..IOO",
+         "SZZLL..IOO",
+         "..........",
+         ".........."
+        ],
+        "cur": "T",
+        "hold": "J",
+        "next": "SJLZS",
+        "piece": "J",
+        "held": true,
+        "cells": [
+         5,
+         15,
+         25,
+         26
+        ],
+        "lines": 1
+       },
+       "after": [
+        "JJJZZJ.IOO",
+        "JSZZLJ.IOO",
+        "SZZLL..IOO",
+        "..........",
+        "..........",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "T",
+         "cells": [
+          6,
+          15,
+          16,
+          26
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          5,
+          15,
+          25,
+          26
+         ],
+         "held": true
+        }
+       ],
+       "plan_H": 4
+      },
+      {
+       "i": 20,
+       "verified": false,
+       "lost_to": "garbage"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 6,
+   "round": 4,
+   "file": "replay-2026-08-01-7.ttrm",
+   "user": "pinglamb",
+   "verified_to": 17,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 19,
+     "pcLock": 19,
+     "outcome": "pc",
+     "misses": []
+    },
+    {
+     "kind": "pc",
+     "start": 19,
+     "end": 31,
+     "pcLock": null,
+     "outcome": "possible_to_end",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 6,
+   "round": 4,
+   "file": "replay-2026-08-01-7.ttrm",
+   "user": "yachi",
+   "verified_to": 207,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 15,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": true,
+       "state": {
+        "grid": [
+         "OOTSS.LLLI",
+         "IJJJ...ZZL",
+         "I..J..OOZL",
+         "......OOLL",
+         "......IIII",
+         ".........."
+        ],
+        "cur": "O",
+        "hold": "J",
+        "next": "STZLI",
+        "piece": "O",
+        "held": false,
+        "cells": [
+         21,
+         22,
+         31,
+         32
+        ],
+        "lines": 0
+       },
+       "after": [
+        "OOTSS.LLLI",
+        "IJJJ...ZZL",
+        "IOOJ..OOZL",
+        ".OO...OOLL",
+        "......IIII",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "J",
+         "cells": [
+          21,
+          22,
+          32,
+          42
+         ],
+         "held": true
+        },
+        {
+         "piece": "O",
+         "cells": [
+          30,
+          31,
+          40,
+          41
+         ],
+         "held": true
+        },
+        {
+         "piece": "T",
+         "cells": [
+          5,
+          14,
+          15,
+          16
+         ],
+         "held": false
+        },
+        {
+         "piece": "S",
+         "cells": [
+          4,
+          13,
+          14,
+          23
+         ],
+         "held": true
+        },
+        {
+         "piece": "L",
+         "cells": [
+          5,
+          15,
+          24,
+          25
+         ],
+         "held": false
+        }
+       ],
+       "plan_H": 5,
+       "category": "hold"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 6,
+   "round": 5,
+   "file": "replay-2026-08-01-7.ttrm",
+   "user": "pinglamb",
+   "verified_to": 70,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "never",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 6,
+   "round": 5,
+   "file": "replay-2026-08-01-7.ttrm",
+   "user": "yachi",
+   "verified_to": 78,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "never",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 7,
+   "round": 0,
+   "file": "replay-2026-08-01-8.ttrm",
+   "user": "yachi",
+   "verified_to": 217,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "not_evaluated",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 7,
+   "round": 0,
+   "file": "replay-2026-08-01-8.ttrm",
+   "user": "pinglamb",
+   "verified_to": 194,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_other",
+     "misses": [
+      {
+       "i": 15,
+       "verified": true,
+       "lost_to": "garbage"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 7,
+   "round": 1,
+   "file": "replay-2026-08-01-8.ttrm",
+   "user": "yachi",
+   "verified_to": 108,
+   "windows": []
+  },
+  {
+   "match": 7,
+   "round": 1,
+   "file": "replay-2026-08-01-8.ttrm",
+   "user": "pinglamb",
+   "verified_to": 108,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 14,
+     "end": 26,
+     "pcLock": null,
+     "outcome": "not_evaluated",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 7,
+   "round": 2,
+   "file": "replay-2026-08-01-8.ttrm",
+   "user": "yachi",
+   "verified_to": 110,
+   "windows": []
+  },
+  {
+   "match": 7,
+   "round": 2,
+   "file": "replay-2026-08-01-8.ttrm",
+   "user": "pinglamb",
+   "verified_to": 109,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "not_evaluated",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 7,
+   "round": 3,
+   "file": "replay-2026-08-01-8.ttrm",
+   "user": "pinglamb",
+   "verified_to": 32,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 14,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": true,
+       "state": {
+        "grid": [
+         "ILLST.JJOO",
+         "SSZZ...JJI",
+         "S..Z..OOJI",
+         "......OOJI",
+         "..........",
+         ".........."
+        ],
+        "cur": "O",
+        "hold": "I",
+        "next": "TSZLJ",
+        "piece": "O",
+        "held": false,
+        "cells": [
+         48,
+         49,
+         58,
+         59
+        ],
+        "lines": 0
+       },
+       "after": [
+        "ILLST.JJOO",
+        "SSZZ...JJI",
+        "S..Z..OOJI",
+        "......OOJI",
+        "........OO",
+        "........OO"
+       ],
+       "plan": [
+        {
+         "piece": "O",
+         "cells": [
+          21,
+          22,
+          31,
+          32
+         ],
+         "held": false
+        },
+        {
+         "piece": "T",
+         "cells": [
+          5,
+          14,
+          15,
+          16
+         ],
+         "held": false
+        },
+        {
+         "piece": "I",
+         "cells": [
+          26,
+          27,
+          28,
+          29
+         ],
+         "held": true
+        },
+        {
+         "piece": "Z",
+         "cells": [
+          4,
+          5,
+          13,
+          14
+         ],
+         "held": false
+        },
+        {
+         "piece": "L",
+         "cells": [
+          0,
+          10,
+          11,
+          12
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          5,
+          13,
+          14,
+          15
+         ],
+         "held": false
+        }
+       ],
+       "plan_H": 5,
+       "category": "over"
+      },
+      {
+       "i": 16,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": false,
+       "state": {
+        "grid": [
+         "S..Z..OOJI",
+         "......OOJI",
+         "........OO",
+         "........OO",
+         "..........",
+         ".........."
+        ],
+        "cur": "S",
+        "hold": "I",
+        "next": "ZLJSL",
+        "piece": "S",
+        "held": false,
+        "cells": [
+         27,
+         36,
+         37,
+         46
+        ],
+        "lines": 0
+       },
+       "after": [
+        "S..Z..OOJI",
+        "......OOJI",
+        ".......SOO",
+        "......SSOO",
+        "......S...",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "S",
+         "cells": [
+          12,
+          13,
+          23,
+          24
+         ],
+         "held": false
+        },
+        {
+         "piece": "Z",
+         "cells": [
+          1,
+          2,
+          10,
+          11
+         ],
+         "held": false
+        },
+        {
+         "piece": "L",
+         "cells": [
+          20,
+          21,
+          30,
+          40
+         ],
+         "held": false
+        },
+        {
+         "piece": "I",
+         "cells": [
+          33,
+          34,
+          35,
+          36
+         ],
+         "held": true
+        },
+        {
+         "piece": "S",
+         "cells": [
+          22,
+          31,
+          32,
+          41
+         ],
+         "held": false
+        },
+        {
+         "piece": "L",
+         "cells": [
+          25,
+          26,
+          27,
+          37
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          4,
+          5,
+          15,
+          25
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          4,
+          12,
+          13,
+          14
+         ],
+         "held": true
+        },
+        {
+         "piece": "I",
+         "cells": [
+          6,
+          7,
+          8,
+          9
+         ],
+         "held": false
+        }
+       ],
+       "plan_H": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 7,
+   "round": 3,
+   "file": "replay-2026-08-01-8.ttrm",
+   "user": "yachi",
+   "verified_to": 23,
+   "windows": []
+  },
+  {
+   "match": 7,
+   "round": 4,
+   "file": "replay-2026-08-01-8.ttrm",
+   "user": "yachi",
+   "verified_to": 56,
+   "windows": []
+  },
+  {
+   "match": 7,
+   "round": 4,
+   "file": "replay-2026-08-01-8.ttrm",
+   "user": "pinglamb",
+   "verified_to": 33,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "never",
+     "misses": []
+    }
+   ]
+  },
+  {
+   "match": 7,
+   "round": 5,
+   "file": "replay-2026-08-01-8.ttrm",
+   "user": "pinglamb",
+   "verified_to": -1,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 19,
+     "pcLock": 19,
+     "outcome": "pc",
+     "misses": []
+    },
+    {
+     "kind": "pc",
+     "start": 19,
+     "end": 31,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 21,
+       "verified": false,
+       "lost_to": "placement",
+       "in_preview": false,
+       "state": {
+        "grid": [
+         "....ZZ....",
+         "...ZZ.....",
+         "..........",
+         "..........",
+         "..........",
+         ".........."
+        ],
+        "cur": "Z",
+        "hold": "L",
+        "next": "JIOST",
+        "piece": "Z",
+        "held": false,
+        "cells": [
+         7,
+         8,
+         16,
+         17
+        ],
+        "lines": 0
+       },
+       "after": [
+        "....ZZ.ZZ.",
+        "...ZZ.ZZ..",
+        "..........",
+        "..........",
+        "..........",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "Z",
+         "cells": [
+          23,
+          24,
+          32,
+          33
+         ],
+         "held": false
+        },
+        {
+         "piece": "J",
+         "cells": [
+          8,
+          9,
+          19,
+          29
+         ],
+         "held": false
+        },
+        {
+         "piece": "L",
+         "cells": [
+          2,
+          3,
+          12,
+          22
+         ],
+         "held": true
+        },
+        {
+         "piece": "O",
+         "cells": [
+          15,
+          16,
+          25,
+          26
+         ],
+         "held": false
+        },
+        {
+         "piece": "S",
+         "cells": [
+          6,
+          7,
+          17,
+          18
+         ],
+         "held": false
+        },
+        {
+         "piece": "T",
+         "cells": [
+          0,
+          10,
+          11,
+          20
+         ],
+         "held": false
+        },
+        {
+         "piece": "S",
+         "cells": [
+          17,
+          18,
+          28,
+          29
+         ],
+         "held": false
+        },
+        {
+         "piece": "I",
+         "cells": [
+          24,
+          25,
+          26,
+          27
+         ],
+         "held": true
+        },
+        {
+         "piece": "L",
+         "cells": [
+          1,
+          11,
+          20,
+          21
+         ],
+         "held": false
+        }
+       ],
+       "plan_H": 4
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 7,
+   "round": 5,
+   "file": "replay-2026-08-01-8.ttrm",
+   "user": "yachi",
+   "verified_to": 72,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 19,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": true,
+       "state": {
+        "grid": [
+         "ILSS.ZJJJJ",
+         "ILLL.ZZOOJ",
+         "IIII..ZOOJ",
+         "..........",
+         "..........",
+         ".........."
+        ],
+        "cur": "L",
+        "hold": "S",
+        "next": "LZJIO",
+        "piece": "L",
+        "held": false,
+        "cells": [
+         25,
+         35,
+         36,
+         37
+        ],
+        "lines": 0
+       },
+       "after": [
+        "ILSS.ZJJJJ",
+        "ILLL.ZZOOJ",
+        "IIII.LZOOJ",
+        ".....LLL..",
+        "..........",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "L",
+         "cells": [
+          31,
+          32,
+          33,
+          43
+         ],
+         "held": false
+        },
+        {
+         "piece": "L",
+         "cells": [
+          30,
+          40,
+          41,
+          42
+         ],
+         "held": false
+        },
+        {
+         "piece": "S",
+         "cells": [
+          24,
+          25,
+          35,
+          36
+         ],
+         "held": true
+        },
+        {
+         "piece": "J",
+         "cells": [
+          27,
+          35,
+          36,
+          37
+         ],
+         "held": false
+        },
+        {
+         "piece": "I",
+         "cells": [
+          4,
+          14,
+          24,
+          34
+         ],
+         "held": false
+        },
+        {
+         "piece": "O",
+         "cells": [
+          8,
+          9,
+          18,
+          19
+         ],
+         "held": false
+        }
+       ],
+       "plan_H": 5,
+       "category": "spot"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 7,
+   "round": 6,
+   "file": "replay-2026-08-01-8.ttrm",
+   "user": "yachi",
+   "verified_to": 76,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 13,
+     "end": 25,
+     "pcLock": null,
+     "outcome": "lost_placement",
+     "misses": [
+      {
+       "i": 15,
+       "verified": true,
+       "lost_to": "placement",
+       "in_preview": true,
+       "state": {
+        "grid": [
+         "OOLL.TZJJI",
+         "ILL...SSZZ",
+         "ILOO..S..Z",
+         "ILOO......",
+         "IIII......",
+         ".........."
+        ],
+        "cur": "J",
+        "hold": "L",
+        "next": "OTZSZ",
+        "piece": "J",
+        "held": false,
+        "cells": [
+         27,
+         28,
+         38,
+         48
+        ],
+        "lines": 0
+       },
+       "after": [
+        "OOLL.TZJJI",
+        "ILL...SSZZ",
+        "ILOO..SJJZ",
+        "ILOO....J.",
+        "IIII....J.",
+        ".........."
+       ],
+       "plan": [
+        {
+         "piece": "L",
+         "cells": [
+          25,
+          35,
+          36,
+          37
+         ],
+         "held": true
+        },
+        {
+         "piece": "J",
+         "cells": [
+          24,
+          34,
+          44,
+          45
+         ],
+         "held": true
+        },
+        {
+         "piece": "O",
+         "cells": [
+          38,
+          39,
+          48,
+          49
+         ],
+         "held": true
+        },
+        {
+         "piece": "Z",
+         "cells": [
+          27,
+          28,
+          36,
+          37
+         ],
+         "held": false
+        },
+        {
+         "piece": "T",
+         "cells": [
+          4,
+          13,
+          14,
+          15
+         ],
+         "held": true
+        }
+       ],
+       "plan_H": 5,
+       "category": "hold"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "match": 7,
+   "round": 6,
+   "file": "replay-2026-08-01-8.ttrm",
+   "user": "pinglamb",
+   "verified_to": 58,
+   "windows": [
+    {
+     "kind": "tst",
+     "start": 14,
+     "end": 26,
+     "pcLock": null,
+     "outcome": "not_evaluated",
+     "misses": []
+    }
+   ]
+  }
+ ]
+}
