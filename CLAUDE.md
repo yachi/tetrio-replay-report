@@ -505,6 +505,9 @@ bash lean/mutate.sh                        # its mutants
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-attack-facts.ts \
   --out sessions/<date>/sim/attack-facts.json                   # the 攻擊由邊度嚟 split (quarantined)
 bun test pipeline/sim/attack-facts.test.ts                     #   byte identity + named anchor exceptions
+REPLAY_DIR=sessions/<date> bun pipeline/sim/pc-miss.ts \
+  --out <json>                                                  # which placement made a Perfect Clear impossible (quarantined scratch tool, no artefact committed)
+bun test pipeline/sim/pc-solver.test.ts                         #   the PC solver's rules + engine movegen ⊇ SRS movegen
 python3 -m pipeline.check_attack_section sessions/<date>/report  # CI gate: the attack-sources region
 python3 -m pipeline.check_attack_section sessions/<date>/report --selftest  #   its mutants
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-finesse-facts.ts \
