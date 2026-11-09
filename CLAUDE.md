@@ -506,7 +506,10 @@ REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-attack-facts.ts \
   --out sessions/<date>/sim/attack-facts.json                   # the 攻擊由邊度嚟 split (quarantined)
 bun test pipeline/sim/attack-facts.test.ts                     #   byte identity + named anchor exceptions
 REPLAY_DIR=sessions/<date> bun pipeline/sim/pc-miss.ts \
-  --out <json>                                                  # which placement made a Perfect Clear impossible (quarantined scratch tool, no artefact committed)
+  --out sessions/<date>/sim/pc-miss-facts.json                  # 行錯咗嗰一步: which placement made a Perfect Clear impossible (quarantined; run from the repo root)
+bun test pipeline/sim/pc-miss.test.ts                           #   every artefact's md5s current + 10-20 rebuilt byte for byte
+python3 -m pipeline.check_pc_miss_section sessions/<date>/report  # CI gate: the pc-miss region (--selftest its mutants)
+python3 -m pipeline.pc_miss_page --selftest     # the docs/pc-miss.html audit's mutants (--out-dir <dir> renders)
 bun test pipeline/sim/pc-solver.test.ts                         #   the PC solver's rules + engine movegen ⊇ SRS movegen
 python3 -m pipeline.check_attack_section sessions/<date>/report  # CI gate: the attack-sources region
 python3 -m pipeline.check_attack_section sessions/<date>/report --selftest  #   its mutants
@@ -4172,6 +4175,28 @@ many agree is the artefact's and the section's, never this file's. Two traps the
 emitter re-arms `eng.resCache.keys` with a recording array after every tick; and a 「←」 in an actual
 sequence is one keydown, held or tapped — the section says so. Which placement carried a fault has no
 second implementation, so no claim id and no ✓.
+
+## 行錯咗嗰一步 — the sixth quarantined section, and why its artefact is committed
+
+`pipeline/sim/pc-miss.ts` → `sessions/<date>/sim/pc-miss-facts.json` → `pipeline/pc_miss_section.py`
+(region `pc-miss`, in `SELF_INSERTING`, chained after finesse-placements), gated by
+`check_pc_miss_section.py`, rolled up into `docs/pc-miss.html` by `pipeline/pc_miss_page.py` (a 中盤手法
+card). Inside the 12 locks after the opener TST and after each PC, a PC solver (`pc-solver.ts`, frame
+≤ 6 rows, the round's own dealt pieces) is asked before and after every lock; a lock after which the
+answer turns from yes to no, re-checked with the engine's own movegen (180 included), with no garbage
+on the next lock, is a miss. Only misses with a PC using the current piece, the hold and the five-piece
+preview, whose next lock is inside the verified prefix, are REPORTED and carry a category, first that
+applies: `hole`, `over` (taller than the plan's frame), `hold` (the plan's first piece is another),
+`spot`. One solver over one simulator board, so no claim id and no ✓; and a PC being possible is not the
+player building one, which both pages say.
+
+**One full run is about 3.5 CPU-hours, so the artefacts are committed and only the shortest night is
+rebuilt** (`pc-miss.test.ts`, 2026-10-20 byte for byte). Each artefact records the md5 of its
+replay-facts and of `pc-miss.ts`, `pc-solver.ts` and `pc-engine-gen.ts` (`HASHED`), so an edit to any of
+those stales EVERY artefact loudly and costs the full rerun; imports from `emit-replay.ts` are not hashed,
+and the byte rebuild is what catches a change through them. The gate recomputes each category with its
+own Python `category()` and replays every plan row by row; the page's audit reads every example's replay
+link back through the technique pages' reader. Counts are the artefacts', never typed here.
 
 ## 重播 — the animated replay, the third quarantined section
 

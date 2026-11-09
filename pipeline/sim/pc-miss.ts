@@ -1,7 +1,7 @@
 /**
  * Which placement made a perfect clear impossible?
  *
- *   REPLAY_DIR=sessions/<date> bun pipeline/sim/pc-miss.ts --out <json>
+ *   REPLAY_DIR=sessions/<date> bun pipeline/sim/pc-miss.ts --out sessions/<date>/sim/pc-miss-facts.json
  *
  * Two kinds of WINDOW per (round, player), each at most `SPAN` locks long and ending at the first
  * Perfect Clear inside it:
@@ -16,9 +16,16 @@
  * using only the current piece, the hold and the five pieces of the preview, and `verified` when
  * lock i+1 is inside the round's verified prefix.
  *
+ * A `placement` miss that is `in_preview` and `verified` is a REPORTED miss and carries a `category`
+ * (first that applies): `hole` the placement covered an empty cell; `over` the stack after it is
+ * taller than the frame the solver's PC used; `hold` the solver's first piece is not the piece placed
+ * (play another piece, through hold or by order); `spot` the same piece, somewhere else.
+ *
  * Simulator output on the replay-facts timeline: quarantined, like every sim/ artefact — no claim
- * id, no badge, no figure in any report.
+ * id, no badge, no figure in any count. One run of the 22 sessions took about 3.5 CPU-hours, so the
+ * per-session artefact is committed and `pc-miss.test.ts` rebuilds the shortest session byte for byte.
  */
+import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { placeCells, WIDTH } from './emit-replay.ts';
 import { solve, frames, height, setMovegen, type Placement } from './pc-solver.ts';
@@ -26,20 +33,54 @@ import { enginePlacements } from './pc-engine-gen.ts';
 
 type Lock = [number, number | number[], number, number, [number, number][], number, number, number];
 
-const argv = process.argv.slice(2);
-const dir = process.env.REPLAY_DIR!;
-const outPath = argv[argv.indexOf('--out') + 1]!;
-const RF = JSON.parse(readFileSync(`${dir}/sim/replay-facts.json`, 'utf8'));
-export const MAXH = Number(process.env.PC_MAXH ?? 6);
+export const MAXH = 6;
 export const SPAN = 12;
 export const PREVIEW = 5;
 const NODES = 3_000_000;
+/** The files whose md5 the artefact records. Imports from emit-replay.ts / route-demos.ts are not
+ *  hashed (an edit there would stale every artefact for a 3.5-hour rerun); the byte rebuild of one
+ *  session in pc-miss.test.ts is what catches a behaviour change through them. */
+export const HASHED = ['pipeline/sim/pc-miss.ts', 'pipeline/sim/pc-solver.ts', 'pipeline/sim/pc-engine-gen.ts'];
+
+const md5 = (p: string) => createHash('md5').update(readFileSync(p)).digest('hex');
 
 const toMasks = (b: (string | null)[][]) => {
   const m = b.map(r => r.reduce((a, c, x) => a | (c != null ? 1 << x : 0), 0));
   let h = m.length; while (h && !m[h - 1]) h--;
   return m.slice(0, h);
 };
+
+/** Covered empty cells: an empty cell with a filled cell above it in the same column. */
+export function holes(g: string[]): number {
+  let h = 0;
+  for (let x = 0; x < WIDTH; x++) {
+    let seen = false;
+    for (let y = g.length - 1; y >= 0; y--) {
+      if (g[y]![x] !== '.') seen = true;
+      else if (seen) h++;
+    }
+  }
+  return h;
+}
+export const stackHeight = (g: string[]) => g.reduce((a, r, i) => (/[^.]/.test(r) ? i + 1 : a), 0);
+
+/** The board (rows bottom-up, '.' empty) with the placement's cells drawn in, before any clear. */
+export function withPlacement(grid: string[], cells: number[], piece: string): string[] {
+  const g = grid.map(r => [...r]);
+  for (const c of cells) {
+    const y = Math.floor(c / WIDTH), x = c % WIDTH;
+    while (g.length <= y) g.push([...'.'.repeat(WIDTH)]);
+    g[y]![x] = piece;
+  }
+  return g.map(r => r.join(''));
+}
+
+export function category(st: { grid: string[]; cells: number[]; piece: string }, planH: number, firstPiece: string) {
+  const g = withPlacement(st.grid, st.cells, st.piece);
+  if (holes(g) > holes(st.grid)) return 'hole';
+  if (stackHeight(g) > planH) return 'over';
+  return firstPiece !== st.piece ? 'hold' : 'spot';
+}
 
 type V = { ok: true; H: number; plan: Placement[] } | { ok: false } | { ok: null };
 function check(rows: number[], cur: string, hold: string, seq: string, ptr: number, memo: Map<string, any>): V {
@@ -55,86 +96,117 @@ function check(rows: number[], cur: string, hold: string, seq: string, ptr: numb
 }
 const fits = (rows: number[]) => height(rows) <= MAXH && frames(rows, MAXH).length > 0;
 
-const out: any[] = [];
-const t0 = performance.now();
-for (const rd of RF.rounds) {
-  for (const P of rd.players) {
-    if (!P.admission.ok) continue;
-    const seq: string = rd.seq;
-    const locks: Lock[] = P.locks;
-    const board: (string | null)[][] = Array.from({ length: 40 }, () => new Array(WIDTH).fill(null));
-    let cur = seq[0]!, ptr = 1, hold = '';
-    const st: any[] = [];
-    for (let i = 0; i < locks.length; i++) {
-      const lk = locks[i]!;
-      for (const [col, amt] of lk[4]) {
-        const rows = Array.from({ length: amt }, () => { const r = new Array<string | null>(WIDTH).fill('G'); r[col] = null; return r; });
-        board.splice(0, 0, ...rows); board.splice(40 - amt - 1, amt);
-      }
-      const pre = toMasks(board);
-      const grid = board.slice(0, MAXH).map(r => r.map(c => c ?? '.').join(''));
-      const s: any = { i, pre, grid, cur, hold, ptr, garbageIn: lk[4].length > 0, held: !!lk[5], lines: lk[2], spin: lk[3] };
-      if (lk[5]) { if (hold === '') { hold = cur; cur = seq[ptr++]!; } else { const t = hold; hold = cur; cur = t; } }
-      s.piece = cur;
-      s.cells = placeCells(cur, lk[1]);
-      for (const c of s.cells) board[Math.floor(c / WIDTH)]![c % WIDTH] = cur;
-      const full: number[] = [];
-      for (let y = 0; y < 40; y++) if (board[y]!.every(v => v != null)) full.push(y);
-      for (let k = full.length - 1; k >= 0; k--) { board.splice(full[k]!, 1); board.push(new Array(WIDTH).fill(null)); }
-      cur = seq[ptr++]!;
-      s.pc = board[0]!.every(v => v == null);
-      st.push(s);
-    }
-    // windows
-    const wins: { kind: string; start: number; end: number }[] = [];
-    const tst = st.findIndex(s => s.i <= 21 && s.spin === 2 && s.lines === 3);
-    const pcs = st.filter(s => s.pc).map(s => s.i);
-    const endAt = (start: number) => { const p = pcs.find(x => x > start); return Math.min(p ?? Infinity, start + SPAN, st.length - 1); };
-    if (tst >= 0) wins.push({ kind: 'tst', start: tst, end: endAt(tst) });
-    for (const p of pcs) if (p + 1 < st.length) wins.push({ kind: 'pc', start: p, end: endAt(p) });
-    const memo = new Map<string, any>();
-    const verdict = (s: any): V | null => {
-      if (s.v !== undefined) return s.v;
-      s.v = fits(s.pre) ? check(s.pre, s.cur, s.hold, seq, s.ptr, memo) : null;
-      return s.v;
-    };
-    const verified = P.prefix.verified_to;
-    const rw: any[] = [];
-    for (const w of wins) {
-      const ev: any[] = [];
-      for (let i = w.start + 1; i <= w.end; i++) ev.push(verdict(st[i]));
-      const pcLock = st[w.end]!.pc && w.end > w.start ? w.end : null;
-      const misses: any[] = [];
-      for (let i = w.start + 1; i < w.end; i++) {
-        const a = st[i], b = st[i + 1];
-        if (a.v?.ok !== true || a.pc || b.v?.ok === true) continue;
-        const m: any = { i, verified: i + 1 < verified };
-        if (b.garbageIn) m.lost_to = 'garbage';
-        else if (b.v?.ok === null) m.lost_to = 'unknown';
-        else {
-          let e: V = { ok: false };
-          if (fits(b.pre)) { setMovegen(enginePlacements); e = check(b.pre, b.cur, b.hold, seq, b.ptr, new Map()); setMovegen(null); }
-          m.lost_to = e.ok === true ? 'engine_disagrees' : e.ok === null ? 'unknown' : 'placement';
+export function build(dir: string, log: (s: string) => void = () => {}) {
+  const RF = JSON.parse(readFileSync(`${dir}/sim/replay-facts.json`, 'utf8'));
+  const out: any[] = [];
+  for (const rd of RF.rounds) {
+    for (const P of rd.players) {
+      if (!P.admission.ok) continue;
+      const seq: string = rd.seq;
+      const locks: Lock[] = P.locks;
+      const board: (string | null)[][] = Array.from({ length: 40 }, () => new Array(WIDTH).fill(null));
+      let cur = seq[0]!, ptr = 1, hold = '';
+      const st: any[] = [];
+      for (let i = 0; i < locks.length; i++) {
+        const lk = locks[i]!;
+        for (const [col, amt] of lk[4]) {
+          const rows = Array.from({ length: amt }, () => { const r = new Array<string | null>(WIDTH).fill('G'); r[col] = null; return r; });
+          board.splice(0, 0, ...rows); board.splice(40 - amt - 1, amt);
         }
-        if (m.lost_to === 'placement') {
-          const vis = check(a.pre, a.cur, a.hold, seq.slice(0, a.ptr + PREVIEW), a.ptr, new Map());
-          m.in_preview = vis.ok === true;
-          m.state = { grid: a.grid, cur: a.cur, hold: a.hold, next: seq.slice(a.ptr, a.ptr + PREVIEW), piece: a.piece, held: a.held, cells: a.cells, lines: a.lines };
-          m.after = b.grid;
-          m.plan = (vis.ok === true ? vis : a.v).plan;
-          m.plan_H = (vis.ok === true ? vis : a.v).H;
-        }
-        misses.push(m);
+        const pre = toMasks(board);
+        const grid = board.slice(0, MAXH).map(r => r.map(c => c ?? '.').join(''));
+        const s: any = { i, pre, grid, cur, hold, ptr, garbageIn: lk[4].length > 0, held: !!lk[5], lines: lk[2], spin: lk[3] };
+        if (lk[5]) { if (hold === '') { hold = cur; cur = seq[ptr++]!; } else { const t = hold; hold = cur; cur = t; } }
+        s.piece = cur;
+        s.cells = placeCells(cur, lk[1]);
+        for (const c of s.cells) board[Math.floor(c / WIDTH)]![c % WIDTH] = cur;
+        const full: number[] = [];
+        for (let y = 0; y < 40; y++) if (board[y]!.every(v => v != null)) full.push(y);
+        for (let k = full.length - 1; k >= 0; k--) { board.splice(full[k]!, 1); board.push(new Array(WIDTH).fill(null)); }
+        cur = seq[ptr++]!;
+        s.pc = board[0]!.every(v => v == null);
+        st.push(s);
       }
-      const evaluated = ev.filter(v => v != null).length;
-      const outcome = pcLock != null ? 'pc'
-        : misses.some(m => m.lost_to === 'placement') ? 'lost_placement'
-        : misses.length ? 'lost_other'
-        : !ev.some(v => v?.ok === true) ? (evaluated ? 'never' : 'not_evaluated') : 'possible_to_end';
-      rw.push({ ...w, pcLock, outcome, misses });
+      const wins: { kind: string; start: number; end: number }[] = [];
+      const tst = st.findIndex(s => s.i <= 21 && s.spin === 2 && s.lines === 3);
+      const pcs = st.filter(s => s.pc).map(s => s.i);
+      const endAt = (start: number) => { const p = pcs.find(x => x > start); return Math.min(p ?? Infinity, start + SPAN, st.length - 1); };
+      if (tst >= 0) wins.push({ kind: 'tst', start: tst, end: endAt(tst) });
+      for (const p of pcs) if (p + 1 < st.length) wins.push({ kind: 'pc', start: p, end: endAt(p) });
+      const memo = new Map<string, any>();
+      const verdict = (s: any): V | null => {
+        if (s.v !== undefined) return s.v;
+        s.v = fits(s.pre) ? check(s.pre, s.cur, s.hold, seq, s.ptr, memo) : null;
+        return s.v;
+      };
+      const verified = P.prefix.verified_to;
+      const rw: any[] = [];
+      for (const w of wins) {
+        const ev: any[] = [];
+        for (let i = w.start + 1; i <= w.end; i++) ev.push(verdict(st[i]));
+        const pcLock = st[w.end]!.pc && w.end > w.start ? w.end : null;
+        const misses: any[] = [];
+        for (let i = w.start + 1; i < w.end; i++) {
+          const a = st[i], b = st[i + 1];
+          if (a.v?.ok !== true || a.pc || b.v?.ok === true) continue;
+          const m: any = { i, verified: i + 1 < verified };
+          if (b.garbageIn) m.lost_to = 'garbage';
+          else if (b.v?.ok === null) m.lost_to = 'unknown';
+          else {
+            let e: V = { ok: false };
+            if (fits(b.pre)) { setMovegen(enginePlacements); e = check(b.pre, b.cur, b.hold, seq, b.ptr, new Map()); setMovegen(null); }
+            m.lost_to = e.ok === true ? 'engine_disagrees' : e.ok === null ? 'unknown' : 'placement';
+          }
+          if (m.lost_to === 'placement') {
+            const vis = check(a.pre, a.cur, a.hold, seq.slice(0, a.ptr + PREVIEW), a.ptr, new Map());
+            m.in_preview = vis.ok === true;
+            m.state = { grid: a.grid, cur: a.cur, hold: a.hold, next: seq.slice(a.ptr, a.ptr + PREVIEW), piece: a.piece, held: a.held, cells: a.cells, lines: a.lines };
+            m.after = b.grid;
+            const use = (vis.ok === true ? vis : a.v) as { H: number; plan: Placement[] };
+            m.plan = use.plan;
+            m.plan_H = use.H;
+            if (m.in_preview && m.verified) m.category = category(m.state, m.plan_H, m.plan[0].piece);
+          }
+          misses.push(m);
+        }
+        const evaluated = ev.filter(v => v != null).length;
+        const outcome = pcLock != null ? 'pc'
+          : misses.some(m => m.lost_to === 'placement') ? 'lost_placement'
+          : misses.length ? 'lost_other'
+          : !ev.some(v => v?.ok === true) ? (evaluated ? 'never' : 'not_evaluated') : 'possible_to_end';
+        rw.push({ ...w, pcLock, outcome, misses });
+      }
+      out.push({ match: rd.match, round: rd.round, file: rd.file, user: P.user, verified_to: verified, windows: rw });
     }
-    out.push({ match: rd.match, round: rd.round, file: rd.file, user: P.user, verified_to: verified, windows: rw });
+    log(`m${rd.match}r${rd.round + 1}`);
   }
-  console.error(`m${rd.match}r${rd.round + 1} ${Math.round((performance.now() - t0) / 1000)}s`);
+  return {
+    schema: 'pc-miss-facts/1',
+    session: RF.session,
+    report_eligible: false,
+    not_eligible_because: ['one solver over one simulator board: which placement lost the Perfect Clear has no second implementation'],
+    rule: 'a placement miss: a PC was possible before the lock (hindsight, the round\'s dealt sequence, frame <= '
+      + `${MAXH} rows) and not after it (re-checked with the engine's own movegen, 180 included), the lock did not `
+      + 'itself perfect-clear and the next lock brought no garbage. Reported when in_preview (a PC existed using only '
+      + `the current piece, the hold and the ${PREVIEW}-piece preview) and verified (the next lock is inside the verified prefix).`,
+    categories: {
+      hole: 'the placement covered an empty cell',
+      over: 'the stack after the placement is taller than the frame of the solver\'s PC',
+      hold: 'the solver\'s first piece is not the piece placed',
+      spot: 'the same piece, placed somewhere else',
+    },
+    caveat: 'a PC being possible does not mean the player was building one',
+    maxh: MAXH, span: SPAN, preview: PREVIEW, nodes: NODES,
+    md5: { replay_facts: md5(`${dir}/sim/replay-facts.json`), ...Object.fromEntries(HASHED.map(p => [p, md5(p)])) },
+    rounds: out,
+  };
 }
-writeFileSync(outPath, JSON.stringify({ session: RF.session, maxh: MAXH, span: SPAN, preview: PREVIEW, rounds: out }));
+
+export const serialise = (x: unknown) => JSON.stringify(x, null, 1) + '\n';
+
+if (import.meta.main) {
+  const outIx = process.argv.indexOf('--out');
+  const t0 = performance.now();
+  const res = build(process.env.REPLAY_DIR!, s => console.error(`${s} ${Math.round((performance.now() - t0) / 1000)}s`));
+  if (outIx > 0) writeFileSync(process.argv[outIx + 1]!, serialise(res));
+}

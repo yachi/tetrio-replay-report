@@ -23,7 +23,7 @@ import json
 import os
 import sys
 
-from pipeline import (app_section, appendix, attack_section, finesse_section, chart_data, claim_cards, coaching,
+from pipeline import (app_section, appendix, attack_section, finesse_section, pc_miss_section, chart_data, claim_cards, coaching,
                       forecast_section, hero, intense_round, matches, moments, opener_section, pc_section, records, region, video_section,
                       replay_section, routes_techniques_section, stats_section)
 from pipeline.claims import generators
@@ -137,6 +137,13 @@ def finesse_sec(ctx):
     return finesse_section.build(ctx["facts"], ctx["report_dir"])
 
 
+def pc_miss_sec(ctx):
+    # Quarantined like finesse_sec: the SESSION's sim/pc-miss-facts.json, never facts.json, and
+    # None for a session with no such file. facts.json supplies only the player order; the replay
+    # facts give each miss its replay position.
+    return pc_miss_section.build(ctx["facts"], ctx["report_dir"])
+
+
 def replay_sec(ctx):
     # Quarantined like forecast_sec and opener_sec, and conditional twice over: no
     # sim/replay-facts.json, or no round long enough for `generators._intense_round`, and it
@@ -225,6 +232,9 @@ SECTIONS = [
     # it lands between attack-sources and the replay (or the footer when there is no replay).
     ("finesse-placements", ('<!-- BEGIN generated round-replay',
                             '<footer class="report-footer">'), finesse_sec, None),
+    # the sixth quarantined section, on the same chain anchor, so it lands after finesse-placements.
+    ("pc-miss", ('<!-- BEGIN generated round-replay',
+                 '<footer class="report-footer">'), pc_miss_sec, None),
     ("round-replay", '<footer class="report-footer">', replay_sec, None),
     ("chart-data", "<!-- CLAIMS_DATA_START -->", chart_section, None),
     ("match-copy", "<!-- CLAIMS_DATA_START -->", match_copy_section, None),

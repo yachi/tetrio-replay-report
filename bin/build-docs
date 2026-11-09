@@ -55,7 +55,7 @@ def _root(session):
 
 sys.path.insert(0, str(REPO))
 from pipeline import docs_gate, forecast_pooled, replay_page, replay_section, route_page  # noqa: E402
-from pipeline import dpc_page, replay_labels, replay_links, secondpc_page, section_anchors, technique_page, video_links  # noqa: E402
+from pipeline import dpc_page, pc_miss_page, replay_labels, replay_links, secondpc_page, section_anchors, technique_page, video_links  # noqa: E402
 from pipeline.sites import INDEX_ROUTE_SITES, TECHNIQUE_SITES  # noqa: E402
 
 # (session dir, artefact subdir, output name, label, blurb)
@@ -523,7 +523,7 @@ def main(argv=None):
     # not produce is drift, exactly as for *-replay.html — none of these names ends in -replay.html,
     # and no opener's prefix is a prefix of another's, so one site's glob never sees another's pages.
     openers = []
-    prefixes = [site.p.prefix for site in INDEX_ROUTE_SITES + TECHNIQUE_SITES] + [dpc_page.PREFIX, secondpc_page.PREFIX]
+    prefixes = [site.p.prefix for site in INDEX_ROUTE_SITES + TECHNIQUE_SITES] + [dpc_page.PREFIX, secondpc_page.PREFIX, pc_miss_page.PREFIX]
     for a in prefixes:
         if any(b != a and b.startswith(a) for b in prefixes):
             print(f"FAIL route page prefix {a!r} is a prefix of another site's", file=sys.stderr)
@@ -611,6 +611,27 @@ def main(argv=None):
                     stale.unlink()
                     print(f"  removed docs/{stale.name} (the {who} renderer does not produce it)")
         techniques.append(mod.site_card(site, site_inputs[1]))
+
+    # 行錯咗嗰一步: every night's pc-miss artefact rolled up, the same tier and the same
+    # render-and-byte-compare; its card sits in the 中盤手法 group after the PC pages.
+    pm_arts = pc_miss_page.load_all(str(REPO))
+    pm_pages = pc_miss_page.render_all(str(REPO), pm_arts)
+    for name, page in pm_pages.items():
+        dst = DOCS / name
+        if check:
+            if not dst.exists() or dst.read_text(encoding="utf-8") != page:
+                drift.append(f"docs/{name} differs from what the pc-miss artefacts render")
+        else:
+            dst.write_text(page, encoding="utf-8")
+            print(f"  rendered docs/{name} ({len(page.encode())} bytes)")
+    for stale in sorted(DOCS.glob(f"{pc_miss_page.PREFIX}*.html")):
+        if stale.name not in pm_pages:
+            if check:
+                drift.append(f"docs/{stale.name} is published but the pc-miss renderer does not produce it")
+            else:
+                stale.unlink()
+                print(f"  removed docs/{stale.name} (the pc-miss renderer does not produce it)")
+    techniques.append(pc_miss_page.site_card(pm_arts))
 
     # Computed from the four committed artefacts at render time rather than read from a pooled
     # artefact of its own: --check regenerates this, so the figure cannot go stale against its
