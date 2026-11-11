@@ -1096,6 +1096,17 @@ jobs:
       - name: Check the Second PC page audit catches its corruptions
         run: python3 -m pipeline.secondpc_page --selftest
 
+      # The SDPC loop page: JayKob's SDPC loop video, read against stick spin's SDパフェ and the
+      # くるまDPC setup. The video is not committed; --video <mp4> re-reads every frame by hand.
+      - name: Check the SDPC loop video read
+        run: python3 -m pipeline.openers.check_sdpc_loop
+
+      - name: Check the SDPC loop gate catches its mutants
+        run: python3 -m pipeline.openers.check_sdpc_loop --selftest
+
+      - name: Check the SDPC loop page audit catches its corruptions
+        run: python3 -m pipeline.sdpc_loop_page --selftest
+
       - name: Check the pc-miss page audit catches its corruptions
         run: python3 -m pipeline.pc_miss_page --selftest
 
