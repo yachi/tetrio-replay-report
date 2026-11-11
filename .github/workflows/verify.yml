@@ -1098,6 +1098,9 @@ jobs:
 
       # The SDPC loop page: JayKob's SDPC loop video, read against stick spin's SDパフェ and the
       # くるまDPC setup. The video is not committed; --video <mp4> re-reads every frame by hand.
+      # Its selftest also covers sdpc-loop-demos.html, every constructed loop of
+      # analysis/sdpc-loop-demos.json, whose engine re-run is pipeline/openers/sdpc-loop-demos.test.ts
+      # in the typescript job's whole-suite bun test.
       - name: Check the SDPC loop video read
         run: python3 -m pipeline.openers.check_sdpc_loop
 

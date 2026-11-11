@@ -29,6 +29,7 @@ from pipeline import dpc_page as DP
 from pipeline import replay_page as RP
 from pipeline import replay_section as RS
 from pipeline import route_page as RT
+from pipeline import sdpc_loop_demos as SLD
 from pipeline.claims.build_claims import SIMPLIFIED
 from pipeline.openers import check_sdpc_loop as CL
 
@@ -164,6 +165,8 @@ class SdpcLoopSite:
                 f'{board_svg(DP.DpcSite._setup_rows(dp, setup), nm, RT.PIECE_CLASS)}</div>', "    </div>"]
         sd, dc, sl, dl, _ = CL.loop_arithmetic(d, st, dp)
         s0 = [s for s in dp["setups"] if s["id"] == setup][0]
+        out.append(f'    <p class="scp-quote"><a href="{SLD.PAGE}">{_esc(PR["demos"]["words"]["to_demos"])}</a>：'
+                   f'{_esc(PR["demos"]["lede"])}</p>')
         out += [f'    <h3>{_esc(S["arith"])}</h3>',
                 f'    <p>{_esc(W["arith"].format(pc=sl - CL.SPIN_LINES["TSS"] - CL.SPIN_LINES["TSD"], sl=sl, sd=sd, tsd=s0["lines"], dpc_pc=dl - s0["lines"], dl=dl, dc=dc, total=sd + dc, bags=(sd + dc) // 7))}</p>',
                 "  </section>"]
@@ -241,12 +244,24 @@ class SdpcLoopSite:
         bad += [f"gate: {b}" for b in CL.check(d, st, dp)]
         return bad
 
+    @staticmethod
+    def load_demos(repo=REPO):
+        a = SLD.load(repo)
+        with open(os.path.join(repo, "analysis/stickspin-demos.json"), encoding="utf-8") as f:
+            sd = json.load(f)["demos"]
+        return a, sd
+
     def render_all(self, repo=REPO, inputs=None):
         inp = inputs or self.load_inputs(repo)
         page = self.render(*inp)
         bad = self.audit(page, *inp)
         _need(not bad, "; ".join(bad))
-        return {OVERVIEW: page}
+        a, sd = self.load_demos(repo)
+        dp = SLD.DemoPage(self.PROSE)
+        demo = dp.render(a, sd, OVERVIEW)
+        bad = dp.audit(demo, a)
+        _need(not bad, "; ".join(bad[:5]))
+        return {OVERVIEW: page, SLD.PAGE: demo}
 
     # ------------------------------------------------------------ selftest
 
@@ -281,6 +296,9 @@ class SdpcLoopSite:
         bad_d = json.loads(json.dumps(d))
         bad_d["reads"][0]["segment"] += 3
         expect("a read the gate refuses", self.audit(page, bad_d, *inp[1:]), True)
+        a, sd = self.load_demos(repo)
+        k2, s2 = SLD.DemoPage(self.PROSE).selftest(a, sd, OVERVIEW)
+        killed, survived = killed + k2, survived + s2
         print(f"selftest: {killed} killed, {survived} survived")
         return 1 if survived else 0
 
