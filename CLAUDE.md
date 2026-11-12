@@ -492,6 +492,12 @@ python3 -m pipeline.secondpc_page --selftest     # the docs/secondpc.html audit'
 python3 -m pipeline.openers.check_video_examples            # CI gate: the 影片實戰例子 boards and verdicts (both ? readings)
 python3 -m pipeline.openers.check_video_examples --selftest #   its mutants; python3 -m pipeline.video_examples --selftest the section audit's
 bun test pipeline/openers/video-examples.test.ts           #   key cells and whole shapes against each page's own qualify module
+python3 -m pipeline.openers.check_sdpc_loop            # CI gate: the SDPC loop video read (JayKob)
+python3 -m pipeline.openers.check_sdpc_loop --selftest #   its mutants; --video <mp4> re-reads every frame
+python3 -m pipeline.sdpc_loop_page --selftest          # the docs/sdpc-loop.html audit's mutants (--out-dir <dir> renders)
+bun pipeline/sim/emit-sdpc-loop-demos.ts \
+  --out analysis/sdpc-loop-demos.json                           # every SD Perfect Clear × DPC that closes the loop, engine-built (constructed, quarantined)
+bun test pipeline/openers/sdpc-loop-demos.test.ts              #   byte rebuild, engine re-run, independent decode, completeness + mutants
 bun pipeline/sim/emit-route-orders.ts --opener sdpcspin \
   --out analysis/sdpcspin-orders.json                           # which dealt orders build each SDPC Spin node (constructed, quarantined)
 bun pipeline/sim/emit-route-orders-cc.ts --opener sdpcspin \
@@ -5851,6 +5857,34 @@ sends that PC's attack in packets the oracle sends as one; every case says wheth
 and the page prints both counts. It is NOT in `TECHNIQUE_SITES` (`replay_labels` and the report's
 routes section read that list); `bin/build-docs` renders it in its own loop. Counts, the named
 `MATCHED` list and the Shachiku cross-check live in `dpc.test.ts`, never here.
+
+## SDPC 循環頁 — stick spin's SDパフェ into くるまDPC, read off one video
+
+JayKob's quickplay video `ey8jYVawDBs` (yachi 2026-11-11: 「Add opening sdpc looping」; yt-dlp `-f 298`
+through a Tailscale exit node) loops two halves the repo already transcribes: stick spin's SDパフェ route
+(bag1.left → bag1.pc TSS → 2.sd TSD → an SD Perfect Clear, 20 pieces, the O left over) and とんぼ's
+くるまDPC (`p01.000`, a TSD into a 4-line PC, 15 pieces); 35 pieces is five bags, so the board is empty at a
+bag's start again. `pipeline/openers/sdpc-loop.json` adds NO board, only times: the Perfect Clears (by eye,
+ALL CLEAR banner) and every frame whose bottom 8 rows equal one of those boards by occupancy, all 80 cells
+(the reader is in `check_sdpc_loop.py`; `--video` re-reads and must give the committed reads byte for byte).
+The gate checks route order per stretch between PCs, one half per stretch, and the 20 + 15 = 35 arithmetic
+from the two transcriptions. `pipeline/sdpc_loop_page.py` → `docs/sdpc-loop.html`, a 定式路線 card rendered
+in its own `bin/build-docs` block; its figures are recounted from the read and from stick spin's and the DPC
+page's corpus artefacts. Video tier: in no count. The loop's end is the video's own caption, quoted.
+
+**Every combination that closes the loop is built and replayed** (yachi 2026-11-11: 「用engine verify, 同搵曬可能所有
+example可能性出嚟」). `pipeline/sim/sdpc-loop-demos.ts` → `analysis/sdpc-loop-demos.json`, CONSTRUCTED like the route
+demos: every stick spin `2.sd.pc#N` / `2.mochi.pc#N` demo (20 locks, as drawn only; a mirrored loop is a mirror of
+one) × every とんぼ DPC setup × its PC patterns, as drawn and mirrored, whose first piece is the SD's leftover. The DPC
+half is planned from an empty board (leftover first, bag 4's T last into a full TSD, bag 5 into the 4-line PC; no
+hold; the setup heading's 「A>B」 read as a bag-4 dealing order, tried first and recorded as `condition_met`), and the
+whole 35 locks are replayed on a fresh engine that must agree lock for lock, end empty after locks 20 and 35, and
+credit exactly TSS TSD PC TSD PC. Identical drawings are built once (`dpc_unbuilt`, `same_as`). SD Perfect Clears
+whose leftover no catalogue DPC starts with close nothing, and the page lists them. `sdpc-loop-demos.test.ts` holds
+the byte rebuild, the re-run, an independent decode and completeness; `pipeline/sdpc_loop_demos.py` renders
+`docs/sdpc-loop-demos.html` (via `sdpc_loop_page.render_all`: a combination table per leftover linking every loop,
+each DPC half's board before its T, decoded again by `replay_section.decode_boards` in the audit). Counts are the
+artefact's, never typed here.
 
 ## 第二次全消頁 — a Perfect Clear straight into a four-line one
 

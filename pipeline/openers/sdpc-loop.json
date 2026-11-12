@@ -1,0 +1,439 @@
+{
+ "schema": "sdpc-loop/1",
+ "report_eligible": false,
+ "means": "JayKob's quickplay video of an SDPC loop: every Perfect Clear in its loop section, and every frame in which the bottom 8 rows of the board equal, cell for cell by occupancy, a board this repo already transcribes (stick spin's SDパフェ route, とんぼ's くるまDPC setup). Video data: in no count, claim, window or agreement set.",
+ "source": {
+  "kind": "youtube",
+  "video": "ey8jYVawDBs",
+  "url": "https://www.youtube.com/watch?v=ey8jYVawDBs",
+  "title": "SDPC Looping in Quickplay For Over 3 Minutes Straight",
+  "channel": "JayKob",
+  "uploaded": "2025-01-08",
+  "duration_s": 459,
+  "fetched": "2026-11-11",
+  "file": {
+   "format": "itag 298, 1152x720, 60 fps, mp4",
+   "sha256": "f94c6494379c290eee92b6acfed4c0387c15376f61e7150a4c80ffaa944c0b7b",
+   "bytes": 81214072,
+   "how": "yt-dlp -f 298 through a Tailscale exit node (snapyt's links returned 403); no frame is committed, and the hash is ours alone"
+  },
+  "terms": "YouTube's standard licence; nothing of the video is committed or republished, the page links each moment",
+  "end": {
+   "t": 220,
+   "quote": [
+    "3:37 misdrop + first garbage",
+    "no more pc loop :("
+   ],
+   "note": "the video's own caption, on screen at 220 s, which ends the loop section; frames after it are not read"
+  }
+ },
+ "reader": {
+  "crop": "crop=210:440:471:101,scale=30:63:flags=area, cell centres at rows 1::3 and columns 1::3: a 21 x 10 grid, row 20 the bottom row",
+  "seconds": 217,
+  "palette": {
+   "Z": [
+    172,
+    56,
+    56
+   ],
+   "J": [
+    84,
+    56,
+    200
+   ],
+   "L": [
+    172,
+    104,
+    52
+   ],
+   "O": [
+    172,
+    152,
+    52
+   ],
+   "T": [
+    172,
+    56,
+    160
+   ],
+   "S": [
+    128,
+    172,
+    48
+   ],
+   "I": [
+    60,
+    172,
+    128
+   ]
+  },
+  "threshold": 2500,
+  "rule": "a cell is filled when its colour is within the threshold (squared RGB distance) of a palette colour; a read is the first frame, in each stretch between two Perfect Clears, at which the bottom 8 rows equal a transcribed board (as drawn or mirrored) exactly, all 80 cells; a DPC setup is compared without its T and with it (the video never draws the T, so the T cells are the derived TSD's)"
+ },
+ "loop": {
+  "sdpc": {
+   "stickspin": [
+    "bag1.left",
+    "bag1.pc",
+    "2.sd",
+    "2.sd.after"
+   ],
+   "pc_list": "2.sd.pc"
+  },
+  "dpc": {
+   "setup": "p01.000"
+  }
+ },
+ "pcs": {
+  "note": "every Perfect Clear in the loop section, read by eye: each time is a frame on which the ALL CLEAR banner appears",
+  "t": [
+   7.77,
+   12.35,
+   19.83,
+   26.23,
+   32.18,
+   39.95,
+   47.73,
+   52.2,
+   58.93,
+   64.4,
+   77.58,
+   84.4,
+   90.13,
+   97.53,
+   102.27,
+   109.75,
+   119.13,
+   125.18,
+   129.92,
+   137.78,
+   142.82,
+   151.7,
+   156.92,
+   162.52,
+   168.7,
+   174.72,
+   179.03,
+   184.83,
+   190.67,
+   197.25,
+   202.48,
+   209.18,
+   214.22
+  ]
+ },
+ "reads": [
+  {
+   "frame": 174,
+   "segment": 0,
+   "board": "stickspin:bag1.left",
+   "mirrored": false
+  },
+  {
+   "frame": 190,
+   "segment": 0,
+   "board": "stickspin:bag1.pc",
+   "mirrored": false
+  },
+  {
+   "frame": 304,
+   "segment": 0,
+   "board": "stickspin:2.sd",
+   "mirrored": false
+  },
+  {
+   "frame": 583,
+   "segment": 1,
+   "board": "dpc:p01.000",
+   "mirrored": true
+  },
+  {
+   "frame": 598,
+   "segment": 1,
+   "board": "dpc:p01.000+T",
+   "mirrored": true
+  },
+  {
+   "frame": 853,
+   "segment": 2,
+   "board": "stickspin:bag1.left",
+   "mirrored": false
+  },
+  {
+   "frame": 1002,
+   "segment": 2,
+   "board": "stickspin:2.sd.after",
+   "mirrored": false
+  },
+  {
+   "frame": 1314,
+   "segment": 3,
+   "board": "dpc:p01.000",
+   "mirrored": false
+  },
+  {
+   "frame": 1663,
+   "segment": 4,
+   "board": "stickspin:bag1.left",
+   "mirrored": false
+  },
+  {
+   "frame": 1681,
+   "segment": 4,
+   "board": "stickspin:bag1.pc",
+   "mirrored": false
+  },
+  {
+   "frame": 1808,
+   "segment": 4,
+   "board": "stickspin:2.sd.after",
+   "mirrored": false
+  },
+  {
+   "frame": 3263,
+   "segment": 8,
+   "board": "stickspin:bag1.left",
+   "mirrored": false
+  },
+  {
+   "frame": 3280,
+   "segment": 8,
+   "board": "stickspin:bag1.pc",
+   "mirrored": false
+  },
+  {
+   "frame": 3434,
+   "segment": 8,
+   "board": "stickspin:2.sd.after",
+   "mirrored": false
+  },
+  {
+   "frame": 3700,
+   "segment": 9,
+   "board": "dpc:p01.000",
+   "mirrored": true
+  },
+  {
+   "frame": 3721,
+   "segment": 9,
+   "board": "dpc:p01.000+T",
+   "mirrored": true
+  },
+  {
+   "frame": 3979,
+   "segment": 10,
+   "board": "stickspin:bag1.left",
+   "mirrored": false
+  },
+  {
+   "frame": 3996,
+   "segment": 10,
+   "board": "stickspin:bag1.pc",
+   "mirrored": false
+  },
+  {
+   "frame": 4112,
+   "segment": 10,
+   "board": "stickspin:2.sd",
+   "mirrored": false
+  },
+  {
+   "frame": 4771,
+   "segment": 11,
+   "board": "stickspin:bag1.pc",
+   "mirrored": false
+  },
+  {
+   "frame": 4917,
+   "segment": 11,
+   "board": "stickspin:2.sd",
+   "mirrored": false
+  },
+  {
+   "frame": 5991,
+   "segment": 14,
+   "board": "dpc:p01.000",
+   "mirrored": false
+  },
+  {
+   "frame": 6006,
+   "segment": 14,
+   "board": "dpc:p01.000+T",
+   "mirrored": false
+  },
+  {
+   "frame": 6739,
+   "segment": 16,
+   "board": "dpc:p01.000",
+   "mirrored": false
+  },
+  {
+   "frame": 6753,
+   "segment": 16,
+   "board": "dpc:p01.000+T",
+   "mirrored": false
+  },
+  {
+   "frame": 7251,
+   "segment": 17,
+   "board": "stickspin:bag1.left",
+   "mirrored": false
+  },
+  {
+   "frame": 7264,
+   "segment": 17,
+   "board": "stickspin:bag1.pc",
+   "mirrored": false
+  },
+  {
+   "frame": 7367,
+   "segment": 17,
+   "board": "stickspin:2.sd",
+   "mirrored": false
+  },
+  {
+   "frame": 7636,
+   "segment": 18,
+   "board": "dpc:p01.000",
+   "mirrored": false
+  },
+  {
+   "frame": 7646,
+   "segment": 18,
+   "board": "dpc:p01.000+T",
+   "mirrored": false
+  },
+  {
+   "frame": 8387,
+   "segment": 20,
+   "board": "dpc:p01.000",
+   "mirrored": true
+  },
+  {
+   "frame": 8401,
+   "segment": 20,
+   "board": "dpc:p01.000+T",
+   "mirrored": true
+  },
+  {
+   "frame": 9286,
+   "segment": 22,
+   "board": "dpc:p01.000",
+   "mirrored": false
+  },
+  {
+   "frame": 9304,
+   "segment": 22,
+   "board": "dpc:p01.000+T",
+   "mirrored": false
+  },
+  {
+   "frame": 9514,
+   "segment": 23,
+   "board": "stickspin:bag1.left",
+   "mirrored": false
+  },
+  {
+   "frame": 9532,
+   "segment": 23,
+   "board": "stickspin:bag1.pc",
+   "mirrored": false
+  },
+  {
+   "frame": 9649,
+   "segment": 23,
+   "board": "stickspin:2.sd",
+   "mirrored": false
+  },
+  {
+   "frame": 9874,
+   "segment": 24,
+   "board": "dpc:p01.000",
+   "mirrored": true
+  },
+  {
+   "frame": 9912,
+   "segment": 24,
+   "board": "dpc:p01.000+T",
+   "mirrored": true
+  },
+  {
+   "frame": 10228,
+   "segment": 25,
+   "board": "stickspin:bag1.left",
+   "mirrored": false
+  },
+  {
+   "frame": 10244,
+   "segment": 25,
+   "board": "stickspin:bag1.pc",
+   "mirrored": false
+  },
+  {
+   "frame": 10614,
+   "segment": 26,
+   "board": "dpc:p01.000",
+   "mirrored": true
+  },
+  {
+   "frame": 10629,
+   "segment": 26,
+   "board": "dpc:p01.000+T",
+   "mirrored": true
+  },
+  {
+   "frame": 10878,
+   "segment": 27,
+   "board": "stickspin:bag1.left",
+   "mirrored": false
+  },
+  {
+   "frame": 10892,
+   "segment": 27,
+   "board": "stickspin:bag1.pc",
+   "mirrored": false
+  },
+  {
+   "frame": 10997,
+   "segment": 27,
+   "board": "stickspin:2.sd",
+   "mirrored": false
+  },
+  {
+   "frame": 11546,
+   "segment": 29,
+   "board": "stickspin:bag1.left",
+   "mirrored": false
+  },
+  {
+   "frame": 11575,
+   "segment": 29,
+   "board": "stickspin:bag1.pc",
+   "mirrored": false
+  },
+  {
+   "frame": 11997,
+   "segment": 30,
+   "board": "dpc:p01.000",
+   "mirrored": true
+  },
+  {
+   "frame": 12013,
+   "segment": 30,
+   "board": "dpc:p01.000+T",
+   "mirrored": true
+  },
+  {
+   "frame": 12691,
+   "segment": 32,
+   "board": "dpc:p01.000",
+   "mirrored": false
+  },
+  {
+   "frame": 12704,
+   "segment": 32,
+   "board": "dpc:p01.000+T",
+   "mirrored": false
+  }
+ ]
+}

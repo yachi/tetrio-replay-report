@@ -1,0 +1,94 @@
+{
+ "title": "SDPC 循環：全消、DPC、再全消",
+ "overview_title": "SDPC 循環：全消、DPC、再全消",
+ "desc": "JayKob 喺 quickplay 連續打 SDPC 循環嘅片，逐次全消讀出嚟，對 repo 已經抄低嘅 stick spin SDパフェ 同くるまDPC 盤面。片嘅資料，唔屬於信任鏈。",
+ "lede": "SDPC 循環係兩個已經有版嘅開局駁埋一齊，打完一個再由頭嚟：stick spin 嘅 SDパフェ（第一包 T 打橫入 T-spin Single，第二包 T-spin Double，第三包全消，剩低一粒 O），再用嗰粒 O 砌くるまDPC（T-spin Double 接 4 行全消）。兩邊加埋 35 粒方塊，啱啱五包，全消完盤面清晒、又係新一包嘅開頭，所以可以一直循環落去。呢版用 JayKob 條片做例子，逐次全消標明時間，連去片入面嗰一刻。",
+ "source_words": "來源：",
+ "source_terms": "條片冇任何一格畫面放入 repo 或者呢版：每個盤面都係 repo 本身已經抄低嘅（stick spin 版同 DPC 版），呢度淨係記低片入面幾時出現，連結去片入面嗰一刻。",
+ "page_sentences": [
+  "<strong>呢版係片嘅資料，唔係 corpus</strong>：片入面嘅盤面唔入任何計數、claim、窗口或者對照組。",
+  "<strong>讀法</strong>：每一格畫面嘅最底 8 行，同 stick spin 版或者 DPC 版畫嘅盤面逐格對（淨係睇有冇方塊，唔睇顏色，正反都對），80 格全部一樣先算讀到。對唔到嘅畫面唔會估。全消時間係人手睇 ALL CLEAR 字樣讀出嚟。"
+ ],
+ "index_card": {
+  "kicker": "全消循環 · JayKob 條片",
+  "blurb": "SDパフェ 接くるまDPC，35 粒一個循環，片入面逐次全消嘅時間同盤面。"
+ },
+ "sections": {
+  "loop": "一個循環",
+  "loop_note": "上面一行係 SDパフェ（stick spin 版嘅盤面），下面一行係くるまDPC（DPC 版嘅盤面，虛線係 T 入嘅位）。片入面くるまDPC 有時正、有時反轉砌。",
+  "arith": "點解可以一直循環",
+  "video": "片入面每次全消",
+  "video_note": "每段係兩次全消之間嘅時間。「讀到」一欄列出嗰段讀到嘅盤面，每個都連去片入面嗰一刻（早 3 秒）。一段 SDパフェ 之後緊接一段くるまDPC，就算讀到一個完整循環。",
+  "corpus": "corpus 入面",
+  "corpus_note": "兩邊嘅數都係由各自版嘅 artefact 數出嚟。"
+ },
+ "table": {
+  "n": "第幾次全消",
+  "t": "時間",
+  "half": "嗰段係",
+  "reads": "讀到"
+ },
+ "words": {
+  "sdpc": "SDパフェ",
+  "dpc": "くるまDPC",
+  "unread": "冇讀到",
+  "mirrored": "（反轉）",
+  "with_t": "＋T",
+  "arith": "SDパフェ：T-spin Single 1 行、T-spin Double 2 行、全消 {pc} 行，共 {sl} 行 = {sd} 粒（三包少一粒）。くるまDPC：T-spin Double {tsd} 行、全消 {dpc_pc} 行，共 {dl} 行 = {dc} 粒（剩低嗰粒加兩包）。兩邊加埋 {total} 粒，即係 {bags} 包。",
+  "counts": "片入面讀咗 {pcs} 次全消；讀到 SDパフェ 嘅段、讀到くるまDPC 嘅段、乜都冇讀到嘅段，同埋完整循環，數目如下。",
+  "end": "條片自己寫明循環喺邊度斷：",
+  "corpus_sd": "stick spin：corpus 入面去到第一包嘅 case，每個最遠去到邊個盤面：",
+  "corpus_sd_tail": "所以 corpus 入面一個完整 SDPC 循環都冇。",
+  "corpus_dpc": "くるまDPC：corpus 入面全消之後第一下 T-spin 對到呢個 setup 嘅次數（呢個 setup 喺 DPC 版其他頁都有畫，當同一個計）：",
+  "sd_page": "stick spin 版",
+  "dpc_page": "DPC 版",
+  "laps": "完整循環（SDパフェ 跟住くるまDPC）",
+  "corpus_sd_reached": "去到第二包 SD 盤面或者之後嘅 case："
+ },
+ "board_names": {
+  "stickspin:2.sd.after": "SDパフェ派生 2巡目 · T-spin Double 之後"
+ },
+ "demos": {
+  "title": "SDPC 循環：全部示範重播",
+  "desc": "stick spin 每一款 SDパフェ（同もっちパフェ）同とんぼ DPC 目錄每一款 DPC 全消，接得埋做一個 35 粒循環嘅組合，全部由空盤砌起，用引擎重播核過。示範，唔係對局，唔屬於信任鏈。",
+  "lede": "上面嗰版係片入面點樣打；呢版反過嚟問：stick spin 版畫嘅每一款 SD 全消，配とんぼ DPC 目錄入面每一款 DPC，邊啲可以真係駁埋一個循環？每個組合都由空盤開始，用我哋揀嘅出牌次序同按鍵，喺模擬器（Triangle 引擎）入面由頭行到尾：頭 20 粒係 stick spin 版嘅示範，之後嗰粒剩低嘅方塊放第一，第四包砌 DPC、T 打 T-spin Double，第五包全消。",
+  "sentences": [
+   "<strong>呢啲係示範，唔係對局</strong>：冇人打過呢啲局，出牌次序同按鍵都係我哋揀，所以佢哋唔入任何計數、claim、窗口或者對照組。",
+   "<strong>每一個都用引擎核過</strong>：成局 35 粒喺一個新嘅引擎由空盤重播，每一粒擺落嘅位、清幾多行、有冇 T-spin 都要同計劃一樣；第 20 粒同第 35 粒之後盤面一定要清晒，T-spin 一定係 Single、Double、Double 呢三下。呢版自己亦用另一個解碼器，由空盤再行一次每一局，核返兩次全消。",
+   "<strong>讀法</strong>：SD 嗰半淨係照 stick spin 版畫嘅方向砌，反轉嘅循環就係呢度某一個嘅鏡像；DPC 嗰半正反都砌。DPC 版標題寫住「A>B」嘅，我哋讀做第四包入面 A 早過 B 出，砌嘅時候先試照呢個次序；第四包嘅 T 最後出，全程冇 hold。"
+  ],
+  "idle": "撳表入面任何一格開始播。",
+  "user": "示範",
+  "now": "{sd} 接 {dpc}",
+  "spin": "第 {n} 粒：{name}",
+  "pc": "第 {n} 粒：全消（呢半段共 {lines} 行）",
+  "note_sd": "第 1-20 粒：stick spin 版 {sd} 嘅示範，剩低 {left}。",
+  "note_dpc": "第 21-35 粒：{left} 先放，第四包 {q4}（T 最後），第五包 {q5}。",
+  "sections": {
+   "table": "組合表",
+   "table_note": "每一行係一款 SD 全消，每一欄係一款 DPC（「↔」係反轉砌）。有 ▶ 嘅格就係砌到、核過嘅循環，撳落去播。按 SD 全消剩低嗰粒分開三個表，因為 DPC 一定要用返嗰粒做第一粒。",
+   "halves": "DPC 半段",
+   "halves_note": "每一款 DPC 喺引擎入面砌到 T 入位之前一刻嘅盤面（虛線係 T），由佢第一個循環解碼出嚟。",
+   "none": "接唔到嘅 SD 全消",
+   "none_note": "以下 SD 全消剩低嘅方塊，とんぼ 嘅 DPC 目錄冇一款係用佢開頭，所以接唔到呢個 DPC 循環（唔代表冇其他 DPC 接得到，淨係呢個目錄冇）。",
+   "dups": "同一款嘅 DPC",
+   "dups_note": "片入面每版都有正反兩個，好多係同另一版一模一樣，所以只砌一次。"
+  },
+  "words": {
+   "counts": "總共",
+   "loops": "個循環",
+   "sd": "款 SD 全消接得到",
+   "dpc": "款唔同嘅 DPC",
+   "left": "剩低",
+   "mirror": "↔",
+   "cond_met": "第四包照住「{cond}」嘅次序出",
+   "cond_none": "標題冇寫次序",
+   "used": "用喺 {n} 個循環",
+   "play": "▶",
+   "same_as": "同 {other} 一樣",
+   "sd_link": "stick spin 版示範",
+   "back": "片入面嘅循環",
+   "to_demos": "全部組合嘅示範重播"
+  }
+ }
+}
