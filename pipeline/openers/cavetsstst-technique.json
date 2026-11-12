@@ -1,0 +1,396 @@
+{
+  "schema": "technique-shapes/1",
+  "technique": "cavetsstst",
+  "source": {
+    "url": "https://harddrop.com/wiki/T-Spin_Triple_Setups",
+    "edit_url": "https://harddrop.com/w/index.php?title=T-Spin_Triple_Setups&action=edit",
+    "title": "T-Spin Triple Setups (Cave TSS to TST)",
+    "site": "harddrop.com (Hard Drop Tetris Wiki, MediaWiki)",
+    "author_note": "the page is harddrop's, edited by its wiki editors; it names no inventor for this setup",
+    "section": "Garbage Manipulation",
+    "label_text": "'''Cave TSS to TST'''",
+    "oldid": 42323,
+    "revision_sha1": "0e64836c95d3214bb8c83a5151cbe72763717aef",
+    "revision_timestamp": "2025-02-21T13:50:15Z",
+    "updated": "2025-02-21",
+    "revision_note": "MediaWiki's own sha1 of revision 42323 (read from the API), equal to sha1 of the saved bytes: a second authority beside snapshot_sha256, which is ours; the same revision King Crimson pins (kingcrimson-technique.json cross_source.pages[0]), the page's latest when fetched",
+    "fetched": "2026-11-12",
+    "fetch_method": "the pinned revision's own bytes from the MediaWiki API (api.php?action=query&prop=revisions&titles=T-Spin_Triple_Setups&rvprop=ids|sha1|content|timestamp&rvslots=main&format=json&formatversion=2), with Python's urllib and a descriptive User-Agent (NOT curl). Boards are {{pfstart}} … {{pfend}} templates, read by route_transcription.wikitext_boards with `wikitext_readings`; only the three Cave TSS to TST boards are transcribed",
+    "snapshot_file": "T-Spin_Triple_Setups.wikitext",
+    "snapshot_sha256": "8ae446b1b7d9b4e8733fd0f4338b1b0279e8fb2609f9c5e612e2e8ee5a0a2042",
+    "snapshot_bytes": 48802,
+    "snapshot_note": "sha256 of the revision's bytes as the API serves them. The page is not committed; the weekly `wikitext-sources` job refetches the pinned revision, checks both hashes and re-runs --wikitext-dir, and fails when the page has a newer revision.",
+    "wikitext_readings": {
+      "g": "c",
+      "G": "q",
+      "T": "t",
+      "'L": "v",
+      "-T": "-",
+      "-": "-",
+      "Q": "q"
+    },
+    "wikitext_readings_note": "route_transcription.wikitext_cell reads blank as -, P as U and a piece letter as its lower case; this page also draws `g` (dark grey under the setup, read c), `G` (the stack built around the TST slot, read q: filled, no piece), `T` (the TSS's T cut by its clear, read t), and on boards this file does not transcribe `'L` and `-T`, which are given a reading only so the page parses; `Q` (read q) is what the synthetic page writes for q, which the real page never draws",
+    "boards_not_transcribed": [
+      {
+        "boards": [
+          0,
+          43
+        ],
+        "heading": "every setup before Cave TSS to TST",
+        "reason": "other T-spin Triple setups; this file transcribes the three Cave TSS to TST boards only"
+      },
+      {
+        "boards": [
+          47,
+          162
+        ],
+        "heading": "every setup after Cave TSS to TST",
+        "reason": "other T-spin Triple setups; this file transcribes the three Cave TSS to TST boards only"
+      }
+    ],
+    "shiwehi": {
+      "checked": "2026-11-12",
+      "index": "https://shiwehi.com/tetris/template/ (its 中盤テンプレ・ドネイト list names no TSS into a TST)",
+      "note": "no shiwehi.com page draws this setup, so harddrop's boards are the primary source"
+    }
+  },
+  "terms": {
+    "url": "https://harddrop.com/wiki/Hard_Drop_Tetris_Wiki:About",
+    "dated": "not stated: harddrop publishes no licence or terms page for wiki content",
+    "read": "2026-10-15, for SDPC Spin (sdpcspin-routes.json): the page footer and the About page it links (no body); not re-read for this page",
+    "allows": "not stated (no licence is published)",
+    "excludes": "not stated (no licence is published)",
+    "requests": "not stated; credited by link, as this repo credits every harddrop page it reads",
+    "how_met": "source link to the harddrop page in every page header; no ads on GitHub Pages"
+  },
+  "legend": {
+    "orientation": "rows top to bottom as drawn; 10 columns, column 0 the left wall",
+    "-": "empty",
+    "c": "a cell drawn dark grey (harddrop g): placed before this diagram, any piece or garbage",
+    "q": "a cell drawn grey (harddrop G): the stack built around the TST slot after the TSS, no piece named (OUR READING)",
+    "l": "a cell of the L (the overhang)",
+    "U": "a cell of the T the spin places (harddrop P)",
+    "t": "a cell of the TSS's T left by its clear (harddrop T on the third board; OUR READING)",
+    "muting": "harddrop never draws the row a spin clears muted, so the spin board is a named `:muting` discrepancy"
+  },
+  "empty_letters": "",
+  "quotes": [
+    {
+      "id": "h.section",
+      "verbatim": "=== Garbage Manipulation ==="
+    },
+    {
+      "id": "label",
+      "verbatim": "'''Cave TSS to TST'''"
+    },
+    {
+      "id": "ez",
+      "verbatim": "EZ TSS"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "terrain",
+      "table": 0,
+      "board": 0,
+      "kind": "base",
+      "caption_quote": "label",
+      "label": "the terrain: a single garbage block in the corner, a garbage row with its hole one column in",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "c---------",
+        "c-cccccccc"
+      ]
+    },
+    {
+      "id": "tss",
+      "table": 0,
+      "board": 1,
+      "kind": "derived",
+      "derived": true,
+      "caption_quote": "ez",
+      "label": "an L hung over the hole (harddrop draws it only with the T in)",
+      "rows": [
+        "----------",
+        "----------",
+        "lll-------",
+        "l---------",
+        "c---------",
+        "c-cccccccc"
+      ],
+      "on": "terrain",
+      "adds": "l"
+    },
+    {
+      "id": "tss.spin",
+      "table": 0,
+      "board": 1,
+      "kind": "spin",
+      "caption_quote": "ez",
+      "label": "the T stood up under the L, nub right: a T-spin Single",
+      "rows": [
+        "----------",
+        "----------",
+        "lll-------",
+        "lU--------",
+        "cUU-------",
+        "cUcccccccc"
+      ],
+      "on": "tss",
+      "adds": "U",
+      "spin_of": "tss",
+      "spin_piece": "U",
+      "spin": "TSS",
+      "lines": 1
+    },
+    {
+      "id": "tss.after",
+      "table": 0,
+      "board": 2,
+      "kind": "derived",
+      "derived": true,
+      "caption_quote": "ez",
+      "label": "what the TSS leaves: the L and the T's three cells, a row lower",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "lll-------",
+        "lt--------",
+        "ctt-------"
+      ]
+    },
+    {
+      "id": "tst",
+      "table": 0,
+      "board": 2,
+      "kind": "build",
+      "caption_quote": "label",
+      "label": "the stack built around a TST slot beside the T's remnant, roofed one column over",
+      "rows": [
+        "----------",
+        "---qqqqqqq",
+        "----qqqqqq",
+        "lll-qqqqqq",
+        "lt--qqqqqq",
+        "ctt-qqqqqq"
+      ],
+      "on": "tss.after",
+      "adds": "q"
+    }
+  ],
+  "page_order": [
+    "terrain",
+    "tss.spin",
+    "tst"
+  ],
+  "basic_form": [],
+  "variants": [
+    {
+      "id": "cavetsstst",
+      "board": "tss.spin",
+      "spin": "TSS",
+      "lines": 1,
+      "credit": "mini",
+      "credit_note": "the engine credits this TSS as a MINI T-spin Single (probed 2026-11-12 with the demo planner's reach() on harddrop's board and on the short's: the only arrival is spin \"mini\"). Of the four corners of the T's centre three are filled, but on the nub side only one, so it is a mini under TETR.IO's rule; the matcher measures the variant at a mini TSS and the follow-up TST at a full one. extra_checks re-counts the corners on every drawing.",
+      "window_basis": "agreement",
+      "window": {
+        "rows": [
+          2,
+          5
+        ],
+        "cols": [
+          0,
+          3
+        ]
+      },
+      "t_cells": [
+        [
+          3,
+          1
+        ],
+        [
+          4,
+          1
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          5,
+          1
+        ]
+      ],
+      "roof_cells": [
+        [
+          2,
+          0
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          2,
+          2
+        ]
+      ],
+      "window_note": "in tss.spin's frame, row 0 the top: the AGREEMENT BOX of harddrop's board and the short's. Row 2 is the overhang (the L over the stem and the wall column, open over the column the TST will stand in); rows 3 and 4 the stem's wall on the left and the open cells right of the T, where the TST goes; row 5 the row the TSS clears (entailed by the clear at a full TSS, NaiveClauseForced). Above row 2 the two drawings disagree (the short's left stack goes two rows higher); right of column 3 they disagree (the short's right stack is built, harddrop's is not yet); below row 5 and left of column 0 harddrop's board ends. Occupancy only, never colour; garbage is filled.",
+      "agreement": [
+        {
+          "board": "tss",
+          "t_cells": [
+            [
+              3,
+              1
+            ],
+            [
+              4,
+              1
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              5,
+              1
+            ]
+          ],
+          "mirrored": false
+        }
+      ],
+      "untested_drawn": {
+        "cells": [],
+        "reason": ""
+      },
+      "followup": {
+        "board": "tst",
+        "spin": "TST",
+        "lines": 3,
+        "t_cells_pre_clear": [
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            4,
+            3
+          ]
+        ],
+        "t_cells_after": [
+          [
+            3,
+            3
+          ],
+          [
+            4,
+            2
+          ],
+          [
+            4,
+            3
+          ],
+          [
+            5,
+            3
+          ]
+        ],
+        "note": "the TST: a second T stood up in the column right of the first, nub left into the cell beside the first T's remnant, roofed by the stack built over it. The TSS clears the row under it, so the row map carries its cells down a row; the matcher checks it fires as a full T-spin Triple at the next T."
+      },
+      "fires_on": [
+        "tss"
+      ],
+      "misses": [
+        "terrain",
+        "tss.after",
+        "tst"
+      ]
+    }
+  ],
+  "cross_source": {
+    "kind": "video",
+    "note": "the window, by the gate's predicate (technique_transcription.window_fires), over every U-slot board of every committed *-routes.json, with the U cells as the T: it fires on none. The independent drawing is the short yachi sent (`video`), whose board is the window's external `agreement` drawing: rule (g) fires the window on it, once, at its slot, as drawn.",
+    "routes_fire_none": "no committed routes file draws a TSS under an overhang into a TST (measured: the window fires on none of their U-slot boards); the cross-check is the short, below",
+    "video": {
+      "url": "https://www.youtube.com/shorts/vr1N137z038",
+      "id": "vr1N137z038",
+      "title": "I’m a T-Spin WIZARD",
+      "channel": "WylieCan'tGame",
+      "uploaded": "2024-11-26",
+      "game": "Tetris Effect: Connected",
+      "fetched": "2026-11-12",
+      "fetch_method": "yt-dlp, format 299 (1080x1920, 60 fps, video only), through a Tailscale exit node",
+      "file_sha256": "81f2a6b0a95840a7a0f05670e952b4d48b6f91f783ee4b3374c9a73c62c719fa",
+      "file_bytes": 10428013,
+      "file_note": "the download is not committed and nothing refetches it; its hash is ours alone",
+      "frame_s": 5.35,
+      "reading": "read by eye off the frame at 5.35 s (the T resting in its slot before it locks); palette sampling misread Tetris Effect's lit cells. Six rows: the overhang's row, the two above it and the three under it, the bottom one the row the TSS clears; the rows above are higher stack and the rows below garbage, neither read by the window. One column right of harddrop's board.",
+      "rows": [
+        "cc--cccccc",
+        "cc---ccccc",
+        "cccc-ccccc",
+        "cc---ccccc",
+        "cc---ccccc",
+        "cc-ccccccc"
+      ],
+      "t_cells": [
+        [
+          3,
+          2
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          5,
+          2
+        ]
+      ],
+      "mirrored": false,
+      "after_s": 10.25,
+      "after_note": "at 10.25 s the short fires the TST into the column right of the first T (its stem rows 3-5 and its nub on the row the TSS left beside the remnant, in the frame after the clear), as the follow-up slot says"
+    },
+    "page_fires": [
+      {
+        "board": 45,
+        "mirrored": false
+      }
+    ],
+    "other_techniques": [],
+    "fires": [],
+    "also": [],
+    "labelled_not_fired": []
+  },
+  "known_discrepancies": [
+    {
+      "id": "tss.spin:muting",
+      "note": "harddrop draws the row the TSS clears in the same letters as the rest (it never mutes a cleared row)"
+    },
+    {
+      "id": "tss.after:colour",
+      "note": "the TSS's T is three cells after its clear (the fourth was in the cleared row): a piece cut by a line clear, not a whole T"
+    },
+    {
+      "id": "tst:colour",
+      "note": "the same three cells of the TSS's T, drawn as harddrop draws them (T)"
+    }
+  ]
+}

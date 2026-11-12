@@ -188,11 +188,13 @@ def pc_matches(rnd, user, i):
 
 
 def technique_matches(rnd, user, i, tr, var, mirrored):
-    """Lock `i` is a T with a full spin clearing the variant's lines, and the variant's window fires
-    on the board it went into, anchored on its cells, in the hit's hand."""
+    """Lock `i` is a T with a full spin (a mini one for a variant whose transcription says `credit:
+    mini`) clearing the variant's lines, and the variant's window fires on the board it went into,
+    anchored on its cells, in the hit's hand."""
     from pipeline.openers.technique_transcription import window_fires
     lk = rnd.locks[user][i]
-    if rnd.pieces[user][i] != "T" or lk[3] != 2 or lk[2] != var["lines"]:
+    want = 1 if var.get("credit") == "mini" else 2
+    if rnd.pieces[user][i] != "T" or lk[3] != want or lk[2] != var["lines"]:
         return False
     before = rnd.board_after(user, i - 1)
     H, W = rnd.rows, rnd.width
@@ -266,6 +268,8 @@ def technique_items(src, h, rnd):
     _need(technique_matches(rnd, h["player"], h["lock"], src.tr, var, h["mirrored"]),
           f"{where}: the window does not fire on the board before the T, or the T is not its spin")
     words = SPIN_WORDS.get((var["lines"], var["spin"]))
+    if words and var.get("credit") == "mini":
+        words = "mini " + words
     _need(words is not None, f"{where}: no words for a {var['spin']} clearing {var['lines']}")
     if src.art.get("qualify") and not h["qualifies"]:
         # 社畜トレイン's `qualify`: the window fired but the hit fails a build rule, so the shape

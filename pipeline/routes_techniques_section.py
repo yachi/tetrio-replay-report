@@ -188,7 +188,7 @@ def compute(facts, data):
         hs = [h for h in t.art["hits"] if h["session"] == S]
         for vid, var in t.variants.items():
             row = {"name": _variant_name(t, vid, var), "short": t.name, "href": t.href,
-                   "spin": var["spin"], "payoff": bool(var.get("payoff")), "cells": {}}
+                   "spin": ("mini " if var.get("credit") == "mini" else "") + var["spin"], "payoff": bool(var.get("payoff")), "cells": {}}
             for p in players:
                 mine = [h for h in hs if h["variant"] == vid and h["player"] == p]
                 den = data["tsd"][p] if var["spin"] == "TSD" else None

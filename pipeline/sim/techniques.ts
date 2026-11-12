@@ -16,6 +16,7 @@ import { KAIDAN } from './technique-profile-kaidan.ts';
 import { DTCANNON } from './technique-profile-dtcannon.ts';
 import { BASICDONATING } from './technique-profile-basicdonating.ts';
 import { KINGCRIMSON } from './technique-profile-kingcrimson.ts';
+import { CAVETSSTST } from './technique-profile-cavetsstst.ts';
 import type { TechniqueDemoProfile } from './technique-demo-profile.ts';
 import { STSD_DEMOS } from './technique-demos-stsd.ts';
 import { STMBCAVE_DEMOS } from './technique-demos-stmbcave.ts';
@@ -29,13 +30,14 @@ import { KAIDAN_DEMOS } from './technique-demos-kaidan.ts';
 import { DTCANNON_DEMOS } from './technique-demos-dtcannon.ts';
 import { BASICDONATING_DEMOS } from './technique-demos-basicdonating.ts';
 import { KINGCRIMSON_DEMOS } from './technique-demos-kingcrimson.ts';
+import { CAVETSSTST_DEMOS } from './technique-demos-cavetsstst.ts';
 import type { OwnProfile } from './technique-own.ts';
 import { CUTCOPY_OWN } from './technique-own-cutcopy.ts';
 
 export const TECHNIQUES: Record<string, TechniqueProfile & { crossRoute?: CrossRoute }> = {
   stsd: STSD, stmbcave: STMBCAVE, imperialcross: IMPERIALCROSS, doubledagger: DOUBLEDAGGER, btcannon: BTCANNON,
   cutcopy: CUTCOPY, shachikutrain: SHACHIKUTRAIN, parapet: PARAPET, kaidan: KAIDAN,
-  dtcannon: DTCANNON, basicdonating: BASICDONATING, kingcrimson: KINGCRIMSON,
+  dtcannon: DTCANNON, basicdonating: BASICDONATING, kingcrimson: KINGCRIMSON, cavetsstst: CAVETSSTST,
 };
 /** each technique's constructed-demo half, by the same key */
 export const TECHNIQUE_DEMOS: Record<string, TechniqueDemoProfile> = {
@@ -43,6 +45,7 @@ export const TECHNIQUE_DEMOS: Record<string, TechniqueDemoProfile> = {
   doubledagger: DOUBLEDAGGER_DEMOS, btcannon: BTCANNON_DEMOS, cutcopy: CUTCOPY_DEMOS,
   shachikutrain: SHACHIKUTRAIN_DEMOS, parapet: PARAPET_DEMOS, kaidan: KAIDAN_DEMOS,
   dtcannon: DTCANNON_DEMOS, basicdonating: BASICDONATING_DEMOS, kingcrimson: KINGCRIMSON_DEMOS,
+  cavetsstst: CAVETSSTST_DEMOS,
 };
 /** the techniques with an own-design search (`technique-own.ts`), by the same key */
 export const TECHNIQUE_OWN: Record<string, OwnProfile> = { cutcopy: CUTCOPY_OWN };

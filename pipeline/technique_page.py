@@ -85,6 +85,9 @@ class TechniqueSiteProfile:
     #: the variant every figure is about, and the denominators key of its opportunity
     variant: str
     opportunity: str
+    #: opt-in: the word the demo page's quarantine sentence names the opportunity by, when its denominators key is no
+    #: word a reader knows (Cave TSS to TST's `mini_TSS`); default the key itself
+    opportunity_word: str = ""
     #: board letters beyond route_page.PIECE_CLASS, and the CSS for them
     cell_classes: dict = field(default_factory=dict)
     extra_css: str = ""
@@ -145,7 +148,7 @@ class TechniqueSite:
         #: every variant the pages print, the primary first: (variant id, its opportunity's denominators key)
         self.VARIANTS = ((p.variant, p.opportunity),) + tuple(p.more_variants)
         #: the spin the demo page's quarantine sentence names (King Crimson's is a TST; every other page's a TSD)
-        self.OPP_WORD = p.opportunity
+        self.OPP_WORD = p.opportunity_word or p.opportunity
 
     # ------------------------------------------------------------ inputs
 
@@ -464,6 +467,8 @@ class TechniqueSite:
         bad = []
         hits = {case_key(h): h for h in art["hits"]}
         lines = {v["id"]: v["lines"] for v in tr["variants"]}
+        # a variant whose transcription says `credit: mini` is a mini T-spin by the engine (spin code 1)
+        want = {v["id"]: 1 if v.get("credit") == "mini" else 2 for v in tr["variants"]}
         for ck, href in _CASE_LINK.findall(page):
             ck, href = html.unescape(ck), html.unescape(href)
             h = hits.get(ck)
@@ -485,8 +490,9 @@ class TechniqueSite:
             piece, cleared, spin = r["locks"][user][k]
             if user != h["player"] or k != h["lock"]:
                 bad.append(f"{ck}: position {n} steps into {user}'s lock {k}, not the hit's T")
-            elif piece != "T" or spin != 2 or cleared != lines[h["variant"]]:
-                bad.append(f"{ck}: position {n} steps into a {piece} (spin {spin}, {cleared} lines), not a full "
+            elif piece != "T" or spin != want[h["variant"]] or cleared != lines[h["variant"]]:
+                kind = "mini" if want[h["variant"]] == 1 else "full"
+                bad.append(f"{ck}: position {n} steps into a {piece} (spin {spin}, {cleared} lines), not a {kind} "
                            f"T-spin clearing {lines[h['variant']]}")
         if len(_CASE_LINK.findall(page)) != len(_CASE.findall(page)):
             bad.append("a case row carries no replay link")
