@@ -163,6 +163,9 @@ const kindKey = (spin: string, lines: number) => `${spin === 'mini' ? 'mini' : '
 
 export interface Variant {
   id: string; board: string; spin: string; lines: number;
+  /** the engine's spin credit the variant is measured at: `mini` when its T has only one front corner filled
+   *  (Cave TSS to TST's TSS, which the engine credits as a mini T-spin Single); default full */
+  credit?: 'mini';
   /** `rule`: no window — the profile's `detect` decides (基本的なドネイト's donation rule); `window` and `t_cells`
    *  then only say where the variant's board draws its T */
   window_basis?: string;
@@ -291,15 +294,16 @@ const isStood = (cells: Cell[]) => {
 
 // ── classification ───────────────────────────────────────────────────────────────────────────────
 
-const KIND_NAME: Record<string, string> = { 'full:1': 'TSS', 'full:2': 'TSD', 'full:3': 'TST' };
+const KIND_NAME: Record<string, string> = { 'full:1': 'TSS', 'full:2': 'TSD', 'full:3': 'TST',
+                                             'mini:1': 'mini_TSS', 'mini:2': 'mini_TSD' };
 const kindName = (k: string) => KIND_NAME[k] ?? `T-spin ${k}`;
 const SPIN_LINES: Record<string, number> = { TSS: 1, TSD: 2, TST: 3 };
 
-/** The opportunity a variant is measured at: the full T-spin its transcription names, which must be
- *  the profile's opportunity or one of its control spins. */
+/** The opportunity a variant is measured at: the T-spin its transcription names (full unless its `credit` is
+ *  `mini`), which must be the profile's opportunity or one of its control spins. */
 function variantOpp(tag: string, v: Variant, opp: string, ctl: { key: string }[]): string {
   if (SPIN_LINES[v.spin] !== v.lines) throw new Error(`${tag}: variant ${v.id} is a ${v.spin} clearing ${v.lines} line(s)`);
-  const key = kindKey('full', v.lines);
+  const key = kindKey(v.credit ?? 'full', v.lines);
   if (key !== opp && !ctl.some(c => c.key === key))
     throw new Error(`${tag}: variant ${v.id}'s ${v.spin} is neither the opportunity nor a control spin`);
   return key;

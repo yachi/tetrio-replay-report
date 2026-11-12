@@ -3,7 +3,7 @@
  * (`technique-profile.ts`), read by `technique-facts.ts`'s `assemble`, for every technique page whose own rules are
  * the shared ones below. 社畜トレイン (`shachikutrain-qualify.ts`) and 欄干 (`parapet-qualify.ts`) keep their own
  * modules, written first; this one carries the same rules to the other seven pages, at yachi's request on 2026-10-23
- * (「睇埋其他中盤」), and to 途中DT砲, added after them. A hit failing any rule stays in `hits` (the shape did stand)
+ * (「睇埋其他中盤」), and to 途中DT砲, King Crimson and Cave TSS to TST, added after them. A hit failing any rule stays in `hits` (the shape did stand)
  * with `qualifies: false` and every rule it fails named.
  *
  *   1. `fragment` / `garbage_in_shape`: the variant's KEY cells — the pieces a player places to make the shape — are
@@ -55,6 +55,8 @@ export const QUALIFY_OPTIONS: Record<string, TechniqueQualifyOptions> = {
   // King Crimson: the overhang over the well (row 0, over the wall and the well), which every drawing roofs the
   // well with; the wall under it (roof_cells' third cell) is the stack the page draws grey, so it is not a key cell
   kingcrimson: { keyCells: { kingcrimson: [[0, 6], [0, 7]] } },
+  // roof_cells: the L laid over the stem and the wall column, the overhang both drawings place before the TSS
+  cavetsstst: {},
 };
 
 export interface TechniqueQualifyMutants { allowFragments?: boolean; allowGarbage?: boolean; allowSplit?: boolean;

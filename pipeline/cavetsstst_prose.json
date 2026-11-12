@@ -1,0 +1,152 @@
+{
+ "_comment": "Words for pipeline/cavetsstst_page.py (the shared pipeline/technique_page.py renderer bound to Cave TSS to TST). Numbers never live here: every count on the pages is rendered from analysis/cavetsstst-facts.json and analysis/cavetsstst-demos.json. Every key below is read by name, so deleting one is a KeyError at render time, not a quietly shorter page. Traditional-character Cantonese; the loader runs the simplified-glyph check (the source's own English stays as quoted text). source_credit replaces the shared shiwehi.com credit: the source is harddrop, which publishes no licence (SDPC Spin's and King Crimson's precedent).",
+ "source_credit": {
+  "site": "harddrop.com，Hard Drop Tetris Wiki",
+  "terms_link": "關於 Hard Drop Tetris Wiki",
+  "terms_words": "harddrop 冇公開內容授權條款；呢度同每一頁讀過嘅 harddrop 頁一樣，用連結註明出處"
+ },
+ "title": "Cave TSS 接 TST 中盤手法",
+ "overview_title": "Cave TSS 接 TST 中盤手法",
+ "technique_name": "Cave TSS 接 TST",
+ "desc": "harddrop 個 T-Spin Triple Setups 頁「Cave TSS to TST」嘅局部形狀，同 corpus 每一下 mini T-spin Single 逐個對：模擬器推導，唔屬於信任鏈。",
+ "lede": "Cave TSS 接 TST 係一個先打 TSS、再打 TST 嘅中盤手法：盤底有一條一欄闊嘅窿（垃圾行個窿），一粒 L 瞓喺窿上面做屋頂，第一粒 T 企直插入窿度，打一下 TSS 消走最底嗰行；消完之後，T 剩低嗰三格同旁邊嘅疊夾住一個 TST 位，第二粒 T 企直落去打 TST，消三行。harddrop 將佢擺喺 T-Spin Triple Setups 頁「Garbage Manipulation」嗰段，只係畫咗三幅圖，第一幅寫住「EZ TSS」。要留意：呢下 TSS 喺引擎（同 TETR.IO 嘅規則）入面係 mini T-spin Single，唔係全 T-spin，因為 T 個尖嗰邊淨係得一隻角有嘢；所以呢版用 mini TSS 做分母，而跟住嗰下 TST 就要係全 T-spin。呢版將 harddrop 嗰三幅圖照抄，加埋 yachi 傳嚟嗰條 short 嘅盤面，再同成個 corpus 每一下 mini TSS 對：T 企直落去嗰陣，佢周圍嗰個窗口係咪原頁畫嘅樣，同埋之後嗰粒 T 有冇打到 TST。對到之後再睇個形係咪用完整嘅方塊砌出嚟，過得晒規則嗰幾下先列出。",
+ "page_sentences": {
+  "source": "盤面圖逐格轉錄自 harddrop 嘅 T-Spin Triple Setups 頁「Cave TSS to TST」三幅圖（Hard Drop Tetris Wiki，用 MediaWiki 自己嘅版本號同 sha1 釘住咗讀嗰個版本），轉錄有自己嘅 gate 核對；引號入面嘅英文係原頁原文。shiwehi.com 冇呢個手法嘅頁，所以呢版嘅主要來源係 harddrop；第二個來源係 yachi 傳嚟嗰條 YouTube short（WylieCan'tGame 嘅「I’m a T-Spin WIZARD」，Tetris Effect: Connected），佢個盤面係人手由 5.35 秒嗰格讀落嚟，個窗口喺佢度一樣對到一次。",
+  "midgame": "呢個係中盤手法，唔係開局定式：盤面係對住 T 嘅局部窗口比，唔係成個盤面比，邊一粒都可以，唔使由空盤開始。harddrop 將佢擺喺「Garbage Manipulation」，即係食咗垃圾之後點打；如果喺開局對到，會算喺「開局」嗰欄，唔會刪走。",
+  "window": "對法：嗰粒 T 嘅四格要啱啱係原頁畫嘅企直 T，個尖向住右邊（左右反轉都算，反轉嗰陣個窗口一齊反）；個窗口入面原頁畫咗有嘢嘅格要有嘢、畫咗空嘅格要空。顏色唔比，窗口以外一格都唔睇。個窗口係 harddrop 嗰幅同 short 嗰幅都一致嘅最大長方形：四欄闊（窿左邊嘅牆、條窿、T 個尖嗰欄、TST 企嗰欄），四行高（L 嗰行、T 旁邊兩行、TSS 消嗰行）。再高一行，short 左邊嘅疊高過 harddrop；再闊一欄，short 右邊嘅疊已經砌好、harddrop 未砌；再低或者再左，harddrop 幅圖已經完。個窗口出咗板邊，唔算對到。最底嗰行係 TSS 消嘅行（消得到就一定滿，唔會分到嘢）；分到嘢嘅係 T 嘅方向、L 嗰行（屋頂，同 TST 嗰欄要空），同 T 旁邊嗰兩行（TST 位要空、窿左邊要有嘢）。gate 逐幅核過個窗口喺 harddrop 嗰幅同 short 嗰幅，喺畫咗嘅 T 位對到一次，其他位一次都唔對；原頁其他兩幅都記低咗係對唔到嘅。",
+  "garbage": "窗口入面嘅垃圾當有嘢計；垃圾行個窿喺邊一欄係引擎用種子亂數揀嘅，所以窗口有垃圾嘅個案會喺下面張表單獨數出嚟。",
+  "our_reading": "標住「我哋嘅讀法」嘅係我哋自己點讀原頁，原頁冇明講：虛線框係 T 落嘅位；深灰格（原頁 g）係之前已經有嘅嘢，可能係方塊亦可能係垃圾；淺灰格（原頁 G）係打完 TSS 之後圍住 TST 位砌嘅堆，當有嘢計，唔知係乜方塊；第三幅入面 T 嘅三格係 TSS 消完行剩低嘅碎。harddrop 唔會將 spin 消嘅行畫淡色，所以 spin 圖冇淡色行。原頁冇畫 T 未落之前嘅盤面，呢幅係由畫咗 T 嗰幅減走 T 推出嚟。",
+  "control": "對照：同一個窗口擺喺全 T-spin 嘅 TSS、TSD、TST 同 mini TSD 度數一次，再逐條拎走個條件數一次。一個形狀如果喺唔關佢事嘅 spin 度都對到差唔多咁多，佢就只係一個形狀測試，唔係呢個手法；所以呢幾行一定同主表一齊印。"
+ },
+ "names": {
+  "terrain": "地形：角落一格垃圾，加一行垃圾，個窿喺第二欄",
+  "tss": "一粒 L 瞓喺窿上面做屋頂（原頁淨係畫咗 T 落咗嘅樣）",
+  "tss.spin": "T 企直插入窿度，個尖向右：一下 TSS（引擎當 mini）",
+  "tss.after": "TSS 消完：L 同 T 剩低嗰三格跌低一行",
+  "tst": "圍住 TST 位砌好嘅堆，屋頂喺隔籬一欄"
+ },
+ "derived_note": "我哋嘅讀法：原頁冇畫呢幅，係由嗰幅圖減走頁面嗰幾粒推出嚟，gate 逐格核過。",
+ "discrepancies": {
+  "tss.spin:muting": "原頁同我哋其他版唔同：harddrop 唔會將 spin 消走嘅行畫淡色，呢幅照原頁顏色抄；對法淨係睇有冇嘢，唔睇顏色。",
+  "tss.after:colour": "TSS 嗰粒 T 消完行淨低三格（第四格喺消走嗰行度）：係俾消行切開咗嘅方塊，唔係一粒完整嘅 T。",
+  "tst:colour": "同上，TSS 嗰粒 T 剩低嘅三格，照原頁畫法（原頁用 T）。"
+ },
+ "sections": {
+  "boards": "原頁嘅圖",
+  "boards_note": "原頁每一幅圖，照頁面次序；冇畫出嚟、由圖推返出嚟嘅盤面（如果有）排喺最尾。",
+  "window": "我哋點樣對",
+  "window_note": "左邊係原頁嘅樣（個尖向右），右邊係左右反轉。虛線框係嗰粒 T 嘅四格，灰格係要有嘢嘅格，空格要空；窗口以外唔睇。",
+  "window_drawn": "照原頁",
+  "window_mirrored": "左右反轉",
+  "headline": "corpus 入面對到幾多",
+  "headline_note": "分母係已核對範圍入面、過咗重組核對嘅每一下 mini TSS（引擎當 mini T-spin、消一行；呢個形嘅 TSS 就係咁記）。開局係頭 {pieces} 粒以內（由 0 數起，即係第 {last} 粒或之前），中盤係之後。",
+  "followup": "TST 有冇打到",
+  "followup_note": "原頁話 TSS 之後係一下 TST。由對到嗰下起，將 TST 位跟住每一下消行同垃圾行推落去，一直推到下一粒 T；每一步都同引擎自己嘅盤面核過。下一粒 T 啱啱落入個位、而且係全 T-spin 消三行，先算打到。",
+  "controls": "對照",
+  "cross": "同另一個來源對",
+  "cross_note": "（呢版冇用到）",
+  "cases": "個案",
+  "cases_note": "每一個過得晒規則嘅 mini TSS 一行（張表冇行，就係一個都冇對到）。縮圖係 T 落之前個窗口（虛線係 T 嘅位，灰色係垃圾）；連結去嗰晚嘅逐局重播，一開就停喺呢粒 T 落之前，行多一粒就係呢下 T-spin。",
+  "demos": "示範重播",
+  "demos_link": "睇示範重播：原頁每一幅圖有冇示範、點解冇"
+ },
+ "table": {
+  "player": "玩家",
+  "all": "全部",
+  "in_opener": "開局",
+  "mid_game": "中盤",
+  "mirrored": "左右反轉",
+  "garbage": "窗口有垃圾",
+  "fired": "打到 TST",
+  "of_hits": "（分母係對到嘅數）",
+  "reason": "冇打到嘅原因",
+  "row": "對照",
+  "followup_head": "結果",
+  "under": "同一個窗口，喺 {kind} 度",
+  "ablation": {
+   "no_must_empty": "拎走「要空嘅格要空」",
+   "no_roof": "拎走 T 上面嗰行（L 嘅屋頂）",
+   "t_overlap": "唔要求 T 係窗口嘅 T，淨係要同窗口重疊"
+  },
+  "baseline": "T 企直嘅 mini TSS（唔睇窗口；呢行係基線）",
+  "denominator_note": "分母係嗰款 spin 嘅已核對數（同主表同一個核對）；拎走條件嗰幾行同基線，分母係全部 mini TSS。",
+  "date": "日期",
+  "round": "局",
+  "lock": "第幾粒（由 0 數）",
+  "phase": "開局／中盤",
+  "window_col": "窗口",
+  "followup_col": "TST",
+  "cross_round": "回合",
+  "cross_node": "去到嗰個位嘅粒（由 0 數）",
+  "cross_hit": "對到嘅粒（由 0 數）",
+  "yes": "打到（第 {lock} 粒，由 0 數）",
+  "phase_opener": "開局",
+  "phase_mid": "中盤",
+  "mirrored_mark": "（反轉）"
+ },
+ "reasons": {
+  "next_t_elsewhere": "下一粒 T 落咗第二度",
+  "slot_filled_before_t": "T 未到，個位已經俾其他方塊填咗",
+  "t_in_slot_not_tsd": "T 入咗個位，但唔係全 T-spin 消三行",
+  "past_verified": "下一粒 T 喺已核對範圍之外",
+  "recon_dropped": "下一粒 T 冇過重組核對",
+  "slot_off_board": "個位推出咗盤面",
+  "round_ended": "局完之前冇下一粒 T",
+  "rowmap_unverified": "中間有一步對唔返引擎嘅盤面，停咗唔再推"
+ },
+ "spin_kinds": {
+  "TSS": "TSS",
+  "TSD": "TSD",
+  "TST": "TST",
+  "mini_TSS": "mini TSS",
+  "mini_TSD": "mini TSD"
+ },
+ "index_card": {
+  "kicker": "中盤手法 · harddrop.com",
+  "blurb": "Cave TSS 接 TST：T 企直插入一粒 L 蓋住嘅垃圾窿打 TSS（引擎當 mini），消完一行，第二粒 T 企直落隔籬打 TST。harddrop 原頁三幅圖、一條 short 嘅盤面、corpus 入面真係用完整方塊砌出嚟嘅、同每幅圖有冇示範。"
+ },
+ "missing": "搵唔到呢個示範。",
+ "demo": {
+  "title": "Cave TSS 接 TST 示範重播",
+  "desc": "Cave TSS 接 TST 嘅示範：harddrop 原頁每一幅圖，由空盤砌唔砌得到、冇示範嘅點解冇。",
+  "lede": "示範要由空盤開始：先用方塊砌出原頁灰色嘅地形，再放原頁畫嘅 L，再將 T 企直插入窿打 TSS，再打 TST。冇示範嘅圖，原因逐幅寫喺下面。",
+  "user": "示範",
+  "play": "播呢個示範",
+  "idle": "揀一個示範嚟播；冇砌得到嘅示範，就冇嘢播。",
+  "now": "示範：{name}",
+  "sentences": {
+   "demo": "呢度嘅示範（如果有）都係我哋砌出嚟嘅，唔係任何人打過嘅對局：出邊粒、幾時 hold、點樣按掣，全部係我哋揀嘅，所以唔計入任何數。",
+   "engine": "一個示範要用同 corpus 一樣嘅 Triangle 引擎由頭行一次，每一粒都要落喺計劃嘅位、spin 同消行數都要啱，先會出現喺呢度；行唔到就寫低原因，唔會靜靜雞唔見咗。",
+   "base": "元地形要我哋自己用方塊砌：原頁將佢畫成灰色，冇講係乜方塊。由空盤砌，每粒加四格、每消一行減十格，所以格數係單數嘅地形一定砌唔出；格數係雙數但唔係四嘅倍數嘅，要消過行先砌得出，而呢個 planner 唔消行。",
+   "order": "planner 將砌好嗰幅圖嘅細楷方塊當係原頁放嘅方塊、其餘當地形；淺灰格係打完 TSS 之後砌嘅堆，原頁冇講係乜方塊，同灰格一樣要我哋自己砌。",
+   "rule": "冇示範嘅原因係第一個撞到嘅問題：盤面嘅格數由空盤砌唔出（單數），或者係雙數但唔係四嘅倍數（要消過行先得），或者要用 T 先鋪得到（planner 嘅 T 留咗俾 T-spin）。同一幅圖可能仲有其他原因，下面淨係寫第一個。"
+  },
+  "chain": "砌法：{chain}",
+  "base_words": "頭 {n} 粒係我哋砌嘅元地形（{pieces}）",
+  "page_words": "跟住 {pieces} 係原頁畫嘅",
+  "fill_words": "TST 之前我哋用 {pieces} 填咗",
+  "spin": "第 {n} 粒：{name}",
+  "events": "spin：{events}",
+  "reaches": "停過喺：{boards}",
+  "unbuilt": "冇示範：{reason}",
+  "unbuilt_title": "冇示範嘅圖"
+ },
+ "qualify": {
+  "title": "真係砌出嚟定撞出嚟",
+  "note": "窗口淨係話個形喺 T 落之前企咗喺度。原頁同 short 都係用一粒完整嘅 L 瞓喺窿上面做屋頂，所以對到嘅每一下再用同其他中盤手法頁一樣嘅規則篩：L 嗰三格屋頂（反轉嗰陣一齊反）要屬於一粒四格仲齊晒喺板上面嘅方塊（唔係消行之後剩低嘅碎），唔可以係垃圾；T 之前或之後 14 粒以內唔可以有全消，因為咁係 DPC。窗口其他要有嘢嘅格，原頁畫做之前已經有嘅嘢，所以唔要求係新方塊。另外，仲要原頁或者 short 其中一幅圖成個形喺 T 周圍企到：T、佢掂到嘅窿同佢下面三行以內嘅窿、再加一圈一格嘅邊，每格有冇嘢都要同幅圖一樣（唔理顏色，可以反轉）。",
+  "summary_lead": "corpus 入面規則都過、算係用完整方塊砌出嚟嘅 Cave TSS：",
+  "summary_unit": " 下",
+  "summary_note": "個窗口對到個形、但唔過規則嘅 T-spin，呢版唔列出亦唔數；佢哋仍然逐個記喺 analysis/cavetsstst-facts.json。過到嘅每一下喺下面「個案」逐個列出，連去嗰晚嘅重播。",
+  "col": "算唔算",
+  "yes": "算",
+  "no_join": "；",
+  "reasons": {
+   "fragment": "L 嘅屋頂係消行之後剩低嘅碎",
+   "garbage_in_shape": "L 嘅屋頂係垃圾",
+   "shape_cell_empty": "L 嘅屋頂係空（窗口要佢有嘢，正常唔會出現）",
+   "dpc": "T 前後 14 粒以內有全消（DPC）",
+   "ownership_unverified": "T 之前有一步核對唔到，分唔出邊格屬於邊粒",
+   "not_whole_shape": "原頁同 short 冇一幅圖成個形喺 T 周圍企到（每幅圖：T、佢掂到或者佢下面三行以內嘅窿、再加一格邊，格格佔位都要一樣，可以反轉）"
+  }
+ }
+}

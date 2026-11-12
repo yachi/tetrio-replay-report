@@ -1069,6 +1069,20 @@ jobs:
       - name: Check the King Crimson technique page audit catches its corruptions
         run: python3 -m pipeline.kingcrimson_page --selftest
 
+      # The thirteenth technique page, Cave TSS to TST (harddrop's T-Spin_Triple_Setups page, Garbage Manipulation,
+      # and the short that shows it): a T into a cave under an L roof, credited by the engine as a MINI T-spin
+      # Single, whose clear opens the TST slot beside it. Its window is the agreement box of harddrop's board
+      # and the short's board; the corpus artefact and the demos are checked by pipeline/openers/cavetsstst.test.ts and
+      # cavetsstst-demos.test.ts in the typescript job.
+      - name: Check the Cave TSS to TST technique transcription
+        run: python3 -m pipeline.openers.extract_cavetsstst_shapes
+
+      - name: Check the Cave TSS to TST technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_cavetsstst_shapes --selftest
+
+      - name: Check the Cave TSS to TST technique page audit catches its corruptions
+        run: python3 -m pipeline.cavetsstst_page --selftest
+
       # The DPC page: what the first T-spin after each Perfect Clear was built on, against the setups
       # とんぼ's DPC video catalogues (read off its frames; nothing refetches it, a re-read needs the video
       # and --video). Its PC points are

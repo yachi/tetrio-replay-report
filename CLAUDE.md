@@ -4921,7 +4921,7 @@ fail. Their matchable children whose parent is never filed are named in `CLASSIF
 The shared edit moved every sibling's artefacts in their md5 lines only and none of their pages
 (no sibling profile names a `uFiresBefore` node, so `noUBefore` cannot reach them).
 
-## 中盤手法頁（STSD、STMB Cave、インペリアルクロス、ダブルダガー、BT砲、千鳥格子、社畜トレイン、欄干、階段のドネイト、途中DT砲、基本的なドネイト、King Crimson）— every mid-game technique page, quarantined like the route pages
+## 中盤手法頁（STSD、STMB Cave、インペリアルクロス、ダブルダガー、BT砲、千鳥格子、社畜トレイン、欄干、階段のドネイト、途中DT砲、基本的なドネイト、King Crimson、Cave TSS 接 TST）— every mid-game technique page, quarantined like the route pages
 
 shiwehi.com's 「中盤テンプレ・ドネイト」 pages draw a technique on a PARTIAL stack, at whatever lock it
 happens, which the route machinery cannot express: `route-facts.ts` compares whole boards (at most 8
@@ -4929,7 +4929,7 @@ rows, bottom-aligned) at fixed lock counts from an empty board, behind a bag-1 g
 pages are a SIBLING framework that imports the route code and edits none of it — no route artefact's
 hash line and no route page moved when it landed. STSD (`template/stsd.php`) is the first page,
 STMB Cave (`template/stmbcave.php`) the second, インペリアルクロス (`template/imperialcross.php`) the third and
-ダブルダガー (`template/doubledagger.php`) the fourth, BT砲 (`template/btcannon.php`) the fifth, 千鳥格子 (`template/cutcopy.php`) the sixth, 社畜トレイン (`template/shachikutrain.php`) the seventh, 欄干 (`template/parapet.php`) the eighth, 階段のドネイト (`template/kaidansetup.php`) the ninth, 途中DT砲 (`template/dtcannon.php`) the tenth, 基本的なドネイト (`template/basicdonating.php`) the eleventh and King Crimson (harddrop's `King_Crimson`, the first not from shiwehi.com) the twelfth (each later one has a ### below); a later technique whose shape the window
+ダブルダガー (`template/doubledagger.php`) the fourth, BT砲 (`template/btcannon.php`) the fifth, 千鳥格子 (`template/cutcopy.php`) the sixth, 社畜トレイン (`template/shachikutrain.php`) the seventh, 欄干 (`template/parapet.php`) the eighth, 階段のドネイト (`template/kaidansetup.php`) the ninth, 途中DT砲 (`template/dtcannon.php`) the tenth, 基本的なドネイト (`template/basicdonating.php`) the eleventh, King Crimson (harddrop's `King_Crimson`, the first not from shiwehi.com) the twelfth and Cave TSS 接 TST (harddrop's T-Spin_Triple_Setups and a YouTube short) the thirteenth (each later one has a ### below); a later technique whose shape the window
 predicate can express is a data addition (a transcription
 module + JSON, a facts profile, a demos profile, a page profile + prose, one registry line per side,
 two tests, three CI steps, one `TECHNIQUE_SITES` entry).
@@ -5788,9 +5788,35 @@ artefact hashing that module (the other eight pages of the section below, plus `
 its hash lines only. Named lists and their sizes live in the two tests. The demo page's quarantine sentence names the profile's
 `opportunity` (`technique_page.py`'s `OPP_WORD`; every other page's is TSD, so their pages did not move).
 
+### Cave TSS 接 TST
+
+The same deliverable for the 「Cave TSS to TST」 board of harddrop's `T-Spin_Triple_Setups` page (Garbage Manipulation),
+added because yachi sent a YouTube short (`vr1N137z038`, Tetris Effect: Connected) that plays it (2026-11-12):
+`pipeline/openers/cavetsstst-technique.json` (held as a literal in `extract_cavetsstst_shapes.py`, gated by the shared
+`technique_transcription.py`), `technique-profile-cavetsstst.ts` → `analysis/cavetsstst-facts.json` (`cavetsstst.test.ts`),
+`technique-demos-cavetsstst.ts` → `analysis/cavetsstst-demos.json` (`cavetsstst-demos.test.ts`), and `docs/cavetsstst.html` +
+`docs/cavetsstst-demos.html` from `cavetsstst_page.py` + `cavetsstst_prose.json`, the thirteenth card under 中盤手法. Every figure
+is read off the artefacts and tests, never typed here. The harddrop page is the same pinned revision King Crimson's
+transcription records, so `check_wikitext_sources` re-reads it weekly; the short was downloaded through Tailscale, read by
+eye off one frame (palette sampling misread Tetris Effect's lit cells), and is not committed or refetched (its sha256 is ours).
+
+**The first technique whose opportunity is a MINI T-spin.** A T goes into a cave under an L roof; three of its centre's
+corners are filled but only one on the nub side, so the engine credits a mini T-spin Single, and that clear opens the TST
+slot beside it. The variant carries `credit: mini` (with `credit_note`), and four shared files read it, each
+default-preserving: `technique-facts.ts` (`Variant.credit`, `variantOpp`: the opportunity is `mini_TSS`, so the denominator is
+the scored mini TSSs, and the follow-up TST must still be full), `technique_page.py` (`audit_replay_links` wants spin code 1,
+and the opt-in `opportunity_word` names the spin on the demo page), `replay_labels.technique_matches` (the same spin code, and
+the label says 「mini TSS」) and `routes_techniques_section` (the cell says 「mini TSS」). `technique-facts.ts` and
+`technique-qualify.ts` (its `cavetsstst` entry) are hashed, so every technique artefact, `cutcopy-own.json` and
+`cutcopy-selfplay.json` moved in their hash lines and nothing else (checked with `git diff`), and every report moved only in
+its routes-techniques row list. The window is the agreement box of harddrop's board and the short's; no routes board and no
+other technique's board fires it. No demo is built: the terrain and the board before the TSS are not multiples of four (a
+planner limit), the board after it has covers only with a T (enumerated in the demos test), and the TST board is odd. The
+corpus has one hit, which qualifies; whether its follow-up fired, and the named lists and mutants, are the tests'.
+
 ### 用完整方塊砌出嚟先算 — the shared `qualify` hook of the other nine pages
 
-STSD, STMB Cave, インペリアルクロス, ダブルダガー, BT砲, 千鳥格子, 階段のドネイト, 途中DT砲 and King Crimson carry the same build rules as 社畜トレイン
+STSD, STMB Cave, インペリアルクロス, ダブルダガー, BT砲, 千鳥格子, 階段のドネイト, 途中DT砲, King Crimson and Cave TSS 接 TST carry the same build rules as 社畜トレイン
 and 欄干 (yachi, 2026-10-23: 「睇埋其他中盤」), through ONE module, `pipeline/sim/technique-qualify.ts`
 (`techniqueQualifier`, `QUALIFY_OPTIONS`), gated by `pipeline/openers/technique-qualify.test.ts`. A hit qualifies iff each of
 its variant's KEY cells is a cell of a complete piece and never garbage (`fragment`, `garbage_in_shape`), a piece the page
