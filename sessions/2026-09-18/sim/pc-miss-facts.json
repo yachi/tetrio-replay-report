@@ -21,9 +21,13 @@
  "md5": {
   "replay_facts": "fb2a5a2b6d4e1819caa7847679b2ded6",
   "ttrm": "de09815da40f2b2f03e092b3b33ea0a8",
-  "pipeline/sim/pc-miss.ts": "05e10bcb887474978819477c3f17502c",
-  "pipeline/sim/pc-solver.ts": "49f59c21e63294641a3d71c82aaf123a",
-  "pipeline/sim/pc-engine-gen.ts": "43ca4e0bbc7843f0d8212ff721df4740"
+  "pipeline/sim/pc-miss.ts": "b7c4ec56e9339e051ebe0377cf1d209b",
+  "pipeline/sim/pc-solver-native.ts": "50f6aeefc7639a88ea563ae56ae9ef9a",
+  "pipeline/sim/pc-solver-rs/src/lib.rs": "9494289d499fd8789803c501dc9d4625",
+  "pipeline/sim/pc-solver-rs/src/srs.rs": "7cc697e065cd0490517133bc142fdab0",
+  "pipeline/sim/pc-solver-rs/src/solver.rs": "d4c99b8e92ceb2566712184ef0af703e",
+  "pipeline/sim/pc-solver-rs/src/engine_gen.rs": "84e80dc56d649852dafd3e79cf4d085f",
+  "pipeline/sim/pc-solver-rs/src/ffi.rs": "0a7ee5b22247affca54bf745905f6b08"
  },
  "rounds": [
   {

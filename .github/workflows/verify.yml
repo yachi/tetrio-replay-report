@@ -1270,6 +1270,16 @@ jobs:
       # job. Warming it first, 4-way, keeps parallel workers from filling the same cases twice.
       # On the weekly schedule the suite reads it OFF (the warm step is then wasted, ~1 min), so the suite also runs once a week exactly as it did
       # before the cache existed — the backstop for anything the cache key could miss.
+      # The PC solver behind 行錯咗嗰一步 is Rust (pipeline/sim/pc-solver-rs, loaded through bun:ffi by
+      # pc-solver-native.ts). pc-solver-native.ts builds it on first use when stale; building it here,
+      # once, keeps four parallel workers from each waiting on cargo's lock. The runner image ships
+      # rustup's stable toolchain; the crate has no dependencies, so Cargo.lock pins nothing external.
+      - name: Build the native PC solver
+        run: |
+          set -euo pipefail
+          cargo --version
+          cargo build --release --locked --manifest-path pipeline/sim/pc-solver-rs/Cargo.toml
+
       - name: Warm the oracle cache
         run: bun pipeline/sim/oracle-cache.ts --warm --jobs 4
 
