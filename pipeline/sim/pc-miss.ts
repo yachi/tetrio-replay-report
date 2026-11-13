@@ -16,6 +16,9 @@
  * using only the current piece, the hold and the five pieces of the preview, and `verified` when
  * lock i+1 is inside the round's verified prefix.
  *
+ * A `pc`-window miss is a DPC miss and is reported on a different footing (`dpcReported`): in hindsight,
+ * when the next lock is inside the split-tolerant verified prefix (`resumedIndex`).
+ *
  * A `placement` miss that is `in_preview` and `verified` is a REPORTED miss and carries a `category`
  * (first that applies): `hole` the placement covered an empty cell; `over` the stack after it is
  * taller than the frame the solver's PC used; `hold` the solver's first piece is not the piece placed
@@ -30,6 +33,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { placeCells, WIDTH } from './emit-replay.ts';
 import { solve, frames, height, setMovegen, type Placement } from './pc-solver.ts';
 import { enginePlacements } from './pc-engine-gen.ts';
+import { matchesIgeY } from './ige-y-oracle.ts';
 
 type Lock = [number, number | number[], number, number, [number, number][], number, number, number];
 
@@ -43,6 +47,7 @@ const NODES = 3_000_000;
 export const HASHED = ['pipeline/sim/pc-miss.ts', 'pipeline/sim/pc-solver.ts', 'pipeline/sim/pc-engine-gen.ts'];
 
 const md5 = (p: string) => createHash('md5').update(readFileSync(p)).digest('hex');
+const md5Files = (ps: string[]) => { const h = createHash('md5'); for (const p of ps) h.update(readFileSync(p)); return h.digest('hex'); };
 
 const toMasks = (b: (string | null)[][]) => {
   const m = b.map(r => r.reduce((a, c, x) => a | (c != null ? 1 << x : 0), 0));
@@ -82,6 +87,46 @@ export function category(st: { grid: string[]; cells: number[]; piece: string },
   return firstPiece !== st.piece ? 'hold' : 'spot';
 }
 
+/** The opponent's recorded incoming garbage aimed at `user` in one round: the attacks the verified
+ *  prefix compares against (`verified-prefix.ts` loadCases' `truth`, read the same way). */
+export function truthFor(ttrm: any, round: number, user: string): { frame: number; amt: number; y: number }[] {
+  const rnd = ttrm.replay.rounds[round];
+  const me = rnd.find((p: any) => p.username === user), other = rnd.find((p: any) => p.username !== user);
+  return other.replay.events.filter((e: any) => e.type === 'ige' && e.data.type === 'interaction'
+    && e.data.data?.type === 'garbage' && e.data.data.gameid === me.replay.options.gameid)
+    .map((e: any) => ({ frame: e.data.data.frame ?? e.frame, amt: e.data.data.amt, y: e.data.data.y }))
+    .sort((a: any, b: any) => a.frame - b.frame);
+}
+
+export interface SentLock { frame: number; sent: number; lines: number; rows: number[]; pc: boolean }
+
+/**
+ * The verified-prefix walk (`verifiedBoundary`, frame+amount+row) over this timeline's own attacks, with
+ * ONE tolerance: a Perfect Clear the engine sends as one attack may match the game's packets at that
+ * frame when they sum to it, each on the cleared rows (the game sends the clear and its All Clear bonus
+ * separately, e.g. 1 + 10 where the engine sends 11). `split: false` is the plain walk, which must
+ * reproduce replay-facts' `verified_to` (pc-miss.test.ts checks it on every player). Returns the index
+ * of the last lock at or before the last matched attack (-1 if none).
+ */
+export function resumedIndex(locks: SentLock[], truth: { frame: number; amt: number; y: number }[], split = true): number {
+  let vf = -1, j = 0;
+  for (const a of locks) {
+    if (a.sent <= 0) continue;
+    const b = truth[j];
+    if (!b || Math.abs(a.frame - b.frame) > 25) break;
+    const rowOk = (y: number) => a.lines === 0 || matchesIgeY(a.rows, a.lines, y);
+    if (a.sent === b.amt && rowOk(b.y)) { j++; vf = a.frame; continue; }
+    if (!split || !a.pc) break;
+    let k = j, sum = 0;
+    while (k < truth.length && truth[k]!.frame === b.frame && sum < a.sent && rowOk(truth[k]!.y)) sum += truth[k++]!.amt;
+    if (k - j < 2 || sum !== a.sent) break;
+    j = k; vf = a.frame;
+  }
+  let idx = -1;
+  for (let k = 0; k < locks.length; k++) if (locks[k]!.frame <= vf) idx = k;
+  return idx;
+}
+
 type V = { ok: true; H: number; plan: Placement[] } | { ok: false } | { ok: null };
 function check(rows: number[], cur: string, hold: string, seq: string, ptr: number, memo: Map<string, any>): V {
   let unknown = false;
@@ -94,10 +139,15 @@ function check(rows: number[], cur: string, hold: string, seq: string, ptr: numb
   }
   return unknown ? { ok: null } : { ok: false };
 }
+/** A DPC miss (a `pc` window: after a Perfect Clear) is reported in HINDSIGHT — a PC after a PC
+ *  needs about 15 pieces and the preview shows 7, so `in_preview` almost never holds there — when its
+ *  next lock is inside the split-tolerant verified prefix (`resumedIndex`). */
+export const dpcReported = (kind: string, m: any) => kind === 'pc' && m.lost_to === 'placement' && m.verified_resumed === true;
 const fits = (rows: number[]) => height(rows) <= MAXH && frames(rows, MAXH).length > 0;
 
 export function build(dir: string, log: (s: string) => void = () => {}) {
   const RF = JSON.parse(readFileSync(`${dir}/sim/replay-facts.json`, 'utf8'));
+  const ttrms = new Map<string, any>();
   const out: any[] = [];
   for (const rd of RF.rounds) {
     for (const P of rd.players) {
@@ -107,6 +157,8 @@ export function build(dir: string, log: (s: string) => void = () => {}) {
       const board: (string | null)[][] = Array.from({ length: 40 }, () => new Array(WIDTH).fill(null));
       let cur = seq[0]!, ptr = 1, hold = '';
       const st: any[] = [];
+      const sent: SentLock[] = [];
+      let frame = 0;
       for (let i = 0; i < locks.length; i++) {
         const lk = locks[i]!;
         for (const [col, amt] of lk[4]) {
@@ -126,7 +178,15 @@ export function build(dir: string, log: (s: string) => void = () => {}) {
         cur = seq[ptr++]!;
         s.pc = board[0]!.every(v => v == null);
         st.push(s);
+        frame += lk[0];
+        sent.push({ frame, sent: lk[7], lines: lk[2], rows: full.map(y => 39 - y), pc: s.pc });
       }
+      if (!ttrms.has(rd.file)) ttrms.set(rd.file, JSON.parse(readFileSync(`${dir}/${rd.file}`, 'utf8')));
+      const truth = truthFor(ttrms.get(rd.file), rd.round, P.user);
+      const plain = resumedIndex(sent, truth, false);
+      if (plain !== P.prefix.verified_to)
+        throw new Error(`${rd.file} r${rd.round} ${P.user}: plain walk ${plain} != verified_to ${P.prefix.verified_to}`);
+      const resumed = resumedIndex(sent, truth);
       const wins: { kind: string; start: number; end: number }[] = [];
       const tst = st.findIndex(s => s.i <= 21 && s.spin === 2 && s.lines === 3);
       const pcs = st.filter(s => s.pc).map(s => s.i);
@@ -149,7 +209,7 @@ export function build(dir: string, log: (s: string) => void = () => {}) {
         for (let i = w.start + 1; i < w.end; i++) {
           const a = st[i], b = st[i + 1];
           if (a.v?.ok !== true || a.pc || b.v?.ok === true) continue;
-          const m: any = { i, verified: i + 1 < verified };
+          const m: any = { i, verified: i + 1 < verified, verified_resumed: i + 1 < resumed };
           if (b.garbageIn) m.lost_to = 'garbage';
           else if (b.v?.ok === null) m.lost_to = 'unknown';
           else {
@@ -165,7 +225,9 @@ export function build(dir: string, log: (s: string) => void = () => {}) {
             const use = (vis.ok === true ? vis : a.v) as { H: number; plan: Placement[] };
             m.plan = use.plan;
             m.plan_H = use.H;
-            if (m.in_preview && m.verified) m.category = category(m.state, m.plan_H, m.plan[0].piece);
+            // a hindsight plan uses pieces past the preview: carry them, so the plan can be dealt
+            if (!m.in_preview) m.state.later = seq.slice(a.ptr + PREVIEW, a.ptr + PREVIEW + use.plan.length);
+            if ((m.in_preview && m.verified) || dpcReported(w.kind, m)) m.category = category(m.state, m.plan_H, m.plan[0].piece);
           }
           misses.push(m);
         }
@@ -176,7 +238,7 @@ export function build(dir: string, log: (s: string) => void = () => {}) {
           : !ev.some(v => v?.ok === true) ? (evaluated ? 'never' : 'not_evaluated') : 'possible_to_end';
         rw.push({ ...w, pcLock, outcome, misses });
       }
-      out.push({ match: rd.match, round: rd.round, file: rd.file, user: P.user, verified_to: verified, windows: rw });
+      out.push({ match: rd.match, round: rd.round, file: rd.file, user: P.user, verified_to: verified, verified_resumed_to: resumed, windows: rw });
     }
     log(`m${rd.match}r${rd.round + 1}`);
   }
@@ -189,6 +251,12 @@ export function build(dir: string, log: (s: string) => void = () => {}) {
       + `${MAXH} rows) and not after it (re-checked with the engine's own movegen, 180 included), the lock did not `
       + 'itself perfect-clear and the next lock brought no garbage. Reported when in_preview (a PC existed using only '
       + `the current piece, the hold and the ${PREVIEW}-piece preview) and verified (the next lock is inside the verified prefix).`,
+    dpc_rule: 'a DPC miss: a placement miss inside a pc window (the locks after a Perfect Clear), reported in '
+      + 'HINDSIGHT (the PC used pieces the preview had not shown yet; in_preview says when it did not need to) '
+      + 'when verified_resumed: the next lock is inside the verified prefix re-walked with one tolerance, a '
+      + 'Perfect Clear the engine sends as one attack matching the game\'s packets at that frame when they sum '
+      + 'to it (the game sends the clear and its All Clear bonus apart). verified_resumed_to is that walk\'s '
+      + 'last lock; without the tolerance the walk reproduces verified_to on every player.',
     categories: {
       hole: 'the placement covered an empty cell',
       over: 'the stack after the placement is taller than the frame of the solver\'s PC',
@@ -197,7 +265,7 @@ export function build(dir: string, log: (s: string) => void = () => {}) {
     },
     caveat: 'a PC being possible does not mean the player was building one',
     maxh: MAXH, span: SPAN, preview: PREVIEW, nodes: NODES,
-    md5: { replay_facts: md5(`${dir}/sim/replay-facts.json`), ...Object.fromEntries(HASHED.map(p => [p, md5(p)])) },
+    md5: { replay_facts: md5(`${dir}/sim/replay-facts.json`), ttrm: md5Files([...ttrms.keys()].sort().map(f => `${dir}/${f}`)), ...Object.fromEntries(HASHED.map(p => [p, md5(p)])) },
     rounds: out,
   };
 }

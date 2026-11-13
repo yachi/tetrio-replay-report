@@ -11,7 +11,8 @@ catches a CODE edit that drops a control sentence, and re-derives what the rende
      verified prefix, the solver's plan is one of many, possible ≠ intended, the selection rule);
   3. no claim badge or `data-claim` inside the region;
   4. the artefact says `report_eligible: false`;
-  5. every REPORTED miss (placement, in_preview, verified) carries the category this gate computes
+  5. every REPORTED miss (`pc_miss_section.reported`: placement, and in the opener window in_preview
+     and verified, in the post-PC (DPC) window verified_resumed) carries the category this gate computes
      on its own from the miss's board (a second implementation of `pc-miss.ts`'s `category`), and no
      other miss carries one;
   6. every reported miss's plan really clears its board: replayed here row by row, every cell empty
@@ -91,7 +92,7 @@ def data_problems(data):
         for w in r["windows"]:
             for m in w["misses"]:
                 where = f"m{r['match']} round {r['round']} {r['user']} lock {m['i']}"
-                if not pc_miss_section.reported(m):
+                if not pc_miss_section.reported(m, w["kind"]):
                     if "category" in m:
                         out.append(f"{where}: a miss that is not reported carries a category")
                     continue
@@ -141,12 +142,14 @@ def _load(report_dir):
     return pc_miss_section.load(report_dir), doc
 
 
-def _first_reported(d):
+def _first_reported(d, kind=None):
     for r in d["rounds"]:
         for w in r["windows"]:
             for m in w["misses"]:
-                if pc_miss_section.reported(m):
+                if (kind is None or w["kind"] == kind) and pc_miss_section.reported(m, w["kind"]):
                     return m
+    if kind is not None:
+        return None
     raise SystemExit("selftest needs a session with a reported miss")
 
 
@@ -186,10 +189,24 @@ def _selftest(report_dir):
     for r in stray["rounds"]:
         for w in r["windows"]:
             for mm in w["misses"]:
-                if not pc_miss_section.reported(mm):
+                if not pc_miss_section.reported(mm, w["kind"]):
                     mm["category"] = "spot"
                     break
     cases.append(("a miss that is not reported carries a category", stray, doc, True))
+    dpc = cp(); m = _first_reported(dpc, "pc")
+    if m is not None:
+        # the DPC rule reads the split-tolerant prefix: a DPC miss whose next lock is outside it must lose its category
+        m["verified_resumed"] = False
+        cases.append(("a DPC miss outside the resumed prefix keeps its category", dpc, doc, True))
+        hid = cp()
+        m = next((mm for r in hid["rounds"] for w in r["windows"] if w["kind"] == "pc" for mm in w["misses"]
+                  if pc_miss_section.reported(mm, "pc")
+                  and pc_miss_section.hidden_used(mm["state"], mm["plan"], "selftest")), None)
+        if m is not None:
+            lt = list(m["state"]["later"])
+            lt[0] = next(p for p in "IOTSZJL" if p != lt[0])
+            m["state"]["later"] = "".join(lt) if isinstance(m["state"]["later"], str) else lt
+            cases.append(("a DPC plan dealt from a hidden piece the round never dealt", hid, doc, True))
     moved = cp(); m = _first_reported(moved); m["i"] += 1
     cases.append(("data moved but the report was not rebuilt", moved, doc, True))
     start, end = region.markers(NAME, "pipeline/build_report.py")
