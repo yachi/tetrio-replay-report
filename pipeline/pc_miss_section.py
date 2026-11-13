@@ -35,7 +35,10 @@ VERIFIED_MARKER = "下一粒喺可核嘅重播範圍入面"
 SOLVER_MARKER = "右邊嗰塊板係 solver 搵到嘅其中一個擺法"
 CAVEAT_MARKER = "做得到全消唔等於佢想做全消"
 SELECT_MARKER = "每類畫頭三粒（按比賽次序）"
-REQUIRED = (QUARANTINE_MARKER, PREVIEW_MARKER, VERIFIED_MARKER, SOLVER_MARKER, CAVEAT_MARKER, SELECT_MARKER)
+DPC_MARKER = "全消之後呢段係事後先知：用嗰局之後真係派到嘅粒，唔止手上見到嗰 7 粒"
+SPLIT_MARKER = "全消嗰下遊戲將攻擊分開幾份送出，模擬器一次過送，對得上總數都當可核"
+REQUIRED = (QUARANTINE_MARKER, PREVIEW_MARKER, VERIFIED_MARKER, SOLVER_MARKER, CAVEAT_MARKER, SELECT_MARKER,
+            DPC_MARKER, SPLIT_MARKER)
 TITLE = "行錯咗嗰一步：搞到全消唔到（未經證明）"
 
 # order is the emitter's precedence (first that applies)
@@ -45,7 +48,7 @@ CATEGORIES = (
     ("hold", "揀錯粒", "應該先擺另一粒（用 hold 換，或者留返遲啲）。"),
     ("spot", "擺錯位", "同一粒，擺第二個位就仲做得到。"),
 )
-KIND = {"tst": "開局 TST 之後", "pc": "全消之後"}
+KIND = {"tst": "開局 TST 之後", "pc": "全消之後（DPC）"}
 
 PIECE = {"I": "#2bb5c9", "O": "#d9b12a", "T": "#9b4fcf", "S": "#4fb043", "Z": "#d9463c",
          "J": "#3a5fd8", "L": "#e5832a", "G": "#8c93a1"}
@@ -55,6 +58,8 @@ CSS = """  <style>
        lands in the body and beats the report's own stylesheet. */
     #pc-miss h3 { margin: 2.2rem 0 .3rem; font-size: 1.05rem; }
     #pc-miss h4 { margin: 1.4rem 0 .2rem; font-size: .98rem; }
+    #pc-miss h5 { margin: 1.1rem 0 .2rem; font-size: .92rem; }
+    #pc-miss .pm-card p.pm-note { font-size: .8rem; opacity: .8; }
     #pc-miss .pm-dot { display: inline-block; width: .5rem; height: .5rem; border-radius: 50%;
       margin-right: .4rem; }
     #pc-miss .pm-dot.is-p1 { background: var(--yachi, var(--p1)); }
@@ -103,8 +108,16 @@ def load(report_dir):
         return json.load(fh)
 
 
-def reported(m):
-    return m["lost_to"] == "placement" and m.get("in_preview") is True and m["verified"] is True
+def reported(m, kind):
+    """The opener window keeps the no-hindsight rule (current piece, hold and preview; next lock
+    verified). The post-PC window is the DPC one: a Double Perfect Clear takes about fifteen pieces,
+    more than the hand shows, so it is reported in HINDSIGHT (the round's dealt pieces), with the next
+    lock inside the split-tolerant prefix (`verified_resumed`), and the card says so."""
+    if m["lost_to"] != "placement":
+        return False
+    if kind == "pc":
+        return m.get("verified_resumed") is True
+    return m.get("in_preview") is True and m["verified"] is True
 
 
 def _fail(msg):
@@ -177,7 +190,8 @@ def hand_steps(st, plan, tag):
     hold; or, hold empty, hold it and place the next) over the plan, from the miss's own hand.
     Returns (placed piece, came from hold, hold after) per step; refuses a plan the hand cannot
     deal, so an animation can never show a piece the player did not have."""
-    q, hold, out = [st["cur"]] + list(st["next"]), st["hold"] or "", []
+    known = [st["cur"]] + list(st["next"])
+    q, hold, out = known + list(st.get("later", [])), st["hold"] or "", []
     for step, p in enumerate(plan, 1):
         if not q:
             _fail(f"{tag}: plan step {step} runs past the known pieces")
@@ -195,6 +209,49 @@ def hand_steps(st, plan, tag):
         if placed != p["piece"]:
             _fail(f"{tag}: plan step {step} places {p['piece']} but the hand deals {placed}")
         out.append((placed, bool(p["held"]), hold))
+    return out
+
+
+def hidden_used(st, plan, tag):
+    """How many pieces the plan deals beyond what the hand showed (current piece and the preview)."""
+    hand_steps(st, plan, tag)
+    known = 1 + len(st["next"])
+    dealt, hold = 0, bool(st["hold"])
+    for p in plan:
+        dealt += 1
+        if p["held"] and not hold:
+            hold = True
+            dealt += 1
+    return max(0, dealt - known)
+
+
+def spin_steps(grid0, plan):
+    """Plan steps that put a T into a three-corner slot and clear a line (the shape of a T-spin;
+    the solver records cells, not rotations, so this is the shape, never the engine's credit)."""
+    rows = [sum(1 << x for x, ch in enumerate(r) if ch != ".") for r in grid0]
+    out = []
+    for k, p in enumerate(plan, 1):
+        cs = [divmod(c, 10) for c in p["cells"]]
+        if p["piece"] == "T":
+            cen = [(y, x) for y, x in cs if sum((y + dy, x + dx) in cs for dy, dx in
+                                                ((1, 0), (-1, 0), (0, 1), (0, -1))) == 3]
+            if cen:
+                cy, cx = cen[0]
+                filled = sum(1 for dy in (1, -1) for dx in (1, -1)
+                             if cy + dy < 0 or not 0 <= cx + dx < 10
+                             or (cy + dy < len(rows) and rows[cy + dy] >> (cx + dx) & 1))
+                tmp = list(rows)
+                for y, x in cs:
+                    while len(tmp) <= y:
+                        tmp.append(0)
+                    tmp[y] |= 1 << x
+                if filled >= 3 and any(r == FULL for r in tmp):
+                    out.append(k)
+        for y, x in cs:
+            while len(rows) <= y:
+                rows.append(0)
+            rows[y] |= 1 << x
+        rows = [r for r in rows if r != FULL]
     return out
 
 
@@ -285,6 +342,13 @@ def card(miss, kind, loc, file, rnd, user):
     seq = " → ".join(chip(p["piece"]) + ("（用 hold 換）" if p["held"] else "") for p in miss["plan"])
     hold = chip(st["hold"]) if st["hold"] else "空"
     vlink = f' · <a href="{html.escape(vid)}" target="_blank" rel="noopener">▶ 影片</a>' if vid else ""
+    notes = []
+    hid = hidden_used(st, miss["plan"], tag)
+    if hid:
+        notes.append(f"事後先知：呢條路用埋嗰陣未見到嘅 {hid} 粒（之後真係派到嘅）。")
+    spins = spin_steps(st["grid"], miss["plan"])
+    if spins:
+        notes.append("第 " + "、".join(str(k) for k in spins) + " 粒係 T 入三角位清行（T-spin 嘅形）。")
     return "\n".join([
         '      <div class="pm-card">',
         f'        <div class="pm-head"><strong>{html.escape(label)} 第 {i + 1} 粒</strong>'
@@ -300,6 +364,7 @@ def card(miss, kind, loc, file, rnd, user):
         f'{CONTROLS}</figure>',
         '        </div>',
         f'        <p>次序：{seq}</p>',
+        *[f'        <p class="pm-note">{n}</p>' for n in notes],
         '      </div>'])
 
 
@@ -383,7 +448,7 @@ def tally(data):
             u["win"][w["kind"]][0] += 1
             u["win"][w["kind"]][1] += w["outcome"] == "pc"
             for m in w["misses"]:
-                if reported(m):
+                if reported(m, w["kind"]):
                     if m.get("category") not in dict((k, 0) for k, _, _ in CATEGORIES):
                         _fail(f"m{r['match']} round {r['round']} {r['user']} lock {m['i']}: "
                               f"reported miss without a category")
@@ -397,16 +462,9 @@ def _who(i, user):
     return f'<span class="pm-dot is-p{i + 1}"></span>{html.escape(user)}'
 
 
-def player_block(i, user, t, loc, heading="h3"):
-    win, ms = t["win"], t["misses"]
+def _cards(ms, loc, user, h):
+    body = []
     by = {k: [x for x in ms if x[2]["category"] == k] for k, _, _ in CATEGORIES}
-    nt = sum(1 for x in ms if x[0] == "tst")
-    np_ = len(ms) - nt
-    body = [f'    <{heading}>{_who(i, user)}</{heading}>',
-            f'    <p>開局 TST 之後 {win["tst"][0]} 次，做到全消 {win["tst"][1]} 次，行錯 <strong>{nt}</strong> 粒；'
-            f'全消之後 {win["pc"][0]} 次，再全消 {win["pc"][1]} 次，行錯 <strong>{np_}</strong> 粒。</p>']
-    if not ms:
-        return body + ["    <p>呢晚冇一粒行錯。</p>"]
     body.append("    <table><thead><tr><th>類別</th><th>粒數</th></tr></thead><tbody>"
                 + "".join(f'<tr><td>{name}</td><td class="pm-num">{len(by[k])}</td></tr>'
                           for k, name, _ in CATEGORIES) + "</tbody></table>")
@@ -414,11 +472,27 @@ def player_block(i, user, t, loc, heading="h3"):
         if not by[k]:
             continue
         rest = len(by[k]) - SHOW
-        body += [f'    <h4>{name}（{len(by[k])} 粒）</h4>', f'    <p>{why}'
+        body += [f'    <{h}>{name}（{len(by[k])} 粒）</{h}>', f'    <p>{why}'
                  + (f'下面畫頭 {SHOW} 粒，仲有 {rest} 粒冇畫。' if rest > 0 else "") + '</p>',
                  '    <div class="pm-grid">']
         body += [card(m, kind, loc, r["file"], r["round"], user) for kind, r, m in by[k][:SHOW]]
         body.append('    </div>')
+    return body
+
+
+def player_block(i, user, t, loc, heading="h3"):
+    win, ms = t["win"], t["misses"]
+    tst = [x for x in ms if x[0] == "tst"]
+    dpc = [x for x in ms if x[0] == "pc"]
+    body = [f'    <{heading}>{_who(i, user)}</{heading}>',
+            f'    <p>開局 TST 之後 {win["tst"][0]} 次，做到全消 {win["tst"][1]} 次，行錯 <strong>{len(tst)}</strong> 粒；'
+            f'全消之後 {win["pc"][0]} 次，再全消（DPC）{win["pc"][1]} 次，行錯 <strong>{len(dpc)}</strong> 粒。</p>']
+    if not ms:
+        return body + ["    <p>呢晚冇一粒行錯。</p>"]
+    if tst:
+        body += ['    <h4>開局 TST 之後</h4>'] + _cards(tst, loc, user, "h5")
+    if dpc:
+        body += ['    <h4>全消之後（DPC）</h4>', f'    <p>{DPC_MARKER}。</p>'] + _cards(dpc, loc, user, "h5")
     return body
 
 
@@ -431,10 +505,13 @@ def method_note(data):
         '擺之前得、擺完唔得嘅嗰一粒就係「行錯」；「唔得」再用遊戲引擎自己嘅移動搜尋（包埋 180 度轉）核多次。'
         '冇 claim 編號、冇 ✓ 標記。</p>',
         f'      <p>睇兩段：開局 T-spin Triple 之後嗰 {data["span"]} 粒，同每次全消之後嗰 {data["span"]} 粒。'
-        f'只計 {PREVIEW_MARKER}、{VERIFIED_MARKER}、而且冇垃圾行入嚟嘅。'
+        f'開局嗰段只計 {PREVIEW_MARKER}、{VERIFIED_MARKER}、而且冇垃圾行入嚟嘅。'
         f'{SOLVER_MARKER}，唔一定係唯一或者最好；格入面嘅數字係擺嘅次序。</p>',
-        f'      <p>{CAVEAT_MARKER}：好多時佢揀咗打 TSD 或者繼續砌。全消之後嗰段，盤面好多時已經超出可核範圍，'
-        f'所以嗰段計到嘅粒數少。類別按次序揀第一個啱嘅；{SELECT_MARKER}，紅框係佢嗰粒。</p>',
+        f'      <p>{DPC_MARKER}：一個 DPC 要成十五粒，手上睇唔晒，所以呢段唔係「佢嗰陣應該見到」，'
+        f'係「嗰步之後就冇得再全消」。可核範圍都唔同：{SPLIT_MARKER}。'
+        '卡上面寫明條路用咗幾多粒未見到嘅，同邊一粒係 T 入三角位（T-spin 嘅形；solver 只記格，唔記轉法）。</p>',
+        f'      <p>{CAVEAT_MARKER}：好多時佢揀咗打 TSD 或者繼續砌。'
+        f'類別按次序揀第一個啱嘅；{SELECT_MARKER}，紅框係佢嗰粒。</p>',
         '    </div>',
     ]
 

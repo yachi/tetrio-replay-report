@@ -44,10 +44,10 @@ DATA_ID = RT.DATA_ID
 PREFIX = "pc-miss"
 OVERVIEW = "pc-miss.html"
 TITLE = "行錯咗嗰一步：搞到全消唔到"
-DESC = "每晚每個玩家，擺完之後全消由做得到變做唔到嗰一粒，分四類數，再畫例子。模擬器推導，唔屬於信任鏈。"
+DESC = "每晚每個玩家，開局同全消之後（DPC），擺完之後全消由做得到變做唔到嗰一粒，分四類數，再畫例子。模擬器推導，唔屬於信任鏈。"
 LATEST_MARKER = "每類畫最近嗰三粒（日子最新、喺嗰晚比賽次序最後）"
 KICKER = "全消循環 · PC solver"
-BLURB = "擺完之後全消由做得到變做唔到嗰一粒：蓋住窿、疊得太高、揀錯粒、擺錯位，逐晚逐個玩家數。"
+BLURB = "擺完之後全消（開局，同全消之後嘅 DPC）由做得到變做唔到嗰一粒：蓋住窿、疊得太高、揀錯粒、擺錯位，逐晚逐個玩家數。"
 
 _FIGURE = re.compile(r'data-figure="([^"]+)">([^<]*)<')
 _NIGHT = re.compile(r'<a data-night="([^"]+)" href="([^"]+)">')
@@ -79,7 +79,7 @@ def misses(arts):
         for r in d["rounds"]:
             for w in r["windows"]:
                 for m in w["misses"]:
-                    if PS.reported(m):
+                    if PS.reported(m, w["kind"]):
                         _need(m.get("category") in dict((k, 0) for k, _, _ in PS.CATEGORIES),
                               f"{d['session']} m{r['match']} {r['user']} lock {m['i']}: no category")
                         out.append((d["session"], r, w["kind"], m))
@@ -98,28 +98,32 @@ def players(arts, repo=REPO):
     return ps
 
 
+PHASES = (("tst", "開局 TST 之後"), ("pc", "全消之後（DPC）"))
+
+
 def recount(arts, users):
     ms = misses(arts)
     out = {}
     for u in users:
-        for k, _, _ in PS.CATEGORIES:
-            out[f"{k}.{u}"] = str(sum(1 for s, r, _, m in ms if r["user"] == u and m["category"] == k))
-        out[f"all.{u}"] = str(sum(1 for s, r, _, m in ms if r["user"] == u))
-        for d in arts:
-            mine = [m for s, r, _, m in ms if s == d["session"] and r["user"] == u]
-            out[f"{d['session']}.{u}"] = str(len(mine))
+        for ph, _ in PHASES:
+            mine = [m for s, r, kd, m in ms if r["user"] == u and kd == ph]
             for k, _, _ in PS.CATEGORIES:
-                out[f"{d['session']}.{k}.{u}"] = str(sum(1 for m in mine if m["category"] == k))
+                out[f"{ph}.{k}.{u}"] = str(sum(1 for m in mine if m["category"] == k))
+            out[f"{ph}.all.{u}"] = str(len(mine))
+            for d in arts:
+                out[f"{d['session']}.{ph}.{u}"] = str(sum(1 for s, r, kd, m in ms
+                                                          if s == d["session"] and r["user"] == u and kd == ph))
+        out[f"all.{u}"] = str(sum(1 for s, r, _, m in ms if r["user"] == u))
     out["nights"] = str(len(arts))
     out["all"] = str(len(ms))
     return out
 
 
 def selection(arts, users):
-    """Per user and category, the SHOW latest misses, drawn oldest first."""
+    """Per user, phase and category, the SHOW latest misses, drawn oldest first."""
     ms = misses(arts)
-    return {(u, k): [x for x in ms if x[1]["user"] == u and x[3]["category"] == k][-PS.SHOW:]
-            for u in users for k, _, _ in PS.CATEGORIES}
+    return {(u, ph, k): [x for x in ms if x[1]["user"] == u and x[2] == ph and x[3]["category"] == k][-PS.SHOW:]
+            for u in users for ph, _ in PHASES for k, _, _ in PS.CATEGORIES}
 
 
 def render(arts, repo=REPO):
@@ -151,23 +155,25 @@ def render(arts, repo=REPO):
            *note]
 
     # 1. corpus totals
+    head = "".join(f"<th>{PS._who(i, u)}<br>{phn}</th>" for i, u in enumerate(users) for _, phn in PHASES)
     out += ["    <h2>全部晚加埋</h2>",
-            '    <div class="scp-index-wrap"><table class="scp-table"><tr><th>類別</th>'
-            + "".join(f"<th>{PS._who(i, u)}</th>" for i, u in enumerate(users)) + "</tr>"]
+            '    <div class="scp-index-wrap"><table class="scp-table"><tr><th>類別</th>' + head + "</tr>"]
     for k, name, why in PS.CATEGORIES:
         out.append(f"    <tr><td>{name}<br><span class=\"pm-tag\">{why}</span></td>"
-                   + "".join(f'<td class="pm-num">{F(f"{k}.{u}")}</td>' for u in users) + "</tr>")
-    out.append('    <tr><td>合計</td>' + "".join(f'<td class="pm-num">{F(f"all.{u}")}</td>' for u in users)
-               + "</tr></table></div>")
+                   + "".join(f'<td class="pm-num">{F(f"{ph}.{k}.{u}")}</td>' for u in users for ph, _ in PHASES)
+                   + "</tr>")
+    out.append('    <tr><td>合計</td>' + "".join(f'<td class="pm-num">{F(f"{ph}.all.{u}")}</td>'
+                                                for u in users for ph, _ in PHASES) + "</tr></table></div>")
+    out.append("    <p>加埋兩段：" + "，".join(f"{html.escape(u)} {F(f'all.{u}')} 粒" for u in users) + "。</p>")
 
     # 2. per night
-    out += ["    <h2>逐晚</h2>", "    <p>撳日子去嗰晚戰報嘅「行錯咗嗰一步」一節。每格係嗰晚嗰個玩家嘅粒數：蓋住窿／疊得太高／揀錯粒／擺錯位。</p>",
+    out += ["    <h2>逐晚</h2>", "    <p>撳日子去嗰晚戰報嘅「行錯咗嗰一步」一節。每格係嗰晚嗰個玩家嘅粒數：開局 TST 之後／全消之後（DPC）。</p>",
             '    <div class="scp-index-wrap"><table class="scp-table"><tr><th>日子</th>'
             + "".join(f"<th>{PS._who(i, u)}</th>" for i, u in enumerate(users)) + "</tr>"]
     for d in reversed(arts):
         s = d["session"]
-        cells = "".join(f'<td class="pm-num"><strong>{F(f"{s}.{u}")}</strong>　'
-                        + "／".join(F(f"{s}.{k}.{u}") for k, _, _ in PS.CATEGORIES) + "</td>" for u in users)
+        cells = "".join(f'<td class="pm-num">' + "／".join(F(f"{s}.{ph}.{u}") for ph, _ in PHASES) + "</td>"
+                        for u in users)
         out.append(f'    <tr><td><a data-night="{s}" href="{s}.html#pc-miss">{s}</a></td>{cells}</tr>')
     out.append("    </table></div>")
 
@@ -175,17 +181,22 @@ def render(arts, repo=REPO):
     out.append("    <h2>最近嘅例子</h2>")
     for i, u in enumerate(users):
         out.append(f"    <h3>{PS._who(i, u)}</h3>")
-        for k, name, why in PS.CATEGORIES:
-            got = sel[(u, k)]
-            if not got:
+        for ph, phn in PHASES:
+            if not any(sel[(u, ph, k)] for k, _, _ in PS.CATEGORIES):
                 continue
-            out += [f"    <h4>{name}</h4>", f"    <p>{why}</p>", '    <div class="pm-grid">']
-            for s, r, kind, m in got:
-                c = PS.card(m, kind, loc(s), r["file"], r["round"], u)
-                c = c.replace('<div class="pm-card">', f'<div class="pm-card" data-case="{html.escape(case_key(s, r, m))}">', 1)
-                c = c.replace("<strong>", f"<strong>{s} ", 1)
-                out.append(c)
-            out.append("    </div>")
+            out.append(f"    <h4>{phn}</h4>")
+            for k, name, why in PS.CATEGORIES:
+                got = sel[(u, ph, k)]
+                if not got:
+                    continue
+                out += [f"    <h5>{name}</h5>", f"    <p>{why}</p>", '    <div class="pm-grid">']
+                for s, r, kind, m in got:
+                    c = PS.card(m, kind, loc(s), r["file"], r["round"], u)
+                    c = c.replace('<div class="pm-card">',
+                                  f'<div class="pm-card" data-case="{html.escape(case_key(s, r, m))}">', 1)
+                    c = c.replace("<strong>", f"<strong>{s} ", 1)
+                    out.append(c)
+                out.append("    </div>")
     out.append(PS.SCRIPT)
     out.append("</section>")
     out += RT._tail({"figures": fig})
@@ -216,7 +227,9 @@ def audit(page, arts, repo=REPO):
     nights = _NIGHT.findall(page)
     if sorted(n for n, _ in nights) != sorted(d["session"] for d in arts) or any(h != f"{n}.html#pc-miss" for n, h in nights):
         bad.append("the night table does not link every night's section exactly once")
-    want = [case_key(s, r, m) for u in users for k, _, _ in PS.CATEGORIES for s, r, _, m in selection(arts, users)[(u, k)]]
+    sel = selection(arts, users)
+    want = [case_key(s, r, m) for u in users for ph, _ in PHASES for k, _, _ in PS.CATEGORIES
+            for s, r, _, m in sel[(u, ph, k)]]
     cases = _CASE.findall(page)
     if [html.unescape(c) for c, _ in cases] != want:
         bad.append("the examples are not the selection rule's, in order")
@@ -294,7 +307,7 @@ def _move_category(arts):
         for r in d["rounds"]:
             for w in r["windows"]:
                 for m in w["misses"]:
-                    if PS.reported(m):
+                    if PS.reported(m, w["kind"]):
                         m["category"] = next(k for k, _, _ in PS.CATEGORIES if k != m["category"])
                         return a
     raise ValueError("no reported miss")

@@ -6,6 +6,7 @@
   "one solver over one simulator board: which placement lost the Perfect Clear has no second implementation"
  ],
  "rule": "a placement miss: a PC was possible before the lock (hindsight, the round's dealt sequence, frame <= 6 rows) and not after it (re-checked with the engine's own movegen, 180 included), the lock did not itself perfect-clear and the next lock brought no garbage. Reported when in_preview (a PC existed using only the current piece, the hold and the 5-piece preview) and verified (the next lock is inside the verified prefix).",
+ "dpc_rule": "a DPC miss: a placement miss inside a pc window (the locks after a Perfect Clear), reported in HINDSIGHT (the PC used pieces the preview had not shown yet; in_preview says when it did not need to) when verified_resumed: the next lock is inside the verified prefix re-walked with one tolerance, a Perfect Clear the engine sends as one attack matching the game's packets at that frame when they sum to it (the game sends the clear and its All Clear bonus apart). verified_resumed_to is that walk's last lock; without the tolerance the walk reproduces verified_to on every player.",
  "categories": {
   "hole": "the placement covered an empty cell",
   "over": "the stack after the placement is taller than the frame of the solver's PC",
@@ -19,7 +20,8 @@
  "nodes": 3000000,
  "md5": {
   "replay_facts": "4fca52a70a7b9b0e8e4508319d015bc9",
-  "pipeline/sim/pc-miss.ts": "6a992f7aec9dba28eb3c7241bc231da6",
+  "ttrm": "8a46c990408b3aef729d0e4b4edc5b0b",
+  "pipeline/sim/pc-miss.ts": "05e10bcb887474978819477c3f17502c",
   "pipeline/sim/pc-solver.ts": "49f59c21e63294641a3d71c82aaf123a",
   "pipeline/sim/pc-engine-gen.ts": "43ca4e0bbc7843f0d8212ff721df4740"
  },
@@ -30,6 +32,7 @@
    "file": "replay-2026-09-19-01.ttrm",
    "user": "pinglamb",
    "verified_to": 114,
+   "verified_resumed_to": 114,
    "windows": [
     {
      "kind": "tst",
@@ -41,6 +44,7 @@
       {
        "i": 16,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -128,6 +132,7 @@
    "file": "replay-2026-09-19-01.ttrm",
    "user": "yachi",
    "verified_to": 18,
+   "verified_resumed_to": 93,
    "windows": [
     {
      "kind": "tst",
@@ -147,6 +152,7 @@
       {
        "i": 25,
        "verified": false,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -169,7 +175,8 @@
          14,
          15
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "LTISJTZOLI"
        },
        "after": [
         "TSSSS.ILLL",
@@ -281,7 +288,8 @@
          "held": false
         }
        ],
-       "plan_H": 6
+       "plan_H": 6,
+       "category": "hold"
       }
      ]
     }
@@ -293,6 +301,7 @@
    "file": "replay-2026-09-19-01.ttrm",
    "user": "pinglamb",
    "verified_to": 164,
+   "verified_resumed_to": 164,
    "windows": [
     {
      "kind": "tst",
@@ -304,6 +313,7 @@
       {
        "i": 22,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -326,7 +336,8 @@
          33,
          34
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "JITLSZST"
        },
        "after": [
         "LOOZZ.OOJI",
@@ -430,6 +441,7 @@
    "file": "replay-2026-09-19-01.ttrm",
    "user": "yachi",
    "verified_to": 161,
+   "verified_resumed_to": 161,
    "windows": [
     {
      "kind": "tst",
@@ -447,6 +459,7 @@
    "file": "replay-2026-09-19-01.ttrm",
    "user": "yachi",
    "verified_to": 109,
+   "verified_resumed_to": 109,
    "windows": []
   },
   {
@@ -455,6 +468,7 @@
    "file": "replay-2026-09-19-01.ttrm",
    "user": "pinglamb",
    "verified_to": 87,
+   "verified_resumed_to": 87,
    "windows": [
     {
      "kind": "tst",
@@ -472,6 +486,7 @@
    "file": "replay-2026-09-19-01.ttrm",
    "user": "pinglamb",
    "verified_to": 17,
+   "verified_resumed_to": 139,
    "windows": [
     {
      "kind": "tst",
@@ -491,6 +506,7 @@
       {
        "i": 21,
        "verified": false,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -513,7 +529,8 @@
          12,
          13
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "LOSTZJIOJ"
        },
        "after": [
         ".SS.SS....",
@@ -615,7 +632,8 @@
          "held": true
         }
        ],
-       "plan_H": 4
+       "plan_H": 4,
+       "category": "hole"
       }
      ]
     }
@@ -627,6 +645,7 @@
    "file": "replay-2026-09-19-01.ttrm",
    "user": "yachi",
    "verified_to": 127,
+   "verified_resumed_to": 127,
    "windows": [
     {
      "kind": "tst",
@@ -644,6 +663,7 @@
    "file": "replay-2026-09-19-01.ttrm",
    "user": "yachi",
    "verified_to": 241,
+   "verified_resumed_to": 241,
    "windows": [
     {
      "kind": "tst",
@@ -661,6 +681,7 @@
    "file": "replay-2026-09-19-01.ttrm",
    "user": "pinglamb",
    "verified_to": 18,
+   "verified_resumed_to": 231,
    "windows": [
     {
      "kind": "tst",
@@ -686,6 +707,7 @@
    "file": "replay-2026-09-19-01.ttrm",
    "user": "yachi",
    "verified_to": 54,
+   "verified_resumed_to": 54,
    "windows": []
   },
   {
@@ -694,6 +716,7 @@
    "file": "replay-2026-09-19-01.ttrm",
    "user": "pinglamb",
    "verified_to": 45,
+   "verified_resumed_to": 45,
    "windows": [
     {
      "kind": "tst",
@@ -705,6 +728,7 @@
       {
        "i": 14,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -812,6 +836,7 @@
    "file": "replay-2026-09-19-01.ttrm",
    "user": "yachi",
    "verified_to": 64,
+   "verified_resumed_to": 64,
    "windows": [
     {
      "kind": "tst",
@@ -823,6 +848,7 @@
       {
        "i": 19,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -930,6 +956,7 @@
    "file": "replay-2026-09-19-01.ttrm",
    "user": "pinglamb",
    "verified_to": 52,
+   "verified_resumed_to": 52,
    "windows": [
     {
      "kind": "tst",
@@ -941,6 +968,7 @@
       {
        "i": 14,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -1041,6 +1069,7 @@
       {
        "i": 16,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -1053,6 +1082,7 @@
    "file": "replay-2026-09-19-01.ttrm",
    "user": "pinglamb",
    "verified_to": 72,
+   "verified_resumed_to": 72,
    "windows": [
     {
      "kind": "tst",
@@ -1070,6 +1100,7 @@
    "file": "replay-2026-09-19-01.ttrm",
    "user": "yachi",
    "verified_to": 63,
+   "verified_resumed_to": 63,
    "windows": []
   },
   {
@@ -1078,6 +1109,7 @@
    "file": "replay-2026-09-19-01.ttrm",
    "user": "pinglamb",
    "verified_to": 34,
+   "verified_resumed_to": 34,
    "windows": []
   },
   {
@@ -1086,6 +1118,7 @@
    "file": "replay-2026-09-19-01.ttrm",
    "user": "yachi",
    "verified_to": 26,
+   "verified_resumed_to": 26,
    "windows": []
   },
   {
@@ -1094,6 +1127,7 @@
    "file": "replay-2026-09-19-02.ttrm",
    "user": "yachi",
    "verified_to": 108,
+   "verified_resumed_to": 108,
    "windows": [
     {
      "kind": "tst",
@@ -1105,6 +1139,7 @@
       {
        "i": 21,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -1127,7 +1162,8 @@
          31,
          32
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "TOJLIZSZO"
        },
        "after": [
         ".TSSLLIIII",
@@ -1241,6 +1277,7 @@
    "file": "replay-2026-09-19-02.ttrm",
    "user": "pinglamb",
    "verified_to": 92,
+   "verified_resumed_to": 92,
    "windows": [
     {
      "kind": "tst",
@@ -1252,6 +1289,7 @@
       {
        "i": 16,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -1264,6 +1302,7 @@
    "file": "replay-2026-09-19-02.ttrm",
    "user": "pinglamb",
    "verified_to": 128,
+   "verified_resumed_to": 128,
    "windows": [
     {
      "kind": "tst",
@@ -1275,6 +1314,7 @@
       {
        "i": 15,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -1365,6 +1405,7 @@
       {
        "i": 22,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -1377,6 +1418,7 @@
    "file": "replay-2026-09-19-02.ttrm",
    "user": "yachi",
    "verified_to": 117,
+   "verified_resumed_to": 117,
    "windows": [
     {
      "kind": "tst",
@@ -1394,6 +1436,7 @@
    "file": "replay-2026-09-19-02.ttrm",
    "user": "pinglamb",
    "verified_to": 49,
+   "verified_resumed_to": 49,
    "windows": []
   },
   {
@@ -1402,6 +1445,7 @@
    "file": "replay-2026-09-19-02.ttrm",
    "user": "yachi",
    "verified_to": 40,
+   "verified_resumed_to": 40,
    "windows": []
   },
   {
@@ -1410,6 +1454,7 @@
    "file": "replay-2026-09-19-02.ttrm",
    "user": "pinglamb",
    "verified_to": 26,
+   "verified_resumed_to": 26,
    "windows": [
     {
      "kind": "tst",
@@ -1427,6 +1472,7 @@
    "file": "replay-2026-09-19-02.ttrm",
    "user": "yachi",
    "verified_to": 14,
+   "verified_resumed_to": 14,
    "windows": [
     {
      "kind": "tst",
@@ -1438,6 +1484,7 @@
       {
        "i": 17,
        "verified": false,
+       "verified_resumed": false,
        "lost_to": "garbage"
       }
      ]
@@ -1450,6 +1497,7 @@
    "file": "replay-2026-09-19-02.ttrm",
    "user": "pinglamb",
    "verified_to": 50,
+   "verified_resumed_to": 50,
    "windows": [
     {
      "kind": "tst",
@@ -1461,6 +1509,7 @@
       {
        "i": 20,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -1558,6 +1607,7 @@
    "file": "replay-2026-09-19-02.ttrm",
    "user": "yachi",
    "verified_to": 49,
+   "verified_resumed_to": 49,
    "windows": [
     {
      "kind": "tst",
@@ -1569,6 +1619,7 @@
       {
        "i": 15,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "engine_disagrees"
       }
      ]
@@ -1581,6 +1632,7 @@
    "file": "replay-2026-09-19-02.ttrm",
    "user": "pinglamb",
    "verified_to": 55,
+   "verified_resumed_to": 55,
    "windows": [
     {
      "kind": "tst",
@@ -1598,6 +1650,7 @@
    "file": "replay-2026-09-19-02.ttrm",
    "user": "yachi",
    "verified_to": 47,
+   "verified_resumed_to": 47,
    "windows": [
     {
      "kind": "tst",
@@ -1609,6 +1662,7 @@
       {
        "i": 19,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -1716,6 +1770,7 @@
    "file": "replay-2026-09-19-03.ttrm",
    "user": "yachi",
    "verified_to": 106,
+   "verified_resumed_to": 106,
    "windows": [
     {
      "kind": "tst",
@@ -1727,6 +1782,7 @@
       {
        "i": 14,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -1827,6 +1883,7 @@
       {
        "i": 24,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -1839,6 +1896,7 @@
    "file": "replay-2026-09-19-03.ttrm",
    "user": "pinglamb",
    "verified_to": 86,
+   "verified_resumed_to": 86,
    "windows": [
     {
      "kind": "tst",
@@ -1850,6 +1908,7 @@
       {
        "i": 15,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -1862,6 +1921,7 @@
    "file": "replay-2026-09-19-03.ttrm",
    "user": "pinglamb",
    "verified_to": 78,
+   "verified_resumed_to": 78,
    "windows": [
     {
      "kind": "tst",
@@ -1879,6 +1939,7 @@
    "file": "replay-2026-09-19-03.ttrm",
    "user": "yachi",
    "verified_to": 61,
+   "verified_resumed_to": 61,
    "windows": [
     {
      "kind": "tst",
@@ -1890,6 +1951,7 @@
       {
        "i": 14,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -1997,6 +2059,7 @@
    "file": "replay-2026-09-19-03.ttrm",
    "user": "yachi",
    "verified_to": 37,
+   "verified_resumed_to": 37,
    "windows": [
     {
      "kind": "tst",
@@ -2014,6 +2077,7 @@
    "file": "replay-2026-09-19-03.ttrm",
    "user": "pinglamb",
    "verified_to": -1,
+   "verified_resumed_to": -1,
    "windows": []
   },
   {
@@ -2022,6 +2086,7 @@
    "file": "replay-2026-09-19-03.ttrm",
    "user": "pinglamb",
    "verified_to": 163,
+   "verified_resumed_to": 163,
    "windows": []
   },
   {
@@ -2030,6 +2095,7 @@
    "file": "replay-2026-09-19-03.ttrm",
    "user": "yachi",
    "verified_to": 169,
+   "verified_resumed_to": 169,
    "windows": []
   },
   {
@@ -2038,6 +2104,7 @@
    "file": "replay-2026-09-19-03.ttrm",
    "user": "pinglamb",
    "verified_to": 33,
+   "verified_resumed_to": 33,
    "windows": [
     {
      "kind": "tst",
@@ -2049,6 +2116,7 @@
       {
        "i": 23,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -2071,7 +2139,8 @@
          32,
          41
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "JITSZOLS"
        },
        "after": [
         "JJJ.LOOJJZ",
@@ -2175,6 +2244,7 @@
    "file": "replay-2026-09-19-03.ttrm",
    "user": "yachi",
    "verified_to": 30,
+   "verified_resumed_to": 30,
    "windows": []
   },
   {
@@ -2183,6 +2253,7 @@
    "file": "replay-2026-09-19-03.ttrm",
    "user": "yachi",
    "verified_to": 69,
+   "verified_resumed_to": 69,
    "windows": []
   },
   {
@@ -2191,6 +2262,7 @@
    "file": "replay-2026-09-19-03.ttrm",
    "user": "pinglamb",
    "verified_to": 60,
+   "verified_resumed_to": 60,
    "windows": [
     {
      "kind": "tst",
@@ -2208,6 +2280,7 @@
    "file": "replay-2026-09-19-03.ttrm",
    "user": "yachi",
    "verified_to": 18,
+   "verified_resumed_to": 130,
    "windows": [
     {
      "kind": "tst",
@@ -2227,6 +2300,7 @@
       {
        "i": 24,
        "verified": false,
+       "verified_resumed": true,
        "lost_to": "engine_disagrees"
       }
      ]
@@ -2239,6 +2313,7 @@
    "file": "replay-2026-09-19-03.ttrm",
    "user": "pinglamb",
    "verified_to": 115,
+   "verified_resumed_to": 115,
    "windows": [
     {
      "kind": "tst",
@@ -2256,6 +2331,7 @@
    "file": "replay-2026-09-19-03.ttrm",
    "user": "yachi",
    "verified_to": 179,
+   "verified_resumed_to": 179,
    "windows": [
     {
      "kind": "tst",
@@ -2267,6 +2343,7 @@
       {
        "i": 14,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -2374,6 +2451,7 @@
    "file": "replay-2026-09-19-03.ttrm",
    "user": "pinglamb",
    "verified_to": 141,
+   "verified_resumed_to": 141,
    "windows": [
     {
      "kind": "tst",
@@ -2391,6 +2469,7 @@
    "file": "replay-2026-09-19-04.ttrm",
    "user": "pinglamb",
    "verified_to": 181,
+   "verified_resumed_to": 181,
    "windows": [
     {
      "kind": "tst",
@@ -2408,6 +2487,7 @@
    "file": "replay-2026-09-19-04.ttrm",
    "user": "yachi",
    "verified_to": 18,
+   "verified_resumed_to": 171,
    "windows": [
     {
      "kind": "tst",
@@ -2427,6 +2507,7 @@
       {
        "i": 23,
        "verified": false,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -2439,6 +2520,7 @@
    "file": "replay-2026-09-19-04.ttrm",
    "user": "yachi",
    "verified_to": 83,
+   "verified_resumed_to": 83,
    "windows": [
     {
      "kind": "tst",
@@ -2450,6 +2532,7 @@
       {
        "i": 17,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -2472,7 +2555,8 @@
          36,
          46
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "ZJTIILOJ"
        },
        "after": [
         "OOZZS.IIII",
@@ -2576,6 +2660,7 @@
    "file": "replay-2026-09-19-04.ttrm",
    "user": "pinglamb",
    "verified_to": 84,
+   "verified_resumed_to": 84,
    "windows": [
     {
      "kind": "tst",
@@ -2587,6 +2672,7 @@
       {
        "i": 14,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -2694,6 +2780,7 @@
    "file": "replay-2026-09-19-04.ttrm",
    "user": "pinglamb",
    "verified_to": 137,
+   "verified_resumed_to": 137,
    "windows": [
     {
      "kind": "tst",
@@ -2711,6 +2798,7 @@
    "file": "replay-2026-09-19-04.ttrm",
    "user": "yachi",
    "verified_to": 105,
+   "verified_resumed_to": 105,
    "windows": [
     {
      "kind": "tst",
@@ -2728,6 +2816,7 @@
    "file": "replay-2026-09-19-04.ttrm",
    "user": "pinglamb",
    "verified_to": 45,
+   "verified_resumed_to": 45,
    "windows": [
     {
      "kind": "tst",
@@ -2739,6 +2828,7 @@
       {
        "i": 19,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -2751,6 +2841,7 @@
    "file": "replay-2026-09-19-04.ttrm",
    "user": "yachi",
    "verified_to": 34,
+   "verified_resumed_to": 34,
    "windows": [
     {
      "kind": "tst",
@@ -2768,6 +2859,7 @@
    "file": "replay-2026-09-19-04.ttrm",
    "user": "yachi",
    "verified_to": 17,
+   "verified_resumed_to": 30,
    "windows": [
     {
      "kind": "tst",
@@ -2787,6 +2879,7 @@
       {
        "i": 20,
        "verified": false,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -2799,6 +2892,7 @@
    "file": "replay-2026-09-19-04.ttrm",
    "user": "pinglamb",
    "verified_to": 22,
+   "verified_resumed_to": 22,
    "windows": [
     {
      "kind": "tst",
@@ -2810,6 +2904,7 @@
       {
        "i": 15,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -2822,6 +2917,7 @@
    "file": "replay-2026-09-19-04.ttrm",
    "user": "pinglamb",
    "verified_to": 34,
+   "verified_resumed_to": 34,
    "windows": [
     {
      "kind": "tst",
@@ -2833,6 +2929,7 @@
       {
        "i": 19,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -2940,6 +3037,7 @@
    "file": "replay-2026-09-19-04.ttrm",
    "user": "yachi",
    "verified_to": 19,
+   "verified_resumed_to": 19,
    "windows": []
   },
   {
@@ -2948,6 +3046,7 @@
    "file": "replay-2026-09-19-04.ttrm",
    "user": "yachi",
    "verified_to": 59,
+   "verified_resumed_to": 59,
    "windows": []
   },
   {
@@ -2956,6 +3055,7 @@
    "file": "replay-2026-09-19-04.ttrm",
    "user": "pinglamb",
    "verified_to": 49,
+   "verified_resumed_to": 49,
    "windows": [
     {
      "kind": "tst",
@@ -2973,6 +3073,7 @@
    "file": "replay-2026-09-19-04.ttrm",
    "user": "pinglamb",
    "verified_to": 52,
+   "verified_resumed_to": 52,
    "windows": []
   },
   {
@@ -2981,6 +3082,7 @@
    "file": "replay-2026-09-19-04.ttrm",
    "user": "yachi",
    "verified_to": 36,
+   "verified_resumed_to": 36,
    "windows": [
     {
      "kind": "tst",
@@ -2992,6 +3094,7 @@
       {
        "i": 18,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -3004,6 +3107,7 @@
    "file": "replay-2026-09-19-05.ttrm",
    "user": "pinglamb",
    "verified_to": 56,
+   "verified_resumed_to": 56,
    "windows": [
     {
      "kind": "tst",
@@ -3021,6 +3125,7 @@
    "file": "replay-2026-09-19-05.ttrm",
    "user": "yachi",
    "verified_to": 45,
+   "verified_resumed_to": 45,
    "windows": [
     {
      "kind": "tst",
@@ -3038,6 +3143,7 @@
    "file": "replay-2026-09-19-05.ttrm",
    "user": "pinglamb",
    "verified_to": 73,
+   "verified_resumed_to": 73,
    "windows": [
     {
      "kind": "tst",
@@ -3055,6 +3161,7 @@
    "file": "replay-2026-09-19-05.ttrm",
    "user": "yachi",
    "verified_to": 65,
+   "verified_resumed_to": 65,
    "windows": []
   },
   {
@@ -3063,6 +3170,7 @@
    "file": "replay-2026-09-19-05.ttrm",
    "user": "yachi",
    "verified_to": 52,
+   "verified_resumed_to": 52,
    "windows": [
     {
      "kind": "tst",
@@ -3080,6 +3188,7 @@
    "file": "replay-2026-09-19-05.ttrm",
    "user": "pinglamb",
    "verified_to": 45,
+   "verified_resumed_to": 45,
    "windows": [
     {
      "kind": "tst",
@@ -3097,6 +3206,7 @@
    "file": "replay-2026-09-19-05.ttrm",
    "user": "yachi",
    "verified_to": 63,
+   "verified_resumed_to": 63,
    "windows": []
   },
   {
@@ -3105,6 +3215,7 @@
    "file": "replay-2026-09-19-05.ttrm",
    "user": "pinglamb",
    "verified_to": 39,
+   "verified_resumed_to": 39,
    "windows": []
   },
   {
@@ -3113,6 +3224,7 @@
    "file": "replay-2026-09-19-05.ttrm",
    "user": "pinglamb",
    "verified_to": 57,
+   "verified_resumed_to": 57,
    "windows": [
     {
      "kind": "tst",
@@ -3124,6 +3236,7 @@
       {
        "i": 25,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -3136,6 +3249,7 @@
    "file": "replay-2026-09-19-05.ttrm",
    "user": "yachi",
    "verified_to": 42,
+   "verified_resumed_to": 42,
    "windows": [
     {
      "kind": "tst",
@@ -3147,6 +3261,7 @@
       {
        "i": 14,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -3159,6 +3274,7 @@
    "file": "replay-2026-09-19-05.ttrm",
    "user": "yachi",
    "verified_to": 97,
+   "verified_resumed_to": 97,
    "windows": []
   },
   {
@@ -3167,6 +3283,7 @@
    "file": "replay-2026-09-19-05.ttrm",
    "user": "pinglamb",
    "verified_to": 86,
+   "verified_resumed_to": 86,
    "windows": [
     {
      "kind": "tst",
@@ -3178,6 +3295,7 @@
       {
        "i": 20,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -3285,6 +3403,7 @@
    "file": "replay-2026-09-19-05.ttrm",
    "user": "pinglamb",
    "verified_to": 84,
+   "verified_resumed_to": 84,
    "windows": [
     {
      "kind": "tst",
@@ -3302,6 +3421,7 @@
    "file": "replay-2026-09-19-05.ttrm",
    "user": "yachi",
    "verified_to": 78,
+   "verified_resumed_to": 78,
    "windows": []
   },
   {
@@ -3310,6 +3430,7 @@
    "file": "replay-2026-09-19-05.ttrm",
    "user": "pinglamb",
    "verified_to": 18,
+   "verified_resumed_to": 38,
    "windows": [
     {
      "kind": "tst",
@@ -3329,6 +3450,7 @@
       {
        "i": 25,
        "verified": false,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -3351,7 +3473,8 @@
          14,
          15
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "TJSSIZLOJT"
        },
        "after": [
         "LLLJ.ZZOOI",
@@ -3463,7 +3586,8 @@
          "held": true
         }
        ],
-       "plan_H": 6
+       "plan_H": 6,
+       "category": "spot"
       }
      ]
     }
@@ -3475,6 +3599,7 @@
    "file": "replay-2026-09-19-05.ttrm",
    "user": "yachi",
    "verified_to": 19,
+   "verified_resumed_to": 19,
    "windows": [
     {
      "kind": "tst",
@@ -3486,6 +3611,7 @@
       {
        "i": 14,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -3593,6 +3719,7 @@
    "file": "replay-2026-09-19-06.ttrm",
    "user": "pinglamb",
    "verified_to": 131,
+   "verified_resumed_to": 131,
    "windows": [
     {
      "kind": "tst",
@@ -3610,6 +3737,7 @@
    "file": "replay-2026-09-19-06.ttrm",
    "user": "yachi",
    "verified_to": 124,
+   "verified_resumed_to": 124,
    "windows": []
   },
   {
@@ -3618,6 +3746,7 @@
    "file": "replay-2026-09-19-06.ttrm",
    "user": "pinglamb",
    "verified_to": 158,
+   "verified_resumed_to": 158,
    "windows": [
     {
      "kind": "tst",
@@ -3629,6 +3758,7 @@
       {
        "i": 15,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -3641,6 +3771,7 @@
    "file": "replay-2026-09-19-06.ttrm",
    "user": "yachi",
    "verified_to": 164,
+   "verified_resumed_to": 164,
    "windows": [
     {
      "kind": "tst",
@@ -3658,6 +3789,7 @@
    "file": "replay-2026-09-19-06.ttrm",
    "user": "pinglamb",
    "verified_to": 14,
+   "verified_resumed_to": 19,
    "windows": [
     {
      "kind": "tst",
@@ -3675,6 +3807,7 @@
    "file": "replay-2026-09-19-06.ttrm",
    "user": "yachi",
    "verified_to": -1,
+   "verified_resumed_to": -1,
    "windows": []
   },
   {
@@ -3683,6 +3816,7 @@
    "file": "replay-2026-09-19-06.ttrm",
    "user": "pinglamb",
    "verified_to": 45,
+   "verified_resumed_to": 45,
    "windows": [
     {
      "kind": "tst",
@@ -3694,6 +3828,7 @@
       {
        "i": 23,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -3716,7 +3851,8 @@
          37,
          47
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "IOZTSOL"
        },
        "after": [
         "OOTSS.IIII",
@@ -3810,6 +3946,7 @@
    "file": "replay-2026-09-19-06.ttrm",
    "user": "yachi",
    "verified_to": -1,
+   "verified_resumed_to": -1,
    "windows": []
   },
   {
@@ -3818,6 +3955,7 @@
    "file": "replay-2026-09-19-06.ttrm",
    "user": "yachi",
    "verified_to": 209,
+   "verified_resumed_to": 209,
    "windows": [
     {
      "kind": "tst",
@@ -3829,6 +3967,7 @@
       {
        "i": 18,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -3841,6 +3980,7 @@
    "file": "replay-2026-09-19-06.ttrm",
    "user": "pinglamb",
    "verified_to": 198,
+   "verified_resumed_to": 198,
    "windows": [
     {
      "kind": "tst",
@@ -3852,6 +3992,7 @@
       {
        "i": 14,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -3959,6 +4100,7 @@
    "file": "replay-2026-09-19-06.ttrm",
    "user": "pinglamb",
    "verified_to": 42,
+   "verified_resumed_to": 42,
    "windows": []
   },
   {
@@ -3967,6 +4109,7 @@
    "file": "replay-2026-09-19-06.ttrm",
    "user": "yachi",
    "verified_to": 52,
+   "verified_resumed_to": 52,
    "windows": [
     {
      "kind": "tst",
@@ -3978,6 +4121,7 @@
       {
        "i": 15,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -4000,7 +4144,8 @@
          16,
          17
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "ISTZLOSTJO"
        },
        "after": [
         "I.ZJ.LLLOO",
@@ -4124,6 +4269,7 @@
    "file": "replay-2026-09-19-07.ttrm",
    "user": "pinglamb",
    "verified_to": 45,
+   "verified_resumed_to": 45,
    "windows": []
   },
   {
@@ -4132,6 +4278,7 @@
    "file": "replay-2026-09-19-07.ttrm",
    "user": "yachi",
    "verified_to": 32,
+   "verified_resumed_to": 32,
    "windows": []
   },
   {
@@ -4140,6 +4287,7 @@
    "file": "replay-2026-09-19-07.ttrm",
    "user": "pinglamb",
    "verified_to": 59,
+   "verified_resumed_to": 59,
    "windows": [
     {
      "kind": "tst",
@@ -4157,6 +4305,7 @@
    "file": "replay-2026-09-19-07.ttrm",
    "user": "yachi",
    "verified_to": 55,
+   "verified_resumed_to": 55,
    "windows": []
   },
   {
@@ -4165,6 +4314,7 @@
    "file": "replay-2026-09-19-07.ttrm",
    "user": "pinglamb",
    "verified_to": 124,
+   "verified_resumed_to": 124,
    "windows": [
     {
      "kind": "tst",
@@ -4184,6 +4334,7 @@
       {
        "i": 27,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -4196,6 +4347,7 @@
    "file": "replay-2026-09-19-07.ttrm",
    "user": "yachi",
    "verified_to": 100,
+   "verified_resumed_to": 100,
    "windows": [
     {
      "kind": "tst",
@@ -4213,6 +4365,7 @@
    "file": "replay-2026-09-19-07.ttrm",
    "user": "pinglamb",
    "verified_to": 247,
+   "verified_resumed_to": 247,
    "windows": [
     {
      "kind": "tst",
@@ -4230,6 +4383,7 @@
    "file": "replay-2026-09-19-07.ttrm",
    "user": "yachi",
    "verified_to": 244,
+   "verified_resumed_to": 244,
    "windows": [
     {
      "kind": "tst",
@@ -4241,6 +4395,7 @@
       {
        "i": 17,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -4318,6 +4473,7 @@
    "file": "replay-2026-09-19-07.ttrm",
    "user": "yachi",
    "verified_to": 193,
+   "verified_resumed_to": 193,
    "windows": [
     {
      "kind": "tst",
@@ -4329,6 +4485,7 @@
       {
        "i": 16,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -4416,6 +4573,7 @@
    "file": "replay-2026-09-19-07.ttrm",
    "user": "pinglamb",
    "verified_to": 164,
+   "verified_resumed_to": 164,
    "windows": [
     {
      "kind": "tst",
@@ -4427,6 +4585,7 @@
       {
        "i": 15,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -4517,6 +4676,7 @@
       {
        "i": 20,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -4529,6 +4689,7 @@
    "file": "replay-2026-09-19-07.ttrm",
    "user": "pinglamb",
    "verified_to": 42,
+   "verified_resumed_to": 42,
    "windows": [
     {
      "kind": "tst",
@@ -4546,6 +4707,7 @@
    "file": "replay-2026-09-19-07.ttrm",
    "user": "yachi",
    "verified_to": 50,
+   "verified_resumed_to": 50,
    "windows": [
     {
      "kind": "tst",
@@ -4563,6 +4725,7 @@
    "file": "replay-2026-09-19-08.ttrm",
    "user": "pinglamb",
    "verified_to": 63,
+   "verified_resumed_to": 63,
    "windows": [
     {
      "kind": "tst",
@@ -4574,6 +4737,7 @@
       {
        "i": 15,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -4664,6 +4828,7 @@
       {
        "i": 17,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -4676,6 +4841,7 @@
    "file": "replay-2026-09-19-08.ttrm",
    "user": "yachi",
    "verified_to": 50,
+   "verified_resumed_to": 50,
    "windows": [
     {
      "kind": "tst",
@@ -4693,6 +4859,7 @@
    "file": "replay-2026-09-19-08.ttrm",
    "user": "pinglamb",
    "verified_to": 65,
+   "verified_resumed_to": 65,
    "windows": [
     {
      "kind": "tst",
@@ -4710,6 +4877,7 @@
    "file": "replay-2026-09-19-08.ttrm",
    "user": "yachi",
    "verified_to": 72,
+   "verified_resumed_to": 72,
    "windows": [
     {
      "kind": "tst",
@@ -4727,6 +4895,7 @@
    "file": "replay-2026-09-19-08.ttrm",
    "user": "pinglamb",
    "verified_to": 187,
+   "verified_resumed_to": 187,
    "windows": []
   },
   {
@@ -4735,6 +4904,7 @@
    "file": "replay-2026-09-19-08.ttrm",
    "user": "yachi",
    "verified_to": 208,
+   "verified_resumed_to": 208,
    "windows": [
     {
      "kind": "tst",
@@ -4746,6 +4916,7 @@
       {
        "i": 21,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -4768,7 +4939,8 @@
          51,
          61
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "TLZSJIOJO"
        },
        "after": [
         "OOSSSS.JLI",
@@ -4875,6 +5047,7 @@
       {
        "i": 26,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -4887,6 +5060,7 @@
    "file": "replay-2026-09-19-08.ttrm",
    "user": "yachi",
    "verified_to": 81,
+   "verified_resumed_to": 81,
    "windows": []
   },
   {
@@ -4895,6 +5069,7 @@
    "file": "replay-2026-09-19-08.ttrm",
    "user": "pinglamb",
    "verified_to": 58,
+   "verified_resumed_to": 58,
    "windows": [
     {
      "kind": "tst",
@@ -4912,6 +5087,7 @@
    "file": "replay-2026-09-19-08.ttrm",
    "user": "yachi",
    "verified_to": 130,
+   "verified_resumed_to": 130,
    "windows": [
     {
      "kind": "tst",
@@ -4923,6 +5099,7 @@
       {
        "i": 14,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -5023,6 +5200,7 @@
       {
        "i": 16,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -5045,7 +5223,8 @@
          16,
          26
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "STOZLOLZI"
        },
        "after": [
         "JSOO.ZLOOI",
@@ -5159,6 +5338,7 @@
    "file": "replay-2026-09-19-08.ttrm",
    "user": "pinglamb",
    "verified_to": 13,
+   "verified_resumed_to": 129,
    "windows": [
     {
      "kind": "tst",
@@ -5178,6 +5358,7 @@
       {
        "i": 30,
        "verified": false,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -5190,6 +5371,7 @@
    "file": "replay-2026-09-19-08.ttrm",
    "user": "pinglamb",
    "verified_to": 103,
+   "verified_resumed_to": 103,
    "windows": [
     {
      "kind": "tst",
@@ -5201,6 +5383,7 @@
       {
        "i": 16,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -5223,7 +5406,8 @@
          40,
          50
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "ITZLOSZ"
        },
        "after": [
         "GGGGG.GGGG",
@@ -5317,6 +5501,7 @@
    "file": "replay-2026-09-19-08.ttrm",
    "user": "yachi",
    "verified_to": 95,
+   "verified_resumed_to": 95,
    "windows": [
     {
      "kind": "tst",
@@ -5334,6 +5519,7 @@
    "file": "replay-2026-09-19-08.ttrm",
    "user": "pinglamb",
    "verified_to": 101,
+   "verified_resumed_to": 101,
    "windows": [
     {
      "kind": "tst",
@@ -5345,6 +5531,7 @@
       {
        "i": 14,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -5357,6 +5544,7 @@
    "file": "replay-2026-09-19-08.ttrm",
    "user": "yachi",
    "verified_to": 103,
+   "verified_resumed_to": 103,
    "windows": [
     {
      "kind": "tst",
@@ -5368,6 +5556,7 @@
       {
        "i": 16,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -5448,6 +5637,7 @@
       {
        "i": 19,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -5555,6 +5745,7 @@
    "file": "replay-2026-09-19-09.ttrm",
    "user": "pinglamb",
    "verified_to": 151,
+   "verified_resumed_to": 151,
    "windows": [
     {
      "kind": "tst",
@@ -5566,6 +5757,7 @@
       {
        "i": 22,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -5578,6 +5770,7 @@
    "file": "replay-2026-09-19-09.ttrm",
    "user": "yachi",
    "verified_to": 158,
+   "verified_resumed_to": 158,
    "windows": []
   },
   {
@@ -5586,6 +5779,7 @@
    "file": "replay-2026-09-19-09.ttrm",
    "user": "pinglamb",
    "verified_to": 43,
+   "verified_resumed_to": 43,
    "windows": [
     {
      "kind": "tst",
@@ -5611,6 +5805,7 @@
    "file": "replay-2026-09-19-09.ttrm",
    "user": "yachi",
    "verified_to": 40,
+   "verified_resumed_to": 40,
    "windows": [
     {
      "kind": "tst",
@@ -5628,6 +5823,7 @@
    "file": "replay-2026-09-19-09.ttrm",
    "user": "pinglamb",
    "verified_to": 38,
+   "verified_resumed_to": 38,
    "windows": [
     {
      "kind": "tst",
@@ -5645,6 +5841,7 @@
    "file": "replay-2026-09-19-09.ttrm",
    "user": "yachi",
    "verified_to": 29,
+   "verified_resumed_to": 29,
    "windows": []
   },
   {
@@ -5653,6 +5850,7 @@
    "file": "replay-2026-09-19-09.ttrm",
    "user": "yachi",
    "verified_to": 42,
+   "verified_resumed_to": 42,
    "windows": []
   },
   {
@@ -5661,6 +5859,7 @@
    "file": "replay-2026-09-19-09.ttrm",
    "user": "pinglamb",
    "verified_to": 37,
+   "verified_resumed_to": 37,
    "windows": [
     {
      "kind": "tst",
@@ -5678,6 +5877,7 @@
    "file": "replay-2026-09-19-09.ttrm",
    "user": "yachi",
    "verified_to": 76,
+   "verified_resumed_to": 76,
    "windows": [
     {
      "kind": "tst",
@@ -5695,6 +5895,7 @@
    "file": "replay-2026-09-19-09.ttrm",
    "user": "pinglamb",
    "verified_to": 58,
+   "verified_resumed_to": 58,
    "windows": [
     {
      "kind": "tst",
@@ -5712,6 +5913,7 @@
    "file": "replay-2026-09-19-09.ttrm",
    "user": "yachi",
    "verified_to": 40,
+   "verified_resumed_to": 40,
    "windows": [
     {
      "kind": "tst",
@@ -5729,6 +5931,7 @@
    "file": "replay-2026-09-19-09.ttrm",
    "user": "pinglamb",
    "verified_to": 36,
+   "verified_resumed_to": 36,
    "windows": [
     {
      "kind": "tst",
@@ -5740,6 +5943,7 @@
       {
        "i": 21,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -5752,6 +5956,7 @@
    "file": "replay-2026-09-19-09.ttrm",
    "user": "pinglamb",
    "verified_to": 18,
+   "verified_resumed_to": 18,
    "windows": []
   },
   {
@@ -5760,6 +5965,7 @@
    "file": "replay-2026-09-19-09.ttrm",
    "user": "yachi",
    "verified_to": 48,
+   "verified_resumed_to": 48,
    "windows": []
   },
   {
@@ -5768,6 +5974,7 @@
    "file": "replay-2026-09-19-09.ttrm",
    "user": "pinglamb",
    "verified_to": 89,
+   "verified_resumed_to": 89,
    "windows": [
     {
      "kind": "tst",
@@ -5785,6 +5992,7 @@
    "file": "replay-2026-09-19-09.ttrm",
    "user": "yachi",
    "verified_to": 85,
+   "verified_resumed_to": 85,
    "windows": []
   },
   {
@@ -5793,6 +6001,7 @@
    "file": "replay-2026-09-19-10.ttrm",
    "user": "yachi",
    "verified_to": 33,
+   "verified_resumed_to": 33,
    "windows": [
     {
      "kind": "tst",
@@ -5804,6 +6013,7 @@
       {
        "i": 18,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -5826,7 +6036,8 @@
          31,
          32
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "IJOSLOJ"
        },
        "after": [
         "OOJJ.ZLSSI",
@@ -5913,6 +6124,7 @@
       {
        "i": 23,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -5935,7 +6147,8 @@
          14,
          23
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "OJZTILI"
        },
        "after": [
         "JOOSS.ZLLL",
@@ -6029,6 +6242,7 @@
    "file": "replay-2026-09-19-10.ttrm",
    "user": "pinglamb",
    "verified_to": -1,
+   "verified_resumed_to": -1,
    "windows": []
   },
   {
@@ -6037,6 +6251,7 @@
    "file": "replay-2026-09-19-10.ttrm",
    "user": "yachi",
    "verified_to": 123,
+   "verified_resumed_to": 123,
    "windows": []
   },
   {
@@ -6045,6 +6260,7 @@
    "file": "replay-2026-09-19-10.ttrm",
    "user": "pinglamb",
    "verified_to": 93,
+   "verified_resumed_to": 93,
    "windows": [
     {
      "kind": "tst",
@@ -6062,6 +6278,7 @@
    "file": "replay-2026-09-19-10.ttrm",
    "user": "pinglamb",
    "verified_to": 48,
+   "verified_resumed_to": 48,
    "windows": [
     {
      "kind": "tst",
@@ -6079,6 +6296,7 @@
    "file": "replay-2026-09-19-10.ttrm",
    "user": "yachi",
    "verified_to": 37,
+   "verified_resumed_to": 37,
    "windows": []
   },
   {
@@ -6087,6 +6305,7 @@
    "file": "replay-2026-09-19-10.ttrm",
    "user": "pinglamb",
    "verified_to": 125,
+   "verified_resumed_to": 125,
    "windows": [
     {
      "kind": "tst",
@@ -6104,6 +6323,7 @@
    "file": "replay-2026-09-19-10.ttrm",
    "user": "yachi",
    "verified_to": 116,
+   "verified_resumed_to": 116,
    "windows": []
   },
   {
@@ -6112,6 +6332,7 @@
    "file": "replay-2026-09-19-10.ttrm",
    "user": "pinglamb",
    "verified_to": 29,
+   "verified_resumed_to": 29,
    "windows": [
     {
      "kind": "tst",
@@ -6129,6 +6350,7 @@
    "file": "replay-2026-09-19-10.ttrm",
    "user": "yachi",
    "verified_to": 18,
+   "verified_resumed_to": 18,
    "windows": []
   },
   {
@@ -6137,6 +6359,7 @@
    "file": "replay-2026-09-19-10.ttrm",
    "user": "yachi",
    "verified_to": 109,
+   "verified_resumed_to": 109,
    "windows": [
     {
      "kind": "pc",
@@ -6148,6 +6371,7 @@
       {
        "i": 18,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -6160,6 +6384,7 @@
    "file": "replay-2026-09-19-10.ttrm",
    "user": "pinglamb",
    "verified_to": 109,
+   "verified_resumed_to": 109,
    "windows": [
     {
      "kind": "tst",
@@ -6177,6 +6402,7 @@
    "file": "replay-2026-09-19-10.ttrm",
    "user": "pinglamb",
    "verified_to": 34,
+   "verified_resumed_to": 34,
    "windows": [
     {
      "kind": "tst",
@@ -6188,6 +6414,7 @@
       {
        "i": 17,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -6210,7 +6437,8 @@
          20,
          21
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "ZTIJJZIS"
        },
        "after": [
         "JJOO.ZZZSI",
@@ -6314,6 +6542,7 @@
    "file": "replay-2026-09-19-10.ttrm",
    "user": "yachi",
    "verified_to": 28,
+   "verified_resumed_to": 28,
    "windows": [
     {
      "kind": "tst",
@@ -6331,6 +6560,7 @@
    "file": "replay-2026-09-19-10.ttrm",
    "user": "yachi",
    "verified_to": 112,
+   "verified_resumed_to": 112,
    "windows": []
   },
   {
@@ -6339,6 +6569,7 @@
    "file": "replay-2026-09-19-10.ttrm",
    "user": "pinglamb",
    "verified_to": 98,
+   "verified_resumed_to": 98,
    "windows": [
     {
      "kind": "tst",
@@ -6356,6 +6587,7 @@
    "file": "replay-2026-09-19-10.ttrm",
    "user": "yachi",
    "verified_to": 26,
+   "verified_resumed_to": 26,
    "windows": [
     {
      "kind": "tst",
@@ -6367,6 +6599,7 @@
       {
        "i": 20,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -6464,6 +6697,7 @@
    "file": "replay-2026-09-19-10.ttrm",
    "user": "pinglamb",
    "verified_to": 18,
+   "verified_resumed_to": 18,
    "windows": []
   },
   {
@@ -6472,6 +6706,7 @@
    "file": "replay-2026-09-19-11.ttrm",
    "user": "pinglamb",
    "verified_to": 161,
+   "verified_resumed_to": 161,
    "windows": [
     {
      "kind": "tst",
@@ -6489,6 +6724,7 @@
    "file": "replay-2026-09-19-11.ttrm",
    "user": "yachi",
    "verified_to": 159,
+   "verified_resumed_to": 159,
    "windows": [
     {
      "kind": "tst",
@@ -6506,6 +6742,7 @@
    "file": "replay-2026-09-19-11.ttrm",
    "user": "pinglamb",
    "verified_to": 46,
+   "verified_resumed_to": 46,
    "windows": [
     {
      "kind": "tst",
@@ -6523,6 +6760,7 @@
    "file": "replay-2026-09-19-11.ttrm",
    "user": "yachi",
    "verified_to": 38,
+   "verified_resumed_to": 38,
    "windows": [
     {
      "kind": "tst",
@@ -6534,6 +6772,7 @@
       {
        "i": 19,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -6591,6 +6830,7 @@
    "file": "replay-2026-09-19-11.ttrm",
    "user": "pinglamb",
    "verified_to": 108,
+   "verified_resumed_to": 108,
    "windows": [
     {
      "kind": "tst",
@@ -6602,6 +6842,7 @@
       {
        "i": 22,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -6614,6 +6855,7 @@
    "file": "replay-2026-09-19-11.ttrm",
    "user": "yachi",
    "verified_to": 82,
+   "verified_resumed_to": 82,
    "windows": []
   },
   {
@@ -6622,6 +6864,7 @@
    "file": "replay-2026-09-19-11.ttrm",
    "user": "pinglamb",
    "verified_to": 138,
+   "verified_resumed_to": 138,
    "windows": [
     {
      "kind": "tst",
@@ -6633,6 +6876,7 @@
       {
        "i": 14,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -6740,6 +6984,7 @@
    "file": "replay-2026-09-19-11.ttrm",
    "user": "yachi",
    "verified_to": 131,
+   "verified_resumed_to": 131,
    "windows": [
     {
      "kind": "tst",
@@ -6751,6 +6996,7 @@
       {
        "i": 15,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "engine_disagrees"
       }
      ]
@@ -6763,6 +7009,7 @@
    "file": "replay-2026-09-19-11.ttrm",
    "user": "pinglamb",
    "verified_to": 33,
+   "verified_resumed_to": 33,
    "windows": [
     {
      "kind": "tst",
@@ -6774,6 +7021,7 @@
       {
        "i": 14,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -6881,6 +7129,7 @@
    "file": "replay-2026-09-19-11.ttrm",
    "user": "yachi",
    "verified_to": 33,
+   "verified_resumed_to": 33,
    "windows": []
   },
   {
@@ -6889,6 +7138,7 @@
    "file": "replay-2026-09-19-12.ttrm",
    "user": "yachi",
    "verified_to": 136,
+   "verified_resumed_to": 136,
    "windows": [
     {
      "kind": "tst",
@@ -6906,6 +7156,7 @@
    "file": "replay-2026-09-19-12.ttrm",
    "user": "pinglamb",
    "verified_to": 95,
+   "verified_resumed_to": 95,
    "windows": [
     {
      "kind": "tst",
@@ -6923,6 +7174,7 @@
    "file": "replay-2026-09-19-12.ttrm",
    "user": "yachi",
    "verified_to": 37,
+   "verified_resumed_to": 37,
    "windows": [
     {
      "kind": "tst",
@@ -6940,6 +7192,7 @@
    "file": "replay-2026-09-19-12.ttrm",
    "user": "pinglamb",
    "verified_to": 32,
+   "verified_resumed_to": 32,
    "windows": [
     {
      "kind": "tst",
@@ -6951,6 +7204,7 @@
       {
        "i": 16,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -7031,6 +7285,7 @@
       {
        "i": 23,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -7043,6 +7298,7 @@
    "file": "replay-2026-09-19-12.ttrm",
    "user": "pinglamb",
    "verified_to": 58,
+   "verified_resumed_to": 58,
    "windows": []
   },
   {
@@ -7051,6 +7307,7 @@
    "file": "replay-2026-09-19-12.ttrm",
    "user": "yachi",
    "verified_to": 56,
+   "verified_resumed_to": 56,
    "windows": [
     {
      "kind": "tst",
@@ -7062,6 +7319,7 @@
       {
        "i": 14,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -7162,6 +7420,7 @@
       {
        "i": 18,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -7184,7 +7443,8 @@
          14,
          23
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "JLSJZSO"
        },
        "after": [
         "IZZJS.OOZL",
@@ -7278,6 +7538,7 @@
    "file": "replay-2026-09-19-12.ttrm",
    "user": "pinglamb",
    "verified_to": 85,
+   "verified_resumed_to": 85,
    "windows": [
     {
      "kind": "tst",
@@ -7295,6 +7556,7 @@
    "file": "replay-2026-09-19-12.ttrm",
    "user": "yachi",
    "verified_to": 80,
+   "verified_resumed_to": 80,
    "windows": []
   },
   {
@@ -7303,6 +7565,7 @@
    "file": "replay-2026-09-19-12.ttrm",
    "user": "pinglamb",
    "verified_to": 39,
+   "verified_resumed_to": 39,
    "windows": [
     {
      "kind": "tst",
@@ -7314,6 +7577,7 @@
       {
        "i": 23,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -7326,6 +7590,7 @@
    "file": "replay-2026-09-19-12.ttrm",
    "user": "yachi",
    "verified_to": 32,
+   "verified_resumed_to": 32,
    "windows": [
     {
      "kind": "tst",
@@ -7337,6 +7602,7 @@
       {
        "i": 14,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -7444,6 +7710,7 @@
    "file": "replay-2026-09-19-12.ttrm",
    "user": "pinglamb",
    "verified_to": 128,
+   "verified_resumed_to": 128,
    "windows": [
     {
      "kind": "tst",
@@ -7461,6 +7728,7 @@
    "file": "replay-2026-09-19-12.ttrm",
    "user": "yachi",
    "verified_to": 129,
+   "verified_resumed_to": 129,
    "windows": [
     {
      "kind": "tst",
@@ -7478,6 +7746,7 @@
    "file": "replay-2026-09-19-12.ttrm",
    "user": "pinglamb",
    "verified_to": 35,
+   "verified_resumed_to": 35,
    "windows": [
     {
      "kind": "tst",
@@ -7495,6 +7764,7 @@
    "file": "replay-2026-09-19-12.ttrm",
    "user": "yachi",
    "verified_to": 34,
+   "verified_resumed_to": 34,
    "windows": []
   },
   {
@@ -7503,6 +7773,7 @@
    "file": "replay-2026-09-19-13.ttrm",
    "user": "pinglamb",
    "verified_to": 16,
+   "verified_resumed_to": 104,
    "windows": [
     {
      "kind": "tst",
@@ -7522,6 +7793,7 @@
       {
        "i": 22,
        "verified": false,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -7534,6 +7806,7 @@
    "file": "replay-2026-09-19-13.ttrm",
    "user": "yachi",
    "verified_to": 88,
+   "verified_resumed_to": 88,
    "windows": [
     {
      "kind": "tst",
@@ -7551,6 +7824,7 @@
    "file": "replay-2026-09-19-13.ttrm",
    "user": "pinglamb",
    "verified_to": 41,
+   "verified_resumed_to": 41,
    "windows": [
     {
      "kind": "tst",
@@ -7562,6 +7836,7 @@
       {
        "i": 22,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -7584,7 +7859,8 @@
          60,
          61
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "OIZJLSZL"
        },
        "after": [
         "ILLST.JJOO",
@@ -7688,6 +7964,7 @@
    "file": "replay-2026-09-19-13.ttrm",
    "user": "yachi",
    "verified_to": 22,
+   "verified_resumed_to": 22,
    "windows": []
   },
   {
@@ -7696,6 +7973,7 @@
    "file": "replay-2026-09-19-13.ttrm",
    "user": "yachi",
    "verified_to": 288,
+   "verified_resumed_to": 288,
    "windows": []
   },
   {
@@ -7704,6 +7982,7 @@
    "file": "replay-2026-09-19-13.ttrm",
    "user": "pinglamb",
    "verified_to": 268,
+   "verified_resumed_to": 268,
    "windows": [
     {
      "kind": "tst",
@@ -7721,6 +8000,7 @@
    "file": "replay-2026-09-19-13.ttrm",
    "user": "pinglamb",
    "verified_to": 14,
+   "verified_resumed_to": 161,
    "windows": [
     {
      "kind": "tst",
@@ -7740,6 +8020,7 @@
       {
        "i": 21,
        "verified": false,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -7762,7 +8043,8 @@
          16,
          17
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "ZITSLJOZJ"
        },
        "after": [
         "....ZZ.ZZ.",
@@ -7864,7 +8146,8 @@
          "held": true
         }
        ],
-       "plan_H": 4
+       "plan_H": 4,
+       "category": "hole"
       }
      ]
     }
@@ -7876,6 +8159,7 @@
    "file": "replay-2026-09-19-13.ttrm",
    "user": "yachi",
    "verified_to": 155,
+   "verified_resumed_to": 155,
    "windows": [
     {
      "kind": "tst",
@@ -7887,6 +8171,7 @@
       {
        "i": 15,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -7899,6 +8184,7 @@
    "file": "replay-2026-09-19-13.ttrm",
    "user": "pinglamb",
    "verified_to": 17,
+   "verified_resumed_to": 217,
    "windows": [
     {
      "kind": "tst",
@@ -7918,6 +8204,7 @@
       {
        "i": 23,
        "verified": false,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -7930,6 +8217,7 @@
    "file": "replay-2026-09-19-13.ttrm",
    "user": "yachi",
    "verified_to": 216,
+   "verified_resumed_to": 216,
    "windows": [
     {
      "kind": "tst",
@@ -7947,6 +8235,7 @@
    "file": "replay-2026-09-19-13.ttrm",
    "user": "yachi",
    "verified_to": 23,
+   "verified_resumed_to": 23,
    "windows": [
     {
      "kind": "tst",
@@ -7958,6 +8247,7 @@
       {
        "i": 24,
        "verified": false,
+       "verified_resumed": false,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -7980,7 +8270,8 @@
          33,
          43
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "OZLTLS"
        },
        "after": [
         "IJJJ.TTZZL",
@@ -8074,6 +8365,7 @@
    "file": "replay-2026-09-19-13.ttrm",
    "user": "pinglamb",
    "verified_to": 6,
+   "verified_resumed_to": 6,
    "windows": []
   },
   {
@@ -8082,6 +8374,7 @@
    "file": "replay-2026-09-19-13.ttrm",
    "user": "pinglamb",
    "verified_to": 110,
+   "verified_resumed_to": 110,
    "windows": [
     {
      "kind": "tst",
@@ -8101,6 +8394,7 @@
       {
        "i": 22,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -8113,6 +8407,7 @@
    "file": "replay-2026-09-19-13.ttrm",
    "user": "yachi",
    "verified_to": 105,
+   "verified_resumed_to": 105,
    "windows": [
     {
      "kind": "tst",
@@ -8124,6 +8419,7 @@
       {
        "i": 14,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -8224,6 +8520,7 @@
       {
        "i": 21,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -8236,6 +8533,7 @@
    "file": "replay-2026-09-19-14.ttrm",
    "user": "yachi",
    "verified_to": 98,
+   "verified_resumed_to": 98,
    "windows": []
   },
   {
@@ -8244,6 +8542,7 @@
    "file": "replay-2026-09-19-14.ttrm",
    "user": "pinglamb",
    "verified_to": 81,
+   "verified_resumed_to": 81,
    "windows": [
     {
      "kind": "tst",
@@ -8255,6 +8554,7 @@
       {
        "i": 15,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -8345,6 +8645,7 @@
       {
        "i": 19,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -8445,6 +8746,7 @@
       {
        "i": 23,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -8467,7 +8769,8 @@
          41,
          42
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "LTJSIST"
        },
        "after": [
         "IIII.ZJJSL",
@@ -8561,6 +8864,7 @@
    "file": "replay-2026-09-19-14.ttrm",
    "user": "yachi",
    "verified_to": 62,
+   "verified_resumed_to": 62,
    "windows": [
     {
      "kind": "tst",
@@ -8572,6 +8876,7 @@
       {
        "i": 14,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -8672,6 +8977,7 @@
       {
        "i": 21,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -8684,6 +8990,7 @@
    "file": "replay-2026-09-19-14.ttrm",
    "user": "pinglamb",
    "verified_to": 49,
+   "verified_resumed_to": 49,
    "windows": [
     {
      "kind": "tst",
@@ -8701,6 +9008,7 @@
    "file": "replay-2026-09-19-14.ttrm",
    "user": "pinglamb",
    "verified_to": 175,
+   "verified_resumed_to": 175,
    "windows": []
   },
   {
@@ -8709,6 +9017,7 @@
    "file": "replay-2026-09-19-14.ttrm",
    "user": "yachi",
    "verified_to": 178,
+   "verified_resumed_to": 178,
    "windows": [
     {
      "kind": "tst",
@@ -8720,6 +9029,7 @@
       {
        "i": 14,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -8820,6 +9130,7 @@
       {
        "i": 21,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -8832,6 +9143,7 @@
    "file": "replay-2026-09-19-14.ttrm",
    "user": "yachi",
    "verified_to": 181,
+   "verified_resumed_to": 181,
    "windows": []
   },
   {
@@ -8840,6 +9152,7 @@
    "file": "replay-2026-09-19-14.ttrm",
    "user": "pinglamb",
    "verified_to": 167,
+   "verified_resumed_to": 167,
    "windows": [
     {
      "kind": "tst",
@@ -8857,6 +9170,7 @@
    "file": "replay-2026-09-19-14.ttrm",
    "user": "yachi",
    "verified_to": 51,
+   "verified_resumed_to": 51,
    "windows": []
   },
   {
@@ -8865,6 +9179,7 @@
    "file": "replay-2026-09-19-14.ttrm",
    "user": "pinglamb",
    "verified_to": 30,
+   "verified_resumed_to": 30,
    "windows": []
   },
   {
@@ -8873,6 +9188,7 @@
    "file": "replay-2026-09-19-14.ttrm",
    "user": "pinglamb",
    "verified_to": 37,
+   "verified_resumed_to": 37,
    "windows": [
     {
      "kind": "tst",
@@ -8890,6 +9206,7 @@
    "file": "replay-2026-09-19-14.ttrm",
    "user": "yachi",
    "verified_to": 21,
+   "verified_resumed_to": 21,
    "windows": [
     {
      "kind": "tst",
@@ -8901,6 +9218,7 @@
       {
        "i": 13,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -8923,7 +9241,8 @@
          27,
          37
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "JZIOLSJ"
        },
        "after": [
         "OOLL.TZJJI",
@@ -9010,6 +9329,7 @@
       {
        "i": 19,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -9117,6 +9437,7 @@
    "file": "replay-2026-09-19-14.ttrm",
    "user": "pinglamb",
    "verified_to": 110,
+   "verified_resumed_to": 110,
    "windows": [
     {
      "kind": "tst",
@@ -9134,6 +9455,7 @@
    "file": "replay-2026-09-19-14.ttrm",
    "user": "yachi",
    "verified_to": 103,
+   "verified_resumed_to": 103,
    "windows": [
     {
      "kind": "tst",
@@ -9145,6 +9467,7 @@
       {
        "i": 17,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -9215,6 +9538,7 @@
       {
        "i": 21,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -9227,6 +9551,7 @@
    "file": "replay-2026-09-19-14.ttrm",
    "user": "yachi",
    "verified_to": 127,
+   "verified_resumed_to": 127,
    "windows": [
     {
      "kind": "tst",
@@ -9244,6 +9569,7 @@
    "file": "replay-2026-09-19-14.ttrm",
    "user": "pinglamb",
    "verified_to": 107,
+   "verified_resumed_to": 107,
    "windows": [
     {
      "kind": "tst",
@@ -9261,6 +9587,7 @@
    "file": "replay-2026-09-19-15.ttrm",
    "user": "pinglamb",
    "verified_to": 52,
+   "verified_resumed_to": 52,
    "windows": [
     {
      "kind": "tst",
@@ -9278,6 +9605,7 @@
    "file": "replay-2026-09-19-15.ttrm",
    "user": "yachi",
    "verified_to": 24,
+   "verified_resumed_to": 24,
    "windows": []
   },
   {
@@ -9286,6 +9614,7 @@
    "file": "replay-2026-09-19-15.ttrm",
    "user": "pinglamb",
    "verified_to": 17,
+   "verified_resumed_to": 19,
    "windows": [
     {
      "kind": "tst",
@@ -9311,6 +9640,7 @@
    "file": "replay-2026-09-19-15.ttrm",
    "user": "yachi",
    "verified_to": -1,
+   "verified_resumed_to": -1,
    "windows": []
   },
   {
@@ -9319,6 +9649,7 @@
    "file": "replay-2026-09-19-15.ttrm",
    "user": "yachi",
    "verified_to": 16,
+   "verified_resumed_to": 19,
    "windows": [
     {
      "kind": "tst",
@@ -9344,6 +9675,7 @@
    "file": "replay-2026-09-19-15.ttrm",
    "user": "pinglamb",
    "verified_to": -1,
+   "verified_resumed_to": -1,
    "windows": []
   },
   {
@@ -9352,6 +9684,7 @@
    "file": "replay-2026-09-19-15.ttrm",
    "user": "yachi",
    "verified_to": 154,
+   "verified_resumed_to": 154,
    "windows": [
     {
      "kind": "tst",
@@ -9363,6 +9696,7 @@
       {
        "i": 17,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -9375,6 +9709,7 @@
    "file": "replay-2026-09-19-15.ttrm",
    "user": "pinglamb",
    "verified_to": 148,
+   "verified_resumed_to": 148,
    "windows": [
     {
      "kind": "tst",
@@ -9392,6 +9727,7 @@
    "file": "replay-2026-09-19-15.ttrm",
    "user": "yachi",
    "verified_to": 40,
+   "verified_resumed_to": 40,
    "windows": [
     {
      "kind": "tst",
@@ -9409,6 +9745,7 @@
    "file": "replay-2026-09-19-15.ttrm",
    "user": "pinglamb",
    "verified_to": 46,
+   "verified_resumed_to": 46,
    "windows": [
     {
      "kind": "tst",
@@ -9426,6 +9763,7 @@
    "file": "replay-2026-09-19-15.ttrm",
    "user": "pinglamb",
    "verified_to": 81,
+   "verified_resumed_to": 81,
    "windows": [
     {
      "kind": "tst",
@@ -9437,6 +9775,7 @@
       {
        "i": 22,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -9459,7 +9798,8 @@
          29,
          38
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "ILTJOSTZ"
        },
        "after": [
         "JJJZZSS.SS",
@@ -9563,6 +9903,7 @@
    "file": "replay-2026-09-19-15.ttrm",
    "user": "yachi",
    "verified_to": 81,
+   "verified_resumed_to": 81,
    "windows": [
     {
      "kind": "tst",
@@ -9574,6 +9915,7 @@
       {
        "i": 16,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -9661,6 +10003,7 @@
    "file": "replay-2026-09-19-15.ttrm",
    "user": "pinglamb",
    "verified_to": 167,
+   "verified_resumed_to": 167,
    "windows": [
     {
      "kind": "tst",
@@ -9680,6 +10023,7 @@
       {
        "i": 22,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -9702,7 +10046,8 @@
          21,
          22
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "SOLTJILISJZTO"
        },
        "after": [
         ".OO....OO.",
@@ -9844,7 +10189,8 @@
          "held": true
         }
        ],
-       "plan_H": 6
+       "plan_H": 6,
+       "category": "hole"
       }
      ]
     }
@@ -9856,6 +10202,7 @@
    "file": "replay-2026-09-19-15.ttrm",
    "user": "yachi",
    "verified_to": 14,
+   "verified_resumed_to": 159,
    "windows": [
     {
      "kind": "tst",
@@ -9875,6 +10222,7 @@
       {
        "i": 21,
        "verified": false,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -9887,6 +10235,7 @@
    "file": "replay-2026-09-19-15.ttrm",
    "user": "yachi",
    "verified_to": 44,
+   "verified_resumed_to": 44,
    "windows": []
   },
   {
@@ -9895,6 +10244,7 @@
    "file": "replay-2026-09-19-15.ttrm",
    "user": "pinglamb",
    "verified_to": 24,
+   "verified_resumed_to": 24,
    "windows": [
     {
      "kind": "tst",
@@ -9906,6 +10256,7 @@
       {
        "i": 15,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -10003,6 +10354,7 @@
    "file": "replay-2026-09-19-15.ttrm",
    "user": "pinglamb",
    "verified_to": 101,
+   "verified_resumed_to": 136,
    "windows": [
     {
      "kind": "tst",
@@ -10022,6 +10374,7 @@
       {
        "i": 114,
        "verified": false,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -10044,7 +10397,8 @@
          41,
          51
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "IOJSTLOZ"
        },
        "after": [
         ".LLZSSTTTI",
@@ -10136,7 +10490,8 @@
          "held": false
         }
        ],
-       "plan_H": 6
+       "plan_H": 6,
+       "category": "spot"
       }
      ]
     }
@@ -10148,6 +10503,7 @@
    "file": "replay-2026-09-19-15.ttrm",
    "user": "yachi",
    "verified_to": 134,
+   "verified_resumed_to": 134,
    "windows": []
   },
   {
@@ -10156,6 +10512,7 @@
    "file": "replay-2026-09-19-16.ttrm",
    "user": "yachi",
    "verified_to": 74,
+   "verified_resumed_to": 74,
    "windows": [
     {
      "kind": "tst",
@@ -10173,6 +10530,7 @@
    "file": "replay-2026-09-19-16.ttrm",
    "user": "pinglamb",
    "verified_to": 45,
+   "verified_resumed_to": 45,
    "windows": [
     {
      "kind": "tst",
@@ -10184,6 +10542,7 @@
       {
        "i": 20,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -10196,6 +10555,7 @@
    "file": "replay-2026-09-19-16.ttrm",
    "user": "yachi",
    "verified_to": 15,
+   "verified_resumed_to": 19,
    "windows": [
     {
      "kind": "tst",
@@ -10213,6 +10573,7 @@
    "file": "replay-2026-09-19-16.ttrm",
    "user": "pinglamb",
    "verified_to": 13,
+   "verified_resumed_to": 13,
    "windows": [
     {
      "kind": "tst",
@@ -10224,6 +10585,7 @@
       {
        "i": 15,
        "verified": false,
+       "verified_resumed": false,
        "lost_to": "garbage"
       }
      ]
@@ -10236,6 +10598,7 @@
    "file": "replay-2026-09-19-16.ttrm",
    "user": "yachi",
    "verified_to": 14,
+   "verified_resumed_to": 235,
    "windows": [
     {
      "kind": "tst",
@@ -10263,6 +10626,7 @@
       {
        "i": 38,
        "verified": false,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -10275,6 +10639,7 @@
    "file": "replay-2026-09-19-16.ttrm",
    "user": "pinglamb",
    "verified_to": 15,
+   "verified_resumed_to": 205,
    "windows": [
     {
      "kind": "tst",
@@ -10294,6 +10659,7 @@
       {
        "i": 27,
        "verified": false,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -10306,6 +10672,7 @@
    "file": "replay-2026-09-19-16.ttrm",
    "user": "pinglamb",
    "verified_to": 14,
+   "verified_resumed_to": 101,
    "windows": [
     {
      "kind": "tst",
@@ -10325,6 +10692,7 @@
       {
        "i": 23,
        "verified": false,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -10347,7 +10715,8 @@
          21,
          22
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "STZJLSZJITOL"
        },
        "after": [
         ".OO....OO.",
@@ -10479,11 +10848,13 @@
          "held": true
         }
        ],
-       "plan_H": 6
+       "plan_H": 6,
+       "category": "hole"
       },
       {
        "i": 29,
        "verified": false,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -10496,6 +10867,7 @@
    "file": "replay-2026-09-19-16.ttrm",
    "user": "yachi",
    "verified_to": 96,
+   "verified_resumed_to": 96,
    "windows": [
     {
      "kind": "tst",
@@ -10515,6 +10887,7 @@
       {
        "i": 26,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -10537,7 +10910,8 @@
          26,
          27
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "JLSZJITOL"
        },
        "after": [
         "IOOSS.JOOL",
@@ -10639,7 +11013,8 @@
          "held": true
         }
        ],
-       "plan_H": 6
+       "plan_H": 6,
+       "category": "spot"
       }
      ]
     }
@@ -10651,6 +11026,7 @@
    "file": "replay-2026-09-19-16.ttrm",
    "user": "pinglamb",
    "verified_to": 80,
+   "verified_resumed_to": 80,
    "windows": [
     {
      "kind": "tst",
@@ -10668,6 +11044,7 @@
    "file": "replay-2026-09-19-16.ttrm",
    "user": "yachi",
    "verified_to": 78,
+   "verified_resumed_to": 78,
    "windows": []
   },
   {
@@ -10676,6 +11053,7 @@
    "file": "replay-2026-09-19-16.ttrm",
    "user": "yachi",
    "verified_to": 89,
+   "verified_resumed_to": 89,
    "windows": [
     {
      "kind": "tst",
@@ -10687,6 +11065,7 @@
       {
        "i": 15,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -10699,6 +11078,7 @@
    "file": "replay-2026-09-19-16.ttrm",
    "user": "pinglamb",
    "verified_to": 74,
+   "verified_resumed_to": 74,
    "windows": [
     {
      "kind": "tst",
@@ -10718,6 +11098,7 @@
       {
        "i": 22,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -10730,6 +11111,7 @@
    "file": "replay-2026-09-19-16.ttrm",
    "user": "yachi",
    "verified_to": 124,
+   "verified_resumed_to": 124,
    "windows": [
     {
      "kind": "tst",
@@ -10749,6 +11131,7 @@
       {
        "i": 21,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -10761,6 +11144,7 @@
    "file": "replay-2026-09-19-16.ttrm",
    "user": "pinglamb",
    "verified_to": 102,
+   "verified_resumed_to": 102,
    "windows": [
     {
      "kind": "tst",
@@ -10778,6 +11162,7 @@
    "file": "replay-2026-09-19-17.ttrm",
    "user": "pinglamb",
    "verified_to": 103,
+   "verified_resumed_to": 103,
    "windows": [
     {
      "kind": "tst",
@@ -10795,6 +11180,7 @@
    "file": "replay-2026-09-19-17.ttrm",
    "user": "yachi",
    "verified_to": 98,
+   "verified_resumed_to": 98,
    "windows": [
     {
      "kind": "pc",
@@ -10806,6 +11192,7 @@
       {
        "i": 16,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -10818,6 +11205,7 @@
    "file": "replay-2026-09-19-17.ttrm",
    "user": "pinglamb",
    "verified_to": 93,
+   "verified_resumed_to": 93,
    "windows": [
     {
      "kind": "tst",
@@ -10835,6 +11223,7 @@
    "file": "replay-2026-09-19-17.ttrm",
    "user": "yachi",
    "verified_to": 84,
+   "verified_resumed_to": 84,
    "windows": [
     {
      "kind": "tst",
@@ -10846,6 +11235,7 @@
       {
        "i": 14,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -10953,6 +11343,7 @@
    "file": "replay-2026-09-19-17.ttrm",
    "user": "yachi",
    "verified_to": 16,
+   "verified_resumed_to": 19,
    "windows": [
     {
      "kind": "tst",
@@ -10972,6 +11363,7 @@
       {
        "i": 23,
        "verified": false,
+       "verified_resumed": false,
        "lost_to": "unknown"
       }
      ]
@@ -10984,6 +11376,7 @@
    "file": "replay-2026-09-19-17.ttrm",
    "user": "pinglamb",
    "verified_to": 13,
+   "verified_resumed_to": 13,
    "windows": [
     {
      "kind": "tst",
@@ -10995,6 +11388,7 @@
       {
        "i": 15,
        "verified": false,
+       "verified_resumed": false,
        "lost_to": "garbage"
       }
      ]
@@ -11007,6 +11401,7 @@
    "file": "replay-2026-09-19-17.ttrm",
    "user": "yachi",
    "verified_to": 40,
+   "verified_resumed_to": 40,
    "windows": [
     {
      "kind": "tst",
@@ -11024,6 +11419,7 @@
    "file": "replay-2026-09-19-17.ttrm",
    "user": "pinglamb",
    "verified_to": 18,
+   "verified_resumed_to": 18,
    "windows": []
   },
   {
@@ -11032,6 +11428,7 @@
    "file": "replay-2026-09-19-17.ttrm",
    "user": "pinglamb",
    "verified_to": 168,
+   "verified_resumed_to": 168,
    "windows": []
   },
   {
@@ -11040,6 +11437,7 @@
    "file": "replay-2026-09-19-17.ttrm",
    "user": "yachi",
    "verified_to": 172,
+   "verified_resumed_to": 172,
    "windows": []
   },
   {
@@ -11048,6 +11446,7 @@
    "file": "replay-2026-09-19-17.ttrm",
    "user": "pinglamb",
    "verified_to": 151,
+   "verified_resumed_to": 151,
    "windows": [
     {
      "kind": "tst",
@@ -11065,6 +11464,7 @@
    "file": "replay-2026-09-19-17.ttrm",
    "user": "yachi",
    "verified_to": 146,
+   "verified_resumed_to": 146,
    "windows": []
   },
   {
@@ -11073,6 +11473,7 @@
    "file": "replay-2026-09-19-17.ttrm",
    "user": "yachi",
    "verified_to": 129,
+   "verified_resumed_to": 129,
    "windows": []
   },
   {
@@ -11081,6 +11482,7 @@
    "file": "replay-2026-09-19-17.ttrm",
    "user": "pinglamb",
    "verified_to": 103,
+   "verified_resumed_to": 103,
    "windows": [
     {
      "kind": "tst",
@@ -11092,6 +11494,7 @@
       {
        "i": 15,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -11189,6 +11592,7 @@
    "file": "replay-2026-09-19-17.ttrm",
    "user": "pinglamb",
    "verified_to": 42,
+   "verified_resumed_to": 42,
    "windows": [
     {
      "kind": "tst",
@@ -11206,6 +11610,7 @@
    "file": "replay-2026-09-19-17.ttrm",
    "user": "yachi",
    "verified_to": 33,
+   "verified_resumed_to": 33,
    "windows": [
     {
      "kind": "tst",
@@ -11223,6 +11628,7 @@
    "file": "replay-2026-09-19-18.ttrm",
    "user": "pinglamb",
    "verified_to": 39,
+   "verified_resumed_to": 39,
    "windows": []
   },
   {
@@ -11231,6 +11637,7 @@
    "file": "replay-2026-09-19-18.ttrm",
    "user": "yachi",
    "verified_to": 34,
+   "verified_resumed_to": 34,
    "windows": []
   },
   {
@@ -11239,6 +11646,7 @@
    "file": "replay-2026-09-19-18.ttrm",
    "user": "pinglamb",
    "verified_to": 347,
+   "verified_resumed_to": 347,
    "windows": []
   },
   {
@@ -11247,6 +11655,7 @@
    "file": "replay-2026-09-19-18.ttrm",
    "user": "yachi",
    "verified_to": 364,
+   "verified_resumed_to": 364,
    "windows": []
   },
   {
@@ -11255,6 +11664,7 @@
    "file": "replay-2026-09-19-18.ttrm",
    "user": "pinglamb",
    "verified_to": 54,
+   "verified_resumed_to": 54,
    "windows": [
     {
      "kind": "tst",
@@ -11272,6 +11682,7 @@
    "file": "replay-2026-09-19-18.ttrm",
    "user": "yachi",
    "verified_to": 53,
+   "verified_resumed_to": 53,
    "windows": []
   },
   {
@@ -11280,6 +11691,7 @@
    "file": "replay-2026-09-19-18.ttrm",
    "user": "yachi",
    "verified_to": 63,
+   "verified_resumed_to": 63,
    "windows": []
   },
   {
@@ -11288,6 +11700,7 @@
    "file": "replay-2026-09-19-18.ttrm",
    "user": "pinglamb",
    "verified_to": 42,
+   "verified_resumed_to": 42,
    "windows": []
   },
   {
@@ -11296,6 +11709,7 @@
    "file": "replay-2026-09-19-18.ttrm",
    "user": "pinglamb",
    "verified_to": 110,
+   "verified_resumed_to": 110,
    "windows": [
     {
      "kind": "tst",
@@ -11307,6 +11721,7 @@
       {
        "i": 14,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -11407,6 +11822,7 @@
       {
        "i": 19,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -11514,6 +11930,7 @@
    "file": "replay-2026-09-19-18.ttrm",
    "user": "yachi",
    "verified_to": 110,
+   "verified_resumed_to": 110,
    "windows": [
     {
      "kind": "tst",
@@ -11525,6 +11942,7 @@
       {
        "i": 16,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -11605,6 +12023,7 @@
       {
        "i": 21,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -11627,7 +12046,8 @@
          32,
          42
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "LIZOJSTSI"
        },
        "after": [
         "JJJ.ISSLSS",
@@ -11741,6 +12161,7 @@
    "file": "replay-2026-09-19-18.ttrm",
    "user": "yachi",
    "verified_to": 61,
+   "verified_resumed_to": 61,
    "windows": [
     {
      "kind": "tst",
@@ -11752,6 +12173,7 @@
       {
        "i": 27,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -11774,7 +12196,8 @@
          40,
          50
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "OIOJTSL"
        },
        "after": [
         "GGGGGGG.GG",
@@ -11868,6 +12291,7 @@
    "file": "replay-2026-09-19-18.ttrm",
    "user": "pinglamb",
    "verified_to": 44,
+   "verified_resumed_to": 44,
    "windows": [
     {
      "kind": "tst",
@@ -11885,6 +12309,7 @@
    "file": "replay-2026-09-19-18.ttrm",
    "user": "pinglamb",
    "verified_to": 89,
+   "verified_resumed_to": 89,
    "windows": [
     {
      "kind": "tst",
@@ -11896,6 +12321,7 @@
       {
        "i": 16,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -11908,6 +12334,7 @@
    "file": "replay-2026-09-19-18.ttrm",
    "user": "yachi",
    "verified_to": 82,
+   "verified_resumed_to": 82,
    "windows": [
     {
      "kind": "tst",
@@ -11925,6 +12352,7 @@
    "file": "replay-2026-09-19-19.ttrm",
    "user": "pinglamb",
    "verified_to": 117,
+   "verified_resumed_to": 117,
    "windows": []
   },
   {
@@ -11933,6 +12361,7 @@
    "file": "replay-2026-09-19-19.ttrm",
    "user": "yachi",
    "verified_to": 115,
+   "verified_resumed_to": 115,
    "windows": []
   },
   {
@@ -11941,6 +12370,7 @@
    "file": "replay-2026-09-19-19.ttrm",
    "user": "yachi",
    "verified_to": 83,
+   "verified_resumed_to": 83,
    "windows": []
   },
   {
@@ -11949,6 +12379,7 @@
    "file": "replay-2026-09-19-19.ttrm",
    "user": "pinglamb",
    "verified_to": 79,
+   "verified_resumed_to": 79,
    "windows": [
     {
      "kind": "tst",
@@ -11966,6 +12397,7 @@
    "file": "replay-2026-09-19-19.ttrm",
    "user": "pinglamb",
    "verified_to": 43,
+   "verified_resumed_to": 43,
    "windows": [
     {
      "kind": "tst",
@@ -11983,6 +12415,7 @@
    "file": "replay-2026-09-19-19.ttrm",
    "user": "yachi",
    "verified_to": 41,
+   "verified_resumed_to": 41,
    "windows": []
   },
   {
@@ -11991,6 +12424,7 @@
    "file": "replay-2026-09-19-19.ttrm",
    "user": "yachi",
    "verified_to": 104,
+   "verified_resumed_to": 104,
    "windows": []
   },
   {
@@ -11999,6 +12433,7 @@
    "file": "replay-2026-09-19-19.ttrm",
    "user": "pinglamb",
    "verified_to": 72,
+   "verified_resumed_to": 72,
    "windows": [
     {
      "kind": "tst",
@@ -12016,6 +12451,7 @@
    "file": "replay-2026-09-19-19.ttrm",
    "user": "yachi",
    "verified_to": 46,
+   "verified_resumed_to": 46,
    "windows": [
     {
      "kind": "tst",
@@ -12027,6 +12463,7 @@
       {
        "i": 16,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -12114,6 +12551,7 @@
    "file": "replay-2026-09-19-19.ttrm",
    "user": "pinglamb",
    "verified_to": 28,
+   "verified_resumed_to": 28,
    "windows": [
     {
      "kind": "tst",
@@ -12125,6 +12563,7 @@
       {
        "i": 16,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -12212,6 +12651,7 @@
    "file": "replay-2026-09-19-19.ttrm",
    "user": "pinglamb",
    "verified_to": 179,
+   "verified_resumed_to": 179,
    "windows": [
     {
      "kind": "tst",
@@ -12229,6 +12669,7 @@
    "file": "replay-2026-09-19-19.ttrm",
    "user": "yachi",
    "verified_to": 175,
+   "verified_resumed_to": 175,
    "windows": []
   },
   {
@@ -12237,6 +12678,7 @@
    "file": "replay-2026-09-19-19.ttrm",
    "user": "yachi",
    "verified_to": 71,
+   "verified_resumed_to": 71,
    "windows": [
     {
      "kind": "tst",
@@ -12248,6 +12690,7 @@
       {
        "i": 23,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -12270,7 +12713,8 @@
          26,
          27
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "LIOSTJSO"
        },
        "after": [
         "JJJ.JJZLOO",
@@ -12374,6 +12818,7 @@
    "file": "replay-2026-09-19-19.ttrm",
    "user": "pinglamb",
    "verified_to": 54,
+   "verified_resumed_to": 54,
    "windows": []
   },
   {
@@ -12382,6 +12827,7 @@
    "file": "replay-2026-09-19-19.ttrm",
    "user": "pinglamb",
    "verified_to": 72,
+   "verified_resumed_to": 72,
    "windows": []
   },
   {
@@ -12390,6 +12836,7 @@
    "file": "replay-2026-09-19-19.ttrm",
    "user": "yachi",
    "verified_to": 55,
+   "verified_resumed_to": 55,
    "windows": []
   },
   {
@@ -12398,6 +12845,7 @@
    "file": "replay-2026-09-19-19.ttrm",
    "user": "yachi",
    "verified_to": 18,
+   "verified_resumed_to": 18,
    "windows": [
     {
      "kind": "tst",
@@ -12415,6 +12863,7 @@
    "file": "replay-2026-09-19-19.ttrm",
    "user": "pinglamb",
    "verified_to": -1,
+   "verified_resumed_to": -1,
    "windows": []
   },
   {
@@ -12423,6 +12872,7 @@
    "file": "replay-2026-09-19-20.ttrm",
    "user": "pinglamb",
    "verified_to": 207,
+   "verified_resumed_to": 207,
    "windows": [
     {
      "kind": "tst",
@@ -12440,6 +12890,7 @@
    "file": "replay-2026-09-19-20.ttrm",
    "user": "yachi",
    "verified_to": 214,
+   "verified_resumed_to": 214,
    "windows": [
     {
      "kind": "tst",
@@ -12451,6 +12902,7 @@
       {
        "i": 19,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -12558,6 +13010,7 @@
    "file": "replay-2026-09-19-20.ttrm",
    "user": "pinglamb",
    "verified_to": 83,
+   "verified_resumed_to": 83,
    "windows": [
     {
      "kind": "tst",
@@ -12575,6 +13028,7 @@
    "file": "replay-2026-09-19-20.ttrm",
    "user": "yachi",
    "verified_to": 88,
+   "verified_resumed_to": 88,
    "windows": []
   },
   {
@@ -12583,6 +13037,7 @@
    "file": "replay-2026-09-19-20.ttrm",
    "user": "yachi",
    "verified_to": 48,
+   "verified_resumed_to": 48,
    "windows": [
     {
      "kind": "tst",
@@ -12594,6 +13049,7 @@
       {
        "i": 14,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": true,
        "state": {
@@ -12694,6 +13150,7 @@
       {
        "i": 20,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -12706,6 +13163,7 @@
    "file": "replay-2026-09-19-20.ttrm",
    "user": "pinglamb",
    "verified_to": 17,
+   "verified_resumed_to": 38,
    "windows": [
     {
      "kind": "tst",
@@ -12725,6 +13183,7 @@
       {
        "i": 21,
        "verified": false,
+       "verified_resumed": true,
        "lost_to": "placement",
        "in_preview": false,
        "state": {
@@ -12747,7 +13206,8 @@
          12,
          13
         ],
-        "lines": 0
+        "lines": 0,
+        "later": "OITLZJSSO"
        },
        "after": [
         ".SS.SS....",
@@ -12849,7 +13309,8 @@
          "held": false
         }
        ],
-       "plan_H": 4
+       "plan_H": 4,
+       "category": "hole"
       }
      ]
     }
@@ -12861,6 +13322,7 @@
    "file": "replay-2026-09-19-20.ttrm",
    "user": "yachi",
    "verified_to": 42,
+   "verified_resumed_to": 42,
    "windows": [
     {
      "kind": "tst",
@@ -12872,6 +13334,7 @@
       {
        "i": 15,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -12884,6 +13347,7 @@
    "file": "replay-2026-09-19-20.ttrm",
    "user": "pinglamb",
    "verified_to": 34,
+   "verified_resumed_to": 34,
    "windows": [
     {
      "kind": "tst",
@@ -12901,6 +13365,7 @@
    "file": "replay-2026-09-19-20.ttrm",
    "user": "pinglamb",
    "verified_to": 125,
+   "verified_resumed_to": 125,
    "windows": [
     {
      "kind": "tst",
@@ -12912,6 +13377,7 @@
       {
        "i": 24,
        "verified": true,
+       "verified_resumed": true,
        "lost_to": "garbage"
       }
      ]
@@ -12924,6 +13390,7 @@
    "file": "replay-2026-09-19-20.ttrm",
    "user": "yachi",
    "verified_to": 115,
+   "verified_resumed_to": 115,
    "windows": []
   },
   {
@@ -12932,6 +13399,7 @@
    "file": "replay-2026-09-19-20.ttrm",
    "user": "yachi",
    "verified_to": 46,
+   "verified_resumed_to": 46,
    "windows": []
   },
   {
@@ -12940,6 +13408,7 @@
    "file": "replay-2026-09-19-20.ttrm",
    "user": "pinglamb",
    "verified_to": 38,
+   "verified_resumed_to": 38,
    "windows": [
     {
      "kind": "tst",
@@ -12957,6 +13426,7 @@
    "file": "replay-2026-09-19-20.ttrm",
    "user": "pinglamb",
    "verified_to": 98,
+   "verified_resumed_to": 98,
    "windows": [
     {
      "kind": "tst",
@@ -12974,6 +13444,7 @@
    "file": "replay-2026-09-19-20.ttrm",
    "user": "yachi",
    "verified_to": 100,
+   "verified_resumed_to": 100,
    "windows": []
   },
   {
@@ -12982,6 +13453,7 @@
    "file": "replay-2026-09-19-20.ttrm",
    "user": "pinglamb",
    "verified_to": 124,
+   "verified_resumed_to": 124,
    "windows": [
     {
      "kind": "tst",
@@ -12999,6 +13471,7 @@
    "file": "replay-2026-09-19-20.ttrm",
    "user": "yachi",
    "verified_to": 112,
+   "verified_resumed_to": 112,
    "windows": []
   }
  ]

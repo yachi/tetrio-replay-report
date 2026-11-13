@@ -4196,9 +4196,23 @@ applies: `hole`, `over` (taller than the plan's frame), `hold` (the plan's first
 `spot`. One solver over one simulator board, so no claim id and no ✓; and a PC being possible is not the
 player building one, which both pages say.
 
+**The post-PC window is the DPC one, and it is reported by a different rule** (since 2026-11-13, yachi:
+「Add DPC mistakes too that cannot lead to PC」). A PC after a PC takes about fifteen pieces, more than the
+hand shows, so a miss there is reported in HINDSIGHT (the round's dealt pieces, carried as `state.later`
+so the card's animation can deal them and counts how many the hand never showed), and the next lock
+must be inside `verified_resumed_to`, not `verified_to`. The plain verified prefix almost always ends AT
+the PC, because the game sends a PC's attack as separate packets on one frame (1 + 10) where the engine
+sends one (11). `resumedIndex` is the same walk with one tolerance — at an engine PC lock, consecutive
+truth packets on that frame that sum to the engine's amount, each on the cleared rows — and its
+`split: false` form must equal replay-facts' `verified_to` on every player-round (the emitter throws
+otherwise). `pc_miss_section.reported(m, kind)` is the one rule; each window renders as its own
+subsection, and the page counts the two phases apart. A card's 「T 入三角位」 note is the plan's SHAPE
+(three filled corners, a line cleared); the solver records cells, not rotations.
+
 **One full run is about 3.5 CPU-hours, so the artefacts are committed and only the shortest night is
 rebuilt** (`pc-miss.test.ts`, 2026-10-20 byte for byte). Each artefact records the md5 of its
-replay-facts and of `pc-miss.ts`, `pc-solver.ts` and `pc-engine-gen.ts` (`HASHED`), so an edit to any of
+replay-facts, its `.ttrm` files (`md5.ttrm`, the DPC walk reads their garbage events) and of
+`pc-miss.ts`, `pc-solver.ts` and `pc-engine-gen.ts` (`HASHED`), so an edit to any of
 those stales EVERY artefact loudly and costs the full rerun; imports from `emit-replay.ts` are not hashed,
 and the byte rebuild is what catches a change through them. The gate recomputes each category with its
 own Python `category()` and replays every plan row by row; the page's audit reads every example's replay
