@@ -4204,6 +4204,13 @@ and the byte rebuild is what catches a change through them. The gate recomputes 
 own Python `category()` and replays every plan row by row; the page's audit reads every example's replay
 link back through the technique pages' reader. Counts are the artefacts', never typed here.
 
+**Each 「可以咁擺」 board plays piece by piece** (since 2026-11-13, yachi: 「Create 示範 animations like
+replay」). `frames()` replays the plan in the board's own frame (rows clear and drop) and `hand_steps()`
+replays `pc-solver.ts`'s hold rule from the miss's own hand, refusing a step the hand cannot deal; the
+frames ride in the figure's `data-frames` and one inline script (`SCRIPT`, nodes built, no markup sink)
+steps them, with the numbered board as frame 0 so a page without JavaScript is unchanged. The
+`check_pc_miss_section --selftest` held-flag mutant must be refused by that hand replay itself.
+
 ## 重播 — the animated replay, the third quarantined section
 
 Two boards side by side, stepped lock by lock. **Simulator output, quarantined exactly like the

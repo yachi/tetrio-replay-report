@@ -171,6 +171,13 @@ def _selftest(report_dir):
     cases.append(("a reported miss carries the wrong category", cat, doc, True))
     plan = cp(); m = _first_reported(plan); m["plan"] = m["plan"][:-1]
     cases.append(("a plan with its last piece dropped", plan, doc, True))
+    hand = cp(); m = _first_reported(hand)
+    k = next(j for j, p in enumerate(m["plan"]) if not p["held"]); m["plan"][k]["held"] = True
+    cases.append(("an animated plan the hand cannot deal (a step marked held)", hand, doc, True))
+    # that case must be refused by the renderer's hand replay, not only by the region's text moving
+    why = problems(hand, doc, report_dir)
+    hand_ok = any("the hand deals" in w for w in why)
+    print(f"  {'ok ' if hand_ok else 'BAD'} the held-flag mutant is refused by the hand replay itself")
     over = cp(); m = _first_reported(over); m["state"]["cells"] = [c for c in m["state"]["cells"]]
     g = m["state"]["grid"]; filled = next(y * 10 + x for y, r in enumerate(g) for x, ch in enumerate(r) if ch != ".")
     m["state"]["cells"][0] = filled
@@ -188,7 +195,7 @@ def _selftest(report_dir):
     start, end = region.markers(NAME, "pipeline/build_report.py")
     cases.append(("an artefact with no region", data, doc.replace(body, "").replace(start, "").replace(end, ""), True))
 
-    ok = True
+    ok = hand_ok
     for name, d, dc, must_fail in cases:
         failed = bool(problems(d, dc, report_dir))
         good = failed == must_fail

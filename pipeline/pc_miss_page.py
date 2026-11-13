@@ -186,6 +186,7 @@ def render(arts, repo=REPO):
                 c = c.replace("<strong>", f"<strong>{s} ", 1)
                 out.append(c)
             out.append("    </div>")
+    out.append(PS.SCRIPT)
     out.append("</section>")
     out += RT._tail({"figures": fig})
     return "\n".join(out)
