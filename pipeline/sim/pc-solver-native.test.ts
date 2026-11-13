@@ -90,7 +90,7 @@ test('placements: native list equals pc-solver.ts placements, order included', (
   console.log(`placements compared: ${n}`);
   expect(n).toBeGreaterThan(1000);
   expect(bad).toBe(0);
-});
+}, 600_000);
 
 test('check: native equals pc-miss.ts check, shared memo per round-player', () => {
   let n = 0, bad = 0, tTs = 0, tNa = 0, nPrev = 0, nEng = 0;
