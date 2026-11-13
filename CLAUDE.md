@@ -517,6 +517,7 @@ bun test pipeline/sim/pc-miss.test.ts                           #   every artefa
 python3 -m pipeline.check_pc_miss_section sessions/<date>/report  # CI gate: the pc-miss region (--selftest its mutants)
 python3 -m pipeline.pc_miss_page --selftest     # the docs/pc-miss.html audit's mutants (--out-dir <dir> renders)
 bun test pipeline/sim/pc-solver.test.ts                         #   the PC solver's rules + engine movegen ⊇ SRS movegen
+bun test pipeline/sim/pc-solver-native.test.ts pipeline/sim/pc-engine-gen-native.test.ts  #   the Rust solver == the TS one (sampled; PC_NATIVE_FULL=1)
 python3 -m pipeline.check_attack_section sessions/<date>/report  # CI gate: the attack-sources region
 python3 -m pipeline.check_attack_section sessions/<date>/report --selftest  #   its mutants
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-finesse-facts.ts \
@@ -4209,10 +4210,21 @@ otherwise). `pc_miss_section.reported(m, kind)` is the one rule; each window ren
 subsection, and the page counts the two phases apart. A card's 「T 入三角位」 note is the plan's SHAPE
 (three filled corners, a line cleared); the solver records cells, not rotations.
 
-**One full run is about 3.5 CPU-hours, so the artefacts are committed and only the shortest night is
-rebuilt** (`pc-miss.test.ts`, 2026-10-20 byte for byte). Each artefact records the md5 of its
+**The solver the artefacts are built with is Rust** (since 2026-11-13, yachi: 「全套做啦」):
+`pipeline/sim/pc-solver-rs` (bitboard rows, integer memo keys, the SRS movegen and the engine's movegen
+with 180) loaded through bun:ffi by `pc-solver-native.ts`, which builds the crate on first use when stale
+(CI builds it in the typescript job). `pc-solver.ts` and `pc-engine-gen.ts` stay as the reference
+implementations: `pc-solver-native.test.ts` holds placements and every check verdict (shared memo,
+preview, engine) equal to the TS ones, and `pc-engine-gen-native.test.ts` the engine movegen list for list,
+order included; both sample by default (`PC_NATIVE_FULL=1`, `ENGINE_GEN_SESSIONS=<dates>` for more). The
+port changed no verdict: every night's artefact re-emitted identical outside its md5 lines. A full
+22-night run went from about 3.5 CPU-hours to minutes (measured once, by hand, on 2026-11-13; re-measure
+rather than quote).
+
+**The artefacts are still committed and only the shortest night is rebuilt** (`pc-miss.test.ts`,
+2026-10-20 byte for byte). Each artefact records the md5 of its
 replay-facts, its `.ttrm` files (`md5.ttrm`, the DPC walk reads their garbage events) and of
-`pc-miss.ts`, `pc-solver.ts` and `pc-engine-gen.ts` (`HASHED`), so an edit to any of
+`pc-miss.ts`, `pc-solver-native.ts` and the crate's `src/*.rs` (`HASHED`), so an edit to any of
 those stales EVERY artefact loudly and costs the full rerun; imports from `emit-replay.ts` are not hashed,
 and the byte rebuild is what catches a change through them. The gate recomputes each category with its
 own Python `category()` and replays every plan row by row; the page's audit reads every example's replay

@@ -31,8 +31,8 @@
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { placeCells, WIDTH } from './emit-replay.ts';
-import { solve, frames, height, setMovegen, type Placement } from './pc-solver.ts';
-import { enginePlacements } from './pc-engine-gen.ts';
+import { frames, height, type Placement } from './pc-solver.ts';
+import { nativeCheck, newMemo, freeMemo, type Memo } from './pc-solver-native.ts';
 import { matchesIgeY } from './ige-y-oracle.ts';
 
 type Lock = [number, number | number[], number, number, [number, number][], number, number, number];
@@ -44,7 +44,8 @@ const NODES = 3_000_000;
 /** The files whose md5 the artefact records. Imports from emit-replay.ts / route-demos.ts are not
  *  hashed (an edit there would stale every artefact for a 3.5-hour rerun); the byte rebuild of one
  *  session in pc-miss.test.ts is what catches a behaviour change through them. */
-export const HASHED = ['pipeline/sim/pc-miss.ts', 'pipeline/sim/pc-solver.ts', 'pipeline/sim/pc-engine-gen.ts'];
+export const HASHED = ['pipeline/sim/pc-miss.ts', 'pipeline/sim/pc-solver-native.ts',
+  ...['lib', 'srs', 'solver', 'engine_gen', 'ffi'].map(m => `pipeline/sim/pc-solver-rs/src/${m}.rs`)];
 
 const md5 = (p: string) => createHash('md5').update(readFileSync(p)).digest('hex');
 const md5Files = (ps: string[]) => { const h = createHash('md5'); for (const p of ps) h.update(readFileSync(p)); return h.digest('hex'); };
@@ -128,16 +129,11 @@ export function resumedIndex(locks: SentLock[], truth: { frame: number; amt: num
 }
 
 type V = { ok: true; H: number; plan: Placement[] } | { ok: false } | { ok: null };
-function check(rows: number[], cur: string, hold: string, seq: string, ptr: number, memo: Map<string, any>): V {
-  let unknown = false;
-  for (const H of frames(rows, MAXH)) {
-    let v;
-    try { v = solve(rows, H, cur, hold, seq, ptr, memo, { nodes: NODES }); }
-    catch { unknown = true; continue; }
-    if (v.ok === true) return { ok: true, H, plan: v.plan };
-    if (v.ok === null) unknown = true;
-  }
-  return unknown ? { ok: null } : { ok: false };
+/** Every frame up to MAXH, a fresh NODES budget per frame, in the Rust port of pc-solver.ts
+ *  (`pc-solver-native.ts`; answers equal to the TS solver's, pc-solver-native.test.ts). `engine`
+ *  swaps in the engine's own movegen (180 included), pc-engine-gen.ts's port. */
+function check(rows: number[], cur: string, hold: string, seq: string, ptr: number, memo: Memo | null, engine = false): V {
+  return nativeCheck(rows, cur, hold, seq, ptr, memo, { maxH: MAXH, nodes: NODES, engine });
 }
 /** A DPC miss (a `pc` window: after a Perfect Clear) is reported in HINDSIGHT — a PC after a PC
  *  needs about 15 pieces and the preview shows 7, so `in_preview` almost never holds there — when its
@@ -193,7 +189,7 @@ export function build(dir: string, log: (s: string) => void = () => {}) {
       const endAt = (start: number) => { const p = pcs.find(x => x > start); return Math.min(p ?? Infinity, start + SPAN, st.length - 1); };
       if (tst >= 0) wins.push({ kind: 'tst', start: tst, end: endAt(tst) });
       for (const p of pcs) if (p + 1 < st.length) wins.push({ kind: 'pc', start: p, end: endAt(p) });
-      const memo = new Map<string, any>();
+      const memo = newMemo();
       const verdict = (s: any): V | null => {
         if (s.v !== undefined) return s.v;
         s.v = fits(s.pre) ? check(s.pre, s.cur, s.hold, seq, s.ptr, memo) : null;
@@ -214,11 +210,11 @@ export function build(dir: string, log: (s: string) => void = () => {}) {
           else if (b.v?.ok === null) m.lost_to = 'unknown';
           else {
             let e: V = { ok: false };
-            if (fits(b.pre)) { setMovegen(enginePlacements); e = check(b.pre, b.cur, b.hold, seq, b.ptr, new Map()); setMovegen(null); }
+            if (fits(b.pre)) e = check(b.pre, b.cur, b.hold, seq, b.ptr, null, true);
             m.lost_to = e.ok === true ? 'engine_disagrees' : e.ok === null ? 'unknown' : 'placement';
           }
           if (m.lost_to === 'placement') {
-            const vis = check(a.pre, a.cur, a.hold, seq.slice(0, a.ptr + PREVIEW), a.ptr, new Map());
+            const vis = check(a.pre, a.cur, a.hold, seq.slice(0, a.ptr + PREVIEW), a.ptr, null);
             m.in_preview = vis.ok === true;
             m.state = { grid: a.grid, cur: a.cur, hold: a.hold, next: seq.slice(a.ptr, a.ptr + PREVIEW), piece: a.piece, held: a.held, cells: a.cells, lines: a.lines };
             m.after = b.grid;
@@ -238,6 +234,7 @@ export function build(dir: string, log: (s: string) => void = () => {}) {
           : !ev.some(v => v?.ok === true) ? (evaluated ? 'never' : 'not_evaluated') : 'possible_to_end';
         rw.push({ ...w, pcLock, outcome, misses });
       }
+      freeMemo(memo);
       out.push({ match: rd.match, round: rd.round, file: rd.file, user: P.user, verified_to: verified, verified_resumed_to: resumed, windows: rw });
     }
     log(`m${rd.match}r${rd.round + 1}`);
