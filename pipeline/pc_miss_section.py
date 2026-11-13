@@ -79,6 +79,15 @@ CSS = """  <style>
     #pc-miss .pm-p { display: inline-block; min-width: 1.2em; text-align: center; border-radius: 3px;
       color: #fff; font-family: var(--mono, ui-monospace, monospace); padding: 0 2px; margin-right: 1px; }
     #pc-miss td.pm-num { text-align: right; font-variant-numeric: tabular-nums; }
+    #pc-miss .pm-board span.pm-new { outline: 2px solid #fff; outline-offset: -2px; }
+    #pc-miss .pm-board span.pm-full { filter: brightness(1.6) saturate(.6); }
+    #pc-miss .pm-ctl { display: flex; flex-wrap: wrap; gap: .25rem; align-items: center; margin-top: .3rem; }
+    #pc-miss .pm-ctl button { font: .8rem/1 var(--mono, ui-monospace, monospace); padding: .3rem .45rem;
+      min-width: 2rem; border: 1px solid var(--rule, rgba(127,127,127,.4)); border-radius: 4px;
+      background: transparent; color: inherit; cursor: pointer; }
+    #pc-miss .pm-ctl button.pm-play { min-width: 3.2rem; }
+    #pc-miss .pm-ctl[hidden] { display: none; }
+    #pc-miss .pm-step { font-size: .75rem; min-height: 1.4em; margin: .2rem 0 0; white-space: nowrap; }
   </style>"""
 
 
@@ -163,6 +172,74 @@ def composite(grid0, plan, tag):
     return board(g, nums=nums, h=h), h
 
 
+def hand_steps(st, plan, tag):
+    """Replays the solver's hold rule (`pc-solver.ts`: place the current piece; or swap with the
+    hold; or, hold empty, hold it and place the next) over the plan, from the miss's own hand.
+    Returns (placed piece, came from hold, hold after) per step; refuses a plan the hand cannot
+    deal, so an animation can never show a piece the player did not have."""
+    q, hold, out = [st["cur"]] + list(st["next"]), st["hold"] or "", []
+    for step, p in enumerate(plan, 1):
+        if not q:
+            _fail(f"{tag}: plan step {step} runs past the known pieces")
+        c = q.pop(0)
+        if p["held"]:
+            if hold:
+                placed, hold = hold, c
+            else:
+                hold = c
+                if not q:
+                    _fail(f"{tag}: plan step {step} holds with nothing behind it")
+                placed = q.pop(0)
+        else:
+            placed = c
+        if placed != p["piece"]:
+            _fail(f"{tag}: plan step {step} places {p['piece']} but the hand deals {placed}")
+        out.append((placed, bool(p["held"]), hold))
+    return out
+
+
+def frames(grid0, plan, st, h, tag):
+    """The plan played piece by piece in the board's own frame (rows clear and drop), each frame
+    bottom-aligned in the composite's h rows: `b` the cells top-down, `n` the just-placed piece's
+    cell indices, `f` full rows (top-down index), `c` caption parts (text, or {"p": piece})."""
+    rows = [list(r) for r in grid0]
+    while rows and not "".join(rows[-1]).strip("."):
+        rows.pop()
+
+    def snap(new=(), full=(), cap=()):
+        if len(rows) > h:
+            _fail(f"{tag}: the animation is taller than the composite")
+        b = "".join("".join(rows[y]) if y < len(rows) else "." * 10 for y in range(h - 1, -1, -1))
+        return {"b": b, "n": sorted((h - 1 - y) * 10 + x for y, x in new),
+                "f": sorted(h - 1 - y for y in full), "c": list(cap)}
+
+    hand = hand_steps(st, plan, tag)
+    hold0 = st["hold"] or ""
+    out = [snap(cap=["開始　hold ", {"p": hold0} if hold0 else "空"])]
+    for k, (p, (piece, held, hold)) in enumerate(zip(plan, hand), 1):
+        new = []
+        for cc in p["cells"]:
+            y, x = divmod(cc, 10)
+            while len(rows) <= y:
+                rows.append(list("." * 10))
+            if rows[y][x] != ".":
+                _fail(f"{tag}: animation step {k} overlaps a filled cell")
+            rows[y][x] = piece
+            new.append((y, x))
+        full = [y for y, r in enumerate(rows) if "." not in r]
+        cap = [f"第 {k}/{len(plan)} 粒 ", {"p": piece}, "（由 hold 拎出嚟）" if held else "",
+               "　hold ", {"p": hold} if hold else "空"]
+        out.append(snap(new, full, cap))
+        if full:
+            rows = [r for r in rows if "." in r]
+            while rows and not "".join(rows[-1]).strip("."):
+                rows.pop()
+            out.append(snap(cap=["全消！"] if not rows else [f"清咗 {len(full)} 行"]))
+    if rows:
+        _fail(f"{tag}: the animation does not end on an empty board")
+    return out
+
+
 class Locator:
     """Replay-page positions and video times for one session's misses."""
 
@@ -200,7 +277,10 @@ def card(miss, kind, loc, file, rnd, user):
     st = miss["state"]
     i = miss["i"]
     label, rep, vid = loc.links(file, rnd, user, i)
-    comp, h = composite(st["grid"], miss["plan"], f"{loc.session} {label} {user} {i}")
+    tag = f"{loc.session} {label} {user} {i}"
+    comp, h = composite(st["grid"], miss["plan"], tag)
+    anim = html.escape(json.dumps({"h": h, "fr": frames(st["grid"], miss["plan"], st, h, tag)},
+                                  ensure_ascii=False, separators=(",", ":")), quote=True)
     placed = with_placement(st["grid"], st["cells"], st["piece"])
     seq = " → ".join(chip(p["piece"]) + ("（用 hold 換）" if p["held"] else "") for p in miss["plan"])
     hold = chip(st["hold"]) if st["hold"] else "空"
@@ -216,10 +296,82 @@ def card(miss, kind, loc, file, rnd, user):
         f'{"（由 hold 拎出嚟）" if st["held"] else ""}</figcaption>'
         f'{board(placed, hl=frozenset(st["cells"]))}</figure>',
         f'          <figure><figcaption>擺完之後</figcaption>{board(miss["after"])}</figure>',
-        f'          <figure><figcaption>可以咁擺：{h} 行全消</figcaption>{comp}</figure>',
+        f'          <figure class="pm-anim" data-frames="{anim}"><figcaption>可以咁擺：{h} 行全消</figcaption>{comp}'
+        f'{CONTROLS}</figure>',
         '        </div>',
         f'        <p>次序：{seq}</p>',
         '      </div>'])
+
+
+# Static and hidden: the script reveals them, so a page without JavaScript shows the numbered board.
+CONTROLS = ('<div class="pm-ctl" hidden><button type="button" data-act="start" aria-label="由頭">⏮</button>'
+            '<button type="button" data-act="back" aria-label="上一步">◀</button>'
+            '<button type="button" class="pm-play" data-act="play">示範</button>'
+            '<button type="button" data-act="fwd" aria-label="下一步">▶</button></div>'
+            '<p class="pm-step" aria-live="polite"></p>')
+
+# One player for every card. Frame 0 is the numbered board already in the markup; nodes are built,
+# never assigned as markup.
+SCRIPT = r"""  <script>
+(function () {
+  var COL = %s;
+  function mount(fig) {
+    var data = JSON.parse(fig.getAttribute("data-frames"));
+    var grid = fig.querySelector(".pm-board"), cells = grid.children;
+    var ctl = fig.querySelector(".pm-ctl"), out = fig.querySelector(".pm-step");
+    var play = ctl.querySelector('[data-act="play"]');
+    var orig = [];
+    for (var i = 0; i < cells.length; i++) orig.push([cells[i].getAttribute("style"), cells[i].textContent, cells[i].className]);
+    var pos = -1, timer = null;
+    function chip(p) {
+      var s = document.createElement("span");
+      s.className = "pm-p"; s.style.background = COL[p]; s.textContent = p; return s;
+    }
+    function draw() {
+      out.textContent = "";
+      if (pos < 0) {
+        for (var i = 0; i < cells.length; i++) {
+          var o = orig[i];
+          if (o[0] === null) cells[i].removeAttribute("style"); else cells[i].setAttribute("style", o[0]);
+          cells[i].textContent = o[1]; cells[i].className = o[2];
+        }
+        return;
+      }
+      var f = data.fr[pos], nw = {}, fl = {};
+      f.n.forEach(function (k) { nw[k] = 1; });
+      f.f.forEach(function (r) { fl[r] = 1; });
+      for (var j = 0; j < cells.length; j++) {
+        var ch = f.b.charAt(j);
+        cells[j].textContent = "";
+        if (ch === ".") cells[j].removeAttribute("style"); else cells[j].style.background = COL[ch];
+        cells[j].className = (nw[j] ? "pm-new" : "") + (fl[Math.floor(j / 10)] && ch !== "." ? " pm-full" : "");
+      }
+      f.c.forEach(function (c) { out.appendChild(typeof c === "string" ? document.createTextNode(c) : chip(c.p)); });
+    }
+    function stop() { if (timer) { clearInterval(timer); timer = null; } play.textContent = pos < 0 ? "示範" : "播"; }
+    function go(p) { pos = Math.max(-1, Math.min(data.fr.length - 1, p)); draw(); }
+    function tick() { if (pos >= data.fr.length - 1) { stop(); return; } go(pos + 1); }
+    ctl.addEventListener("click", function (e) {
+      var a = e.target.getAttribute && e.target.getAttribute("data-act");
+      if (!a) return;
+      if (a === "play") {
+        if (timer) { stop(); return; }
+        if (pos >= data.fr.length - 1) go(-1);
+        go(pos + 1); timer = setInterval(tick, 650); play.textContent = "停";
+        return;
+      }
+      stop();
+      if (a === "start") go(-1);
+      else if (a === "back") go(pos - 1);
+      else if (a === "fwd") go(pos + 1);
+      stop();
+    });
+    ctl.hidden = false;
+  }
+  var figs = document.querySelectorAll("#pc-miss .pm-anim");
+  for (var i = 0; i < figs.length; i++) mount(figs[i]);
+})();
+  </script>""" % json.dumps(PIECE, sort_keys=True)
 
 
 def tally(data):
@@ -309,6 +461,7 @@ def section(data, players, loc):
         '',
         *body,
         '  </div>',
+        SCRIPT,
         '</section>',
     ]
     markup = "\n".join(out)
