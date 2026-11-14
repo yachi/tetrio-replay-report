@@ -11,7 +11,7 @@
  *   - a Case loadCases did not register (a spread copy) is computed, never looked up.
  */
 import { test, expect } from 'bun:test';
-import { appendFileSync, cpSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { appendFileSync, cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { loadCases, runCaseOracle, verifiedIndex } from './verified-prefix.ts';
@@ -94,7 +94,17 @@ test('the key moves when any file under pipeline/sim changes, and with every par
     expect(treeHash(copy)).toBe(h0);
     writeFileSync(join(copy, 'vendor', 'new-module.mjs'), 'export {};\n');   // a file nobody listed
     const h2 = treeHash(copy);
-    expect(new Set([h0, h1, h2]).size).toBe(3);
+    // the Rust oracle's sources are inside the tree, its build output is not
+    const rs = join(copy, 'oracle-rs', 'src', 'engine.rs');
+    const rsOrig = readFileSync(rs);
+    appendFileSync(rs, '\n');
+    const h3 = treeHash(copy);
+    writeFileSync(rs, rsOrig);
+    expect(treeHash(copy)).toBe(h2);
+    mkdirSync(join(copy, 'oracle-rs', 'target', 'release'), { recursive: true });
+    writeFileSync(join(copy, 'oracle-rs', 'target', 'release', 'scratch.bin'), 'built\n');
+    expect(treeHash(copy)).toBe(h2);
+    expect(new Set([h0, h1, h2, h3]).size).toBe(4);
     const id: CaseId = { fileSha: 'a'.repeat(64), round: 3, side: 0, user: 'yachi' };
     const keys = [
       keyOf('oracle', id, h0), keyOf('oracle', id, h1), keyOf('oracle', id, h2),
@@ -106,6 +116,16 @@ test('the key moves when any file under pipeline/sim changes, and with every par
     ];
     expect(new Set(keys).size).toBe(keys.length);
     expect(keyOf('oracle', id, h0)).toBe(keys[0]!);      // and it is a function of its inputs
+    // and of which implementation replays the oracle (oracle-rs, or the TS reference)
+    const was = process.env.ORACLE_NATIVE;
+    const keyIn = (mode: string | undefined) => {
+      if (mode === undefined) delete process.env.ORACLE_NATIVE; else process.env.ORACLE_NATIVE = mode;
+      return keyOf('oracle', id, h0);
+    };
+    try {
+      expect(keyIn(undefined)).not.toBe(keyIn('off'));
+      expect(keyIn(undefined)).toBe(keyIn('on'));
+    } finally { keyIn(was); }
   } finally { rmSync(copy, { recursive: true, force: true }); }
 });
 
@@ -131,6 +151,9 @@ test('everything the cache stands in for imports only modules inside pipeline/si
   expect(bare).toEqual([]);
   // the closure really does reach the engine, so an empty walk cannot pass this vacuously
   expect([...seen].some(f => f.includes('/vendor/teto/'))).toBe(true);
+  // ...and the Rust oracle's loader; the crate behind it is Rust, which this walk cannot follow, so
+  // the tree hash covering oracle-rs/src (the test above) is what keys it
+  expect([...seen].some(f => f.endsWith('/oracle-native.ts'))).toBe(true);
 });
 
 test('a corrupt entry is a miss and is recomputed; a well-formed wrong one is caught by verify', () => {

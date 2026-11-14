@@ -19,6 +19,7 @@ import { GARBAGE, H, type SimResult } from './sim.ts';
 import type { Board } from './vendor/core/srs.ts';
 import type { PieceType } from './vendor/core/types.ts';
 import { BOARD_WIDTH } from './vendor/core/types.ts';
+import { runCaseOracleNative } from './oracle-native.ts';
 
 // The TL ruleset fields the version-19 .ttrm `options` omit — identical to tools/triangle-oracle/oracle.mjs.
 // Board-affecting ones (gravity, holes) are pinned; the rest are TETR.IO TL defaults. `clutch` was `false`
@@ -38,8 +39,20 @@ export const TL_DEFAULTS: Record<string, unknown> = {
 
 const SPIN_MAP: Record<string, 'none' | 'mini' | 'full'> = { none: 'none', mini: 'mini', normal: 'full', full: 'full' };
 
-/** One player/round replayed through the vendored engine, emitted as a SimResult in the sim's frame. */
+/** Which implementation `runCaseOracle` runs: the Rust port unless `ORACLE_NATIVE=off`. */
+export const oracleMode = (): 'native' | 'ts' => (process.env.ORACLE_NATIVE === 'off' ? 'ts' : 'native');
+
+/**
+ * One player/round replayed through the engine, emitted as a SimResult in the sim's frame. The replay
+ * runs in the Rust port (oracle-native.ts, oracle-rs/), whose result equals `runCaseOracleTs`'s byte for
+ * byte (oracle-native.test.ts); `ORACLE_NATIVE=off` runs the TS reference instead.
+ */
 export function runCaseOracle(player: any, roundPlayers: any[]): SimResult {
+  return oracleMode() === 'ts' ? runCaseOracleTs(player, roundPlayers) : runCaseOracleNative(player, TL_DEFAULTS);
+}
+
+/** The reference: one player/round replayed through the vendored engine itself. */
+export function runCaseOracleTs(player: any, roundPlayers: any[]): SimResult {
   const o = player.replay.options;
   const players = roundPlayers.map((p) => ({ gameid: p.replay.options.gameid, userid: p.id, username: p.username }));
   const eng: any = createEngine({ ...TL_DEFAULTS, ...o, g: o.g ?? TL_DEFAULTS.g }, o.gameid, players);
@@ -122,13 +135,25 @@ export function runCaseOracle(player: any, roundPlayers: any[]): SimResult {
     recvTotal += ev.amount;
   });
 
-  // pre-tick board snapshot (occupancy), for cleared-row reconstruction
+  // pre-tick board snapshot (occupancy), for cleared-row reconstruction. Taken LAZILY: the board can only
+  // change through the Board methods wrapped below, so the snapshot is taken by the first of them to run in
+  // a tick, and a tick that never reaches one leaves the board as it was at the tick's start. Until
+  // 2026-11-14 this was taken eagerly at every tick, which was about 65% of the whole replay's time
+  // (measured with bun --cpu-prof); the output is identical, which the full-corpus SimResult digest checked.
   let preTick: boolean[][] = [];
+  let preTickTaken = false;
+  let snapshotError = false;   // the tick loop's catch turns a throw into a topout; this one must escape it
   const snapOccupancy = (): boolean[][] => {
     const st = eng.board.state, g: boolean[][] = [];
     for (let r = 0; r < st.length; r++) { const row = new Array(BOARD_WIDTH).fill(false); for (let c = 0; c < BOARD_WIDTH; c++) row[c] = st[r]?.[c] != null; g.push(row); }
     return g;
   };
+  const takePreTick = () => { if (!preTickTaken) { preTick = snapOccupancy(); preTickTaken = true; } };
+  for (const m of ['add', 'clearLines', 'clearBombs', 'clearBombsAndLines', 'insertGarbage', 'reset']) {
+    const orig = eng.board[m];
+    if (typeof orig !== 'function') throw new Error(`oracle-source: Board has no method ${m}`);
+    eng.board[m] = (...args: any[]) => { takePreTick(); return orig.apply(eng.board, args); };
+  }
 
   let pendingCells: { col: number; row: number }[] | null = null;   // captured at lock.pre (pre-clear, y-down)
   eng.events.on('falling.lock.pre', () => {
@@ -148,6 +173,9 @@ export function runCaseOracle(player: any, roundPlayers: any[]): SimResult {
     // yUp yields DESCENDING sim-rows (bottom-most first), which the prov splice below relies on.
     const clearedRows: number[] = [];
     if (lines > 0) {
+      // the lock's own Board.add() took the snapshot; a lock that reached here without it would read a board
+      // that already holds this piece, so it is an error, never a silent snapshot
+      if (!preTickTaken) { snapshotError = true; throw new Error('oracle-source: a clearing lock with no pre-tick snapshot'); }
       const g = preTick.map((r) => r.slice());                       // y-up occupancy [yUp][x]
       for (const { col, row } of cells) { const yUp = (H - 1) - row; if (yUp >= 0 && yUp < H && col >= 0 && col < BOARD_WIDTH) g[yUp]![col] = true; }
       for (let yUp = 0; yUp < H; yUp++) if (g[yUp]!.every(Boolean)) clearedRows.push((H - 1) - yUp);
@@ -182,13 +210,14 @@ export function runCaseOracle(player: any, roundPlayers: any[]): SimResult {
   const maxF = player.replay.frames ?? 20000;
   try {
     for (let f = 0; f <= maxF; f++) {
-      preTick = snapOccupancy();
+      preTickTaken = false;
       const r = eng.tick(byFrame.get(f) || []);
       // snapshot boards + prov once per lock that happened this tick
       while (boards.length < locks.length) { boards.push(encBoard()); provSnaps.push(provFromBoard()); }
       if (r && r.topout) { topout = true; break; }
     }
   } catch { topout = true; }
+  if (snapshotError) throw new Error('oracle-source: a clearing lock with no pre-tick snapshot');
 
   return {
     lines: linesTotal, placed: locks.length, holds, clears, topbtb, topcombo,

@@ -1,0 +1,10 @@
+oracle-rs is a Rust port of the parts of the Triangle.js engine that pipeline/sim/oracle-source.ts
+reaches when it replays a TETR.IO .ttrm player-round. The engine it ports is vendored, unmodified, in
+pipeline/sim/vendor/teto/engine (the @haelp/teto package, version 4.2.7).
+
+Triangle.js — https://github.com/Genius6942/triangle
+Copyright (c) haelp (Genius6942) and the Triangle.js contributors
+Licensed under the MIT License.
+
+The piece shapes, kick tables and T corner table in src/data.rs are generated from that package's
+own data modules by pipeline/sim/gen-oracle-rs-data.ts. No TETR.IO client code is copied here.
