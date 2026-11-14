@@ -1,0 +1,54 @@
+{
+  "title": "T-Spin Forecast",
+  "overview_title": "T-Spin Forecast：窿同屋頂先砌好，清完行先打",
+  "desc": "T-spin 個窿連屋頂都砌好咗，但係要等之後一次清行先打得：二十二晚入面每一次，同一場直播入面嘅例子。",
+  "lede": "Forecast 係中盤嘅一個做法：T-spin 個窿同屋頂一早砌好，嗰陣仲打唔到，要等之後清一次行，個窿先變成打得嘅形。",
+  "rule": [
+    "計嘅規則（yachi 確認）：屋頂擺低嗰一刻，個 T-spin 仲未打得；之後一次清行令佢打得，跟住先放 T。",
+    "算：個窿企喺一個冇底嘅 Tetris 井上面（A）；個窿有底，靠其他位打 Tetris 跌落嚟（B）；直播入面嗰個 STSD（D）。唔算：屋頂喺清行之後先擺（C），因為咁就係清完行先砌，唔係預早砌好。"
+  ],
+  "page_sentences": [
+    "直播嘅例子係睇片讀出嚟嘅，唔係 corpus 數據，唔入任何統計。"
+  ],
+  "index_card": {
+    "kicker": "中盤手法",
+    "blurb": "窿同屋頂預早砌好，等清行先打得嘅 T-spin：corpus 每一次，加直播例子。"
+  },
+  "sections": {
+    "figures": "二十二晚數到幾多次",
+    "figures_note": "每一次都係模擬器重跑 replay 搵出嚟：屋頂擺低嗰陣打唔到，之後一次清行令佢打得，然後真係打咗嗰個 T-spin。",
+    "cases": "每一次，畫出嚟",
+    "cases_note": "每格三個盤面：屋頂擺低之後、令佢打得嗰次清行之後、放 T 之前。㩒個 case 開 replay 去放 T 前一步。",
+    "video": "直播入面嘅例子",
+    "video_note": "以下係 {link} 入面左邊玩家嘅例子，連結開喺清行前三秒。",
+    "video_limit": "片入面嘅盤面係逐格讀出嚟再用眼核過，冇引擎重跑，所以只係示範，唔係量度。"
+  },
+  "table": {
+    "player": "玩家",
+    "events": "次數",
+    "lines1": "TSS",
+    "lines2": "TSD",
+    "lines3": "TST",
+    "sessions": "出現過幾多晚",
+    "case": "Case",
+    "spin": "T-spin",
+    "roof_lock": "屋頂（第幾粒）",
+    "clear_lock": "清行（第幾粒）",
+    "t_lock": "放 T（第幾粒）",
+    "video_example": "片段",
+    "side": "邊個",
+    "kind": "類型",
+    "note": "點睇"
+  },
+  "words": {
+    "total": "總共 {n} 次",
+    "moments": ["屋頂擺低之後", "清行之後", "放 T 之前"],
+    "spin": "{spin}，屋頂擺低之後隔 {gap} 粒先放 T",
+    "clock": "{t}",
+    "side_L": "左邊",
+    "side_R": "右邊",
+    "kind_A": "A：個窿喺 Tetris 井上面",
+    "kind_B": "B：有底，靠其他位清行跌落嚟",
+    "kind_D": "D：直播 STSD"
+  }
+}

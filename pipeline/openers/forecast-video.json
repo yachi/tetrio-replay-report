@@ -1,0 +1,19 @@
+{
+  "schema": "forecast-video/1",
+  "report_eligible": false,
+  "link_lead_s": 3,
+  "video": {
+    "id": "QheX1_UP5W4",
+    "url": "https://www.youtube.com/watch?v=QheX1_UP5W4",
+    "title": "vs ゆうくんさん 5先あきぬけ【ぷよぷよテトリス２】"
+  },
+  "read": "Boards read off the stream at 10 frames a second by palette sampling, then checked by eye. clear_s is the second the line clear that makes the T-spin doable lands; the link opens link_lead_s earlier. Not corpus data, in no count.",
+  "examples": [
+    {"id": "v0", "side": "L", "clear_s": 172.3, "spin": "STSD", "kind": "D", "note": "yachi 指出嘅例子：STSD 個窿同屋頂都砌好咗，等下面清行先打得。"},
+    {"id": "v9", "side": "L", "clear_s": 4761.3, "spin": "TSS", "kind": "A", "note": "Z 做屋頂，個窿企喺 I 嘅井上面，打完 Tetris 先打得。"},
+    {"id": "v10", "side": "L", "clear_s": 7304.2, "spin": "TST", "kind": "B", "note": "L 做屋頂喺右上，左邊打 Tetris 之後個 TST 先打得。"},
+    {"id": "v11", "side": "L", "clear_s": 7444.2, "spin": "TSS", "kind": "B", "note": "右邊個 TSS，屋頂喺 Tetris 之前已經擺好。"},
+    {"id": "v24", "side": "R", "clear_s": 8806.2, "spin": "TSS", "kind": "A", "note": "右邊玩家喺左邊角落嘅 TSS，個窿企喺 Tetris 井上面，打完 Tetris 先打得。"},
+    {"id": "v18", "side": "L", "clear_s": 10919.3, "spin": "TSD", "kind": "B", "note": "左邊個 TSD，屋頂同窿砌好咗，下面清一行之後先打得。"}
+  ]
+}

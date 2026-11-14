@@ -4,7 +4,7 @@
  */
 import { test, expect } from 'bun:test';
 import { forecastMetric, isVerifiedForecast, floorOrigin, garbageArrivedAfter,
-         localiseMechanism, bestTspinLines } from './forecast.ts';
+         localiseMechanism, bestTspinLines, bestTspin } from './forecast.ts';
 import { H } from './sim.ts';
 import type { SimResult } from './sim.ts';
 import { tryMove, tryRotate, hardDrop, getPieceCells } from './vendor/core/srs.ts';
@@ -1164,4 +1164,26 @@ test('a garbage roof (j = -1) is NOT scored by co-occurrence in strict mode', ()
   // LOOSE mode is the pre-correction rule verbatim and must be UNCHANGED — `LOOSE=1` exists to
   // reproduce the old figures, so narrowing it would silently rewrite the comparison baseline.
   expect(forecastMetric(r, false).records[0]!.kind).toBe('forecast_garbage');
+});
+
+// 2026-11-14 (yachi, live QheX1_UP5W4 at 2:52): an STSD slot built with its roof over a stack whose
+// rows will clear. `bestTspin` now reports the FLOOR the T stands on, and localiseMechanism reads the
+// slot as roof..floor, so a clear between the T and its floor is the line clear that formed it. Here:
+// a TSD slot on a raised floor. The floor is the first filled row under the T's nub, not the ground.
+test('bestTspin reports the floor the T stands on, not the ground', () => {
+  // A TSD slot: roof over column 2, the T's arms in the upper row, its nub in column 3.
+  const slot = ['XX...XXXXX', 'XXX.XXXXXX'];
+  const flat = boardFrom(slot);
+  flat[H - 3]![2] = 1;
+  const f = bestTspin(flat);
+  expect(f).not.toBeNull();
+  expect(f!.lines).toBe(2);
+  expect(f!.floor).toBe(H);       // the nub rests on the ground
+  // The same slot two rows up, over two rows that are not full: the nub rests on row H - 2.
+  const raised = boardFrom([...slot, 'XXXXXXXXX.', 'XXXXXXXXX.']);
+  raised[H - 5]![2] = 1;
+  const r = bestTspin(raised);
+  expect(r).not.toBeNull();
+  expect(r!.lines).toBe(2);
+  expect(r!.floor).toBe(H - 2);
 });

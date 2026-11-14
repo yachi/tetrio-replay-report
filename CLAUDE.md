@@ -5960,6 +5960,25 @@ and the page prints both counts. It is NOT in `TECHNIQUE_SITES` (`replay_labels`
 routes section read that list); `bin/build-docs` renders it in its own loop. Counts, the named
 `MATCHED` list and the Shachiku cross-check live in `dpc.test.ts`, never here.
 
+## T-Spin Forecast 頁 — a slot built, roof and all, before a line clear makes it doable
+
+The rule (yachi, 2026-11-14, on the live `QheX1_UP5W4` at 2:52, left player's STSD): the T-spin's slot
+and its roof are fully built while the spin is NOT yet doable, and a later line clear makes it doable.
+A slot over a floorless Tetris well counts, so does a floored slot dropped by a Tetris elsewhere; a roof
+placed AFTER the clear does not. In `forecast.ts`, `bestTspin` returns the `floor` the T stands on and
+`localiseMechanism` reads the slot as roof..floor, so a clear between the T and its floor is the
+`line-clear` mechanism (it was `access` before). The corpus count did not move (re-derive from
+`analysis/forecast-events.json`, never from here); every `forecast-facts.json` is unchanged.
+
+`pipeline/sim/emit-forecast-events.ts` → `analysis/forecast-events.json` lists every counted forecast
+(the same loop as `emit-forecast-facts.ts`'s tally, a copy held equal per (session, player) to each
+`forecast-facts.json`'s `forecast_total` by `forecast-events.test.ts`, which also rebuilds it byte for
+byte). `pipeline/forecast_page.py` + `forecast_prose.json` → `docs/forecast.html`, a 中盤手法 card
+rendered in `bin/build-docs`'s PC-page loop: every event drawn at roof, clear and T, linked to the replay
+position before its T, plus the examples read off the live video (`pipeline/openers/forecast-video.json`,
+video tier, in no count; read at 10 fps by palette and checked by eye, nothing committed of the video).
+Same quarantine as the technique pages; the page prints counts and no `%`.
+
 ## SDPC 循環頁 — stick spin's SDパフェ into くるまDPC, read off one video
 
 JayKob's quickplay video `ey8jYVawDBs` (yachi 2026-11-11: 「Add opening sdpc looping」; yt-dlp `-f 298`

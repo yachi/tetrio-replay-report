@@ -125,8 +125,8 @@ export function withBfsTrace<T>(fn: () => T): { value: T; trace: BfsTrace } {
   try { return { value: fn(), trace: t }; } finally { trace = outer; }
 }
 
-export function bestTspin(board: Board): { lines: number; rows: number[] } | null {
-  let best = 0, bestRows: number[] = [];
+export function bestTspin(board: Board): { lines: number; rows: number[]; floor: number } | null {
+  let best = 0, bestRows: number[] = [], bestFloor = H;
   const spawn: ActivePiece = { type: 'T', rotation: 0, col: 3, row: 18 };
   // Uint32 wraps after 4.29e9 boards; restarting from 1 over a zeroed table keeps the
   // "holds the current stamp" test honest instead of resurrecting stale marks.
@@ -194,6 +194,18 @@ export function bestTspin(board: Board): { lines: number; rows: number[] } | nul
         // state (row 0 needs a 40-row stack that a topout ends first); 0 of 7,544 corpus boards.
         const rows = cells.map(c => c.row);
         bestRows = [...rows, Math.min(...rows) - 1];
+        // The FLOOR is the deepest cell the T stands on: under each T cell that has no T cell
+        // below it, a filled cell (or the ground, row H). This is `floorAt` in spec/Forecast.dfy's
+        // `GapClosed`, and the line-clear test reads the slot as roof..floor because of it: a clear
+        // between the T and what it stands on BROUGHT the floor up, which is a forecast (yachi,
+        // 2026-11-14: an STSD built over an open Tetris well, the I's Tetris giving it its floor).
+        let floor = -1;
+        for (const c of cells) {
+          const below = c.row + 1;
+          if (cells.some(o => o.col === c.col && o.row === below)) continue;
+          if (below >= H || board[below]![c.col] !== null) floor = Math.max(floor, below);
+        }
+        bestFloor = floor < 0 ? H : floor;
       }
     }
     if (!expand) continue;
@@ -223,7 +235,7 @@ export function bestTspin(board: Board): { lines: number; rows: number[] } | nul
       trace.colLo = Math.min(trace.colLo, e.p.col); trace.colHi = Math.max(trace.colHi, e.p.col);
     }
   }
-  return best > 0 ? { lines: best, rows: bestRows } : null;
+  return best > 0 ? { lines: best, rows: bestRows, floor: bestFloor } : null;
 }
 
 /** How many lines the best available T-spin clears; 0 if none is reachable. */
@@ -738,7 +750,11 @@ export function localiseMechanism(
       for (let p = 0; p < H; p++) if (p + clearedRows.filter(cr => cr > p).length === rB) return p;
       return rB;
     };
-    const ps = slot.rows.map(back);
+    // The slot runs from its roof down to its FLOOR (the cell the T stands on), as the spec's
+    // `GapClosed` does: a cleared row anywhere in between formed the slot. Until 2026-11-14 the
+    // floor was left out, so a clear UNDER the T — the Tetris that gives an STSD built over an open
+    // well its floor — was read as `access` and never counted.
+    const ps = [...slot.rows, slot.floor].map(back);
     if (clearedRows.some(cr => cr > Math.min(...ps) && cr < Math.max(...ps)))
       return { step: t, mechanism: 'line-clear' };
     // The clear did not FORM the slot — but availability here is reachability, so it may still have
