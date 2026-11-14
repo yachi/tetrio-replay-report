@@ -6,7 +6,7 @@
     "hypothesis": "paired AUC, winner vs loser, of rows cleared per piece over locks whose PRE-lock board carries at least one garbage row, over the verified prefix; one-sided, winner higher",
     "estimand_entry": "pipeline/sim/board-metrics.ts",
     "board_source": "runCaseOracle",
-    "pinned_commit": "1ab94b3e84a71a08552343cb777a69f0b72c1d5a",
+    "pinned_commit": "4d028f642e281845a623c915e2e9a3f2babc49c3",
     "pinned_on": "2026-11-14",
     "unblinding": [
       "CLAUDE.md publishes the UNCONDITIONAL per-piece DS paired AUC for both banked sessions (08-09: 66.0, 08-14: 70.2). That is not the registered estimand — the registered one conditions on garbage being on the pre-lock board — but the two are correlated, so the bank is partially unblinded and the confirmatory test must be reported as such.",
@@ -93,6 +93,13 @@
         "why": "Copying the board on every tick was most of `runCaseOracle`'s time. THE RELEVANT FACT FOR THIS REGISTRATION is that the change is inert: the snapshot a clearing lock reads is the same board either way, and the JSON of `runCaseOracle`'s result was hashed for all 3344 player-rounds before and after and every hash is identical. `board-metrics.ts` is untouched and the registered estimand has still never been computed on a banked session.",
         "pin_from": "e8507d5d0d2620f769c30a67ebd077a7d5133728",
         "pin_to": "1ab94b3e84a71a08552343cb777a69f0b72c1d5a"
+      },
+      {
+        "date": "2026-11-14",
+        "what": "The estimand's import closure moved in three files: `oracle-source.ts`'s `runCaseOracle` now replays through `oracle-native.ts`, which loads `pipeline/sim/oracle-rs` (a Rust port of the vendored Triangle engine, restricted to the paths the harness reaches) over bun:ffi; the TS replay is kept as `runCaseOracleTs` and `ORACLE_NATIVE=off` selects it. `oracle-cache.ts` adds which of the two ran to its key and skips the crate's build output. All sessions stay classified as they were.",
+        "why": "Speed: the TS engine was most of every corpus replay. THE RELEVANT FACT FOR THIS REGISTRATION is that the change is inert: `oracle-native.test.ts` with ORACLE_NATIVE_FULL=1 found the JSON of the Rust result equal to the TS reference's for all 3344 player-rounds, and the JSON of `runCaseOracle`'s result hashed through `verified-prefix.ts` reproduced the previous pin's hashes for all 3344. The closure scan follows TS/JS imports only, so the Rust sources under `oracle-rs/src` are outside it; equivalence to the TS reference is what stands in for them. `board-metrics.ts` is untouched and the registered estimand has still never been computed on a banked session.",
+        "pin_from": "1ab94b3e84a71a08552343cb777a69f0b72c1d5a",
+        "pin_to": "4d028f642e281845a623c915e2e9a3f2babc49c3"
       }
     ]
   }
