@@ -4080,10 +4080,39 @@ id="coaching">` lives inside the coaching region, so anchoring there inserts the
 span a later pass rewrites: `build_report` prints `inserted: <name>` and the finished file contains
 nothing at all.
 
-## 定式路線同中盤手法 — the one quarantined section ABOVE the trust chain, and the advice written from it
+## 報告次序 — four reading tiers, one place that holds them
 
-`pipeline/routes_techniques_section.py`, region `routes-techniques`, inserted right after 數據對決
-(before the moments region's BEGIN marker; in `SELF_INSERTING`, because a filtered subset has no
+Since 2026-11-14 (yachi agreed to Fable's re-ordering), a report reads in four tiers, and
+`pipeline/report_order.py`'s `TIERS` is the ONE place the order lives: 今晚 30 秒 (hero, 三件事,
+戰況, 影片), 練乜 (建議, 練習卡, 行錯咗嗰一步, finesse, 定式路線同中盤手法), 點解 (數據對決, 每粒攻擊,
+攻擊由邊度嚟, 最癲一局 and its replay, 全場之最, 全消) and 參考 (逐局全數據, T-Spin Forecast, C-Spin 同
+DT 砲, 證明附錄). `report_order.apply` runs at the end of every `build_report.render`: it cuts each
+region out of the body (from the first region to the footer), puts them back in tier order with one
+`<!-- ===== tier ===== -->` separator each, and writes a generated `nav` region (a sticky bar, one
+link per tier, highlighting the tier in view) right after the hero. So a `SECTIONS` anchor or a
+`skeleton.LAYOUT` position only has to put a region SOMEWHERE in the body. It refuses a region no
+tier names, a region twice, and anything between regions but whitespace and separator comments;
+`--selftest` plants each. Trust tiers are not reading tiers: the 練乜 tier puts quarantined sections
+beside 建議, and each keeps its own eyebrow and quarantine sentences, so a section's text must not
+locate another section by 「上面」/「下面」 (four such phrases were reworded on that pass). A new
+section needs a tier in `TIERS`, or `apply` fails. The nav links to the first region in each tier
+that has a section id; a new session's skeleton round table is empty until `build_round_table`
+fills it, which is why `bin/new-session` runs `build_report` once more after it.
+
+**練習卡** (`pipeline/practice_section.py`, region `practice`, the seventh quarantined section, in
+`SELF_INSERTING`) prints, per player, two cards picked by rule: the 行錯咗嗰一步 category with the most
+reported misses in the opener window (ties by that section's category order; the post-PC window when
+the opener one has none) and its first miss, and the finesse placement ranked first. Each card is
+rendered by its own section's renderer from the same artefact, and the gate (`python3 -m
+pipeline.practice_section <report_dir>`, `--selftest` its mutants) requires the region to be a
+re-render with its `REQUIRED` sentences and no badge, and every card to be byte-identical to one the
+pc-miss or finesse region draws. Its CSS and script are those two sections' with the section id
+swapped, built in functions because the module sits in an import cycle with `build_report`.
+
+## 定式路線同中盤手法 — the quarantined section in the 練乜 tier, and the advice written from it
+
+`pipeline/routes_techniques_section.py`, region `routes-techniques`, first inserted right after 數據對決
+and moved to the 練乜 tier by `report_order` (in `SELF_INSERTING`, because a filtered subset has no
 `sim/` directory and gets none). It prints one night's slice of the corpus route and technique
 artefacts (`pipeline.sites`' lists, read through `replay_labels.load_sources`): per opener, the rounds
 whose bag 1 matched and how many reached bag 2, bag 3 or a drawn Perfect Clear inside the verified
@@ -4096,7 +4125,7 @@ rules — in the table and the per-match strip alike (數據對決's two bar pan
 prints the shape-only hits beside them as 「另外 N 次形似但唔算」 (worded once in the table's note; a technique or opener both players left at zero is named in one line under its table, not drawn as a row, since 2026-11-06), so a night's window hits are never
 read as the technique played (the first pass printed the qualify count UNDER the raw hits, and the chart and
 strip kept showing the raw ones). No win rate, the 全消 rule. Same tier as the four sections below the footer — no claim id, no ✓
-— and it sits early only because 建議 cites it.
+— and it sits in the 練乜 tier, after 建議, which cites it.
 
 **建議 has a second kind of item, and it is the one place hand prose cites simulator figures.** A
 `prose/coaching.json` column may carry `sim_recs`; `coaching.py` renders them after the proved `recs`,
@@ -4114,8 +4143,8 @@ the new cells, not just rebuilt.
 
 ## 每粒攻擊 — the APP section
 
-`pipeline/app_section.py`, region `app` (section id `app`), placed right after 數據對決 and before
-the routes-techniques and moments regions (in `skeleton.LAYOUT`, not `SELF_INSERTING`: every
+`pipeline/app_section.py`, region `app` (section id `app`), placed right after 數據對決 in the 點解
+tier (in `skeleton.LAYOUT`, not `SELF_INSERTING`: every
 session has a facts.json). It is about APP (`garbage_attack / pieces`) and has seven blocks in a fixed order:
 1 the scoreboard and its volume meter (piece surplus against the surplus that would cover the gap),
 2 the speed-against-APP scatter, 3 the per-round APP-gap strip, 4a the per-match dumbbells,

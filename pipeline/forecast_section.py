@@ -577,7 +577,7 @@ def section(data):
         '    <h2 class="section-title">T-Spin Forecast（未經證明）</h2>',
         '',
         '    <div class="method-note">',
-        '      <p><strong>呢一節同上面所有數唔同級數，請當佢係探索性資料，唔好當結論。</strong>'
+        '      <p><strong>呢一節同信任鏈入面嘅數唔同級數，請當佢係探索性資料，唔好當結論。</strong>'
         '上面每個數都係兩個獨立 parser 抽出嚟、再由 Dafny 引理逐條證明；'
         '呢節嘅數係由<strong>一個 replay 模擬器</strong>重跑操作記錄推導出嚟，'
         '得一份實作，冇第二個獨立實作對得上，所以套唔到同一個信任鏈——'

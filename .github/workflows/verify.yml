@@ -504,6 +504,22 @@ jobs:
             python3 -m pipeline.check_pc_miss_section "$W" --selftest
           fi
 
+      # 練習卡, the seventh quarantined section: each player's first card of 行錯咗嗰一步 and of
+      # finesse, picked by rule and placed under 建議. The region must be exactly a re-render, carry
+      # practice_section.REQUIRED and no badge, and every card must be byte-identical to one its
+      # own section draws. report_order --selftest checks the tier order the report is read in and
+      # that hand-written markup, an untiered region or a duplicated one is refused.
+      - name: Check the practice cards and the report's reading order
+        run: |
+          set -euo pipefail
+          W="sessions/${{ matrix.session }}/report"
+          python3 -m pipeline.practice_section "$W"
+          python3 -m pipeline.report_order --selftest "$W"
+          if [ -f "sessions/${{ matrix.session }}/sim/pc-miss-facts.json" ] && \
+             [ -f "sessions/${{ matrix.session }}/sim/finesse-facts.json" ]; then
+            python3 -m pipeline.practice_section "$W" --selftest
+          fi
+
       # 定式路線同中盤手法: the night's slice of the opener route and mid-game technique artefacts,
       # placed early in the report, and 建議's tagged 「未經證明」 items written from it. The region
       # must be exactly a re-render, carry its quarantine sentences and no badge; every tagged item

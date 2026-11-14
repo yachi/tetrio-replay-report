@@ -140,6 +140,9 @@ else
     || die "the skeleton's regions did not fill — see the error above"
   python3 -m pipeline.build_round_table "$WORK" >/dev/null \
     || die "the round table did not fill"
+  # Again, so the tier nav (pipeline/report_order.py) links to the round table it now holds.
+  python3 -m pipeline.build_report "$WORK" >/dev/null \
+    || die "the report did not re-render after the round table"
   echo "  ok  $WORK/report.html built from the skeleton with TODO prose"
 fi
 

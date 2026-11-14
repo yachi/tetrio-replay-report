@@ -15,6 +15,9 @@ Sections handled so far:
   chart-data   the JSON island every chart reads — per-match scoreboard, the VS
                small multiples, clear-type bars, the tape chart, match boundaries.
 
+Every region is then moved to its reading tier by `pipeline/report_order.py`, which also
+writes the tier nav bar after the hero; the anchors in SECTIONS only place a new region.
+
 `--check` regenerates in memory and exits non-zero if the committed report differs,
 which is what CI runs: the report and facts.json cannot drift apart unnoticed.
 """
@@ -24,8 +27,9 @@ import os
 import sys
 
 from pipeline import (app_section, appendix, attack_section, finesse_section, pc_miss_section, chart_data, claim_cards, coaching,
-                      forecast_section, hero, intense_round, matches, moments, opener_section, pc_section, records, region, video_section,
-                      replay_section, routes_techniques_section, stats_section)
+                      forecast_section, hero, intense_round, matches, moments, opener_section, pc_section, practice_section,
+                      records, region, report_order, video_section, replay_section, routes_techniques_section,
+                      stats_section)
 from pipeline.claims import generators
 
 
@@ -144,6 +148,12 @@ def pc_miss_sec(ctx):
     return pc_miss_section.build(ctx["facts"], ctx["report_dir"])
 
 
+def practice_sec(ctx):
+    # 練習卡: each player's first card of 行錯咗嗰一步 and of finesse, rendered by those two
+    # sections' own renderers from the same artefacts. None unless the session has both.
+    return practice_section.build(ctx["facts"], ctx["report_dir"])
+
+
 def replay_sec(ctx):
     # Quarantined like forecast_sec and opener_sec, and conditional twice over: no
     # sim/replay-facts.json, or no round long enough for `generators._intense_round`, and it
@@ -236,6 +246,8 @@ SECTIONS = [
     ("pc-miss", ('<!-- BEGIN generated round-replay',
                  '<footer class="report-footer">'), pc_miss_sec, None),
     ("round-replay", '<footer class="report-footer">', replay_sec, None),
+    # Anchored anywhere in the body: report_order.apply moves it under 建議.
+    ("practice", '<footer class="report-footer">', practice_sec, None),
     ("chart-data", "<!-- CLAIMS_DATA_START -->", chart_section, None),
     ("match-copy", "<!-- CLAIMS_DATA_START -->", match_copy_section, None),
     ("claims-data", '<footer class="report-footer">', claims_island,
@@ -264,6 +276,12 @@ def render(html, ctx):
             continue
         html, how = region.replace(html, start, end, body, anchor)
         applied.append((name, how))
+    # The anchors above only put a region somewhere in the body; the reading order, and the
+    # nav bar that follows it, live in report_order and nowhere else.
+    try:
+        html = report_order.apply(html)
+    except report_order.OrderError as e:
+        raise SystemExit(f"report_order: {e}")
     return html, applied
 
 

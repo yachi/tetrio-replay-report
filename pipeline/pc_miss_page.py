@@ -140,7 +140,7 @@ def render(arts, repo=REPO):
     title = f"{TITLE}{RS.TITLE_MARK}"
     css = [RP._tokens_css(), RP.BASE_CSS.strip("\n"), RT.PAGE_CSS.strip("\n")]
     note = PS.method_note(arts[-1])
-    note = [ln.replace(PS.SELECT_MARKER, LATEST_MARKER).replace("同上面幾節一樣，", "") for ln in note]
+    note = [ln.replace(PS.SELECT_MARKER, LATEST_MARKER).replace("同其他模擬器推導嘅幾節一樣，", "") for ln in note]
     F = lambda k: f'<span data-figure="{html.escape(k)}">{fig[k]}</span>'
     out = ["<!doctype html>", '<html lang="zh-HK">', "<head>", '<meta charset="utf-8">',
            '<meta name="viewport" content="width=device-width, initial-scale=1">',

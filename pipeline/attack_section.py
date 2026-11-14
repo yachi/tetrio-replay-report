@@ -280,7 +280,7 @@ def section(data, players):
         f'    <h2 class="section-title">{TITLE}</h2>',
         '',
         '    <div class="method-note">',
-        f'      <p><strong>同上面 C-Spin 同 DT 砲一樣，{QUARANTINE_MARKER}。</strong>'
+        f'      <p><strong>同 C-Spin 同 DT 砲嗰節一樣，{QUARANTINE_MARKER}。</strong>'
         '呢節將每一局用 replay 模擬器（vendored Triangle 引擎）由頭重跑，'
         '逐粒讀返佢未抵消之前打出嘅攻擊，再按消行種類、時間同攻擊成分拆開。'
         '冇 claim 編號、冇 ✓ 標記。</p>',

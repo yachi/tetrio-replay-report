@@ -499,7 +499,7 @@ def player_block(i, user, t, loc, heading="h3"):
 def method_note(data):
     return [
         '    <div class="method-note">',
-        f'      <p><strong>同上面幾節一樣，{QUARANTINE_MARKER}。</strong>'
+        f'      <p><strong>同其他模擬器推導嘅幾節一樣，{QUARANTINE_MARKER}。</strong>'
         '呢節用 replay 模擬器重建每一粒擺之前嘅盤面，再用一個 Perfect Clear solver 試：'
         f'用嗰局真正嘅出牌次序同 hold 規則，{data["maxh"]} 行之內仲有冇擺法清晒個盤。'
         '擺之前得、擺完唔得嘅嗰一粒就係「行錯」；「唔得」再用遊戲引擎自己嘅移動搜尋（包埋 180 度轉）核多次。'

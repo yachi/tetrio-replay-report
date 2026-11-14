@@ -164,7 +164,7 @@ def section(data, players, positions):
         f'    <h2 class="section-title">{TITLE}</h2>',
         '',
         '    <div class="method-note">',
-        f'      <p><strong>同上面幾節一樣，{QUARANTINE_MARKER}。</strong>'
+        f'      <p><strong>同其他模擬器推導嘅幾節一樣，{QUARANTINE_MARKER}。</strong>'
         '呢節將每一局用 replay 模擬器（vendored Triangle 引擎）由頭重跑，逐粒數返玩家用咗幾多下'
         '左右同轉，再同「喺空板由出生位置去同一個位最少要幾多下」比較；多出嚟嘅就係 finesse 錯。'
         '冇 claim 編號、冇 ✓ 標記。</p>',
