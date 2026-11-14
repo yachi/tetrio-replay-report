@@ -49,6 +49,55 @@ DECL = re.compile(
     r'(?:function|const|let|var|class|type|interface|enum)\s+([A-Za-z_$][\w$]*)', re.M)
 DECL_LIST = re.compile(r'^export\s+(?:type\s+)?\{(?P<names>[^}]*)\}', re.M)
 STAR = re.compile(r'^export\s+\*\s', re.M)
+DECL_MULTI = re.compile(r'^export\s+(?:const|let|var)\s+[A-Za-z_$]', re.M)
+IDENT = re.compile(r'\s*([A-Za-z_$][\w$]*)\s*=')
+
+
+def _more_declarators(src: str, start: int) -> list[str]:
+    """The names after the first in one `export const a = …, b = …, c = …;` statement.
+
+    Walks from `start` (the statement's first character) to its end at bracket depth 0, skipping
+    strings and comments, and reads the identifier after every depth-0 comma. A vendored module
+    (the Triangle engine's kick tables) exports three tables this way; without this they read as
+    not exported. A regex literal holding a bracket would throw the depth off, so a statement this
+    walk cannot close is an error rather than a guess.
+    """
+    names, depth, i, n = [], 0, start, len(src)
+    while i < n:
+        c = src[i]
+        if c in '\'"`':
+            j = i + 1
+            while j < n and src[j] != c:
+                j += 2 if src[j] == '\\' else 1
+            i = j + 1
+            continue
+        if src.startswith('//', i):
+            i = src.find('\n', i)
+            i = n if i < 0 else i
+            continue
+        if src.startswith('/*', i):
+            i = src.find('*/', i) + 2
+            if i < 2:
+                break
+            continue
+        if c in '([{':
+            depth += 1
+        elif c in ')]}':
+            depth -= 1
+            if depth < 0:
+                raise ValueError(f'unbalanced brackets in an export statement at offset {start}')
+        elif depth == 0 and c == ';':
+            return names
+        elif depth == 0 and c == ',':
+            m = IDENT.match(src, i + 1)
+            if m:
+                names.append(m.group(1))
+        elif depth == 0 and c == '\n' and src.startswith('export', i + 1):
+            return names                              # no semicolon: the next export starts it
+        i += 1
+    if depth != 0:
+        raise ValueError(f'an export statement at offset {start} never closes')
+    return names
 SKIP_DIRS = {'vendor', 'node_modules', '.git'}
 
 
@@ -56,6 +105,8 @@ def exported_names(path: pathlib.Path) -> tuple[set[str], bool]:
     """Names `path` exports, and whether it re-exports someone else's with `export *`."""
     src = path.read_text()
     names = set(DECL.findall(src))
+    for m in DECL_MULTI.finditer(src):
+        names.update(_more_declarators(src, m.start()))
     for block in DECL_LIST.findall(src):
         for part in block.split(','):
             part = part.strip().removeprefix('type ').strip()
@@ -111,14 +162,22 @@ def selftest() -> int:
         # `export type { … }` is an export list too (a shim re-exporting types uses it)
         (d / 'lib.ts').write_text('export const real = 1;\nexport { real as aliased };\n'
                                   'type Shape = number;\nexport type { Shape };\n')
-        (d / 'ok.ts').write_text("import { real, aliased, type Shape } from './lib.ts';\n")
+        # `export const a = …, b = …` exports b too (the vendored kick tables do this)
+        (d / 'multi.ts').write_text("export const one = { a: [1, 2], s: 'x, y = 3' }, two = 2,\n"
+                                    "  three = (4, 5);\nexport const four = 4;\n")
+        (d / 'ok.ts').write_text("import { real, aliased, type Shape } from './lib.ts';\n"
+                                 "import { one, two, three, four } from './multi.ts';\n")
         if scan(d):
             print('SELFTEST FAIL: a sound import was reported', file=sys.stderr)
             return 1
-        (d / 'bad.ts').write_text("import { real, missing } from './lib.ts';\n")
+        (d / 'bad.ts').write_text("import { real, missing } from './lib.ts';\n"
+                                  "import { two } from './multi.ts';\n")
+        # a name inside the first table's value or string is not an export
+        (d / 'bad2.ts').write_text("import { y } from './multi.ts';\n")
         (d / 'odd.ts').write_text("import Default from './lib.ts';\n")
         found = scan(d)
-        if len(found) != 2 or not any("'missing'" in p for p in found) \
+        if len(found) != 3 or not any("'missing'" in p for p in found) \
+                or not any("'y'" in p for p in found) \
                 or not any('cannot read' in p for p in found):
             print(f'SELFTEST FAIL: expected a dangling name and an unreadable form, got {found}',
                   file=sys.stderr)
