@@ -55,7 +55,7 @@ def _root(session):
 
 sys.path.insert(0, str(REPO))
 from pipeline import docs_gate, forecast_pooled, replay_page, replay_section, route_page  # noqa: E402
-from pipeline import dpc_page, pc_miss_page, sdpc_loop_page, replay_labels, replay_links, secondpc_page, section_anchors, technique_page, video_links  # noqa: E402
+from pipeline import dpc_page, forecast_page, pc_miss_page, sdpc_loop_page, replay_labels, replay_links, secondpc_page, section_anchors, technique_page, video_links  # noqa: E402
 from pipeline.sites import INDEX_ROUTE_SITES, TECHNIQUE_SITES  # noqa: E402
 
 # (session dir, artefact subdir, output name, label, blurb)
@@ -523,7 +523,7 @@ def main(argv=None):
     # not produce is drift, exactly as for *-replay.html — none of these names ends in -replay.html,
     # and no opener's prefix is a prefix of another's, so one site's glob never sees another's pages.
     openers = []
-    prefixes = [site.p.prefix for site in INDEX_ROUTE_SITES + TECHNIQUE_SITES] + [dpc_page.PREFIX, secondpc_page.PREFIX, pc_miss_page.PREFIX, sdpc_loop_page.PREFIX]
+    prefixes = [site.p.prefix for site in INDEX_ROUTE_SITES + TECHNIQUE_SITES] + [dpc_page.PREFIX, secondpc_page.PREFIX, forecast_page.PREFIX, pc_miss_page.PREFIX, sdpc_loop_page.PREFIX]
     for a in prefixes:
         if any(b != a and b.startswith(a) for b in prefixes):
             print(f"FAIL route page prefix {a!r} is a prefix of another site's", file=sys.stderr)
@@ -609,9 +609,11 @@ def main(argv=None):
     # Second PC page (a Perfect Clear straight into a four-line one, against harddrop's Second
     # Perfect Clear drawings): the same tier, the same render-and-byte-compare, and their cards in
     # the 中盤手法 group. They are not in TECHNIQUE_SITES because replay_labels and the report's
-    # routes section read that list.
+    # routes section read that list. The Forecast page (a T-spin slot built, roof and all, before
+    # a later line clear makes it doable) joins them on the same terms.
     for mod, site, who in ((dpc_page, dpc_page.DpcSite(), "DPC"),
-                           (secondpc_page, secondpc_page.SecondPcSite(), "Second PC")):
+                           (secondpc_page, secondpc_page.SecondPcSite(), "Second PC"),
+                           (forecast_page, forecast_page.ForecastSite(), "Forecast")):
         site_inputs = site.load_inputs(str(REPO))
         site_pages = site.render_all(str(REPO), site_inputs)
         for name, page in site_pages.items():

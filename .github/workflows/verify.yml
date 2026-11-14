@@ -1126,6 +1126,13 @@ jobs:
       - name: Check the Second PC page audit catches its corruptions
         run: python3 -m pipeline.secondpc_page --selftest
 
+      # The T-spin Forecast page: every counted forecast (analysis/forecast-events.json, held equal to
+      # each session's forecast-facts.json by pipeline/sim/forecast-events.test.ts in the whole-suite
+      # bun test) plus the examples read off one live video (pipeline/openers/forecast-video.json,
+      # video tier, in no count).
+      - name: Check the Forecast page audit catches its corruptions
+        run: python3 -m pipeline.forecast_page --selftest
+
       # The SDPC loop page: JayKob's SDPC loop video, read against stick spin's SDパフェ and the
       # くるまDPC setup. The video is not committed; --video <mp4> re-reads every frame by hand.
       # Its selftest also covers sdpc-loop-demos.html, every constructed loop of
