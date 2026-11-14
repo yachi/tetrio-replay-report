@@ -4312,6 +4312,20 @@ as before, and `TL_DEFAULTS` is only exported, so every pre-existing `sim/*.json
 byte-identical. Keep it that way. The emitter reads the engine directly; it does not change what
 `runCaseOracle` returns.
 
+**`runCaseOracle` replays through Rust** (since 2026-11-14): `pipeline/sim/oracle-rs`, the vendored
+Triangle engine ported for the rule set and paths `oracle-source.ts`'s harness reaches (MIT, `NOTICE`),
+loaded through bun:ffi by `oracle-native.ts`, which builds it on first use when stale (CI builds it in
+the typescript job) and refuses any other rule set with an `unsupported` error. `runCaseOracleTs` stays
+the reference; `ORACLE_NATIVE=off` selects it, and the oracle cache keys on which one ran.
+`oracle-native.test.ts` holds the two SimResults equal as JSON, key order included (all of 2026-10-20
+and a fixed sample by default, every player-round with `ORACLE_NATIVE_FULL=1`, which the weekly run
+sets), `f64::ln_1p` equal to `Math.log1p` bit for bit on the garbage formula's arguments, and the
+kick and piece tables in `oracle-rs/src/data.rs` equal to what `gen-oracle-rs-data.ts` renders from the
+vendored engine. Engines built directly by the emitters (`emit-replay.ts` and the rest) are still the
+TS engine. The import-closure scanners (`oracle-cache.test.ts`, `check_preregistrations`) follow TS/JS
+imports only; the crate's sources are covered by the cache's tree hash, not by those walks. The speed-up
+was measured once, on 2026-11-14, and is not quoted here.
+
 ## 定式路線頁（迷走砲、はちみつ砲、山岳積み2号、stick spin、ガムシロ積み（兩個版本）、SDPC Spin）— the opener route pages, quarantined like the replays
 
 Six opener pages are transcribed and matched against the corpus — five from shiwehi.com, 迷走砲

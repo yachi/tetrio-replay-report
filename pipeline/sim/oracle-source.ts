@@ -19,6 +19,7 @@ import { GARBAGE, H, type SimResult } from './sim.ts';
 import type { Board } from './vendor/core/srs.ts';
 import type { PieceType } from './vendor/core/types.ts';
 import { BOARD_WIDTH } from './vendor/core/types.ts';
+import { runCaseOracleNative } from './oracle-native.ts';
 
 // The TL ruleset fields the version-19 .ttrm `options` omit — identical to tools/triangle-oracle/oracle.mjs.
 // Board-affecting ones (gravity, holes) are pinned; the rest are TETR.IO TL defaults. `clutch` was `false`
@@ -38,8 +39,20 @@ export const TL_DEFAULTS: Record<string, unknown> = {
 
 const SPIN_MAP: Record<string, 'none' | 'mini' | 'full'> = { none: 'none', mini: 'mini', normal: 'full', full: 'full' };
 
-/** One player/round replayed through the vendored engine, emitted as a SimResult in the sim's frame. */
+/** Which implementation `runCaseOracle` runs: the Rust port unless `ORACLE_NATIVE=off`. */
+export const oracleMode = (): 'native' | 'ts' => (process.env.ORACLE_NATIVE === 'off' ? 'ts' : 'native');
+
+/**
+ * One player/round replayed through the engine, emitted as a SimResult in the sim's frame. The replay
+ * runs in the Rust port (oracle-native.ts, oracle-rs/), whose result equals `runCaseOracleTs`'s byte for
+ * byte (oracle-native.test.ts); `ORACLE_NATIVE=off` runs the TS reference instead.
+ */
 export function runCaseOracle(player: any, roundPlayers: any[]): SimResult {
+  return oracleMode() === 'ts' ? runCaseOracleTs(player, roundPlayers) : runCaseOracleNative(player, TL_DEFAULTS);
+}
+
+/** The reference: one player/round replayed through the vendored engine itself. */
+export function runCaseOracleTs(player: any, roundPlayers: any[]): SimResult {
   const o = player.replay.options;
   const players = roundPlayers.map((p) => ({ gameid: p.replay.options.gameid, userid: p.id, username: p.username }));
   const eng: any = createEngine({ ...TL_DEFAULTS, ...o, g: o.g ?? TL_DEFAULTS.g }, o.gameid, players);

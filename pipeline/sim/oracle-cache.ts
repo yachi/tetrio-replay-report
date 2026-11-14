@@ -14,8 +14,11 @@
  * THE KEY: sha256 over the schema version, a hash of EVERY file under `pipeline/sim` (globbed by a
  * recursive readdir, never a hand list — over-inclusive, so a test edit costs a cold cache and never
  * a stale one), `Bun.version`, platform, arch, the date era above, the kind of result, and per case
- * the .ttrm's own sha256, the round index, the side and the username. `oracle-cache.test.ts` checks
- * the import closure of everything this caches stays inside `pipeline/sim`, so an import from
+ * the .ttrm's own sha256, the round index, the side and the username, and which implementation
+ * replays the oracle (`oracleMode()`: the Rust crate `oracle-rs`, or the TS reference with
+ * ORACLE_NATIVE=off). A crate's `target/` is skipped; its sources are hashed like any other file,
+ * which matters because the import-closure check below follows TS/JS imports only and cannot see
+ * Rust. `oracle-cache.test.ts` checks the import closure of everything this caches stays inside `pipeline/sim`, so an import from
  * outside the hashed root goes red rather than silently staling the key.
  *
  * WHAT BYPASSES IT. Only a Case `loadCases` registered (a WeakMap, so the Case object itself is
@@ -53,6 +56,7 @@ import { join, relative, resolve } from 'node:path';
 import { deserialize, serialize } from 'bun:jsc';
 import type { SimResult } from './sim.ts';
 import { forecastMetric } from './forecast.ts';
+import { oracleMode } from './oracle-source.ts';
 
 /** Bump when the value encoding or the key layout changes. */
 export const SCHEMA = 'oracle-cache/1';
@@ -99,6 +103,9 @@ export function treeHash(root = SIM_ROOT): string {
     for (const e of readdirSync(d, { withFileTypes: true })) {
       if (e.name === 'node_modules') continue;
       const p = join(d, e.name);
+      // A Rust crate's build output (oracle-rs, pc-solver-rs): derived from the crate's sources,
+      // which are hashed, and rewritten by every build, so hashing it would only cool the cache.
+      if (e.isDirectory() && e.name === 'target' && existsSync(join(d, 'Cargo.toml'))) continue;
       if (e.isDirectory()) walk(p);
       else if (e.isFile()) files.push(p);
     }
@@ -126,7 +133,7 @@ const IDS = new WeakMap<object, CaseId>();
 
 export function keyOf(kind: string, id: CaseId, treeHashHex = tree()): string {
   return createHash('sha256').update(JSON.stringify([
-    SCHEMA, treeHashHex, Bun.version, process.platform, process.arch, dateEra(),
+    SCHEMA, treeHashHex, Bun.version, process.platform, process.arch, dateEra(), oracleMode(),
     kind, id.fileSha, id.round, id.side, id.user,
   ])).digest('hex');
 }

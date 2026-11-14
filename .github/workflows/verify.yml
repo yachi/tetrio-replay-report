@@ -1280,13 +1280,22 @@ jobs:
           cargo --version
           cargo build --release --locked --manifest-path pipeline/sim/pc-solver-rs/Cargo.toml
 
+      # The oracle replay is Rust too (pipeline/sim/oracle-rs, loaded by oracle-native.ts; the TS
+      # engine is the reference, ORACLE_NATIVE=off selects it). Built here for the same reason, and
+      # before the warm step, which replays every case through it. oracle-native.test.ts holds the
+      # two equal; on the weekly schedule it compares every player-round instead of a sample.
+      - name: Build the native oracle
+        run: |
+          set -euo pipefail
+          cargo build --release --locked --manifest-path pipeline/sim/oracle-rs/Cargo.toml
+
       - name: Warm the oracle cache
         run: bun pipeline/sim/oracle-cache.ts --warm --jobs 4
 
       - name: Run the simulator test suite
         run: |
           set -euo pipefail
-          if [ "$GITHUB_EVENT_NAME" = schedule ]; then export ORACLE_CACHE=off; fi
+          if [ "$GITHUB_EVENT_NAME" = schedule ]; then export ORACLE_CACHE=off ORACLE_NATIVE_FULL=1; fi
           REPLAY_DIR=sessions/2026-07-22 bun test --parallel
 
   # The HAND-WRITTEN spec. Distinct from the `verify` job, which checks the GENERATED per-session
