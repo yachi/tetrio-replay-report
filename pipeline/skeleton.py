@@ -1077,6 +1077,9 @@ LAYOUT = [
     ("html", lambda _facts: SCRIPT),
 ]
 
+# Document order here is only where a region first lands: `report_order.apply`, run at the end
+# of every `build_report.render`, moves each region to its reading tier.
+#
 # Regions `build_report` inserts against an anchor this skeleton already emits, so
 # they need no empty pair here. Each entry says why, because "it is missing" and
 # "it is deliberately absent" look identical in the output.
@@ -1107,6 +1110,9 @@ SELF_INSERTING = {
     "pc-miss": "conditional — only a session with sim/pc-miss-facts.json gets one; "
                "build_report inserts it before the round-replay region's BEGIN marker, "
                "or before the footer anchor when there is no replay, after finesse-placements",
+    "practice": "conditional — only a session with BOTH sim/pc-miss-facts.json and "
+                "sim/finesse-facts.json gets one; build_report inserts it before the footer "
+                "anchor and report_order.apply moves it under 建議",
     "round-replay": "conditional — only a session with sim/replay-facts.json AND a round "
                     "`_intense_round` selects gets one; build_report inserts it before the "
                     "footer anchor, after openers",
