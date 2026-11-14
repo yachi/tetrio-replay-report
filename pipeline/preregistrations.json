@@ -6,7 +6,7 @@
     "hypothesis": "paired AUC, winner vs loser, of rows cleared per piece over locks whose PRE-lock board carries at least one garbage row, over the verified prefix; one-sided, winner higher",
     "estimand_entry": "pipeline/sim/board-metrics.ts",
     "board_source": "runCaseOracle",
-    "pinned_commit": "4d028f642e281845a623c915e2e9a3f2babc49c3",
+    "pinned_commit": "58af1888bb54bb31cc11dd765624fb0dfc683d93",
     "pinned_on": "2026-11-14",
     "unblinding": [
       "CLAUDE.md publishes the UNCONDITIONAL per-piece DS paired AUC for both banked sessions (08-09: 66.0, 08-14: 70.2). That is not the registered estimand — the registered one conditions on garbage being on the pre-lock board — but the two are correlated, so the bank is partially unblinded and the confirmatory test must be reported as such.",
@@ -100,6 +100,13 @@
         "why": "Speed: the TS engine was most of every corpus replay. THE RELEVANT FACT FOR THIS REGISTRATION is that the change is inert: `oracle-native.test.ts` with ORACLE_NATIVE_FULL=1 found the JSON of the Rust result equal to the TS reference's for all 3344 player-rounds, and the JSON of `runCaseOracle`'s result hashed through `verified-prefix.ts` reproduced the previous pin's hashes for all 3344. The closure scan follows TS/JS imports only, so the Rust sources under `oracle-rs/src` are outside it; equivalence to the TS reference is what stands in for them. `board-metrics.ts` is untouched and the registered estimand has still never been computed on a banked session.",
         "pin_from": "1ab94b3e84a71a08552343cb777a69f0b72c1d5a",
         "pin_to": "4d028f642e281845a623c915e2e9a3f2babc49c3"
+      },
+      {
+        "date": "2026-11-14",
+        "what": "`forecast.ts` moved: `bestTspin` returns the `floor` the T stands on, and `localiseMechanism` reads the slot from its roof down to that floor, so a line clear between the T and its floor is the `line-clear` mechanism (it was `access`). All sessions stay classified as they were.",
+        "why": "yachi's T-Spin Forecast rule (a slot and roof built before a line clear makes the spin doable). THE RELEVANT FACT FOR THIS REGISTRATION is that the change is inert: `forecast.ts` is in the closure only through `pairs.ts`, from which `board-metrics.ts` imports `auc`, `exactSignP` and `decideWinner`, none of which calls into `forecast.ts`; and every session's `forecast-facts.json` re-emitted byte-identical under the change. `board-metrics.ts` is untouched and the registered estimand has still never been computed on a banked session.",
+        "pin_from": "4d028f642e281845a623c915e2e9a3f2babc49c3",
+        "pin_to": "58af1888bb54bb31cc11dd765624fb0dfc683d93"
       }
     ]
   }
