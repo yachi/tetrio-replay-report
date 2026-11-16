@@ -52,6 +52,7 @@ import { H, detectTSpin } from './sim.ts';
 import type { SimResult } from './sim.ts';
 import type { Board, ActivePiece } from './vendor/core/srs.ts';
 import { tryMove, tryRotate, hardDrop, getPieceCells } from './vendor/core/srs.ts';
+import { nativeBestTspin } from './forecast-native.ts';
 
 /**
  * Was any line-clearing T-spin ALREADY available on this board?
@@ -125,7 +126,34 @@ export function withBfsTrace<T>(fn: () => T): { value: T; trace: BfsTrace } {
   try { return { value: fn(), trace: t }; } finally { trace = outer; }
 }
 
+/**
+ * The search runs in Rust (`forecast-native.ts`, `pipeline/sim/forecast-rs`) unless FORECAST_NATIVE=off,
+ * the board is not 40 × 10, or `withBfsTrace` is on: the trace reads the TS search's own queue, so a
+ * traced call runs `bestTspinTs`, the reference. `forecast-native.test.ts` holds the two equal, and
+ * `mutate-forecast.ts` patches `bestTspinTs` and runs its suite with FORECAST_NATIVE=off.
+ */
+const NATIVE = process.env.FORECAST_NATIVE !== 'off';
+let boardLog: ((board: Board) => void) | null = null;
+
+/** Run `fn` handing every board `bestTspin` is asked about to `log`. Scoped; the only reader is
+ *  `forecast-native.test.ts`, which compares the two searches on exactly those boards. */
+export function withBestTspinBoards<T>(log: (board: Board) => void, fn: () => T): T {
+  const outer = boardLog;
+  boardLog = log;
+  try { return fn(); } finally { boardLog = outer; }
+}
+
 export function bestTspin(board: Board): { lines: number; rows: number[]; floor: number } | null {
+  if (boardLog) boardLog(board);
+  if (NATIVE && !trace) {
+    const r = nativeBestTspin(board);
+    if (r !== undefined) return r;
+  }
+  return bestTspinTs(board);
+}
+
+/** The TS reference of `bestTspin`. */
+export function bestTspinTs(board: Board): { lines: number; rows: number[]; floor: number } | null {
   let best = 0, bestRows: number[] = [], bestFloor = H;
   const spawn: ActivePiece = { type: 'T', rotation: 0, col: 3, row: 18 };
   // Uint32 wraps after 4.29e9 boards; restarting from 1 over a zeroed table keeps the

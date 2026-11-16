@@ -4355,6 +4355,19 @@ TS engine. The import-closure scanners (`oracle-cache.test.ts`, `check_preregist
 imports only; the crate's sources are covered by the cache's tree hash, not by those walks. The speed-up
 was measured once, on 2026-11-14, and is not quoted here.
 
+**`forecast.ts`'s T-spin search runs in Rust too** (since 2026-11-16): `bestTspin` calls
+`pipeline/sim/forecast-rs` through bun:ffi (`forecast-native.ts`, built on first use when stale; CI builds
+it in the typescript job), the same BFS — spawn, move order, the 40000 cap, the two dedup keys, the first
+strictly better spin winning, `rows` and `floor` — on a bitboard. `bestTspinTs` stays the reference:
+`FORECAST_NATIVE=off` selects it, a board that is not 40 × 10 falls back to it, and so does every call
+under `withBfsTrace`, whose queue figures are the TS search's own. `mutate-forecast.ts` patches
+`bestTspinTs`, so it runs its suite with `FORECAST_NATIVE=off`; without that every BFS mutant survives.
+`forecast-native.test.ts` holds the two answers equal as JSON on every board the metric asks about
+(collected through `withBestTspinBoards`): all of 2026-10-20 and a fixed sample by default, every
+player-round with `FORECAST_NATIVE_FULL=1`, which the weekly run sets. Every `forecast-facts.json` re-emitted
+byte-identical under the port; `forecast-events.json` hashes the port's two files beside `forecast.ts`, so
+only its md5 line moved. The speed-up was measured once, on 2026-11-16, and is not quoted here.
+
 ## 定式路線頁（迷走砲、はちみつ砲、山岳積み2号、stick spin、ガムシロ積み（兩個版本）、SDPC Spin）— the opener route pages, quarantined like the replays
 
 Six opener pages are transcribed and matched against the corpus — five from shiwehi.com, 迷走砲
