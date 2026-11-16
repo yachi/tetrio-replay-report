@@ -390,6 +390,8 @@ pub struct Engine<'o> {
     fatal: Option<Fatal>,
     /// emit-replay.ts's instrumentation (src/trace.rs); None everywhere but `trace::run_traced`.
     pub(crate) trace: Option<Box<crate::trace::Trace>>,
+    /// emit-attack-facts.ts's and emit-finesse-facts.ts's reads (src/facts.rs); None but in `facts_run`.
+    pub(crate) facts: Option<Box<crate::facts::FactsTrace>>,
 }
 
 impl<'o> Engine<'o> {
@@ -427,6 +429,7 @@ impl<'o> Engine<'o> {
             pre_tick: None,
             fatal: None,
             trace: None,
+            facts: None,
         };
         // init(): the first piece has no previous falling piece to inherit from
         e.next_piece_first()?;
@@ -663,6 +666,7 @@ impl<'o> Engine<'o> {
         }
         // falling.new, emitted at the end of initiatePiece
         if is_hold { if let Some(t) = self.trace.as_mut() { t.on_hold(); } }
+        if let Some(t) = self.facts.as_mut() { t.on_new(is_hold); }
         Ok(())
     }
 
@@ -788,6 +792,8 @@ impl<'o> Engine<'o> {
         if pc && self.o.allclears { events.push((self.o.allclear_garbage * self.gmult.get()).floor()); }
         let mut garbage: Vec<f64> = events.into_iter().filter(|&v| v > 0.0).collect();
         if let Some(t) = self.trace.as_mut() { t.attack = garbage.iter().fold(0.0, |a, &b| a + b); }
+        // falling.lock.pre's reads: nothing below changes the piece, its keys or the soft-drop flag before it
+        if let Some(t) = self.facts.as_mut() { t.on_lock_pre(f.sym, &placed, self.state & ACTION_SOFTDROP != 0, garbage.clone()); }
         if lines > 0.0 {
             self.last_was_clear = true;
             while !garbage.is_empty() {
@@ -848,6 +854,9 @@ impl<'o> Engine<'o> {
             t.on_lock(&self.board, self.frame, f.sym, lines, spin, sent, garbage_cleared, allclear, topout, tag);
             self.trace = Some(t);
         }
+        if let Some(t) = self.facts.as_mut() {
+            t.on_lock(lines, spin, js_max(self.b2b, 0.0), js_max(self.combo, 0.0), garbage_cleared, allclear);
+        }
         if topout { self.topout = true; }
         Ok(())
     }
@@ -897,6 +906,7 @@ impl<'o> Engine<'o> {
 
     fn keydown(&mut self, sub: f64, key: u8, hoisted: bool) -> Result<(), Throw> {
         self.process_subframe(sub)?;
+        if let Some(t) = self.facts.as_mut() { t.on_key(key, self.o.allow180); }
         match key {
             0 | 1 => {
                 let das = if hoisted { self.o.das - self.o.dcd } else { 0.0 };
@@ -1043,7 +1053,7 @@ fn dead(o: &Opts) -> (Engine<'_>, RunOut) {
         last_shift: -1.0, soft_drop: false, gravity: Increase::new(0.0, 0.0, 0.0), gmult: Increase::new(0.0, 0.0, 0.0),
         gcap: Increase::new(0.0, 0.0, 0.0), garbage: GarbageQueue::new(o), ige: Ige { players: Vec::new(), iid: 0.0 },
         targets: Vec::new(), locks: Vec::new(), garbage_events: Vec::new(), topout: true, pre_tick: None, fatal: None,
-        trace: None,
+        trace: None, facts: None,
     };
     (e, RunOut { engine_snaps: Vec::new(), n_snaps: 0, threw: true })
 }

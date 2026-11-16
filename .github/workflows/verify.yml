@@ -1309,6 +1309,8 @@ jobs:
       # two equal; on the weekly schedule it compares every player-round instead of a sample.
       # emit-replay.ts's runPlayer goes through the same crate (src/trace.rs, replay-native.ts;
       # REPLAY_NATIVE=off selects the TS one), and replay-native.test.ts holds the two equal the same way.
+      # So do the attack and finesse emitters' engine runs (src/facts.rs, facts-native.ts;
+      # ATTACK_NATIVE=off / FINESSE_NATIVE=off), held equal by attack-native.test.ts and finesse-native.test.ts.
       - name: Build the native oracle
         run: |
           set -euo pipefail
@@ -1329,7 +1331,7 @@ jobs:
       - name: Run the simulator test suite
         run: |
           set -euo pipefail
-          if [ "$GITHUB_EVENT_NAME" = schedule ]; then export ORACLE_CACHE=off ORACLE_NATIVE_FULL=1 FORECAST_NATIVE_FULL=1 REPLAY_NATIVE_FULL=1; fi
+          if [ "$GITHUB_EVENT_NAME" = schedule ]; then export ORACLE_CACHE=off ORACLE_NATIVE_FULL=1 FORECAST_NATIVE_FULL=1 REPLAY_NATIVE_FULL=1 ATTACK_NATIVE_FULL=1 FINESSE_NATIVE_FULL=1; fi
           REPLAY_DIR=sessions/2026-07-22 bun test --parallel
 
   # The HAND-WRITTEN spec. Distinct from the `verify` job, which checks the GENERATED per-session

@@ -42,6 +42,7 @@ import { loadCases, replayDir } from './verified-prefix.ts';
 import { createEngine } from './vendor/teto/create-engine.mjs';
 import { TL_DEFAULTS } from './oracle-source.ts';
 import { SHAPES } from './emit-replay.ts';
+import { runFactsNative } from './facts-native.ts';
 
 /** Input names, as printed: the engine's key name → the arrow the section draws. */
 export const MOVE = {
@@ -126,10 +127,44 @@ export type Piece = {
 export type Mutant = { scoreSoftDrop?: boolean; softDropOnPress?: boolean };
 const ACTION_SOFTDROP = 4096; // engine/constants flags.ACTION_SOFTDROP, as TETR.IO's client
 
-export function runRound(c: any, tables: Map<string, Table>, mutant: Mutant = {}) {
-  const player = c.rawPlayer, o = player.replay.options;
+/** One lock's record from the reads of `falling.lock.pre` and the keys pressed on the piece. */
+function pieceOf(i: number, tables: Map<string, Table>, mutant: Mutant,
+                 pre: { piece: string; keys: number; cells: [number, number][]; softDropFlag: boolean }, own: string[]): Piece {
+  const t = tables.get(pre.piece)!.get(shapeKey(pre.cells));
+  const sd = mutant.softDropOnPress ? own.includes('softDrop') : pre.softDropFlag;
+  const scored = t !== undefined && (!sd || !!mutant.scoreSoftDrop);
+  const excess = scored ? Math.max(0, pre.keys - t!.cost) : 0;
+  const { shape, col } = placementOf(pre.piece, pre.cells);
+  return { i, piece: pre.piece, shape, col, keys: pre.keys, target: t?.cost ?? null, scored, excess,
+    moves: own.filter(k => k in MOVE).map(k => (MOVE as any)[k]) };
+}
+
+const engineOf = (c: any) => {
+  const o = c.rawPlayer.replay.options;
   const players = c.rawRound.map((p: any) => ({ gameid: p.replay.options.gameid, userid: p.id, username: p.username }));
-  const eng: any = createEngine({ ...TL_DEFAULTS, ...o, g: o.g ?? TL_DEFAULTS.g }, o.gameid, players);
+  return createEngine({ ...TL_DEFAULTS, ...o, g: o.g ?? TL_DEFAULTS.g }, o.gameid, players) as any;
+};
+
+/** The Rust engine (`facts-native.ts`) unless FINESSE_NATIVE=off, which keeps the TS engine
+ *  (`runRoundTs`) as the reference; `finesse-native.test.ts` holds the two equal. The finesse table is
+ *  built from a TS engine's own Tetromino and kicks either way. */
+export function runRound(c: any, tables: Map<string, Table>, mutant: Mutant = {}): Piece[] {
+  return process.env.FINESSE_NATIVE === 'off' ? runRoundTs(c, tables, mutant) : runRoundNative(c, tables, mutant);
+}
+
+export function runRoundNative(c: any, tables: Map<string, Table>, mutant: Mutant = {}): Piece[] {
+  if (!tables.size) { const eng = engineOf(c); for (const s of 'IJLOSTZ') tables.set(s, finesseTable(eng, s)); }
+  const { locks, threw } = runFactsNative(c.rawPlayer, c.rawPlayer.replay.frames);
+  // the TS loop has no catch: an engine throw ends the emitter, so it ends this one too
+  if (threw) throw new Error(`emit-finesse-facts: the engine threw in ${c.file} r${c.round}`);
+  return locks.map((l, i) => pieceOf(i, tables, mutant,
+    { piece: l.piece, keys: l.keys, cells: l.cells, softDropFlag: l.softDrop }, l.own));
+}
+
+/** The TS reference: the vendored Triangle engine and its `falling.*` listeners. */
+export function runRoundTs(c: any, tables: Map<string, Table>, mutant: Mutant = {}): Piece[] {
+  const player = c.rawPlayer;
+  const eng: any = engineOf(c);
   if (!tables.size) for (const s of 'IJLOSTZ') tables.set(s, finesseTable(eng, s));
   // `res.keysPresses` holds only the current frame's keys (the engine flushes its cache every tick),
   // so the cache is replaced after every tick by an array that also records into the piece's list.
@@ -150,13 +185,7 @@ export function runRound(c: any, tables: Map<string, Table>, mutant: Mutant = {}
   });
   const pieces: Piece[] = [];
   eng.events.on('falling.lock', () => {
-    const t = tables.get(pre.piece)!.get(shapeKey(pre.cells));
-    const sd = mutant.softDropOnPress ? own.includes('softDrop') : pre.softDropFlag;
-    const scored = t !== undefined && (!sd || !!mutant.scoreSoftDrop);
-    const excess = scored ? Math.max(0, pre.keys - t!.cost) : 0;
-    const { shape, col } = placementOf(pre.piece, pre.cells);
-    pieces.push({ i: pieces.length, piece: pre.piece, shape, col, keys: pre.keys, target: t?.cost ?? null, scored, excess,
-      moves: own.filter(k => k in MOVE).map(k => (MOVE as any)[k]) });
+    pieces.push(pieceOf(pieces.length, tables, mutant, pre, own));
     own = [];
   });
   const byFrame = new Map<number, any[]>();
