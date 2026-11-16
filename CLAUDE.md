@@ -4356,10 +4356,21 @@ vendored engine. **`emit-replay.ts`'s `runPlayer` runs through the same crate to
 as `oracle-native.ts` does. `runPlayerTs` stays the reference; `REPLAY_NATIVE=off` selects it.
 `replay-native.test.ts` holds the two return values equal as JSON, key order included (all of 2026-10-20 and
 a fixed stride elsewhere by default, every player-round with `REPLAY_NATIVE_FULL=1`, which the weekly run
-sets). Every other engine an emitter builds directly (the attack, finesse and opener emitters, the route and
+sets). **So do the attack and finesse emitters' engine runs** (since 2026-11-16): `oracle-rs/src/facts.rs`
+records per lock what their listeners read (the piece, `falling.keys`, its cells and the soft-drop flag at
+`falling.lock.pre`; lines, spin, b2b, combo, `garbageCleared`, the Perfect Clear and `rawGarbage`; the keys
+pressed on the piece), `facts-native.ts` decodes it, and each emitter's `runRound` builds its records from
+it with its own TS rules (classify, split, the finesse table, which a TS engine still builds). `runRoundTs`
+stays the reference in each; `ATTACK_NATIVE=off` / `FINESSE_NATIVE=off` selects it.
+`attack-native.test.ts` and `finesse-native.test.ts` hold the two equal as JSON (the finesse one under
+both mutants too): all of 2026-10-20 and a fixed stride elsewhere by default, every player-round with
+`ATTACK_NATIVE_FULL=1` / `FINESSE_NATIVE_FULL=1`, which the weekly run sets. Every `attack-facts.json`
+and `finesse-facts.json` re-emitted byte-identical under the port; nothing committed hashes the files it
+touched. The native path throws where the TS listener's checks would have ended the round silently
+inside the engine's catch. Every other engine an emitter builds directly (the opener emitter, the route and
 technique demo planners, cc-selfplay) is still the TS engine. The import-closure scanners (`oracle-cache.test.ts`, `check_preregistrations`) follow TS/JS
-imports only; the crate's sources are covered by the cache's tree hash, not by those walks. The speed-up
-was measured once, on 2026-11-14, and is not quoted here.
+imports only; the crate's sources are covered by the cache's tree hash, not by those walks. Both speed-ups (the oracle's on 2026-11-14, the attack and
+finesse runs' on 2026-11-16) were measured once and are not quoted here.
 
 **`forecast.ts`'s T-spin search runs in Rust too** (since 2026-11-16): `bestTspin` calls
 `pipeline/sim/forecast-rs` through bun:ffi (`forecast-native.ts`, built on first use when stale; CI builds

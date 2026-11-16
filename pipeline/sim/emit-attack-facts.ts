@@ -37,6 +37,7 @@ import { basename } from 'node:path';
 import { loadCases, replayDir, type Case } from './verified-prefix.ts';
 import { createEngine } from './vendor/teto/create-engine.mjs';
 import { TL_DEFAULTS } from './oracle-source.ts';
+import { runFactsNative } from './facts-native.ts';
 import { WINDOW_PIECES } from './opener-window.ts';
 
 /** Clear classes, in print order, each with the replay counter that anchors its count and the
@@ -105,14 +106,44 @@ const emptyWindow = (): Window => ({
   classes: Object.fromEntries(CLASSES.map(c => [c.key, { n: 0, attack: 0 }])), components: zeroComponents(),
 });
 
-/** One player-round through the engine: every lock's raw attack, class and components. */
-export function runRound(c: Case) {
+type Lock = { i: number; cls: ClassKey | null; lines: number; raw: number; gar: number; parts: Components };
+
+/** One player-round through the engine: every lock's raw attack, class and components. The Rust engine
+ *  (`facts-native.ts`) unless ATTACK_NATIVE=off, which keeps the TS engine (`runRoundTs`) as the
+ *  reference; `attack-native.test.ts` holds the two equal. */
+export function runRound(c: Case): Lock[] {
+  return process.env.ATTACK_NATIVE === 'off' ? runRoundTs(c) : runRoundNative(c);
+}
+
+/** `runRoundTs` on the Rust engine's per-lock reads. The checks the TS listener makes throw here too,
+ *  but loudly: inside the TS engine's tick they would end the round as its catch does. No surge check:
+ *  `encodeOpts` refuses b2bcharging, the only rule that surges. */
+export function runRoundNative(c: Case): Lock[] {
+  const player = c.rawPlayer;
+  const { locks: native } = runFactsNative(player, player.replay.frames ?? 20000);
+  return native.map((res, k) => {
+    const i = k + 1;
+    const g = res.rawGarbage;
+    const raw = g.reduce((a, b) => a + b, 0);
+    if (!Number.isInteger(res.garbageCleared)) throw new Error(`emit-attack-facts: no garbageCleared in ${c.file} r${c.round} lock ${i}`);
+    if (res.lines === 0) {
+      if (raw !== 0) throw new Error(`emit-attack-facts: attack without a clear in ${c.file} r${c.round} lock ${i}`);
+      return { i, cls: null, lines: 0, raw: 0, gar: 0, parts: zeroComponents() };
+    }
+    const cls = classify(res.lines, res.spin);
+    const pc = res.allclear ? g[g.length - 1]! : 0;
+    return { i, cls, lines: res.lines, raw, gar: res.garbageCleared, parts: split(cls, res.lines, res.b2b, res.combo, raw, pc) };
+  });
+}
+
+/** The TS reference: the vendored Triangle engine and its `falling.lock` listener. */
+export function runRoundTs(c: Case): Lock[] {
   const player = c.rawPlayer, o = player.replay.options;
   const players = c.rawRound!.map((p: any) => ({ gameid: p.replay.options.gameid, userid: p.id, username: p.username }));
   const eng: any = createEngine({ ...TL_DEFAULTS, ...o, g: o.g ?? TL_DEFAULTS.g }, o.gameid, players);
   const byFrame = new Map<number, any[]>();
   for (const e of player.replay.events) { if (!byFrame.has(e.frame)) byFrame.set(e.frame, []); byFrame.get(e.frame)!.push(e); }
-  const locks: { i: number; cls: ClassKey | null; lines: number; raw: number; gar: number; parts: Components }[] = [];
+  const locks: Lock[] = [];
   eng.events.on('falling.lock', (res: any) => {
     const i = locks.length + 1;
     const g = (res.rawGarbage ?? []) as number[];
