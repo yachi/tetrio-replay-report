@@ -504,6 +504,20 @@ jobs:
             python3 -m pipeline.check_pc_miss_section "$W" --selftest
           fi
 
+      # C-Spin 冇砌, the eighth quarantined section: holes one cell short of a C-Spin slot that
+      # cold-clear, given the round's own pieces and garbage, turned into a C-Spin and the player did
+      # not, from sim/cspin-miss-facts.json. The region must be exactly a re-render with
+      # cspin_miss_section.REQUIRED and no badge; the gate recounts every tally from the windows and
+      # reads each case's first move back off the replay. --selftest plants each corruption.
+      - name: Check the simulator-derived cspin-miss section
+        run: |
+          set -euo pipefail
+          W="sessions/${{ matrix.session }}/report"
+          python3 -m pipeline.check_cspin_miss_section "$W"
+          if python3 -c "import json,sys; sys.exit(0 if json.load(open('sessions/${{ matrix.session }}/sim/cspin-miss-facts.json'))['cases'] else 1)" 2>/dev/null; then
+            python3 -m pipeline.check_cspin_miss_section "$W" --selftest
+          fi
+
       # 練習卡, the seventh quarantined section: each player's first card of 行錯咗嗰一步 and of
       # finesse, picked by rule and placed under 建議. The region must be exactly a re-render, carry
       # practice_section.REQUIRED and no badge, and every card must be byte-identical to one its
@@ -1149,6 +1163,9 @@ jobs:
 
       - name: Check the pc-miss page audit catches its corruptions
         run: python3 -m pipeline.pc_miss_page --selftest
+
+      - name: Check the cspin-miss page audit catches its corruptions
+        run: python3 -m pipeline.cspin_miss_page --selftest
 
       # 影片實戰例子: boards read off one match video (pipeline/openers/video-examples.json), drawn on
       # the DPC page and on each technique page beside the source drawings, never in any count. The

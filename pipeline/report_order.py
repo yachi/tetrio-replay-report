@@ -42,7 +42,7 @@ PRODUCER = "pipeline/build_report.py"
 # (key, nav label, separator label, region names in reading order)
 TIERS = (
     ("tonight", "今晚 30 秒", "今晚 30 秒", ("hero", "moments", "matches", "video")),
-    ("practise", "練乜", "練乜", ("coaching", "practice", "pc-miss", "finesse-placements",
+    ("practise", "練乜", "練乜", ("coaching", "practice", "pc-miss", "cspin-miss", "finesse-placements",
                                   "routes-techniques")),
     ("why", "點解", "點解", ("stats", "app", "attack-sources", "intense-round", "round-replay",
                              "records", "perfect-clear")),

@@ -1110,6 +1110,9 @@ SELF_INSERTING = {
     "pc-miss": "conditional — only a session with sim/pc-miss-facts.json gets one; "
                "build_report inserts it before the round-replay region's BEGIN marker, "
                "or before the footer anchor when there is no replay, after finesse-placements",
+    "cspin-miss": "conditional — only a session with sim/cspin-miss-facts.json gets one; "
+                  "build_report inserts it before the round-replay region's BEGIN marker, "
+                  "or before the footer anchor when there is no replay, after pc-miss",
     "practice": "conditional — only a session with BOTH sim/pc-miss-facts.json and "
                 "sim/finesse-facts.json gets one; build_report inserts it before the footer "
                 "anchor and report_order.apply moves it under 建議",
