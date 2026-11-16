@@ -5511,6 +5511,18 @@ page moved. Measured on 2026-10-20 by re-running the own-design emitter and by t
 first 100 candidates against a scratch copy of the old file, with identical results; the timings were not committed
 anywhere, so re-measure rather than quote one.
 
+**A cache miss is answered by Rust (since 2026-11-16).** `searchAll` hands the whole BFS to
+`pipeline/sim/oracle-rs/src/reach.rs` (its own extern fns in the oracle crate, loaded by `reach-native.ts`, which
+builds the crate on first use when stale) whenever `nativeEligible` says the engine is one it ports: SRS+ kicks,
+the 「T-spins」 rule, a 10 × 40 board. The start state is still the TS engine's own `initiatePiece`, passed in;
+anything else, and `REACH_NATIVE=off`, runs the TS search, which stays the reference. `reach-native.test.ts` holds
+the two equal as JSON (placements in discovery order, paths, spins, dedup) on every query the demo planners ask
+(two openers and two techniques by default, every planner with `REACH_NATIVE_FULL=1`, which the weekly run sets)
+and on generated ragged boards with and without the 180 edge; it prints its counts. The oracle-image job runs its
+reach() callers with `REACH_NATIVE=off`, because it builds no crate. Every demo artefact re-emitted with only its
+`planner_md5` (or `route_demos_md5`) lines moved. The speed-up was measured once, by hand, on 2026-11-16, and is
+not quoted here.
+
 **A second implementation behind the own designs, for REACHABILITY only: the original cold-clear (since 2026-10-20).** `cutcopy-own-cc.test.ts` decodes
 every published demo from empty and, on the board just before the stood T and before the follow-up T, asks the `cc-oracle` binary
 (`CC_ORACLE_MOVES=1`, `find_moves` ZeroGComplete, `cross-movegen`'s protocol) whether that exact T placement is reachable, then
