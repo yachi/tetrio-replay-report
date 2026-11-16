@@ -434,9 +434,13 @@ process.on('exit', restore);
 for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP'] as const) process.on(sig, () => { restore(); process.exit(130); });
 process.on('uncaughtException', e => { restore(); console.error(e); process.exit(1); });
 
+// The mutants patch the TS search (`bestTspinTs`); the default `bestTspin` runs the Rust port, which
+// no patch here reaches. So the suite runs on the TS reference, or every BFS mutant would survive.
+const ENV = { ...process.env, FORECAST_NATIVE: 'off' };
+
 // baseline must be green, or every mutant "dies" for the wrong reason
 try {
-  execSync(`bun test ${TESTS.join(' ')}`, { stdio: 'pipe' });
+  execSync(`bun test ${TESTS.join(' ')}`, { stdio: 'pipe', env: ENV });
 } catch {
   console.error('BASELINE IS RED — fix the suite before mutating.');
   process.exit(1);
@@ -472,7 +476,7 @@ for (const m of MUTANTS) {
   writeFileSync(SRC, mutated);
   onDisk = mutated;
   let killed = false;
-  try { execSync(`bun test ${TESTS.join(' ')}`, { stdio: 'pipe' }); }
+  try { execSync(`bun test ${TESTS.join(' ')}`, { stdio: 'pipe', env: ENV }); }
   catch { killed = true; }
 
   const observed: Verdict = killed ? 'killed' : 'survived';

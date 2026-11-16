@@ -2,7 +2,7 @@
  "schema": "forecast-events/1",
  "report_eligible": false,
  "note": "Every T-spin Forecast forecastMetric counts (isVerifiedForecast) inside the verified prefix, one row each. Simulator output: one engine, no second implementation, so no claim id.",
- "md5": "0e16166e6150426c645503a2e95bb79e",
+ "md5": "82e365c2b647dbb9d7dfe4efcbd654b4",
  "events": [
   {
    "session": "2026-07-22",

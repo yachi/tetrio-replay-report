@@ -21,7 +21,7 @@ pub struct Out { data: Vec<f64> }
 
 fn b(x: f64) -> bool { x != 0.0 }
 
-fn opts_from(v: &[f64]) -> Option<Opts> {
+pub(crate) fn opts_from(v: &[f64]) -> Option<Opts> {
     if v.len() != OPTS_LEN { return None; }
     let mut i = 0usize;
     let mut n = || { let x = v[i]; i += 1; x };
@@ -47,7 +47,7 @@ fn key_of(x: f64) -> Option<u8> {
     if x >= 0.0 && x <= 255.0 && x.fract() == 0.0 { Some(x as u8) } else { None }
 }
 
-fn events_from(v: &[f64], max_frame: f64) -> Option<Vec<Vec<Ev>>> {
+pub(crate) fn events_from(v: &[f64], max_frame: f64) -> Option<Vec<Vec<Ev>>> {
     let n_frames = if max_frame < 0.0 { 0 } else { max_frame as usize + 1 };
     let mut frames: Vec<Vec<Ev>> = (0..n_frames).map(|_| Vec::new()).collect();
     let mut i = 0usize;

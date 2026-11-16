@@ -1324,10 +1324,26 @@ jobs:
       # engine is the reference, ORACLE_NATIVE=off selects it). Built here for the same reason, and
       # before the warm step, which replays every case through it. oracle-native.test.ts holds the
       # two equal; on the weekly schedule it compares every player-round instead of a sample.
+      # emit-replay.ts's runPlayer goes through the same crate (src/trace.rs, replay-native.ts;
+      # REPLAY_NATIVE=off selects the TS one), and replay-native.test.ts holds the two equal the same way.
+      # The same library carries the demo planners' reach() search (oracle-rs/src/reach.rs, loaded by
+      # reach-native.ts; REACH_NATIVE=off keeps the TS search). reach-native.test.ts holds the two
+      # equal on the queries the planners ask; on the weekly schedule, on every planner's queries.
+      # So do the attack and finesse emitters' engine runs (src/facts.rs, facts-native.ts;
+      # ATTACK_NATIVE=off / FINESSE_NATIVE=off), held equal by attack-native.test.ts and finesse-native.test.ts.
       - name: Build the native oracle
         run: |
           set -euo pipefail
           cargo build --release --locked --manifest-path pipeline/sim/oracle-rs/Cargo.toml
+
+      # forecast.ts's T-spin search is Rust as well (pipeline/sim/forecast-rs, loaded by
+      # forecast-native.ts; bestTspinTs is the reference, FORECAST_NATIVE=off selects it). Built here
+      # for the same reason as the two above. forecast-native.test.ts holds the two equal on the
+      # boards the metric asks about; on the weekly schedule over every player-round.
+      - name: Build the native forecast search
+        run: |
+          set -euo pipefail
+          cargo build --release --locked --manifest-path pipeline/sim/forecast-rs/Cargo.toml
 
       - name: Warm the oracle cache
         run: bun pipeline/sim/oracle-cache.ts --warm --jobs 4
@@ -1335,7 +1351,7 @@ jobs:
       - name: Run the simulator test suite
         run: |
           set -euo pipefail
-          if [ "$GITHUB_EVENT_NAME" = schedule ]; then export ORACLE_CACHE=off ORACLE_NATIVE_FULL=1; fi
+          if [ "$GITHUB_EVENT_NAME" = schedule ]; then export ORACLE_CACHE=off ORACLE_NATIVE_FULL=1 FORECAST_NATIVE_FULL=1 REPLAY_NATIVE_FULL=1 REACH_NATIVE_FULL=1 ATTACK_NATIVE_FULL=1 FINESSE_NATIVE_FULL=1; fi
           REPLAY_DIR=sessions/2026-07-22 bun test --parallel
 
   # The HAND-WRITTEN spec. Distinct from the `verify` job, which checks the GENERATED per-session
@@ -1575,9 +1591,13 @@ jobs:
       # and full two-line spins (analysis/cutcopy-own.json), and skips the same way without it.
       # route-orders-cc re-queries cold-clear for every route-order DAG edge and requires the committed
       # analysis/sdpcspin-orders-cc.json byte for byte; elsewhere its test 3 skips.
+      # REACH_NATIVE=off: route-orders-cc and cutcopy-own-cc call reach(), whose default is the Rust
+      # search in oracle-rs, and this job builds no Rust crate. The TS search is the reference the
+      # Rust one is held equal to (reach-native.test.ts, typescript job), so the cross-check runs on it.
       - name: Reachability (cross-movegen), kick tables (cross-srs-tables), T-spin rule (cross-tspin), own Cut Copy designs (cutcopy-own-cc) vs cold-clear
         env:
           CC_ORACLE: ./result/bin/cc-oracle
+          REACH_NATIVE: 'off'
         run: bun test pipeline/sim/cross-movegen.test.ts pipeline/sim/cross-srs-tables.test.ts pipeline/sim/cross-tspin.test.ts pipeline/openers/cutcopy-own-cc.test.ts pipeline/openers/route-orders-cc.test.ts
 
   # A pre-registration is a script plus a pinned hash plus a gate, or it is a wish. This repo has

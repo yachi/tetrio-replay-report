@@ -17,7 +17,7 @@ import type { Board } from './vendor/core/srs.ts';
 import type { PieceType } from './vendor/core/types.ts';
 
 const CRATE = join(import.meta.dir, 'oracle-rs');
-const LIB = join(CRATE, 'target/release/liboracle_rs.so');
+export const LIB = join(CRATE, 'target/release/liboracle_rs.so');
 
 /** Piece order of the crate (src/data.rs, from gen-oracle-rs-data.ts): code = index (+1 on a board). */
 const PIECE = ['I', 'J', 'L', 'O', 'S', 'T', 'Z'] as PieceType[];
@@ -43,12 +43,16 @@ const SYMBOLS = {
   oracle_log1p: { args: [FFIType.f64], returns: FFIType.f64 },
 } as const;
 let lib: ReturnType<typeof dlopen<typeof SYMBOLS>>['symbols'] | null = null;
-function L() {
-  if (lib) return lib;
+/** Builds the crate when its library is missing or older than its sources (replay-native.ts shares it). */
+export function buildIfStale() {
   if (stale()) {
     const r = Bun.spawnSync(['cargo', 'build', '--release', '--manifest-path', join(CRATE, 'Cargo.toml')], { stderr: 'pipe' });
     if (r.exitCode !== 0) throw new Error(`cargo build failed:\n${r.stderr.toString()}`);
   }
+}
+function L() {
+  if (lib) return lib;
+  buildIfStale();
   lib = dlopen(LIB, SYMBOLS).symbols;
   return lib;
 }
@@ -61,15 +65,16 @@ const num = (v: unknown, what: string): number =>
   (typeof v === 'number' && Number.isFinite(v) ? v : unsupported(`${what} = ${String(v)}`));
 const is = (v: unknown, want: unknown, what: string) => { if (v !== want) unsupported(`${what} = ${String(v)}`); };
 
-/** The engine options in the crate's `Opts` field order (src/ffi.rs). */
-function encodeOpts(flat: any, maxF: number): Float64Array {
+/** The engine options in the crate's `Opts` field order (src/ffi.rs). `date` is the engine's `misc.date`:
+ *  `runCaseOracle` passes none, so the engine reads the clock; emit-replay.ts passes the replay's own. */
+export function encodeOpts(flat: any, maxF: number, date: Date = new Date()): Float64Array {
   is(flat.kickset, 'SRS+', 'kickset'); is(flat.bagtype, '7-bag', 'bagtype'); is(flat.spinbonuses, 'T-spins', 'spinbonuses');
   is(flat.combotable, 'multiplier', 'combotable'); is(flat.garbagetargetbonus, 'none', 'garbagetargetbonus');
   is(flat.roundmode, 'down', 'roundmode'); is(flat.boardwidth, 10, 'boardwidth'); is(flat.boardheight, 20, 'boardheight');
   if (flat.usebombs) unsupported('usebombs'); if (flat.garbagespecialbonus) unsupported('garbagespecialbonus');
   if (flat.b2bcharging) unsupported('b2bcharging'); if (flat.can_undo) unsupported('can_undo'); if (flat.can_retry) unsupported('can_retry');
-  // createEngine is called without a date, so the engine reads the clock: the 2025-05-06 garbage queue, no opener phase
-  const now = new Date();
+  // the date picks the garbage queue (the 2025-05-06 one) and the opener phase (none after 2025-02-16)
+  const now = date;
   if (!(now > new Date('2025-05-06T15:00:00-04:00')) || now < new Date(2025, 1, 16)) unsupported('date era');
   const h = flat.handling;
   if (h == null || typeof h !== 'object') unsupported('handling');
@@ -95,7 +100,7 @@ function encodeOpts(flat: any, maxF: number): Float64Array {
 }
 
 /** The events the harness hands the engine (integer frames 0..maxF, replay order), as src/ffi.rs reads them. */
-function encodeEvents(events: any[], maxF: number, network: boolean): Float64Array {
+export function encodeEvents(events: any[], maxF: number, network: boolean): Float64Array {
   const out: number[] = [];
   for (const e of events) {
     const f = e.frame;

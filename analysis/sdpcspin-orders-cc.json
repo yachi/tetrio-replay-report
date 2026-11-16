@@ -18,7 +18,7 @@
  "inputs": {
   "routes_md5": "5dc78492640ae47838f55c038425c438",
   "orders_md5": "6947d4cd34b35a79ebf794f6a0fc4e52",
-  "orders_artefact_md5": "18d1facc4e7e3f191c73e96ef2dbd59f",
+  "orders_artefact_md5": "786ffd855f83142803c004b2f6f264c5",
   "cc_emitter_md5": "05542bf5b1955f0193b73ed3f2babbd0"
  },
  "nodes": [

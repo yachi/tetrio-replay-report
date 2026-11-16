@@ -37,8 +37,8 @@
  },
  "inputs": {
   "transcription_md5": "baa922715bf9150a0ab6775fe35fe71a",
-  "planner_md5": "bb8f3569096e8663348322b58fb80c5a",
-  "emit_replay_md5": "8632b959c3070ed7ecaca300ca5b7314",
+  "planner_md5": "901d5953ded5efc041473fb701244087",
+  "emit_replay_md5": "2acf99b059380595cc3fa14df268e8bb",
   "classifier_md5": "d25f3e5b3ebaa3b52b60587e2484026c"
  },
  "board": {

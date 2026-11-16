@@ -4379,10 +4379,40 @@ the reference; `ORACLE_NATIVE=off` selects it, and the oracle cache keys on whic
 and a fixed sample by default, every player-round with `ORACLE_NATIVE_FULL=1`, which the weekly run
 sets), `f64::ln_1p` equal to `Math.log1p` bit for bit on the garbage formula's arguments, and the
 kick and piece tables in `oracle-rs/src/data.rs` equal to what `gen-oracle-rs-data.ts` renders from the
-vendored engine. Engines built directly by the emitters (`emit-replay.ts` and the rest) are still the
-TS engine. The import-closure scanners (`oracle-cache.test.ts`, `check_preregistrations`) follow TS/JS
-imports only; the crate's sources are covered by the cache's tree hash, not by those walks. The speed-up
-was measured once, on 2026-11-14, and is not quoted here.
+vendored engine. **`emit-replay.ts`'s `runPlayer` runs through the same crate too** (since 2026-11-16):
+`oracle-rs/src/trace.rs` records per lock exactly what `instrumentEngine`'s hooks record, and
+`replay-native.ts` decodes it into `runPlayer`'s return value, refusing an unsupported rule set or date era
+as `oracle-native.ts` does. `runPlayerTs` stays the reference; `REPLAY_NATIVE=off` selects it.
+`replay-native.test.ts` holds the two return values equal as JSON, key order included (all of 2026-10-20 and
+a fixed stride elsewhere by default, every player-round with `REPLAY_NATIVE_FULL=1`, which the weekly run
+sets). **So do the attack and finesse emitters' engine runs** (since 2026-11-16): `oracle-rs/src/facts.rs`
+records per lock what their listeners read (the piece, `falling.keys`, its cells and the soft-drop flag at
+`falling.lock.pre`; lines, spin, b2b, combo, `garbageCleared`, the Perfect Clear and `rawGarbage`; the keys
+pressed on the piece), `facts-native.ts` decodes it, and each emitter's `runRound` builds its records from
+it with its own TS rules (classify, split, the finesse table, which a TS engine still builds). `runRoundTs`
+stays the reference in each; `ATTACK_NATIVE=off` / `FINESSE_NATIVE=off` selects it.
+`attack-native.test.ts` and `finesse-native.test.ts` hold the two equal as JSON (the finesse one under
+both mutants too): all of 2026-10-20 and a fixed stride elsewhere by default, every player-round with
+`ATTACK_NATIVE_FULL=1` / `FINESSE_NATIVE_FULL=1`, which the weekly run sets. Every `attack-facts.json`
+and `finesse-facts.json` re-emitted byte-identical under the port; nothing committed hashes the files it
+touched. The native path throws where the TS listener's checks would have ended the round silently
+inside the engine's catch. Every other engine an emitter builds directly (the opener emitter, the route and
+technique demo planners, cc-selfplay) is still the TS engine. The import-closure scanners (`oracle-cache.test.ts`, `check_preregistrations`) follow TS/JS
+imports only; the crate's sources are covered by the cache's tree hash, not by those walks. Both speed-ups (the oracle's on 2026-11-14, the attack and
+finesse runs' on 2026-11-16) were measured once and are not quoted here.
+
+**`forecast.ts`'s T-spin search runs in Rust too** (since 2026-11-16): `bestTspin` calls
+`pipeline/sim/forecast-rs` through bun:ffi (`forecast-native.ts`, built on first use when stale; CI builds
+it in the typescript job), the same BFS — spawn, move order, the 40000 cap, the two dedup keys, the first
+strictly better spin winning, `rows` and `floor` — on a bitboard. `bestTspinTs` stays the reference:
+`FORECAST_NATIVE=off` selects it, a board that is not 40 × 10 falls back to it, and so does every call
+under `withBfsTrace`, whose queue figures are the TS search's own. `mutate-forecast.ts` patches
+`bestTspinTs`, so it runs its suite with `FORECAST_NATIVE=off`; without that every BFS mutant survives.
+`forecast-native.test.ts` holds the two answers equal as JSON on every board the metric asks about
+(collected through `withBestTspinBoards`): all of 2026-10-20 and a fixed sample by default, every
+player-round with `FORECAST_NATIVE_FULL=1`, which the weekly run sets. Every `forecast-facts.json` re-emitted
+byte-identical under the port; `forecast-events.json` hashes the port's two files beside `forecast.ts`, so
+only its md5 line moved. The speed-up was measured once, on 2026-11-16, and is not quoted here.
 
 ## 定式路線頁（迷走砲、はちみつ砲、山岳積み2号、stick spin、ガムシロ積み（兩個版本）、SDPC Spin）— the opener route pages, quarantined like the replays
 
@@ -5520,6 +5550,18 @@ every route demo, technique demo and own-design artefact re-emitted with only it
 page moved. Measured on 2026-10-20 by re-running the own-design emitter and by timing `planOwn` over offset 2's
 first 100 candidates against a scratch copy of the old file, with identical results; the timings were not committed
 anywhere, so re-measure rather than quote one.
+
+**A cache miss is answered by Rust (since 2026-11-16).** `searchAll` hands the whole BFS to
+`pipeline/sim/oracle-rs/src/reach.rs` (its own extern fns in the oracle crate, loaded by `reach-native.ts`, which
+builds the crate on first use when stale) whenever `nativeEligible` says the engine is one it ports: SRS+ kicks,
+the 「T-spins」 rule, a 10 × 40 board. The start state is still the TS engine's own `initiatePiece`, passed in;
+anything else, and `REACH_NATIVE=off`, runs the TS search, which stays the reference. `reach-native.test.ts` holds
+the two equal as JSON (placements in discovery order, paths, spins, dedup) on every query the demo planners ask
+(two openers and two techniques by default, every planner with `REACH_NATIVE_FULL=1`, which the weekly run sets)
+and on generated ragged boards with and without the 180 edge; it prints its counts. The oracle-image job runs its
+reach() callers with `REACH_NATIVE=off`, because it builds no crate. Every demo artefact re-emitted with only its
+`planner_md5` (or `route_demos_md5`) lines moved. The speed-up was measured once, by hand, on 2026-11-16, and is
+not quoted here.
 
 **A second implementation behind the own designs, for REACHABILITY only: the original cold-clear (since 2026-10-20).** `cutcopy-own-cc.test.ts` decodes
 every published demo from empty and, on the board just before the stood T and before the follow-up T, asks the `cc-oracle` binary

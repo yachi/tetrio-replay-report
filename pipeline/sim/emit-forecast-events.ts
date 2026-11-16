@@ -56,7 +56,9 @@ export function build(root = SESSIONS_ROOT) {
     report_eligible: false,
     note: 'Every T-spin Forecast forecastMetric counts (isVerifiedForecast) inside the verified prefix, '
       + 'one row each. Simulator output: one engine, no second implementation, so no claim id.',
-    md5: md5Files([`${import.meta.dir}/forecast.ts`, `${import.meta.dir}/emit-forecast-events.ts`]),
+    // forecast.ts's search runs in Rust by default, so its port is an input too
+    md5: md5Files([`${import.meta.dir}/forecast.ts`, `${import.meta.dir}/emit-forecast-events.ts`,
+                   `${import.meta.dir}/forecast-native.ts`, `${import.meta.dir}/forecast-rs/src/lib.rs`]),
     events,
   };
 }

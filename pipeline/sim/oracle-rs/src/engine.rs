@@ -388,6 +388,10 @@ pub struct Engine<'o> {
     pub topout: bool,
     pre_tick: Option<[[bool; W]; FULL_H]>,
     fatal: Option<Fatal>,
+    /// emit-replay.ts's instrumentation (src/trace.rs); None everywhere but `trace::run_traced`.
+    pub(crate) trace: Option<Box<crate::trace::Trace>>,
+    /// emit-attack-facts.ts's and emit-finesse-facts.ts's reads (src/facts.rs); None but in `facts_run`.
+    pub(crate) facts: Option<Box<crate::facts::FactsTrace>>,
 }
 
 impl<'o> Engine<'o> {
@@ -424,6 +428,8 @@ impl<'o> Engine<'o> {
             topout: false,
             pre_tick: None,
             fatal: None,
+            trace: None,
+            facts: None,
         };
         // init(): the first piece has no previous falling piece to inherit from
         e.next_piece_first()?;
@@ -442,6 +448,7 @@ impl<'o> Engine<'o> {
         }
         let p = self.queue[self.qpos] as usize;
         self.qpos += 1;
+        if let Some(t) = self.trace.as_mut() { t.drawn += 1; }
         p
     }
 
@@ -657,6 +664,9 @@ impl<'o> Engine<'o> {
             }
             if !self.consider_blockout() && self.is_20g() { self.slam_to_floor(); }
         }
+        // falling.new, emitted at the end of initiatePiece
+        if is_hold { if let Some(t) = self.trace.as_mut() { t.on_hold(); } }
+        if let Some(t) = self.facts.as_mut() { t.on_new(is_hold); }
         Ok(())
     }
 
@@ -731,6 +741,7 @@ impl<'o> Engine<'o> {
     /// insertGarbage({amount, size, column}) — rows inserted at the bottom, then
     /// `state.splice(fullHeight - amount - 1, amount)` on the grown array (JS splice semantics).
     fn insert_garbage(&mut self, amount: f64, size: f64, column: Option<f64>) {
+        if let Some(t) = self.trace.as_mut() { t.on_garbage(column, amount, size); }
         self.take_pre_tick();
         let col = column.unwrap_or(0.0); // `x >= null` compares against 0
         let n = amount as usize;
@@ -780,6 +791,9 @@ impl<'o> Engine<'o> {
         if g > 0.0 { events.push((g * self.gmult.get() + 0.0).floor()); }
         if pc && self.o.allclears { events.push((self.o.allclear_garbage * self.gmult.get()).floor()); }
         let mut garbage: Vec<f64> = events.into_iter().filter(|&v| v > 0.0).collect();
+        if let Some(t) = self.trace.as_mut() { t.attack = garbage.iter().fold(0.0, |a, &b| a + b); }
+        // falling.lock.pre's reads: nothing below changes the piece, its keys or the soft-drop flag before it
+        if let Some(t) = self.facts.as_mut() { t.on_lock_pre(f.sym, &placed, self.state & ACTION_SOFTDROP != 0, garbage.clone()); }
         if lines > 0.0 {
             self.last_was_clear = true;
             while !garbage.is_empty() {
@@ -806,6 +820,7 @@ impl<'o> Engine<'o> {
         // falling.lock.pre: the harness reads the piece's cells (still the locked piece) in its y-down frame
         let mut cells = [(0i32, 0i32); 4];
         for i in 0..4 { cells[i] = (placed[i].0 as i32, (FULL_H as f64 - 1.0 - placed[i].1) as i32); }
+        if let Some(t) = self.trace.as_mut() { t.on_lock_pre(self.held, &placed); }
         self.next_piece(false, false)?;
         self.last_spin = None;
         let topout = !legal(&self.board, &self.falling.abs_blocks());
@@ -835,6 +850,13 @@ impl<'o> Engine<'o> {
             b2b: js_max(self.b2b, 0.0), combo: js_max(self.combo, 0.0), garbage_cleared, allclear,
             cells, cleared_rows, snap: -1,
         });
+        if let Some(mut t) = self.trace.take() {
+            t.on_lock(&self.board, self.frame, f.sym, lines, spin, sent, garbage_cleared, allclear, topout, tag);
+            self.trace = Some(t);
+        }
+        if let Some(t) = self.facts.as_mut() {
+            t.on_lock(lines, spin, js_max(self.b2b, 0.0), js_max(self.combo, 0.0), garbage_cleared, allclear);
+        }
         if topout { self.topout = true; }
         Ok(())
     }
@@ -884,6 +906,7 @@ impl<'o> Engine<'o> {
 
     fn keydown(&mut self, sub: f64, key: u8, hoisted: bool) -> Result<(), Throw> {
         self.process_subframe(sub)?;
+        if let Some(t) = self.facts.as_mut() { t.on_key(key, self.o.allow180); }
         match key {
             0 | 1 => {
                 let das = if hoisted { self.o.das - self.o.dcd } else { 0.0 };
@@ -944,6 +967,13 @@ impl<'o> Engine<'o> {
         }
         Ok(())
     }
+
+    /// One harness tick with a fresh pre-tick snapshot (as `run` does), for `trace::run_traced`.
+    pub(crate) fn tick_fresh(&mut self, evs: &[Ev]) -> Result<(), Throw> {
+        self.pre_tick = None;
+        self.tick(evs)
+    }
+    pub(crate) fn take_fatal(&mut self) -> Option<Fatal> { self.fatal.take() }
 
     fn tick(&mut self, evs: &[Ev]) -> Result<(), Throw> {
         self.subframe = 0.0;
@@ -1023,6 +1053,19 @@ fn dead(o: &Opts) -> (Engine<'_>, RunOut) {
         last_shift: -1.0, soft_drop: false, gravity: Increase::new(0.0, 0.0, 0.0), gmult: Increase::new(0.0, 0.0, 0.0),
         gcap: Increase::new(0.0, 0.0, 0.0), garbage: GarbageQueue::new(o), ige: Ige { players: Vec::new(), iid: 0.0 },
         targets: Vec::new(), locks: Vec::new(), garbage_events: Vec::new(), topout: true, pre_tick: None, fatal: None,
+        trace: None, facts: None,
     };
     (e, RunOut { engine_snaps: Vec::new(), n_snaps: 0, threw: true })
+}
+
+/// The first `n_bags` 7-bags the queue deals for `seed`, concatenated (Queue's repopulation order).
+pub(crate) fn bag_sequence(seed: f64, n_bags: usize) -> Vec<u8> {
+    let mut rng = Rng::new(seed);
+    let mut out = Vec::with_capacity(n_bags * 7);
+    for _ in 0..n_bags {
+        let mut b: [u8; 7] = [6, 2, 3, 4, 0, 1, 5];
+        rng.shuffle(&mut b);
+        out.extend_from_slice(&b);
+    }
+    out
 }
