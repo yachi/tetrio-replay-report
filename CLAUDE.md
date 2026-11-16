@@ -4350,8 +4350,14 @@ the reference; `ORACLE_NATIVE=off` selects it, and the oracle cache keys on whic
 and a fixed sample by default, every player-round with `ORACLE_NATIVE_FULL=1`, which the weekly run
 sets), `f64::ln_1p` equal to `Math.log1p` bit for bit on the garbage formula's arguments, and the
 kick and piece tables in `oracle-rs/src/data.rs` equal to what `gen-oracle-rs-data.ts` renders from the
-vendored engine. Engines built directly by the emitters (`emit-replay.ts` and the rest) are still the
-TS engine. The import-closure scanners (`oracle-cache.test.ts`, `check_preregistrations`) follow TS/JS
+vendored engine. **`emit-replay.ts`'s `runPlayer` runs through the same crate too** (since 2026-11-16):
+`oracle-rs/src/trace.rs` records per lock exactly what `instrumentEngine`'s hooks record, and
+`replay-native.ts` decodes it into `runPlayer`'s return value, refusing an unsupported rule set or date era
+as `oracle-native.ts` does. `runPlayerTs` stays the reference; `REPLAY_NATIVE=off` selects it.
+`replay-native.test.ts` holds the two return values equal as JSON, key order included (all of 2026-10-20 and
+a fixed stride elsewhere by default, every player-round with `REPLAY_NATIVE_FULL=1`, which the weekly run
+sets). Every other engine an emitter builds directly (the attack, finesse and opener emitters, the route and
+technique demo planners, cc-selfplay) is still the TS engine. The import-closure scanners (`oracle-cache.test.ts`, `check_preregistrations`) follow TS/JS
 imports only; the crate's sources are covered by the cache's tree hash, not by those walks. The speed-up
 was measured once, on 2026-11-14, and is not quoted here.
 

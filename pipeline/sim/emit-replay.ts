@@ -40,6 +40,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { createEngine } from './vendor/teto/create-engine.mjs';
 import { TL_DEFAULTS } from './oracle-source.ts';
 import { loadCases, replayDir, runCaseOracle, verifiedBoundary } from './verified-prefix.ts';
+import { runPlayerNative } from './replay-native.ts';
 
 export const WIDTH = 10;
 /** Engine board height INCLUDING its 20-row buffer: 20 visible rows + 20 above them. */
@@ -287,8 +288,14 @@ export function instrumentEngine(eng: any) {
   return rec;
 }
 
-/** One player's half of one round, through the engine. */
-export function runPlayer(player: any, roundPlayers: any[], date: Date) {
+/** One player's half of one round, through the engine: the Rust port (replay-native.ts, the same lock
+ *  records, held equal by replay-native.test.ts) unless REPLAY_NATIVE=off, which runs the TS engine. */
+export function runPlayer(player: any, roundPlayers: any[], date: Date): ReturnType<typeof runPlayerTs> {
+  return process.env.REPLAY_NATIVE === 'off' ? runPlayerTs(player, roundPlayers, date) : runPlayerNative(player, roundPlayers, date);
+}
+
+/** One player's half of one round, through the vendored TS engine and `instrumentEngine`: the reference. */
+export function runPlayerTs(player: any, roundPlayers: any[], date: Date) {
   const o = player.replay.options;
   const players = roundPlayers.map((p: any) => ({ gameid: p.replay.options.gameid, userid: p.id, username: p.username }));
   const eng: any = createEngine({ ...TL_DEFAULTS, ...o, g: o.g ?? TL_DEFAULTS.g }, o.gameid, players, date);
