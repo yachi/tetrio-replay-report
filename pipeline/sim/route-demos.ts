@@ -39,6 +39,7 @@ import { instrumentEngine, assertRoundTrip, encodePlace, placeCells, queueStates
          NEXT_SHOWN, WIDTH, ROWS, VISIBLE_ROWS, type Lock } from './emit-replay.ts';
 import { loadRoutes, conditionHolds, initialRowmap, advanceRowmap, md5Files,
          type RouteNode, type Routes } from './route-facts.ts';
+import { nativeEligible, searchNative } from './reach-native.ts';
 import type { RouteProfile, DemoProfile, PieceReading } from './route-profile.ts';
 
 /** A node's rows with the profile's colour readings applied (a cell group drawn in one piece's
@@ -155,15 +156,29 @@ export function reach(eng: any, grid: Grid, piece: string, target: number[], opt
   return (all.get(want) ?? []).map(copyPath);
 }
 
+/** Which search answers a cache miss: the Rust port (`reach-native.ts`, `oracle-rs/src/reach.rs`) by default,
+ *  for an engine it ports (`nativeEligible`); REACH_NATIVE=off keeps the TS one below for every query.
+ *  `reach-native.test.ts` holds the two equal, paths, order and dedup included. */
+const REACH_NATIVE = process.env.REACH_NATIVE !== 'off';
+/** Set by `reach-native.test.ts` to collect the (engine, board, piece, no180) every cache miss asks. */
+export const REACH_QUERIES: {
+  record: ((eng: any, state: (string | null)[][], piece: string, no180: boolean) => void) | null } = { record: null };
+
 /** The whole BFS behind `reach`, for every target at once: per resting placement's cells, the shortest path to
- *  each distinct arrival spin, in the order the search finds them. */
-function searchAll(eng: any, state: (string | null)[][], piece: string, opts: { no180?: boolean })
-  : Map<string, Path[]> {
+ *  each distinct arrival spin, in the order the search finds them. `impl` picks the search (default: the
+ *  REACH_NATIVE rule above). */
+export function searchAll(eng: any, state: (string | null)[][], piece: string, opts: { no180?: boolean },
+                          impl: 'ts' | 'native' | null = null): Map<string, Path[]> {
+  REACH_QUERIES.record?.(eng, state, piece, !!opts.no180);
   eng.board.state = state.map(r => r.map(c => (c ? { mino: c, connections: 0 } : null)));
   eng.held = null;
   eng.initiatePiece(piece.toLowerCase(), true);
   const f = eng.falling;
   const start: St = { x: f.location[0], y: f.location[1], r: f.rotation, spin: null };
+  if (impl === 'native' || (impl === null && REACH_NATIVE && nativeEligible(eng, state))) {
+    if (!nativeEligible(eng, state)) throw new Error('route-demos: the native reach does not port this engine');
+    return searchNative(state, piece, start.x, start.y, start.r, !!opts.no180) as Map<string, Path[]>;
+  }
   const prev = new Map<string, [string | null, Edge | null, St]>();
   prev.set(key(start), [null, null, start]);
   const queue: St[] = [start];

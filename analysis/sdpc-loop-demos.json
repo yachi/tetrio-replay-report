@@ -29,10 +29,10 @@
   "frames_per_input": 4
  },
  "inputs": {
-  "stickspin_demos_md5": "57ca3cdaf45dee4559845ba7bff7a914",
+  "stickspin_demos_md5": "66843bf455fa9e1c0c51f82127fbea22",
   "dpc_setups_md5": "9841c283b049ee578b653492c366cc05",
   "planner_md5": "4e419f21d944d032b1b0bab9dabc67f1",
-  "route_demos_md5": "65d1c4906c3917e2c28126833469faef",
+  "route_demos_md5": "2e362024c9282651da469cf4dfcb8542",
   "emit_replay_md5": "8632b959c3070ed7ecaca300ca5b7314"
  },
  "board": {
