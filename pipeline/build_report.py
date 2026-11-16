@@ -148,6 +148,15 @@ def pc_miss_sec(ctx):
     return pc_miss_section.build(ctx["facts"], ctx["report_dir"])
 
 
+def cspin_miss_sec(ctx):
+    # Quarantined like pc_miss_sec: the SESSION's sim/cspin-miss-facts.json (cold-clear's C-Spins in
+    # holes the player filled), None without one. facts.json supplies only the player order.
+    # Imported here, not at the top: it reads pc_miss_section's palette at import time, and
+    # pc_miss_section sits in an import cycle with this module.
+    from pipeline import cspin_miss_section
+    return cspin_miss_section.build(ctx["facts"], ctx["report_dir"])
+
+
 def practice_sec(ctx):
     # 練習卡: each player's first card of 行錯咗嗰一步 and of finesse, rendered by those two
     # sections' own renderers from the same artefacts. None unless the session has both.
@@ -245,6 +254,9 @@ SECTIONS = [
     # the sixth quarantined section, on the same chain anchor, so it lands after finesse-placements.
     ("pc-miss", ('<!-- BEGIN generated round-replay',
                  '<footer class="report-footer">'), pc_miss_sec, None),
+    # the eighth quarantined section, on the same chain anchor, so it lands after pc-miss.
+    ("cspin-miss", ('<!-- BEGIN generated round-replay',
+                    '<footer class="report-footer">'), cspin_miss_sec, None),
     ("round-replay", '<footer class="report-footer">', replay_sec, None),
     # Anchored anywhere in the body: report_order.apply moves it under 建議.
     ("practice", '<footer class="report-footer">', practice_sec, None),

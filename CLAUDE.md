@@ -516,6 +516,11 @@ REPLAY_DIR=sessions/<date> bun pipeline/sim/pc-miss.ts \
 bun test pipeline/sim/pc-miss.test.ts                           #   every artefact's md5s current + 10-20 rebuilt byte for byte
 python3 -m pipeline.check_pc_miss_section sessions/<date>/report  # CI gate: the pc-miss region (--selftest its mutants)
 python3 -m pipeline.pc_miss_page --selftest     # the docs/pc-miss.html audit's mutants (--out-dir <dir> renders)
+REPLAY_DIR=sessions/<date> bun pipeline/sim/cspin-miss.ts \
+  --cc <cold-clear jsonl> --out sessions/<date>/sim/cspin-miss-facts.json  # C-Spin 冇砌 (quarantined; --windows lists cold-clear's inputs)
+bun test pipeline/sim/cspin-miss.test.ts                        #   every artefact rebuilt byte for byte from its committed cold-clear steps
+python3 -m pipeline.check_cspin_miss_section sessions/<date>/report  # CI gate: the cspin-miss region (--selftest its mutants)
+python3 -m pipeline.cspin_miss_page --selftest  # the docs/cspin-miss.html audit's mutants (--out-dir <dir> renders)
 bun test pipeline/sim/pc-solver.test.ts                         #   the PC solver's rules + engine movegen ⊇ SRS movegen
 bun test pipeline/sim/pc-solver-native.test.ts pipeline/sim/pc-engine-gen-native.test.ts  #   the Rust solver == the TS one (sampled; PC_NATIVE_FULL=1)
 python3 -m pipeline.check_attack_section sessions/<date>/report  # CI gate: the attack-sources region
@@ -4084,7 +4089,7 @@ nothing at all.
 
 Since 2026-11-14 (yachi agreed to Fable's re-ordering), a report reads in four tiers, and
 `pipeline/report_order.py`'s `TIERS` is the ONE place the order lives: 今晚 30 秒 (hero, 三件事,
-戰況, 影片), 練乜 (建議, 練習卡, 行錯咗嗰一步, finesse, 定式路線同中盤手法), 點解 (數據對決, 每粒攻擊,
+戰況, 影片), 練乜 (建議, 練習卡, 行錯咗嗰一步, C-Spin 冇砌, finesse, 定式路線同中盤手法), 點解 (數據對決, 每粒攻擊,
 攻擊由邊度嚟, 最癲一局 and its replay, 全場之最, 全消) and 參考 (逐局全數據, T-Spin Forecast, C-Spin 同
 DT 砲, 證明附錄). `report_order.apply` runs at the end of every `build_report.render`: it cuts each
 region out of the body (from the first region to the footer), puts them back in tier order with one
@@ -4265,6 +4270,30 @@ replays `pc-solver.ts`'s hold rule from the miss's own hand, refusing a step the
 frames ride in the figure's `data-frames` and one inline script (`SCRIPT`, nodes built, no markup sink)
 steps them, with the numbered board as frame 0 so a page without JavaScript is unchanged. The
 `check_pc_miss_section --selftest` held-flag mutant must be refused by that hand replay itself.
+
+## C-Spin 冇砌 — holes cold-clear turned into a C-Spin and the player did not
+
+`pipeline/sim/cspin-miss.ts` → `sessions/<date>/sim/cspin-miss-facts.json` → `pipeline/cspin_miss_section.py`
+(region `cspin-miss`, in `SELF_INSERTING`, placed after pc-miss in the 練乜 tier), gated by
+`check_cspin_miss_section.py`, rolled up into `docs/cspin-miss.html` by `pipeline/cspin_miss_page.py` (a 中盤手法
+card). Asked for by yachi on 2026-11-16 (「搵埋cspin 機會miss 咗」, then 「剩係include cold clear 會砌 c spin 的」 and
+plan A). A HOLE is a row with one empty cell, filled under it and open above; it is a WINDOW from the first board
+where the row above beside it is also one short (eight filled, the cell over the hole empty), if it appeared after
+the opener (0-based lock > 21), never became a ready C-Spin slot (a reachable full TST matching harddrop's C-Spin
+boards) and was not fired through by a T-spin. cold-clear (the cc-coach rollout, the round's real queue and
+garbage) plays 14 pieces from that board; the hole cell is carried through clears and garbage, and the first
+placement on it decides: a T with a full spin clearing three is a C-Spin. A CASE is a window where cold-clear
+fired and the player did not; at none of them was the slot ready at one of the player's T's
+(`ready_at_t`, gated), so none is a misdrop. Bot and simulator output: no claim id, no ✓, and cold-clear is a bot,
+not the right answer, which the section says.
+
+**cold-clear's steps are committed inside the artefact** (each window's `cc.steps`, cut at the deciding step),
+so `cspin-miss.test.ts` rebuilds EVERY night byte for byte from the replays and those steps without re-running
+the search; the md5s of the emitter, `cc-positions.ts`, the C-Spin boards and the coach harness stale every
+artefact loudly. Re-running cold-clear is `cspin-miss.ts --windows` → the coach → `--cc <jsonl> --out`. Of the
+three rules the test mutates on 10-20, only the opener cut moves the windows: the slot check and the full-spin
+rule are measured EQUIVALENT there and named (`NO_SLOT_MOVES`, `ANY_SPIN_MOVED`), so the day either bites is a
+red build. Counts are the artefacts', never typed here.
 
 ## 重播 — the animated replay, the third quarantined section
 
