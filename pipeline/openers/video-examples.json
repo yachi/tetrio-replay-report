@@ -1,7 +1,7 @@
 {
  "schema": "video-examples/2",
  "report_eligible": false,
- "means": "Boards read off YouTube videos (a Puyo Puyo Tetris 2 match, a T-spin tutorial, and three donation compilations): the 中盤 technique and DPC examples they show. Not corpus data: nothing here enters a count, a claim or a report.",
+ "means": "Boards read off YouTube videos (a Puyo Puyo Tetris 2 match, a T-spin tutorial, three donation compilations, a DT Cannon tutorial and one stretch of a live stream): the 中盤 technique and DPC examples they show. Not corpus data: nothing here enters a count, a claim or a report.",
  "sources": [
   {
    "key": "kazu",
@@ -136,6 +136,28 @@
    "reading": "every frame at 30 fps, the board palette-sampled at each cell's centre at one of two fixed geometries, each checked with a grid overlay: the game clips at cells 40 px square from x0 309, y0 158, and the training tool at cells 42.5 px square from x0 293.5, y0 147; a frame is read as the training tool when a patch beside the board is flat grey. In the game clips each board is the last frame before the line-clear flash; the training tool shows no flash, so each board is the last frame with the full rows standing. The T is the purple piece that appeared just before it; `?` is a cell matching no colour. The training tool's preset terrain is grey and is read as garbage (G), so an example whose key cells sit in it is rejected as garbage in the shape. A clip shown twice is filed once, at its first showing. The reader is a scratch script and is NOT committed: nothing re-reads these boards.",
    "terms": "nothing of the video is committed or published: no frame, no clip; every example links the video at its time",
    "requested": "yachi, 2026-11-07: 「https://youtu.be/CzW5f4q1fVQ 加中盤」"
+  },
+  {
+   "key": "syakegohan-stream",
+   "kind": "youtube",
+   "video": "UviTn8au3WE",
+   "url": "https://www.youtube.com/watch?v=UviTn8au3WE",
+   "title": "少しだけパズルリーグ【ぷよぷよテトリス２】  レート3753~",
+   "duration_s": 6449,
+   "players": {
+    "U": "syakegohan"
+   },
+   "player_names_note": "a live stream on the channel syakegohan (しゃけごはん) of Puzzle League games; only the left board, the streamer's, is read (the name shown under it is syakegohan); the side key U is ours",
+   "pieces": "one stretch only: 53:30 to 55:00 of the stream, one Perfect Clear into a T-spin Double into a second Perfect Clear",
+   "fetched": "2026-11-16, the section 53:30-55:00 only, 720p60 (itag 298), with yt-dlp through a Tailscale exit node; the sha256 is of that section, ours alone",
+   "file": {
+    "format": "MP4, 1280x720, the section 53:30-55:00",
+    "sha256": "fb3e0556a040c100b55fdc8dbd4ccc4a7b29b1f28e0415588031d6e3e49bec30",
+    "bytes": 37859804
+   },
+   "reading": "the section at 30 fps, the left board palette-sampled at each cell's centre (x0 214, cells 23.4 px wide, bottom edge y 582, 23.7 px tall; an empty cell is the dark board, value under 0.45); a line clear flashes its rows white, so the board is the last frame before the flash, and the sparkles over the empty part of the board were checked by eye on the frames before and after. The reader is a scratch script and is NOT committed: nothing re-reads this board.",
+   "terms": "nothing of the video is committed or published: no frame, no clip; the example links the video at its time",
+   "requested": "yachi, 2026-11-16: 「Do we have this example https://www.youtube.com/live/UviTn8au3WE?t=3244 DPC」, then 「加，整demo page 睇下先」"
   }
  ],
  "pc_times": {
@@ -169,9 +191,13 @@
   "K": [],
   "H": [],
   "E": [],
-  "D": []
+  "D": [],
+  "U": [
+   3241.2,
+   3248.9
+  ]
  },
- "pc_times_note": "every Perfect Clear by each player, read off the PERFECT CLEAR banner and checked by eye for an empty board; two banner reads at 605.1 and 1052.6 (right) left pieces on the board and are not Perfect Clears; the tutorial (Y) and the three compilations (M, K, H, E) show no Perfect Clear: every empty board in them is a cut between clips",
+ "pc_times_note": "every Perfect Clear by each player, read off the PERFECT CLEAR banner and checked by eye for an empty board; two banner reads at 605.1 and 1052.6 (right) left pieces on the board and are not Perfect Clears; the tutorial (Y) and the three compilations (M, K, H, E) show no Perfect Clear: every empty board in them is a cut between clips; the stream (U) was read only from 53:30 to 55:00, so its two Perfect Clears are the ones in that stretch, not every one in the stream",
  "pc_window_s": 7,
  "dpc_gap_s": 6,
  "boards": [
@@ -4942,6 +4968,56 @@
     "LTZZ.JIOOI",
     "LLZ.JJIOOI"
    ]
+  },
+  {
+   "id": "U3245.33",
+   "side": "U",
+   "t": 3245.33,
+   "lines": 2,
+   "cleared": [
+    17,
+    18
+   ],
+   "t_cells": [
+    [
+     17,
+     2
+    ],
+    [
+     17,
+     3
+    ],
+    [
+     17,
+     4
+    ],
+    [
+     18,
+     3
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..L.......",
+    "LLL.......",
+    "JJTTTZIIII",
+    "JOOTZZSSSS",
+    "JOO.ZSSSS."
+   ]
   }
  ],
  "technique_examples": [
@@ -8006,6 +8082,17 @@
    "gap_s": 9.2,
    "kind": "late",
    "pc_after": false,
+   "garbage_rows": 0
+  },
+  {
+   "board": "U3245.33",
+   "pc_t": 3241.2,
+   "note": "くるまDPC 嘅形，不過最底行個窿喺左數第 4 格（T 鼻正下面），目錄係第 6 格",
+   "setups": [],
+   "near_setups": [],
+   "gap_s": 4.13,
+   "kind": "new",
+   "pc_after": true,
    "garbage_rows": 0
   }
  ]
