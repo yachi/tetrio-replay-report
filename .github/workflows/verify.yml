@@ -1459,6 +1459,13 @@ jobs:
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.cspin_miss_page --selftest
 
+      # The 千鳥格子 practice page (analysis/cutcopy-drills.json, constructed drills, quarantined): its
+      # audit must catch a deleted quarantine sentence, an edited island cell, a swapped difficulty, a
+      # changed count, an external script, a claim id or badge, and report_eligible set true.
+      - name: Check the practice page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.cutcopy_practice_page --selftest
+
       - name: Audit the input closure
         if: env.INPUTS_UNCHANGED != '1' && github.event.schedule == '41 5 * * *'
         run: python3 bin/input-hash audit docs-pages
