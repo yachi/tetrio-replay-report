@@ -12,6 +12,25 @@
                                  still knows every job and step in .github/workflows/
     bin/verify-repo --list       print the plan and exit
     bin/verify-repo --selftest   plant corruptions and require each to be rejected
+    bin/verify-repo --jobs 4     run independent jobs four at a time (the `verify` matrix
+                                 stays one serial lane); output is buffered per job
+    bin/verify-repo --changed    skip a job whose input hash was green here before
+                                 (`--changed=verify` runs it anyway and says if it went red)
+    bin/verify-repo --audit-inputs
+                                 run each job under strace and fail on a tracked file it
+                                 opened outside its input closure (Linux)
+    bin/verify-repo --timings t.json
+                                 write per-job and per-step wall seconds
+
+THE INPUT GATE (yachi's decision of 2026-11-17).  A PR or main push may skip a CI job whose
+input closure (`pipeline/input_closure.py`) is unchanged since a green run; a daily schedule
+runs everything.  Every gated job carries three infrastructure steps — `Input gate` second,
+`Audit the input closure` second to last, `Record green inputs` last — and every other step
+carries the gate's `if:`.  Those three are CI plumbing, never run here; the gate's `if:` is
+stripped before the "every `if:` is decided" rule, so a step whose condition was
+`env.INPUTS_UNCHANGED != '1' && (X)` is held to X exactly as before.  `--check` refuses a
+gated job that is missing any of it, a job with neither `roots` nor `never_skip`, a
+`never_skip` job that is gated, and an entry point a run block names that resolves to no file.
 
 WHY THIS EXISTS.  `bin/new-session` covers steps 1-6 of adding a session and
 `bin/verify-session` takes ONE artefact directory, where every gate it runs is
@@ -55,6 +74,8 @@ is importable — a second implementation as the oracle, which is this repo's ow
 argument for the extractors applied one level up.
 """
 import argparse
+import copy
+import json
 import os
 import re
 import platform
@@ -62,10 +83,15 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 WORKFLOWS = REPO / ".github" / "workflows"
+sys.path.insert(0, str(REPO))
+from pipeline import input_closure as ic  # noqa: E402
 
 # ---------------------------------------------------------------- the scanner
 
@@ -110,6 +136,8 @@ class Job:
         self.needs = []
         self.matrix = {}
         self.steps = []
+        self.permissions = None       # the job's own `permissions:` map, if it has one
+        self.wf_permissions = {}      # the workflow's top-level map, which a job without one gets
 
 
 def _indent(s):
@@ -134,7 +162,16 @@ def scan_workflow(path, text):
 
     # top-level `env:` — the map the ${{ env.X }} interpolations resolve against.
     i = 0
+    wf_perms = {}
     while i < len(lines):
+        if lines[i].rstrip() == "permissions:":
+            i += 1
+            while i < len(lines) and (_blank(lines[i]) or _indent(lines[i]) >= 2):
+                m = re.match(r"^  ([a-z-]+): *(\S+)", lines[i])
+                if m:
+                    wf_perms[m.group(1)] = _plain(m.group(2))
+                i += 1
+            continue
         if lines[i].rstrip() == "env:":
             i += 1
             while i < len(lines) and (_blank(lines[i]) or _indent(lines[i]) >= 2):
@@ -165,6 +202,7 @@ def scan_workflow(path, text):
             if not m:
                 raise ParseError(f"{path.name}:{i+1}: expected a job id, got {ln!r}")
             job = Job(path.name, m.group(1), i + 1, env)
+            job.wf_permissions = wf_perms
             jobs.append(job)
             i += 1
             continue
@@ -195,8 +233,13 @@ def scan_workflow(path, text):
                 i = _scan_strategy(path, lines, i + 1, job)
                 continue
             i += 1
+            if key == "permissions":
+                job.permissions = {}
             # consume any nested block belonging to this key
             while i < len(lines) and (_blank(lines[i]) or _indent(lines[i]) > 4):
+                m = re.match(r"^      ([a-z-]+): *(\S+)", lines[i])
+                if key == "permissions" and m:
+                    job.permissions[m.group(1)] = _plain(m.group(2))
                 i += 1
             continue
         raise ParseError(f"{path.name}:{i+1}: unexpected indent {n} — {ln!r}")
@@ -343,10 +386,19 @@ PREDICATES = {"aarch64-linux": (lambda: sys.platform == "linux"
 
 
 class Entry:
-    def __init__(self, tier, skips=None, needs=(), matrix=None, unless=None):
+    def __init__(self, tier, skips=None, needs=(), matrix=None, unless=None, roots=(),
+                 never_skip=None):
         self.tier, self.skips = tier, dict(skips or {})
         self.needs, self.matrix = tuple(needs), matrix
         self.unless = unless          # (predicate name, reason) or None
+        # The job's INPUT ROOTS: the directories and files its steps read that no code
+        # import names (data, docs, transcriptions).  `pipeline/input_closure.py` adds bin/,
+        # the job's own workflow text, every entry point its run blocks name and their
+        # Python / TypeScript import closures.  `{session}` is the matrix value's session.
+        self.roots = tuple(roots)
+        # A reason this job is never skipped on an unchanged input hash, or None.  Such a
+        # job carries no `Input gate` step, and completeness refuses one that does.
+        self.never_skip = never_skip
 
     def blocked(self):
         """The reason this cannot run here, or None."""
@@ -355,13 +407,20 @@ class Entry:
         return None
 
 
+# Input roots shared by many jobs.  Over-wide on purpose: a root that is too wide costs a
+# job that could have been skipped; one that is too narrow lets a red job read green.
+CORPUS = ("sessions/", "analysis/")
+DOCS = ("README.md", "CLAUDE.md", "ROADMAP.md")
+SESSION = ("{session}", "sessions/*/report/facts.json", "analysis/", "spec/") + DOCS
+
 PLAN = {
     # ---- the two per-session matrices.  Not repo-wide, so not in any default run.
-    "verify": Entry(SESSIONS, matrix="artefact", needs=["dafny", "z3"], skips={
+    "verify": Entry(SESSIONS, matrix="artefact", needs=["dafny", "z3"], roots=SESSION, skips={
         "Install Dafny ${{ env.DAFNY_VERSION }} (pinned by sha256)": _TOOLCHAIN_SKIP % "dafny",
         "Install z3 ${{ env.Z3_VERSION }} (pinned by sha256)": _TOOLCHAIN_SKIP % "z3",
     }),
-    "pipeline": Entry(SESSIONS, matrix="session", needs=["dafny", "z3", "cvc5"], skips={
+    "pipeline": Entry(SESSIONS, matrix="session", needs=["dafny", "z3", "cvc5"], roots=SESSION,
+                      skips={
         "Install Dafny ${{ env.DAFNY_VERSION }} (pinned by sha256)": _TOOLCHAIN_SKIP % "dafny",
         "Install cvc5 ${{ env.CVC5_VERSION }} and z3 ${{ env.Z3_VERSION }} (pinned by sha256)":
             _TOOLCHAIN_SKIP % "cvc5/z3",
@@ -370,60 +429,240 @@ PLAN = {
     }),
 
     # ---- the repo-wide set: what only this script reaches.
-    "cross-extractor": Entry(DEFAULT, needs=["bun", "jq", "sha256sum"]),
-    "docs": Entry(FAST),
-    "leave-one-out": Entry(FAST),
-    "intense-round-corpus": Entry(FAST),
-    "preregistrations": Entry(FAST),
-    "stat-sources": Entry(FAST),
+    "cross-extractor": Entry(DEFAULT, needs=["bun", "jq", "sha256sum"], roots=CORPUS),
+    "docs": Entry(FAST, roots=CORPUS + DOCS + ("spec/", "tools/")),
+    # docs' selftests, split out on 2026-11-17 so the site render is not serial behind them.
+    # The transcription gates read only the committed transcriptions (in their modules'
+    # closure) and the fixtures beside them; the page audits read the corpus artefacts.
+    "docs-transcriptions": Entry(FAST, roots=("spec/fixtures/",)),
+    "docs-pages": Entry(FAST, roots=CORPUS + DOCS + ("spec/",)),
+    "leave-one-out": Entry(FAST, roots=CORPUS + DOCS),
+    "intense-round-corpus": Entry(FAST, roots=CORPUS + DOCS),
+    "preregistrations": Entry(FAST, roots=CORPUS + DOCS + ("spec/",)),
+    "stat-sources": Entry(FAST, roots=CORPUS + DOCS),
     # The job's command is `--rerun`, and what it does is decided by whether Rscript is
     # installed, not by which runner it is on: CI has no R and prints that it checked the
     # fingerprints only; here it re-derives the artefact and demands the committed bytes
     # back. Same command, two honest outcomes, and the weaker one announces itself.
-    "rate-records": Entry(FAST),
+    "rate-records": Entry(FAST, roots=CORPUS + DOCS),
     # Reads the seven committed opener-facts.json and byte-compares CLAUDE.md's bands
     # against them. No simulator run, so it is FAST — the artefacts are the input.
-    "donation-bands": Entry(FAST),
+    "donation-bands": Entry(FAST, roots=CORPUS + DOCS),
     # Same seven artefacts, the other block: the confusion matrix, its board-equality
     # split, and the two engines' prefix lengths. Also FAST — no simulator run.
-    "dual-engine": Entry(FAST),
+    "dual-engine": Entry(FAST, roots=CORPUS + DOCS),
     # Renders every session to trace the quantizers, so it is not instant — but it
     # writes nothing (the round table renders into a copy) and needs no toolchain.
-    "rounding": Entry(FAST),
+    "rounding": Entry(FAST, roots=CORPUS + DOCS),
     # This script's own gate. Running it here is not circular: the job's two commands
     # are --selftest and --check, neither of which executes any job, and both of which
     # are exactly what a local run should confirm before a push.
-    "workflow-plan": Entry(FAST),
-    "typescript": Entry(DEFAULT, needs=["bun"]),
-    "manifest": Entry(DEFAULT, needs=["bun"]),
-    "spec": Entry(DEFAULT, needs=["dafny"], skips={
+    "workflow-plan": Entry(FAST, never_skip="it checks the gates themselves; a skip would let a "
+                                            "workflow edit that broke them go green"),
+    # Sharded over two runners (`--shard=k/2`); each shard is a matrix entry with its own hash,
+    # and both hash the same closure.
+    "typescript": Entry(DEFAULT, needs=["bun"], matrix="shard",
+                        roots=CORPUS + ("spec/", "tools/", "nix/")),
+    "manifest": Entry(DEFAULT, needs=["bun"], roots=CORPUS + ("tools/",)),
+    "spec": Entry(DEFAULT, needs=["dafny"], roots=("spec/",), skips={
         "Install Dafny ${{ env.DAFNY_VERSION }} (pinned by sha256)": _TOOLCHAIN_SKIP % "dafny",
         "Mutation-test the spec": "schedule/inputs.mutation only — --weekly runs it",
     }),
-    "lean": Entry(DEFAULT, needs=["lean", "lake"], skips={
+    # spec's T3 recount, split out of spec on 2026-11-17 so it runs beside the verifier rather
+    # than after it. `route_orders_data.py --check` still runs `dafny verify` on the proof it
+    # compiles, so the job installs Dafny like spec does.
+    "spec-recount": Entry(DEFAULT, needs=["dafny"], roots=("spec/", "analysis/sdpcspin-orders.json"),
+                          skips={
+        "Install Dafny ${{ env.DAFNY_VERSION }} (pinned by sha256)": _TOOLCHAIN_SKIP % "dafny",
+    }),
+    "lean": Entry(DEFAULT, needs=["lean", "lake"], roots=("lean/", "analysis/sdpcspin-orders.json"),
+                  skips={
         "Install Lean ${{ env.LEAN_VERSION }} (pinned by sha256)": _TOOLCHAIN_SKIP % "lean",
         "Mutation-test the Lean proofs": "schedule/inputs.mutation only — --weekly runs it",
     }),
-    "coverage": Entry(SLOW),
+    "coverage": Entry(SLOW, roots=CORPUS + DOCS),
     # `nix build .#cc-oracle-image` targets aarch64-linux; the job's own comment says
     # it is built "the way the local Mac could not".
-    "oracle-image": Entry(SLOW, needs=["nix", "bun"], unless=(
+    "oracle-image": Entry(SLOW, needs=["nix", "bun"],
+                          roots=CORPUS + ("tools/", "nix/", "flake.nix", "flake.lock"), unless=(
         "aarch64-linux", "needs an aarch64 Linux runner (ubuntu-24.04-arm) — the image is aarch64-linux "
                  "and nix has no builder for it here")),
-    "coverage-round": Entry(WEEKLY),
+    "coverage-round": Entry(WEEKLY, roots=CORPUS + DOCS),
     # wikitext-sources.yml: the job IS a network fetch of harddrop's pinned revisions, and CI runs it
     # on schedule/workflow_dispatch only, so it sits in the tier --weekly selects. Run locally it is
     # the same live fetch, not a stand-in; its offline half (--selftest) is a step of `docs`, FAST.
-    "wikitext-sources": Entry(WEEKLY),
+    "wikitext-sources": Entry(WEEKLY, never_skip="a live fetch of harddrop's pinned revisions; it "
+                                                 "runs on schedule and dispatch only, where nothing "
+                                                 "is skipped"),
     # verify.yml's Pages deploy: every step is a `uses:`, so there is nothing here to run, and
     # it runs only on a push to main in CI. Planned so its `needs:` list is checked (see
     # `deploy_problems`), excused so the summary says it did not run instead of printing ok.
-    "deploy": Entry(FAST, unless=(
+    "deploy": Entry(FAST, never_skip="publishes the site; it has no inputs of its own to hash", unless=(
         "github-actions", "publishes to GitHub Pages; runs only in CI, on a push to main")),
 }
 
 WEEKLY_STEP_SKIPS = {"Mutation-test the spec", "Mutation-test the generated proofs",
                      "Mutation-test the Lean proofs"}
+
+
+# ------------------------------------------------------------- the input gate
+
+GATE_STEP, AUDIT_STEP, RECORD_STEP = "Input gate", "Audit the input closure", "Record green inputs"
+INFRA = (GATE_STEP, AUDIT_STEP, RECORD_STEP)
+GATE_IF = "env.INPUTS_UNCHANGED != '1'"
+# docs only: on a main push whose inputs are unchanged, one render and the Pages upload still
+# run, because the deploy needs a site and the Pages artifact expires in a day.
+MAIN_PUSH_IF = GATE_IF + " || (github.event_name == 'push' && github.ref == 'refs/heads/main')"
+MAIN_PUSH_JOBS = {"docs"}
+AUDIT_IF = GATE_IF + " && github.event.schedule == '41 5 * * *'"
+RECORD_IF = "success() && " + GATE_IF
+UPLOAD_ARTIFACT = "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02"
+RECORD_WITH = {"name": "${{ env.INPUTS_ARTIFACT }}", "path": "${{ runner.temp }}/green-inputs/",
+               "retention-days": "90", "if-no-files-found": "error", "overwrite": "true"}
+
+
+def _closes_at_end(text):
+    """True iff `text` starts with `(` whose matching `)` is its last character."""
+    if not (text.startswith("(") and text.endswith(")")):
+        return False
+    depth = 0
+    for i, c in enumerate(text):
+        depth += c == "("
+        depth -= c == ")"
+        if depth == 0:
+            return i == len(text) - 1
+    return False
+
+
+def split_gate(cond, job_name=None):
+    """(gated, residual condition) for a step's `if:`.  Exactly three gated forms are
+    accepted: the gate alone, `<gate> && (X)` (residual X, which must then be decided in
+    PLAN like any `if:`), and docs' main-push form.  Any OTHER mention of INPUTS_UNCHANGED
+    raises: a gate condition of a new shape is one nobody checked skips what it should."""
+    if cond is None:
+        return False, None
+    if cond == GATE_IF:
+        return True, None
+    if cond == MAIN_PUSH_IF and job_name in MAIN_PUSH_JOBS:
+        return True, None
+    pre = GATE_IF + " && "
+    if cond.startswith(pre) and _closes_at_end(cond[len(pre):]):
+        inner = cond[len(pre) + 1:-1]
+        if "INPUTS_UNCHANGED" not in inner:
+            return True, inner
+    if "INPUTS_UNCHANGED" in cond:
+        raise ParseError(f"`if: {cond}` mentions INPUTS_UNCHANGED in a form bin/verify-repo "
+                         f"does not accept (the gate, `{pre}(X)`, or docs' main-push form)")
+    return False, cond
+
+
+def _is_infra(step):
+    return step.name in INFRA
+
+
+def gate_run(verb, job):
+    dim = next(iter(job.matrix), None) if job.matrix else None
+    return f"python3 bin/input-hash {verb} {job.name}" + \
+        (f' "${{{{ matrix.{dim} }}}}"' if dim else "")
+
+
+_CLOSURES = {}
+
+
+def closure_of(job, entry, mv, tree):
+    """The job's input closure, memoised on everything it is computed from."""
+    key = (job.file, job.name, mv, entry.roots, tuple((s.name, s.run, s.workdir) for s in job.steps),
+           id(tree), str(WORKFLOWS), (WORKFLOWS / job.file).read_text())
+    if key not in _CLOSURES:
+        _CLOSURES[key] = ic.closure(job, entry, interpolate, entry.matrix if mv else None, mv,
+                                    tree, WORKFLOWS)
+    return _CLOSURES[key]
+
+
+_TREE = []
+
+
+def the_tree():
+    if not _TREE:
+        _TREE.append(ic.Tree(REPO))
+    return _TREE[0]
+
+
+def gate_problems(jobs):
+    """The static half of the input gate: structure, roots, and entry points resolving."""
+    bad = []
+    for j in jobs:
+        entry = PLAN.get(j.name)
+        if entry is None:
+            continue
+        where = f"{j.file}:{j.line}: job {j.name!r}"
+        names = [s.name for s in j.steps]
+        gated = GATE_STEP in names
+        mentions = [s for s in j.steps if "INPUTS_UNCHANGED" in (s.cond or "")]
+        if not entry.roots and not entry.never_skip:
+            bad.append(f"PLAN[{j.name}] has neither `roots` (its input closure's data) nor "
+                       f"`never_skip` (a reason it is never skipped) — decide one")
+        if entry.roots and entry.never_skip:
+            bad.append(f"PLAN[{j.name}] has both `roots` and `never_skip`; a job is one or the other")
+        if entry.never_skip:
+            if gated or mentions or any(n in names for n in INFRA):
+                bad.append(f"{where} is never skipped ({entry.never_skip}) but carries the "
+                           f"input gate — take it out")
+            continue
+        if not gated:
+            bad.append(f"{where} carries no {GATE_STEP!r} step; every job with `roots` is gated")
+            continue
+        perms = j.permissions if j.permissions is not None else j.wf_permissions
+        if perms.get("actions") not in ("read", "write"):
+            bad.append(f"{where}: the gate reads the green store, so the job needs "
+                       f"`permissions: actions: read`")
+        st = j.steps
+        if len(st) < 5 or not (st[0].uses or "").startswith("actions/checkout@"):
+            bad.append(f"{where}: a gated job starts with the checkout")
+        if len(st) < 2 or st[1].name != GATE_STEP:
+            bad.append(f"{where}: {GATE_STEP!r} must be the second step, right after checkout")
+        else:
+            g = st[1]
+            if g.cond is not None or g.run != gate_run("gate", j):
+                bad.append(f"{where}: {GATE_STEP!r} must run `{gate_run('gate', j)}` with no `if:`")
+        if st[-1].name != RECORD_STEP:
+            bad.append(f"{where}: {RECORD_STEP!r} must be the last step — a step after it "
+                       f"could fail after the inputs were marked green")
+        else:
+            r = st[-1]
+            if not (r.uses or "").startswith(UPLOAD_ARTIFACT) or r.cond != RECORD_IF \
+                    or r.with_ != RECORD_WITH:
+                bad.append(f"{where}: {RECORD_STEP!r} must be `{UPLOAD_ARTIFACT}` with "
+                           f"`if: {RECORD_IF}` and with {RECORD_WITH}")
+        if len(st) < 3 or st[-2].name != AUDIT_STEP:
+            bad.append(f"{where}: {AUDIT_STEP!r} must be the step before {RECORD_STEP!r}")
+        else:
+            a = st[-2]
+            if a.cond != AUDIT_IF or a.run != gate_run("audit", j):
+                bad.append(f"{where}: {AUDIT_STEP!r} must run `{gate_run('audit', j)}` "
+                           f"with `if: {AUDIT_IF}`")
+        for s in st[2:-2]:
+            try:
+                ok, _ = split_gate(s.cond, j.name)
+            except ParseError as e:
+                bad.append(f"{j.file}:{s.line}: step {s.name!r} in {j.name!r}: {e}")
+                continue
+            if not ok:
+                bad.append(f"{j.file}:{s.line}: step {s.name!r} in {j.name!r} lacks the gate's "
+                           f"`if: {GATE_IF}` — on a skip it would run against a stale verdict")
+        for s in (x for x in st[:2] + st[-2:] if x.name not in INFRA):
+            if "INPUTS_UNCHANGED" in (s.cond or ""):
+                bad.append(f"{j.file}:{s.line}: step {s.name!r} sits outside the gated span")
+        # Every entry point a run block names must resolve, or the closure misses its code.
+        mv = j.matrix.get(entry.matrix, [None])[0] if entry.matrix else None
+        try:
+            cl = closure_of(j, entry, mv, the_tree())
+        except Exception as e:      # a closure that cannot be computed is not a pass
+            bad.append(f"{where}: its input closure could not be computed: {e}")
+            continue
+        for sname, tok, why in cl.unresolved:
+            bad.append(f"{where} / {sname}: {tok!r} {why} — its input closure cannot include it")
+    return bad
 
 
 # ------------------------------------------------------------- completeness
@@ -496,14 +735,19 @@ def completeness(env, jobs):
             if key not in step_names:
                 bad.append(f"PLAN[{name}].skips names step {key!r}, which the job no longer has")
         for s in j.steps:
-            if s.kind == "uses" or s.name in entry.skips:
+            if s.kind == "uses" or s.name in entry.skips or _is_infra(s):
                 continue
             if s.name is None:
                 bad.append(f"{j.file}:{s.line}: unnamed `run:` step in job {name!r} — "
                            f"this script addresses steps by name")
                 continue
-            if s.cond and s.name not in entry.skips:
-                bad.append(f"{j.file}:{s.line}: step {s.name!r} in {name!r} carries `if: {s.cond}` "
+            try:
+                _, residual = split_gate(s.cond, name)
+            except ParseError as e:
+                bad.append(f"{j.file}:{s.line}: step {s.name!r} in {name!r}: {e}")
+                continue
+            if residual and s.name not in entry.skips:
+                bad.append(f"{j.file}:{s.line}: step {s.name!r} in {name!r} carries `if: {residual}` "
                            f"and is not in PLAN[{name}].skips — decide it explicitly")
         if entry.matrix and entry.matrix not in j.matrix:
             bad.append(f"PLAN[{name}] expands matrix {entry.matrix!r}, which the job does not define")
@@ -513,7 +757,7 @@ def completeness(env, jobs):
         # hole in it is not the CI command however green it exits.
         mv = j.matrix.get(entry.matrix, [None])[0] if entry.matrix else None
         for s in j.steps:
-            if s.kind == "uses" or s.name in entry.skips or s.run is None:
+            if s.kind == "uses" or s.name in entry.skips or s.run is None or _is_infra(s):
                 continue
             try:
                 interpolate(s.run, j.env, entry.matrix, mv)
@@ -526,7 +770,10 @@ def completeness(env, jobs):
     bad += matrix_membership_problems(on_disk)
     bad += deploy_problems(jobs)
     bad += pin_problems(jobs)
-    return bad
+    bad += gate_problems(jobs)
+    # split_gate is asked twice of one step (gate_problems and the `if:` rule), so a
+    # malformed gate would be reported twice; once is the finding.
+    return list(dict.fromkeys(bad))
 
 
 def deploy_problems(jobs):
@@ -704,17 +951,115 @@ def selected(entry, args, name=None):
     return True
 
 
+class Unit:
+    """One job run, or one matrix entry of one."""
+
+    def __init__(self, name, entry, job, dim, val):
+        self.name, self.entry, self.job, self.dim, self.val = name, entry, job, dim, val
+        self.label = name if val is None else f"{name}[{val}]"
+        # The `verify` matrix is ONE serial lane under --jobs: its entries share the Dafny
+        # toolchain's caches and were never written to run beside each other.  Every other
+        # unit is its own lane.
+        self.lane = name if name == "verify" else self.label
+        self.status, self.output, self.why, self.steps = None, "", "", []
+        self.digest = None
+
+
+def _safe(label):
+    return re.sub(r"[^A-Za-z0-9._-]+", "_", label).strip("_")
+
+
+def _closure_for(u):
+    return ic.closure(u.job, u.entry, interpolate, u.dim, u.val, the_tree())
+
+
+def run_unit(u, args, scratch, stream):
+    """Run one unit's steps.  `stream` prints as it goes (serial); otherwise output is
+    buffered and returned whole, so parallel units never interleave."""
+    buf = []
+
+    def say(text, err=False):
+        if stream:
+            print(text, file=sys.stderr if err else sys.stdout, flush=True)
+        else:
+            buf.append(text)
+
+    # A scratch RUNNER_TEMP of the unit's own: two units side by side must not share one,
+    # and CI gives every job a fresh one anyway.
+    temp = scratch / _safe(u.label)
+    temp.mkdir(parents=True, exist_ok=True)
+    shellenv = runner_env(temp, args.weekly)
+    audit = bool(args.audit_inputs) and not u.entry.never_skip
+    opened, listed = set(), set()
+    say(f"\n== {u.label} ==")
+    t0 = time.monotonic()
+    ok = True
+    for i, st in enumerate(u.job.steps):
+        if st.kind == "uses" or _is_infra(st):
+            continue
+        if st.name in u.entry.skips and not (args.weekly and st.name in WEEKLY_STEP_SKIPS):
+            continue
+        cwd = REPO / st.workdir if st.workdir else REPO
+        say(f"-- {st.name}" + (f"  (in {st.workdir})" if st.workdir else ""))
+        t1 = time.monotonic()
+        try:
+            cmd = interpolate(st.run, u.job.env, u.dim, u.val)
+        except ParseError as e:
+            say(f"FAIL  {u.label} / {st.name}: {e}", err=True)
+            ok = False
+            break
+        if args.dry_run:
+            say("\n".join("     " + l for l in cmd.rstrip().split("\n")))
+            continue
+        argv = ["bash", "-e", "-c", cmd]
+        log = None
+        if audit:
+            log = temp / f"strace-{i}.log"
+            argv = ["strace", "-f", "-qq", "-o", str(log),
+                    "-e", "trace=openat,open,execve", *argv]
+        if stream:
+            r = subprocess.run(argv, cwd=cwd, env=shellenv)
+        else:
+            r = subprocess.run(argv, cwd=cwd, env=shellenv, stdout=subprocess.PIPE,
+                               stderr=subprocess.STDOUT, text=True, errors="replace")
+            buf.append(r.stdout.rstrip("\n"))
+        u.steps.append((st.name, round(time.monotonic() - t1, 3)))
+        if log is not None and log.exists():
+            o, l = ic.parse_strace(log.read_text(errors="replace").splitlines(), REPO, cwd)
+            opened |= o
+            listed |= l
+        if r.returncode:
+            say(f"FAIL  {u.label} / {st.name}", err=True)
+            ok = False
+            break
+    if ok and audit and not args.dry_run:
+        cl = _closure_for(u)
+        bad = ic.audit(cl, the_tree(), opened, listed)
+        say(f"-- audit: {len(opened)} files opened, {len(listed)} directories listed, "
+            f"{len(bad)} problems")
+        for b in bad:
+            say(f"FAIL  {u.label} / input closure: {b}", err=True)
+        if bad:
+            ok, u.why = False, "opened files outside its input closure"
+    u.seconds = round(time.monotonic() - t0, 3)
+    u.status = "ok" if ok else "fail"
+    u.output = "\n".join(buf)
+    return u
+
+
 def execute(env, jobs, args):
     by_name = {j.name: j for j in jobs}
     have, diverge = tool_versions(env)
     scratch = Path(tempfile.mkdtemp(prefix="verify-repo-"))
-    shellenv = runner_env(scratch, args.weekly)
-    ran, failed, skipped, uncovered = [], [], [], []
+    ran, failed, skipped, uncovered, unchanged = [], [], [], [], []
+    changed = args.changed is not None
+    forced = set(args.changed or []) - {""}
 
     order = [n for n in PLAN if n in by_name]
     order.sort(key=lambda n: ({FAST: 0, DEFAULT: 1, SLOW: 2, WEEKLY: 3, SESSIONS: 4}
                               .get(PLAN[n].tier, 5), n))
 
+    units = []
     for name in order:
         entry, job = PLAN[name], by_name[name]
         if not selected(entry, args, name):
@@ -729,46 +1074,73 @@ def execute(env, jobs, args):
             print(f"FAIL  {name} — not on PATH: {', '.join(missing)}", file=sys.stderr)
             failed.append(name)
             continue
-
+        if args.audit_inputs and not shutil.which("strace"):
+            print("FAIL  --audit-inputs needs strace on PATH", file=sys.stderr)
+            return 1
         combos = [(None, None)]
         if entry.matrix:
             keep, left = matrix_combos(entry, job, args)
             combos = [(entry.matrix, v) for v in keep]
             uncovered += [f"{name}[{v}]" for v in left]
+        units += [Unit(name, entry, job, dim, val) for dim, val in combos]
 
-        for dim, val in combos:
-            label = name if val is None else f"{name}[{val}]"
-            print(f"\n== {label} ==", flush=True)
-            bad = False
-            for s in job.steps:
-                if s.kind == "uses":
-                    continue
-                if s.name in entry.skips:
-                    if not (args.weekly and s.name in WEEKLY_STEP_SKIPS):
-                        continue
-                cwd = REPO / s.workdir if s.workdir else REPO
-                print(f"-- {s.name}" + (f"  (in {s.workdir})" if s.workdir else ""), flush=True)
-                try:
-                    ok, cmd = run_step(s, job.env, cwd, (dim, val), args.dry_run, shellenv)
-                    if args.dry_run:
-                        print("\n".join("     " + l for l in cmd.rstrip().split("\n")))
-                except ParseError as e:
-                    print(f"FAIL  {label} / {s.name}: {e}", file=sys.stderr)
-                    ok = False
-                if not ok:
-                    print(f"FAIL  {label} / {s.name}", file=sys.stderr)
-                    bad = True
-                    break
-            (failed if bad else ran).append(label)
+    # --changed: a unit whose input hash was green HERE before is not run.  The hash is
+    # taken before anything runs, so what is recorded on a pass is the input it ran on.
+    green = ic.green_dir() if changed else None
+    todo = []
+    for u in units:
+        if changed and not u.entry.never_skip:
+            u.digest = _closure_for(u).digest(the_tree())
+            mark = green / ic.artifact_name(u.name, u.val, u.digest)
+            u.was_green = mark.exists()
+            if u.was_green and u.name not in forced:
+                unchanged.append(u.label)
+                continue
+        todo.append(u)
+
+    lanes = {}
+    for u in todo:
+        lanes.setdefault(u.lane, []).append(u)
+    stream = args.jobs <= 1
+    lock = threading.Lock()
+    t0 = time.monotonic()
+
+    def run_lane(us):
+        for u in us:
+            run_unit(u, args, scratch, stream)
+            if not stream:
+                with lock:
+                    print(u.output, flush=True)
+        return us
+
+    if stream:
+        for us in lanes.values():
+            run_lane(us)
+    else:
+        with ThreadPoolExecutor(max_workers=args.jobs) as pool:
+            list(pool.map(run_lane, lanes.values()))
+    wall = round(time.monotonic() - t0, 3)
+
+    for u in todo:
+        (ran if u.status == "ok" else failed).append(u.label)
+        if changed and u.digest and u.status == "ok" and not args.dry_run:
+            green.mkdir(parents=True, exist_ok=True)
+            (green / ic.artifact_name(u.name, u.val, u.digest)).write_text(u.digest + "\n")
 
     print("\n" + "=" * 72)
-    print(f"ran {len(ran)}, failed {len(failed)}")
-    for n in ran:
+    print(f"ran {len(ran)}, failed {len(failed)}"
+          + (f", unchanged {len(unchanged)}" if changed else ""))
+    for n in sorted(ran):
         print(f"  ok   {n}")
-    for n in failed:
+    for n in sorted(failed):
         print(f"  FAIL {n}")
+    for u in todo:
+        if u.name in forced and getattr(u, "was_green", False) and u.status != "ok":
+            print(f"  !!   {u.label} was green on these inputs before and is red now")
     # Everything NOT run is named.  A run that quietly covered less than it claims
     # is the failure this tool exists to stop.
+    for n in sorted(unchanged):
+        print(f"  --   {n}: skipped: inputs unchanged (green here before)")
     for n, why in skipped:
         print(f"  --   {n}: {why}")
     if uncovered:
@@ -784,6 +1156,13 @@ def execute(env, jobs, args):
                     print(f"  --   {name} / {s}: {why}")
     for d in diverge:
         print(f"  !!   toolchain divergence — {d}")
+    if args.timings:
+        Path(args.timings).write_text(json.dumps(
+            {"jobs": args.jobs, "wall_seconds": wall,
+             "units": {u.label: {"seconds": u.seconds, "status": u.status,
+                                 "steps": dict(u.steps)} for u in todo}},
+            indent=1, sort_keys=True) + "\n")
+        print(f"  --   timings written to {args.timings}")
     shutil.rmtree(scratch, ignore_errors=True)
     if not args.sessions and not args.session and not args.only:
         print("  --   per-session gates: bin/verify-session <artefact-dir> "
@@ -792,6 +1171,10 @@ def execute(env, jobs, args):
 
 
 # ------------------------------------------------------------------- selftest
+
+DOCS_STEP = "      - name: Check a second render of the site is byte-identical\n"
+GATE_LINE = "        if: env.INPUTS_UNCHANGED != '1'\n"
+
 
 def _corrupt(kind, texts):
     t = dict(texts)
@@ -827,29 +1210,62 @@ def _corrupt(kind, texts):
         # them stopped corrupting the day `timeout-minutes` was added after `runs-on`.
         t[v] = re.sub(r"\n  docs:\n", "\n  docs-renamed:\n", t[v], count=1)
     elif kind == "step added carrying an unresolvable expression":
-        t[v] = t[v].replace("      - name: Check a second render of the site is byte-identical",
-                            "      - name: Newly added step\n"
-                            "        run: echo ${{ secrets.TOKEN }}\n"
-                            "      - name: Check a second render of the site is byte-identical")
+        # Gated like its neighbours, so the ONLY thing wrong with it is the expression.
+        t[v] = t[v].replace(DOCS_STEP,
+                            "      - name: Newly added step\n" + GATE_LINE +
+                            "        run: echo ${{ secrets.TOKEN }}\n" + DOCS_STEP)
     elif kind == "skipped step renamed":
         t[v] = t[v].replace("      - name: Mutation-test the spec",
                             "      - name: Mutation-test the spec (renamed)")
     elif kind == "conditional step added undeclared":
-        t[v] = t[v].replace("      - name: Check a second render of the site is byte-identical",
-                            "      - name: Check a second render of the site is byte-identical\n"
-                            "        if: github.event_name == 'schedule'")
+        # The gate is stripped before the "every `if:` is decided" rule, so the residual
+        # condition is what must be caught, exactly as before the gate existed.
+        t[v] = t[v].replace(DOCS_STEP + GATE_LINE,
+                            DOCS_STEP + "        if: env.INPUTS_UNCHANGED != '1' && "
+                            "(github.event_name == 'schedule')\n")
     elif kind == "step reads an unsupplied runner variable":
-        t[v] = t[v].replace("      - name: Check a second render of the site is byte-identical\n"
-                            "        run: python3 bin/build-docs --check --out _site",
-                            "      - name: Check a second render of the site is byte-identical\n"
-                            "        run: python3 bin/build-docs --check --out _site \"$RUNNER_ARCH\"")
+        t[v] = t[v].replace(DOCS_STEP + GATE_LINE +
+                            "        run: python3 bin/build-docs --check --out _site\n",
+                            DOCS_STEP + GATE_LINE +
+                            "        run: python3 bin/build-docs --check --out _site \"$RUNNER_ARCH\"\n")
+    # ---- the input gate (yachi's decision of 2026-11-17)
+    elif kind == "a gated step loses the gate's if":
+        t[v] = t[v].replace(DOCS_STEP + GATE_LINE, DOCS_STEP)
+    elif kind == "a gate of another shape":
+        t[v] = t[v].replace(DOCS_STEP + GATE_LINE,
+                            DOCS_STEP + "        if: env.INPUTS_UNCHANGED == '1'\n")
+    elif kind == "the main-push render form on a job that is not docs":
+        t[v] = t[v].replace(
+            "      - name: Check the R analysis is current and every figure it feeds agrees "
+            "(and that the gate can fail)\n" + GATE_LINE,
+            "      - name: Check the R analysis is current and every figure it feeds agrees "
+            "(and that the gate can fail)\n" + "        if: " + MAIN_PUSH_IF + "\n")
+    elif kind == "a never-skipped job carries the gate":
+        t[v] = t[v].replace(
+            "      - name: Check bin/verify-repo still knows every job and step",
+            "      - name: Input gate\n        run: python3 bin/input-hash gate workflow-plan\n\n"
+            "      - name: Check bin/verify-repo still knows every job and step")
+    elif kind == "a step after Record green inputs":
+        t[d] = t[d].rstrip("\n") + "\n\n      - name: Late step\n" + GATE_LINE + \
+            "        run: echo late\n"
+    elif kind == "Record green inputs loses its success() guard":
+        t[d] = t[d].replace("        if: success() && env.INPUTS_UNCHANGED != '1'\n",
+                            "        if: env.INPUTS_UNCHANGED != '1'\n")
+    elif kind == "the audit step is dropped":
+        t[d] = re.sub(r"      - name: Audit the input closure\n.*?\n\n", "", t[d],
+                      count=1, flags=re.S)
+    elif kind == "a gated workflow loses actions: read":
+        t[d] = re.sub(r"\n  actions: read[^\n]*", "", t[d], count=1)
+    elif kind == "an entry point names no file":
+        t[v] = t[v].replace("python3 -m pipeline.check_rate_records --selftest",
+                            "python3 -m pipeline.check_rate_recordz --selftest")
     elif kind == "deploy leaves a job out of its needs":
         t[v] = t[v].replace("needs: [verify, pipeline, ", "needs: [verify, ", 1)
     elif kind == "unknown job key":
         t[d] = t[d].replace("  manifest:\n    runs-on:", "  manifest:\n    runz-on:")
     elif kind == "unknown step key":
-        t[d] = t[d].replace("      - name: Setup Bun\n        uses:",
-                            "      - name: Setup Bun\n        usez:")
+        t[d] = t[d].replace("      - name: Setup Bun\n" + GATE_LINE + "        uses:",
+                            "      - name: Setup Bun\n" + GATE_LINE + "        usez:")
     elif kind == "a setup-bun step pins a literal version":
         t[d] = t[d].replace("          bun-version: ${{ env.BUN_VERSION }}",
                             "          bun-version: '1.4.2'")
@@ -946,11 +1362,12 @@ def selftest():
     # must be absorbed silently and end up in the executed set.  If this control
     # ever fails, the command list has become a copy and the whole argument for
     # this script's shape is gone.
+    # Since the input gate, "plain" means plain for a gated job: a run step carrying the
+    # gate's `if:` and nothing else.  (Without it the step is a planted corruption below.)
     added = dict(texts)
     added["verify.yml"] = added["verify.yml"].replace(
-        "      - name: Check a second render of the site is byte-identical",
-        "      - name: Newly added step\n        run: echo hi\n"
-        "      - name: Check a second render of the site is byte-identical")
+        DOCS_STEP, "      - name: Newly added step\n" + GATE_LINE + "        run: echo hi\n\n"
+        + DOCS_STEP)
     if added == texts:
         print("CONTROL FAILED — the absorption control's anchor moved", file=sys.stderr)
         return 1
@@ -1001,7 +1418,12 @@ def selftest():
                  "folded block scalar",
                  "a session dropped from the verify matrix",
                  "a session dropped from the pipeline matrix",
-                 "a matrix names a session that is not on disk"):
+                 "a matrix names a session that is not on disk",
+                 "a gated step loses the gate's if", "a gate of another shape",
+                 "the main-push render form on a job that is not docs",
+                 "a never-skipped job carries the gate", "a step after Record green inputs",
+                 "Record green inputs loses its success() guard", "the audit step is dropped",
+                 "a gated workflow loses actions: read", "an entry point names no file"):
         planted += 1
         bad = _corrupt(kind, texts)
         try:
@@ -1014,6 +1436,26 @@ def selftest():
         else:
             print(f"  FAIL not caught: {kind}", file=sys.stderr)
             failures += 1
+
+    # PLAN-level corruptions: a job whose entry decides neither roots nor never_skip, and one
+    # deciding both.  They edit PLAN, not a workflow, so they are planted by swapping entries.
+    for kind, name, change in (
+            ("a job has neither roots nor never_skip", "rounding", dict(roots=())),
+            ("a job has both roots and never_skip", "rounding", dict(never_skip="planted")),
+            ("a never-skipped job is given roots", "workflow-plan", dict(roots=("bin/",)))):
+        planted += 1
+        old = PLAN[name]
+        PLAN[name] = copy.copy(old)
+        PLAN[name].__dict__.update(change)
+        try:
+            caught = bool(_check_texts(texts))
+        except ParseError:
+            caught = True
+        finally:
+            PLAN[name] = old
+        print(f"  {'ok  ' if caught else 'FAIL'} {'caught' if caught else 'not caught'}: {kind}",
+              file=sys.stdout if caught else sys.stderr)
+        failures += not caught
 
     print(f"\n{planted} planted corruptions, {planted - failures} caught")
     return 1 if failures else 0
@@ -1035,7 +1477,19 @@ def main():
     ap.add_argument("--list", action="store_true", help="print the plan and exit")
     ap.add_argument("--dry-run", action="store_true", help="print each command instead of running it")
     ap.add_argument("--selftest", action="store_true")
+    ap.add_argument("--jobs", type=int, default=1, metavar="N",
+                    help="run N independent jobs at once (the verify matrix is one serial "
+                         "lane); each job's output is printed whole when it ends")
+    ap.add_argument("--changed", nargs="?", const="", default=None, metavar="JOB[,JOB]",
+                    help="skip a job whose input hash was green here before; name jobs to "
+                         "run them anyway and report if one went red")
+    ap.add_argument("--audit-inputs", action="store_true",
+                    help="run each step under strace and fail on a tracked file opened "
+                         "outside the job's input closure (Linux)")
+    ap.add_argument("--timings", metavar="FILE", help="write per-job and per-step wall seconds")
     args = ap.parse_args()
+    if args.changed is not None:
+        args.changed = [x for x in args.changed.split(",")] if args.changed else []
 
     if args.selftest:
         return selftest()

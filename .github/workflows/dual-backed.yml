@@ -32,10 +32,12 @@ on:
       - '.github/workflows/dual-backed.yml'
   schedule:
     - cron: '41 6 * * 1'   # weekly, the backstop for the path filter being incomplete
+    - cron: '41 5 * * *'   # daily: every job in full, no green store, the closure audited
   workflow_dispatch:
 
 permissions:
   contents: read
+  actions: read       # the Input gate reads this repo's green-* artifacts
 
 env:
   # Must equal verify.yml's BUN_VERSION, which is where the pin is explained; bin/verify-repo
@@ -49,7 +51,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
+      # Input gate (yachi's decision of 2026-11-17, see the header): hashes the job's input
+      # closure (pipeline/input_closure.py) and, on a PR or a push, looks the hash up in the green
+      # store. A hit sets INPUTS_UNCHANGED=1 and every later step is skipped; the check stays green
+      # and its notice says why. On a schedule or a dispatch the store is never consulted.
+      - name: Input gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 bin/input-hash gate manifest
+
       - name: Setup Bun
+        if: env.INPUTS_UNCHANGED != '1'
         uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76  # v2.0.2
         with:
           bun-version: ${{ env.BUN_VERSION }}
@@ -58,6 +70,7 @@ jobs:
       # different @haelp/teto would be comparing against a different second engine, which is the
       # one thing this artefact exists to hold fixed.
       - name: Install the oracle's isolated deps
+        if: env.INPUTS_UNCHANGED != '1'
         working-directory: tools/triangle-oracle
         run: bun install --frozen-lockfile
 
@@ -65,5 +78,20 @@ jobs:
       # the committed file, then checks that README.md's three published percentages match it —
       # the JSON stores only counts, so byte-identity alone says nothing about the prose.
       - name: Re-derive the dual-backed manifest and check the published figures
+        if: env.INPUTS_UNCHANGED != '1'
         working-directory: tools/triangle-oracle
         run: bun cross-extract.mjs --check
+
+      - name: Audit the input closure
+        if: env.INPUTS_UNCHANGED != '1' && github.event.schedule == '41 5 * * *'
+        run: python3 bin/input-hash audit manifest
+
+      - name: Record green inputs
+        if: success() && env.INPUTS_UNCHANGED != '1'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: ${{ env.INPUTS_ARTIFACT }}
+          path: ${{ runner.temp }}/green-inputs/
+          retention-days: 90
+          if-no-files-found: error
+          overwrite: true
