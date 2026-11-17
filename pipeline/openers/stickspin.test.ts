@@ -41,7 +41,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
    '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22',
-   '2026-10-29', '2026-11-01', '2026-11-05']);
+   '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17']);
 
 /** Bag 1 matched (six pieces, the page's board) and the 7th lock was NOT a full T-spin Single on a
  *  drawn U slot: the piece, the engine's spin and the lines it cleared. The one round is a T laid
@@ -158,8 +158,8 @@ const NODE_CASES: Record<string, number> = {
 /** Opportunities: bag 1 at 6 locks, the spin step at lock 7, bag 2 at 13 locks. bag1.left's is BOTH
  *  players': pinglamb has no case, and an earlier emitter built its per-player tally from the cases
  *  alone, so his 1259 opportunities vanished and the denominator read 1223 (yachi's). Pinned per player. */
-const OPPORTUNITIES: Record<string, number> = { 'bag1.left': 3153, 'bag1.fire': 87, 'bag1.pc': 87, '2.sd': 73 };
-const BAG1_OPPORTUNITIES_BY_PLAYER = { pinglamb: 1597, yachi: 1556 };
+const OPPORTUNITIES: Record<string, number> = { 'bag1.left': 3196, 'bag1.fire': 87, 'bag1.pc': 87, '2.sd': 73 };
+const BAG1_OPPORTUNITIES_BY_PLAYER = { pinglamb: 1618, yachi: 1578 };
 /** Nodes the classifier cannot compare, and why (from the routes JSON, never a count of 0). */
 const UNMEASURED: Record<string, string> = {
   'bag1.right': 'mirror_of: bag1.left', 'bag1.fire.after': 'illustration', '2.fire.tsd': 'illustration',

@@ -12,7 +12,7 @@
  "alignment": {
   "method": "each replay's ts is the match's end; walking back by the replay's own round lengths plus the gap between rounds, every round start is snapped to the first frame after the empty-board countdown in the video, sampled at 4 frames a second",
   "max_snap_s": 1.0,
-  "link_lead_s": 5
+  "link_lead_s": 1
  },
  "matches": [
   {

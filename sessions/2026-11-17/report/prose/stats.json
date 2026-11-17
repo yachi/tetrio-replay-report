@@ -1,0 +1,43 @@
+{
+  "eyebrow": "數據對決 · 三張圖",
+  "title": "數據對決",
+  "lede": "三張圖答三條問題：逐場點走、散喺邊種清行、同埋逐項身手邊個高。睇之前記住：<strong>今晚 yachi 快啲、落多啲，pinglamb 每粒重一成，粒數填唔返</strong>。yachi 每局平均 PPS 約 1.45 對約 1.40<span class=\"badge\" data-claim=\"G034\"></span>、全晚多疊 71 粒<span class=\"badge\" data-claim=\"C005\"></span>；pinglamb 每粒方塊打出嘅攻擊高 10.46%<span class=\"badge\" data-claim=\"C004\"></span><span class=\"badge\" data-claim=\"G036\"></span>。兩樣相抵，總攻擊 pinglamb 多 97 條<span class=\"badge\" data-claim=\"G024\"></span><span class=\"badge\" data-claim=\"C005\"></span>。",
+  "panels": [
+    {
+      "heading": "逐場 VS 走勢——第一場開局四連敗，尾兩場近啲",
+      "caps": [
+        "三格細圖，一場一格。第一場局數 2 比 5，尾兩場 7 比 10<span class=\"badge\" data-claim=\"C010\"></span>：yachi 尾兩場嘅贏局率高過第一場。"
+      ],
+      "footnote": null,
+      "mount": {
+        "id": "vs-small-multiples",
+        "class": "sm-grid",
+        "scroll_x": false
+      }
+    },
+    {
+      "heading": "清行類型分布——每一種都係 pinglamb 多啲",
+      "caps": [
+        "Quad pinglamb 100 對 97<span class=\"badge\" data-claim=\"G029\"></span>；T-spin double 92 對 89<span class=\"badge\" data-claim=\"G030\"></span>，T-spin triple 26 對 19<span class=\"badge\" data-claim=\"G031\"></span>。T-spin double 加 triple 計埋 pinglamb 118 對 108<span class=\"badge\" data-claim=\"G048\"></span>。"
+      ],
+      "footnote": "「T-spin 總數」<span class=\"badge\" data-claim=\"G028\"></span>計埋冇消行嘅 spin，所以會大過上面逐種清行加埋嘅數。兩個數量度緊唔同嘢，唔好溝埋講。",
+      "mount": {
+        "id": "clears-bar-chart",
+        "class": null,
+        "scroll_x": true
+      }
+    },
+    {
+      "heading": "身手大比拼——快同省力係 yachi，重係 pinglamb",
+      "caps": [
+        "yachi PPS 高<span class=\"badge\" data-claim=\"G034\"></span>、perfect piece 比率高<span class=\"badge\" data-claim=\"G038\"></span>、每粒方塊按少啲掣<span class=\"badge\" data-claim=\"G054\"></span>；pinglamb APM 平均高<span class=\"badge\" data-claim=\"G035\"></span>、每粒方塊嘅攻擊高<span class=\"badge\" data-claim=\"G036\"></span>、B2B 上限高<span class=\"badge\" data-claim=\"G046\"></span>。24 局之後，攻擊 pinglamb 多 97 條<span class=\"badge\" data-claim=\"C005\"></span>。"
+      ],
+      "footnote": "「每粒 finesse 失誤」係<strong>失誤次數</strong>除粒數，唔係「幾多粒方塊撳錯」——一粒可以記幾次，所以呢一行用 toFixed(3) 唔用百分比。",
+      "mount": {
+        "id": "tape-chart",
+        "class": null,
+        "scroll_x": true
+      }
+    }
+  ]
+}

@@ -95,7 +95,7 @@ bun cross-extract.mjs   # how much of each quarantined section two engines agree
 
 `scan-firstdiv` showed the remaining divergences are dominated by garbage-insertion TIMING, not
 placement — no second `hoisted` to find. `cross-extract` then measured Triangle as a SECOND EXTRACTOR:
-over the verified prefix, sim and Triangle agree bit-exact on **96.8%** of locks, backing **96.8%** of
+over the verified prefix, sim and Triangle agree bit-exact on **96.7%** of locks, backing **96.7%** of
 forecast events and **95.5%** of opener rounds with an independent engine — the dual-implementation
 evidence the quarantined sections are missing. Building that check exposed the oracle's own hole-pairing
 bug (the FIFO-vs-iid issue fixed above): before it, the one surviving forecast (`forecast_lineclear`)
@@ -148,6 +148,7 @@ Three separate staleness deltas had stacked up behind it, and the prose above qu
 | 10 | 10-29 added (68 rounds; 3218 of its 3326 prefix locks bit-exact, 96.8% — the lock figure unmoved at one decimal; its 290 of 306 forecast events, 94.8%, lower the forecast figure a tenth to 96.4%) | → 96.5% |
 | 11 | 11-01 added (130 rounds; 6290 of its 6345 prefix locks bit-exact, 99.1% — above the pool, so it lifts the lock figure two tenths to 96.7%; its 574 of 577 forecast events, 99.5%, lift the forecast figure to 96.7%, and its 238 of 242 opener rounds, 98.3%, lift the opener figure to 95.5%) | → 96.7% |
 | 12 | 11-05 added (67 rounds; 3500 of its 3560 prefix locks bit-exact, 98.3% — above the pool, so it lifts the lock figure a tenth to 96.8%; its 304 of 307 forecast events, 99.0%, lift the forecast figure to 96.8%, and its 126 of 130 opener rounds, 96.9%, leave the opener figure at 95.5%) | → 96.8% |
+| 13 | 11-17 added (24 rounds; 1218 of its 1314 prefix locks bit-exact, 92.7% — below the pool, so it lowers the lock figure a tenth to 96.7%; its 117 of 128 forecast events, 91.4%, lower the forecast figure to 96.7%, and its 42 of 45 opener rounds, 93.3%, leave the opener figure at 95.5%) | → 96.7% |
 
 Only delta 3 is the one a "new session" checklist would catch. Delta 1 is prose left behind by a
 regeneration, delta 2 is an artefact left behind by a *source* change — and delta 2 is the large one.

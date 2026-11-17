@@ -647,12 +647,29 @@ PUBLISHED = (
     # The lost gap is the corpus's first negative one and moves TOWARD zero without its round.
     ("2026-11-05", "app_gap_won", "series"),
     ("2026-11-05", "app_gap_lost", "series"),
+    # 2026-11-17 takes TWO `ANNOTATED` entries, both regime gaps, on 24 rounds (the corpus's
+    # smallest): app_gap_won +6.9454 (m2r5 -> +1.3420, rel 0.807, 1.22x the next) and
+    # app_gap_lost +3.7585 (m2r6 -> +6.6333, rel 0.765, 1.09x); neither sign moves.
+    ("2026-11-17", "app_gap_won", "series"),
+    ("2026-11-17", "app_gap_lost", "series"),
 )
 
 # The named exception list: every (session, figure) already investigated, with the reason it
 # crosses. Named, not a raised threshold — a sixth case must be looked at, and a case that
 # stops crossing must be taken off the list and out of the prose.
 ANNOTATED = {
+    ("2026-11-17", "app_gap_won"): (
+        "the won-regime gap is +6.9454 pp and m2r5 alone takes it to +1.3420 — down by 5.6034, "
+        "the sign surviving. m2r5 is a round yachi won at .5325 attack per piece over 231 "
+        "pieces, 28% of his 817-piece winning-round pool on the corpus's smallest night (24 "
+        "rounds), a low-efficiency long win that holds his won rate below pinglamb's. "
+        "`rel` 0.807, the next round 1.22x below it."),
+    ("2026-11-17", "app_gap_lost"): (
+        "the lost-regime gap is +3.7585 pp and m2r6 alone takes it to +6.6333 — WIDER, by "
+        "2.8748, the 08-14 / 09-10 direction. m2r6 is a round yachi lost at .6304 attack per "
+        "piece over 230 pieces, 15% of his 1556-piece losing-round pool; without that "
+        "high-efficiency loss his losing rounds sit further below pinglamb's. The sign "
+        "survives; the size is that round's. `rel` 0.765, the next round 1.09x below it."),
     ("2026-11-05", "app_gap_lost"): (
         "the lost-regime gap is -1.8838 pp — the first NEGATIVE published lost-gap in the corpus: "
         "in the rounds each man lost, yachi's attack per piece is the higher — and m7r6 alone "

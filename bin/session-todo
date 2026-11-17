@@ -1,0 +1,168 @@
+#!/usr/bin/env python3
+"""List what the corpus-wide gates still need after a session lands.  Read-only, seconds.
+
+    bin/session-todo sessions/2026-11-17
+    bin/session-todo sessions/2026-11-17 --corpus    also bin/emit-corpus --check (minutes)
+    bin/session-todo sessions/2026-11-17 --jobs 2    gates run at once (default 4)
+
+WHY THIS EXISTS.  `bin/new-session` ends with a verified ledger and a report shell, and
+then a dozen gates OUTSIDE the session go red, because each one names the corpus: a
+leave-one-out artefact the new session lacks, a CLAUDE.md fragment counting 22 sessions
+when 23 are on disk, a matrix in verify.yml that does not list it, a pre-registration
+that has not classified it, and every other session's report.html, whose corpus-wide
+sections moved.  Those were found one CI run at a time.  This runs the cheap form of each
+(the prose/staleness check, never the re-measurement) and prints, for every red one, the
+command that fixes it.
+
+WHAT IT IS NOT.  It is not CI and not `bin/verify-repo`: a green list here says the cheap
+halves agree, not that the re-measurements would (`check_loo --check`,
+`check_equiv_coverage --check`, `check_rate_records --rerun` re-derive; run them, or
+`bin/verify-repo`, before pushing).  It writes nothing: every command it runs is a check
+mode, and the fixes are printed, never run.
+"""
+import argparse
+import concurrent.futures as cf
+import os
+import re
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parent.parent
+PY = sys.executable or "python3"
+
+# (name, argv, fix).  Each argv is a CHECK mode that writes nothing.  {d} is the date.
+GATES = [
+    ("workflow matrices", [PY, "bin/verify-repo", "--check"],
+     "add `sessions/{d}/report` to the `verify` matrix and '{d}' to the `pipeline` matrix in "
+     ".github/workflows/verify.yml, then `python3 bin/verify-repo --check`"),
+    ("preregistrations", [PY, "-m", "pipeline.check_preregistrations"],
+     "classify {d} (exploratory, banked or tested) in pipeline/preregistrations.json"),
+    ("leave-one-out", [PY, "-m", "pipeline.check_loo", "--check-prose"],
+     "`python3 -m pipeline.check_loo --write`, then paste `python3 -m pipeline.check_loo --render` "
+     "into the documents it names"),
+    ("intense-round corpus", [PY, "-m", "pipeline.check_intense_corpus", "--check-prose"],
+     "rebuild the reports (see build_report below), then paste "
+     "`python3 -m pipeline.check_intense_corpus --render`"),
+    ("equiv coverage", [PY, "-m", "pipeline.claims.check_equiv_coverage", "--check-prose"],
+     "`python3 -m pipeline.claims.check_equiv_coverage --write --jobs 2` (slow), then paste "
+     "`python3 -m pipeline.claims.check_equiv_coverage --render`"),
+    ("rate records", [PY, "-m", "pipeline.check_rate_records"],
+     "`Rscript analysis/rate_records.R --json analysis/rate-records.json`, then paste "
+     "`python3 -m pipeline.check_rate_records --render` into CLAUDE.md"),
+    ("stat sources", [PY, "-m", "pipeline.check_stat_sources"],
+     "paste `python3 -m pipeline.check_stat_sources --render` into CLAUDE.md"),
+    ("app decomposition", [PY, "-m", "pipeline.check_app_decomposition"],
+     "needs sessions/{d}/sim/attack-facts.json; then paste "
+     "`python3 -m pipeline.check_app_decomposition --render` into CLAUDE.md"),
+    ("donation bands", [PY, "-m", "pipeline.check_donation_bands"],
+     "needs sessions/{d}/sim/opener-facts.json; then paste "
+     "`python3 -m pipeline.check_donation_bands --render` into CLAUDE.md"),
+    ("dual engine", [PY, "-m", "pipeline.check_dual_engine"],
+     "needs sessions/{d}/sim/opener-facts.json; then paste "
+     "`python3 -m pipeline.check_dual_engine --render` into CLAUDE.md"),
+]
+CORPUS_GATE = ("corpus artefacts", [PY, "bin/emit-corpus", "--check", "--jobs", "2"],
+               "`python3 bin/emit-corpus --jobs 2` re-emits every analysis/*.json the sessions feed")
+
+TIMEOUT = 900
+_RED = re.compile(r"^\s*(FAIL|BAD|DRIFT|!!)|\bstale\b|does not|not classified|no longer", re.I)
+
+
+def run(argv):
+    t0 = time.monotonic()
+    try:
+        r = subprocess.run(argv, cwd=REPO, capture_output=True, text=True, timeout=TIMEOUT)
+        rc, out = r.returncode, r.stdout + r.stderr
+    except subprocess.TimeoutExpired:
+        rc, out = 124, f"timed out after {TIMEOUT}s"
+    except OSError as e:
+        rc, out = 127, str(e)
+    return rc, out, time.monotonic() - t0
+
+
+def evidence(out, date, n=4):
+    """The lines worth printing: the ones naming the session first, then other red ones."""
+    lines = [l.rstrip() for l in out.splitlines() if l.strip()]
+    mine = [l for l in lines if date in l]
+    red = [l for l in lines if _RED.search(l) and l not in mine]
+    pick = (mine + red)[:n] or lines[-n:]
+    more = len(mine) + len(red) - len(pick)
+    return [l if len(l) <= 220 else l[:217] + "..." for l in pick], max(more, 0)
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap.add_argument("session", help="the session directory, sessions/<date>")
+    ap.add_argument("--corpus", action="store_true",
+                    help="also run bin/emit-corpus --check (re-runs the emitters; minutes)")
+    ap.add_argument("--jobs", type=int, default=4, help="gates run at once (default 4)")
+    args = ap.parse_args()
+
+    sdir = Path(args.session).resolve()
+    date = sdir.name
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", date) or not (sdir / "report").is_dir():
+        print(f"{args.session}: not a session directory (want sessions/<date> holding report/)",
+              file=sys.stderr)
+        return 2
+
+    tasks = {name: argv for name, argv, _ in GATES}
+    fixes = {name: fix for name, _, fix in GATES}
+    if args.corpus:
+        if (REPO / "bin" / "emit-corpus").exists():
+            tasks[CORPUS_GATE[0]] = CORPUS_GATE[1]
+            fixes[CORPUS_GATE[0]] = CORPUS_GATE[2]
+        else:
+            print("  --  --corpus: bin/emit-corpus does not exist here; not run")
+    # Every report's corpus-wide sections move when a session lands, so build_report --check
+    # runs over EVERY session, not just the new one.
+    reports = sorted(p.parent for p in (REPO / "sessions").glob("*/report/report.html"))
+    for r in reports:
+        tasks[f"build_report {r.parent.name}"] = [PY, "-m", "pipeline.build_report",
+                                                  str(r.relative_to(REPO)), "--check"]
+
+    t0 = time.monotonic()
+    with cf.ThreadPoolExecutor(max_workers=max(1, args.jobs)) as ex:
+        futs = {name: ex.submit(run, argv) for name, argv in tasks.items()}
+        res = {name: f.result() for name, f in futs.items()}
+    wall = time.monotonic() - t0
+
+    red_gates = [n for n, _, _ in GATES if n in res and res[n][0] != 0]
+    if CORPUS_GATE[0] in res and res[CORPUS_GATE[0]][0] != 0:
+        red_gates.append(CORPUS_GATE[0])
+    red_reports = [r for r in reports if res[f"build_report {r.parent.name}"][0] != 0]
+
+    print(f"session-todo {date}: {len(tasks)} checks in {wall:.1f}s, "
+          f"{len(red_gates) + len(red_reports)} red\n")
+    for name in [n for n in tasks if not n.startswith("build_report ")]:
+        rc, out, secs = res[name]
+        if rc == 0:
+            print(f"  ok   {name}  ({secs:.1f}s)")
+            continue
+        print(f"  RED  {name}  ({secs:.1f}s, exit {rc})  — {' '.join(tasks[name][1:])}")
+        lines, more = evidence(out, date)
+        for l in lines:
+            print(f"         | {l.strip()}")
+        if more:
+            print(f"         | ... and {more} more")
+        print(f"       fix: {fixes[name].format(d=date)}")
+    if red_reports:
+        print(f"  RED  build_report --check: {len(red_reports)} of {len(reports)} reports drift "
+              f"from what they generate")
+        print(f"         | {', '.join(r.parent.name for r in red_reports)}")
+        print("       fix: python3 -m pipeline.build_report <dir> for each, e.g.")
+        print("         for d in " + " ".join(r.parent.name for r in red_reports) + "; do "
+              "python3 -m pipeline.build_report sessions/$d/report; done")
+    else:
+        print(f"  ok   build_report --check, all {len(reports)} reports")
+    if not args.corpus:
+        print("  --   not run: bin/emit-corpus --check (re-runs every corpus emitter, minutes); "
+              "pass --corpus")
+    print("  --   cheap halves only: re-measurements (check_loo --check, check_equiv_coverage "
+          "--check, check_rate_records --rerun) are bin/verify-repo's")
+    return 1 if (red_gates or red_reports) else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

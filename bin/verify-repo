@@ -5,6 +5,9 @@
     bin/verify-repo --fast       omit the slow tier (coverage, oracle-image)
     bin/verify-repo --weekly     add the schedule-only jobs and steps
     bin/verify-repo --sessions   add the two per-session matrices, expanded from the workflow
+    bin/verify-repo --session 2026-11-05
+                                 both matrices, but only their entries for that date
+                                 (repeatable); every entry left out is named in the summary
     bin/verify-repo --check      completeness only: run nothing, just check this script
                                  still knows every job and step in .github/workflows/
     bin/verify-repo --list       print the plan and exit
@@ -667,13 +670,33 @@ def tool_versions(env):
     return have, diverge
 
 
+def session_of(value):
+    """The session date a matrix value belongs to, or None.  `verify` entries are
+    artefact directories (`sessions/<date>/report`, `sessions/<date>/proof`), `pipeline`
+    entries are bare dates, so a date matches its own entry in either matrix."""
+    m = re.fullmatch(r"(\d{4}-\d{2}-\d{2})", value) or \
+        re.match(r"sessions/(\d{4}-\d{2}-\d{2})/", value)
+    return m.group(1) if m else None
+
+
+def matrix_combos(entry, job, args):
+    """(run, left out) for one matrix job.  With --session, only the entries for those
+    dates run, and every other entry is returned so the summary can name it: a narrowed
+    run that did not say what it left out would read as the full matrix."""
+    vals = list(job.matrix[entry.matrix])
+    if not args.session:
+        return vals, []
+    keep = [v for v in vals if session_of(v) in args.session]
+    return keep, [v for v in vals if v not in keep]
+
+
 def selected(entry, args, name=None):
     # --only is the "CI went red on X, reproduce X" path, and it overrides the tiers
     # outright: naming a job is a decision, so it does not also need the right flag.
     if args.only:
         return name in args.only
     if entry.tier == SESSIONS:
-        return args.sessions
+        return args.sessions or bool(args.session)
     if entry.tier == WEEKLY:
         return args.weekly
     if entry.tier == SLOW:
@@ -686,7 +709,7 @@ def execute(env, jobs, args):
     have, diverge = tool_versions(env)
     scratch = Path(tempfile.mkdtemp(prefix="verify-repo-"))
     shellenv = runner_env(scratch, args.weekly)
-    ran, failed, skipped = [], [], []
+    ran, failed, skipped, uncovered = [], [], [], []
 
     order = [n for n in PLAN if n in by_name]
     order.sort(key=lambda n: ({FAST: 0, DEFAULT: 1, SLOW: 2, WEEKLY: 3, SESSIONS: 4}
@@ -709,7 +732,9 @@ def execute(env, jobs, args):
 
         combos = [(None, None)]
         if entry.matrix:
-            combos = [(entry.matrix, v) for v in job.matrix[entry.matrix]]
+            keep, left = matrix_combos(entry, job, args)
+            combos = [(entry.matrix, v) for v in keep]
+            uncovered += [f"{name}[{v}]" for v in left]
 
         for dim, val in combos:
             label = name if val is None else f"{name}[{val}]"
@@ -746,6 +771,11 @@ def execute(env, jobs, args):
     # is the failure this tool exists to stop.
     for n, why in skipped:
         print(f"  --   {n}: {why}")
+    if uncovered:
+        print(f"  --   {len(uncovered)} matrix entries NOT run (--session "
+              f"{' '.join(sorted(args.session))}):")
+        for n in uncovered:
+            print(f"  --     {n}")
     for name in order:
         e = PLAN[name]
         if selected(e, args, name) and not e.blocked():
@@ -755,7 +785,7 @@ def execute(env, jobs, args):
     for d in diverge:
         print(f"  !!   toolchain divergence — {d}")
     shutil.rmtree(scratch, ignore_errors=True)
-    if not args.sessions and not args.only:
+    if not args.sessions and not args.session and not args.only:
         print("  --   per-session gates: bin/verify-session <artefact-dir> "
               "(or bin/verify-repo --sessions)")
     return 1 if failed else 0
@@ -935,6 +965,30 @@ def selftest():
         return 1
     print("  ok   a plain new run step is absorbed, not rejected")
 
+    # Control 5 — --session partitions each matrix.  Every entry must belong to exactly
+    # one session date, so that the run plus the summary's "NOT run" list is always the
+    # whole matrix.  An entry `session_of` cannot place (a renamed artefact layout) would
+    # be selectable by no --session and named by no summary line.
+    class _A:
+        pass
+    for job, (dim, to_entry, _) in MATRIX_ON_DISK.items():
+        j = next(x for x in jobs if x.name == job)
+        vals = j.matrix[dim]
+        orphans = [v for v in vals if session_of(v) is None]
+        if orphans:
+            print(f"CONTROL FAILED — {job} entries no --session can select: {orphans}",
+                  file=sys.stderr)
+            return 1
+        for d in sorted({session_of(v) for v in vals}):
+            a = _A()
+            a.session = [d]
+            keep, left = matrix_combos(PLAN[job], j, a)
+            if sorted(keep + left) != sorted(vals) or to_entry(d) not in keep:
+                print(f"CONTROL FAILED — --session {d} does not partition {job}: {keep}",
+                      file=sys.stderr)
+                return 1
+    print("  ok   --session partitions both matrices by date")
+
     # The planted corruptions.  Each must be REJECTED — by the scanner or by the
     # completeness check; which one does not matter, going green does.
     for kind in ("job added to CI", "job removed from CI",
@@ -972,6 +1026,9 @@ def main():
     ap.add_argument("--fast", action="store_true", help="omit the slow tier")
     ap.add_argument("--weekly", action="store_true", help="add the schedule-only jobs and steps")
     ap.add_argument("--sessions", action="store_true", help="add the two per-session matrices")
+    ap.add_argument("--session", action="append", metavar="DATE",
+                    help="run both matrices for this session only (repeatable); the "
+                         "summary names every matrix entry left out")
     ap.add_argument("--only", action="append", metavar="JOB",
                     help="run only these jobs, whatever their tier (repeatable)")
     ap.add_argument("--check", action="store_true", help="completeness only; run nothing")
@@ -989,6 +1046,13 @@ def main():
         unknown = sorted(set(args.only) - set(PLAN))
         if unknown:
             problems += [f"--only names {n!r}, which is not a job" for n in unknown]
+    if args.session:
+        by_name = {j.name: j for j in jobs}
+        for d in args.session:
+            for job, (dim, _, _) in MATRIX_ON_DISK.items():
+                j = by_name.get(job)
+                if j is None or not any(session_of(v) == d for v in j.matrix.get(dim, [])):
+                    problems.append(f"--session {d}: the {job!r} matrix has no entry for it")
     if problems:
         print("bin/verify-repo no longer stands in for CI:", file=sys.stderr)
         for p in problems:

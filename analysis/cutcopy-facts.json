@@ -123,6 +123,11 @@
     "session": "2026-11-05",
     "replays_md5": "1307e915c6c9bfe54936492f537a9620",
     "replay_facts_md5": "aba536fe004d66aa95de053f32c06999"
+   },
+   {
+    "session": "2026-11-17",
+    "replays_md5": "84960506bede5c970ecc3bc0f411c310",
+    "replay_facts_md5": "b87100b06a514bc89e4fb74f28057c2f"
    }
   ],
   "transcription_md5": "baa922715bf9150a0ab6775fe35fe71a",
@@ -150,7 +155,8 @@
   "2026-10-22",
   "2026-10-29",
   "2026-11-01",
-  "2026-11-05"
+  "2026-11-05",
+  "2026-11-17"
  ],
  "window_pieces": 21,
  "window_rule": "0-based lock index <= 21 is in_opener (emit-opener-facts.ts's convention; emit-attack-facts.ts counts from 1)",
@@ -158,24 +164,24 @@
  "denominators": {
   "pinglamb": {
    "TSD": {
-    "all": 6651,
-    "in_opener": 1302,
-    "mid_game": 5349
+    "all": 6723,
+    "in_opener": 1318,
+    "mid_game": 5405
    },
    "TSS": {
-    "all": 762,
-    "in_opener": 104,
-    "mid_game": 658
+    "all": 778,
+    "in_opener": 108,
+    "mid_game": 670
    },
    "TST": {
-    "all": 1702,
-    "in_opener": 1662,
-    "mid_game": 40
+    "all": 1727,
+    "in_opener": 1684,
+    "mid_game": 43
    },
    "mini_TSS": {
-    "all": 391,
+    "all": 398,
     "in_opener": 16,
-    "mid_game": 375
+    "mid_game": 382
    },
    "mini_TSD": {
     "all": 0,
@@ -184,28 +190,28 @@
    },
    "other_scored": 0,
    "recon_disagreed": 0,
-   "unscored_past_prefix": 836
+   "unscored_past_prefix": 860
   },
   "yachi": {
    "TSD": {
-    "all": 6052,
-    "in_opener": 1548,
-    "mid_game": 4504
+    "all": 6121,
+    "in_opener": 1565,
+    "mid_game": 4556
    },
    "TSS": {
-    "all": 1258,
-    "in_opener": 301,
-    "mid_game": 957
+    "all": 1276,
+    "in_opener": 304,
+    "mid_game": 972
    },
    "TST": {
-    "all": 1034,
-    "in_opener": 978,
-    "mid_game": 56
+    "all": 1053,
+    "in_opener": 993,
+    "mid_game": 60
    },
    "mini_TSS": {
-    "all": 99,
+    "all": 101,
     "in_opener": 9,
-    "mid_game": 90
+    "mid_game": 92
    },
    "mini_TSD": {
     "all": 0,
@@ -214,14 +220,14 @@
    },
    "other_scored": 0,
    "recon_disagreed": 0,
-   "unscored_past_prefix": 524
+   "unscored_past_prefix": 553
   }
  },
  "check": {
-  "tspin_clears_scored": 17949,
-  "reconstruction_agreed": 17949,
+  "tspin_clears_scored": 18177,
+  "reconstruction_agreed": 18177,
   "reconstruction_disagreed": 0,
-  "rowmap_steps": 314749,
+  "rowmap_steps": 319424,
   "rowmap_unverified": 32,
   "by_session": {
    "2026-07-22": {
@@ -399,6 +405,14 @@
      "pinglamb": 364,
      "yachi": 380
     }
+   },
+   "2026-11-17": {
+    "tspin_clears": 228,
+    "reconstruction_disagreed": 0,
+    "players": {
+     "pinglamb": 120,
+     "yachi": 108
+    }
    }
   }
  },
@@ -453,21 +467,21 @@
     },
     "ablation": {
      "no_must_empty": {
-      "pinglamb": 334,
-      "yachi": 191
+      "pinglamb": 335,
+      "yachi": 192
      },
      "no_roof": {
-      "pinglamb": 506,
+      "pinglamb": 514,
       "yachi": 431
      },
      "t_overlap": {
       "pinglamb": 9,
-      "yachi": 9
+      "yachi": 10
      }
     },
     "orientation_baseline": {
-     "pinglamb": 63,
-     "yachi": 86
+     "pinglamb": 64,
+     "yachi": 89
     }
    }
   },
@@ -519,8 +533,8 @@
     },
     "ablation": {
      "no_must_empty": {
-      "pinglamb": 842,
-      "yachi": 534
+      "pinglamb": 848,
+      "yachi": 541
      },
      "no_roof": {
       "pinglamb": 1,
@@ -528,12 +542,12 @@
      },
      "t_overlap": {
       "pinglamb": 20,
-      "yachi": 7
+      "yachi": 8
      }
     },
     "orientation_baseline": {
-     "pinglamb": 63,
-     "yachi": 86
+     "pinglamb": 64,
+     "yachi": 89
     }
    }
   }
@@ -9912,7 +9926,126 @@
    "2026-11-05 m8r9 yachi lock 48 (cutcopy)",
    "2026-11-05 m8r9 yachi lock 48 (uncut)",
    "2026-11-05 m8r9 yachi lock 68 (cutcopy)",
-   "2026-11-05 m8r9 yachi lock 68 (uncut)"
+   "2026-11-05 m8r9 yachi lock 68 (uncut)",
+   "2026-11-17 m1r1 pinglamb lock 146 (cutcopy)",
+   "2026-11-17 m1r1 pinglamb lock 146 (uncut)",
+   "2026-11-17 m1r2 yachi lock 17 (uncut)",
+   "2026-11-17 m1r2 yachi lock 97 (cutcopy)",
+   "2026-11-17 m1r2 yachi lock 97 (uncut)",
+   "2026-11-17 m1r4 pinglamb lock 18 (uncut)",
+   "2026-11-17 m1r4 pinglamb lock 26 (cutcopy)",
+   "2026-11-17 m1r4 pinglamb lock 26 (uncut)",
+   "2026-11-17 m1r5 yachi lock 18 (uncut)",
+   "2026-11-17 m1r6 yachi lock 19 (uncut)",
+   "2026-11-17 m1r6 pinglamb lock 19 (uncut)",
+   "2026-11-17 m1r7 pinglamb lock 17 (uncut)",
+   "2026-11-17 m1r7 pinglamb lock 39 (cutcopy)",
+   "2026-11-17 m1r7 pinglamb lock 39 (uncut)",
+   "2026-11-17 m2r2 pinglamb lock 23 (uncut)",
+   "2026-11-17 m2r2 pinglamb lock 43 (cutcopy)",
+   "2026-11-17 m2r2 pinglamb lock 43 (uncut)",
+   "2026-11-17 m2r2 yachi lock 18 (uncut)",
+   "2026-11-17 m2r2 yachi lock 44 (cutcopy)",
+   "2026-11-17 m2r2 yachi lock 44 (uncut)",
+   "2026-11-17 m2r2 yachi lock 66 (cutcopy)",
+   "2026-11-17 m2r2 yachi lock 66 (uncut)",
+   "2026-11-17 m2r3 yachi lock 9 (uncut)",
+   "2026-11-17 m2r3 yachi lock 65 (cutcopy)",
+   "2026-11-17 m2r3 yachi lock 65 (uncut)",
+   "2026-11-17 m2r3 yachi lock 130 (cutcopy)",
+   "2026-11-17 m2r3 yachi lock 130 (uncut)",
+   "2026-11-17 m2r3 pinglamb lock 26 (uncut)",
+   "2026-11-17 m2r4 yachi lock 16 (uncut)",
+   "2026-11-17 m2r4 pinglamb lock 16 (uncut)",
+   "2026-11-17 m2r4 pinglamb lock 89 (cutcopy)",
+   "2026-11-17 m2r4 pinglamb lock 89 (uncut)",
+   "2026-11-17 m2r5 yachi lock 45 (cutcopy)",
+   "2026-11-17 m2r5 yachi lock 45 (uncut)",
+   "2026-11-17 m2r5 yachi lock 163 (cutcopy)",
+   "2026-11-17 m2r5 yachi lock 163 (uncut)",
+   "2026-11-17 m2r5 pinglamb lock 96 (cutcopy)",
+   "2026-11-17 m2r5 pinglamb lock 96 (uncut)",
+   "2026-11-17 m2r5 pinglamb lock 121 (cutcopy)",
+   "2026-11-17 m2r5 pinglamb lock 121 (uncut)",
+   "2026-11-17 m2r5 pinglamb lock 137 (cutcopy)",
+   "2026-11-17 m2r5 pinglamb lock 137 (uncut)",
+   "2026-11-17 m2r6 pinglamb lock 69 (cutcopy)",
+   "2026-11-17 m2r6 pinglamb lock 69 (uncut)",
+   "2026-11-17 m2r6 pinglamb lock 221 (cutcopy)",
+   "2026-11-17 m2r6 pinglamb lock 221 (uncut)",
+   "2026-11-17 m2r6 yachi lock 6 (cutcopy)",
+   "2026-11-17 m2r6 yachi lock 6 (uncut)",
+   "2026-11-17 m2r6 yachi lock 28 (cutcopy)",
+   "2026-11-17 m2r6 yachi lock 28 (uncut)",
+   "2026-11-17 m2r6 yachi lock 107 (cutcopy)",
+   "2026-11-17 m2r6 yachi lock 107 (uncut)",
+   "2026-11-17 m2r6 yachi lock 148 (cutcopy)",
+   "2026-11-17 m2r6 yachi lock 148 (uncut)",
+   "2026-11-17 m2r6 yachi lock 161 (cutcopy)",
+   "2026-11-17 m2r6 yachi lock 161 (uncut)",
+   "2026-11-17 m2r6 yachi lock 200 (cutcopy)",
+   "2026-11-17 m2r6 yachi lock 200 (uncut)",
+   "2026-11-17 m2r6 yachi lock 221 (cutcopy)",
+   "2026-11-17 m2r6 yachi lock 221 (uncut)",
+   "2026-11-17 m2r7 yachi lock 39 (cutcopy)",
+   "2026-11-17 m2r7 yachi lock 39 (uncut)",
+   "2026-11-17 m2r7 yachi lock 63 (cutcopy)",
+   "2026-11-17 m2r7 yachi lock 63 (uncut)",
+   "2026-11-17 m2r7 pinglamb lock 15 (uncut)",
+   "2026-11-17 m2r7 pinglamb lock 30 (cutcopy)",
+   "2026-11-17 m2r7 pinglamb lock 30 (uncut)",
+   "2026-11-17 m3r1 yachi lock 7 (cutcopy)",
+   "2026-11-17 m3r1 yachi lock 7 (uncut)",
+   "2026-11-17 m3r1 yachi lock 14 (cutcopy)",
+   "2026-11-17 m3r1 yachi lock 14 (uncut)",
+   "2026-11-17 m3r1 yachi lock 22 (cutcopy)",
+   "2026-11-17 m3r1 yachi lock 22 (uncut)",
+   "2026-11-17 m3r1 yachi lock 34 (cutcopy)",
+   "2026-11-17 m3r1 yachi lock 34 (uncut)",
+   "2026-11-17 m3r1 yachi lock 42 (cutcopy)",
+   "2026-11-17 m3r1 yachi lock 42 (uncut)",
+   "2026-11-17 m3r2 pinglamb lock 274 (cutcopy)",
+   "2026-11-17 m3r2 pinglamb lock 274 (uncut)",
+   "2026-11-17 m3r2 pinglamb lock 299 (cutcopy)",
+   "2026-11-17 m3r2 pinglamb lock 299 (uncut)",
+   "2026-11-17 m3r2 pinglamb lock 303 (cutcopy)",
+   "2026-11-17 m3r2 pinglamb lock 303 (uncut)",
+   "2026-11-17 m3r2 yachi lock 6 (cutcopy)",
+   "2026-11-17 m3r2 yachi lock 6 (uncut)",
+   "2026-11-17 m3r2 yachi lock 13 (uncut)",
+   "2026-11-17 m3r3 pinglamb lock 17 (uncut)",
+   "2026-11-17 m3r4 yachi lock 6 (cutcopy)",
+   "2026-11-17 m3r4 yachi lock 6 (uncut)",
+   "2026-11-17 m3r4 yachi lock 14 (uncut)",
+   "2026-11-17 m3r4 yachi lock 32 (uncut)",
+   "2026-11-17 m3r4 yachi lock 52 (cutcopy)",
+   "2026-11-17 m3r4 yachi lock 52 (uncut)",
+   "2026-11-17 m3r4 yachi lock 67 (cutcopy)",
+   "2026-11-17 m3r4 yachi lock 67 (uncut)",
+   "2026-11-17 m3r5 pinglamb lock 14 (uncut)",
+   "2026-11-17 m3r5 pinglamb lock 27 (cutcopy)",
+   "2026-11-17 m3r5 pinglamb lock 27 (uncut)",
+   "2026-11-17 m3r5 pinglamb lock 34 (cutcopy)",
+   "2026-11-17 m3r5 pinglamb lock 34 (uncut)",
+   "2026-11-17 m3r5 pinglamb lock 112 (cutcopy)",
+   "2026-11-17 m3r5 pinglamb lock 112 (uncut)",
+   "2026-11-17 m3r5 pinglamb lock 138 (cutcopy)",
+   "2026-11-17 m3r5 pinglamb lock 138 (uncut)",
+   "2026-11-17 m3r5 pinglamb lock 146 (cutcopy)",
+   "2026-11-17 m3r5 pinglamb lock 146 (uncut)",
+   "2026-11-17 m3r5 pinglamb lock 157 (cutcopy)",
+   "2026-11-17 m3r5 pinglamb lock 157 (uncut)",
+   "2026-11-17 m3r5 yachi lock 28 (cutcopy)",
+   "2026-11-17 m3r5 yachi lock 28 (uncut)",
+   "2026-11-17 m3r5 yachi lock 145 (cutcopy)",
+   "2026-11-17 m3r5 yachi lock 145 (uncut)",
+   "2026-11-17 m3r6 pinglamb lock 38 (cutcopy)",
+   "2026-11-17 m3r6 pinglamb lock 38 (uncut)",
+   "2026-11-17 m3r7 yachi lock 14 (uncut)",
+   "2026-11-17 m3r8 pinglamb lock 15 (uncut)",
+   "2026-11-17 m3r8 yachi lock 16 (uncut)",
+   "2026-11-17 m3r8 yachi lock 26 (cutcopy)",
+   "2026-11-17 m3r8 yachi lock 26 (uncut)"
   ],
   "recon_dropped_tsd": []
  },

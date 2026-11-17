@@ -45,7 +45,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
    '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22',
-   '2026-10-29', '2026-11-01', '2026-11-05']);
+   '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17']);
 
 /** Bag 1 matched (six pieces, either colouring) and the 7th lock was NOT the drawn TSS: the piece, the
  *  engine's spin and the lines it cleared. Both are stick spin's too: 10-12 m8r4 lays its T flat on the
@@ -155,7 +155,7 @@ const STRUCTURAL_ZERO: Record<string, string> = {
 /** Opportunities per player: bag 1 at 6 locks (both stage boards share them), the TSS at lock 7, bag 2
  *  at 13 locks, the bag-3 boards and the PC patterns under 2.tsd, bag 4 and 5 under the board reached. */
 const OPPORTUNITIES: Record<string, Record<string, number>> = {
-  'bag1.lj.left': { pinglamb: 1597, yachi: 1556 }, 'bag1.jl.left': { pinglamb: 1597, yachi: 1556 },
+  'bag1.lj.left': { pinglamb: 1618, yachi: 1578 }, 'bag1.jl.left': { pinglamb: 1618, yachi: 1578 },
   'bag1.lj': { pinglamb: 4, yachi: 7 }, 'bag1.jl': { pinglamb: 0, yachi: 87 }, '2.tsd': { pinglamb: 4, yachi: 79 },
   '3.first': { pinglamb: 4, yachi: 78 }, '3.second': { pinglamb: 4, yachi: 78 }, '3.third': { pinglamb: 4, yachi: 78 },
   '3.first.cave': { pinglamb: 0, yachi: 58 }, '3.first.trinity': { pinglamb: 0, yachi: 10 },

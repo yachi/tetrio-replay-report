@@ -1,0 +1,291 @@
+#!/usr/bin/env python3
+"""Re-emit every corpus-wide artefact under analysis/, in dependency order, in parallel.
+
+    bin/emit-corpus                  re-emit every artefact that reads the sessions (the corpus tier)
+    bin/emit-corpus --all            also the constructed artefacts no session feeds (demos, own designs,
+                                     orders, the self-play rebuild)
+    bin/emit-corpus --check          emit into a temp dir and cmp against the committed files; write
+                                     nothing; exit 1 on any difference
+    bin/emit-corpus --only <name>    one artefact (repeatable; its dependencies are NOT re-run, they are
+                                     read from analysis/ as committed)
+    bin/emit-corpus --jobs N         run up to N emitters at once (default: nproc)
+    bin/emit-corpus --list           print the plan (tiers, edges, skips) and exit
+
+WHY THIS EXISTS.  The ~24 corpus emitters that write analysis/*.json were run one by one by hand, in an
+order written down only in prose (CLAUDE.md: route facts before 基本的なドネイト's facts, which hash the
+route artefacts; facts before demos).  A session landing moves every one of them, and a missed one is
+not loud until its test goes red in CI.
+
+THE LIST IS DERIVED, NOT COPIED.  Openers, techniques, their demos and own designs come from the
+registries the emitters themselves read (`route-openers.ts` OPENERS, `techniques.ts` TECHNIQUES /
+TECHNIQUE_DEMOS / TECHNIQUE_OWN), asked through bun.  The handful of single-purpose emitters (DPC, Second
+PC, forecast events, the SDPC loop demos, the orders, the self-play rebuild) are listed in EXTRA below.
+Then every analysis/*.json must be produced by exactly one node, or named in EXCLUDED with a reason; an
+artefact on disk nobody accounts for is an error, so a new emitter cannot be silently left out.
+
+THE EDGES ARE DERIVED TOO.  A node's DATA inputs are every analysis/*.json its profile hashes (a technique
+profile's `hashFiles`) or reads (`crossRoute.artefact`), plus EXTRA's own `reads`.  A node is in the
+CORPUS tier when it reads the sessions itself or has a data edge to a corpus node — so
+basicdonating-demos is corpus-tier (its classifier hash covers the route facts) while the other demos
+are not.  ORDER edges (demos after their own facts, as CLAUDE.md asks) only sequence; they do not move a
+node between tiers.
+
+--check READS COMMITTED INPUTS.  An emitter reads its upstream artefacts from analysis/ (the paths are
+compiled into the profiles), never from the temp dir, so under --check a dependent is checked against the
+committed upstream.  That is the right question for a gate (does the committed tree rebuild?), and an
+upstream that does not rebuild is reported on its own line anyway.
+"""
+from __future__ import annotations
+
+import argparse
+import concurrent.futures as cf
+import hashlib
+import json
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+import threading
+import time
+from dataclasses import dataclass, field
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parent.parent
+ANALYSIS = REPO / 'analysis'
+SIM = REPO / 'pipeline' / 'sim'
+
+#: analysis/*.json no node here produces, each with its reason
+EXCLUDED = {
+    'rate-records.json': 'written by `Rscript analysis/rate_records.R --json` (R, not a bun emitter); '
+                         'gated by pipeline/check_rate_records.py',
+}
+
+#: emitters the registries do not describe.  `reads`: analysis/ artefacts they read (data edges);
+#: `sessions`: whether they read sessions/* themselves; `needs`: an executable that must exist, else skip
+EXTRA = [
+    dict(name='dpc-facts', out='dpc-facts.json', argv=['emit-dpc-facts.ts'], sessions=True),
+    dict(name='secondpc-facts', out='secondpc-facts.json', argv=['emit-secondpc-facts.ts'], sessions=True),
+    dict(name='forecast-events', out='forecast-events.json', argv=['emit-forecast-events.ts'], sessions=True),
+    dict(name='sdpc-loop-demos', out='sdpc-loop-demos.json', argv=['emit-sdpc-loop-demos.ts'],
+         reads=['stickspin-demos.json']),
+    dict(name='sdpcspin-orders', out='sdpcspin-orders.json', argv=['emit-route-orders.ts', '--opener', 'sdpcspin']),
+    dict(name='sdpcspin-orders-cc', out='sdpcspin-orders-cc.json',
+         argv=['emit-route-orders-cc.ts', '--opener', 'sdpcspin'], reads=['sdpcspin-orders.json'],
+         needs='cc-oracle',
+         skip_why='needs the cold-clear `cc-oracle` binary (result/bin/cc-oracle, built by the flake for '
+                  'aarch64 only); CI re-queries it in the oracle-image job'),
+    # the self-play artefact rebuilds from the placements committed INSIDE it; re-running cold-clear
+    # (--games <jsonl> --coach-seed <n>) needs the bot's JSONL, which is not committed, and is not done here
+    dict(name='cutcopy-selfplay', out='cutcopy-selfplay.json', argv=['emit-cutcopy-selfplay.ts', '--rebuild'],
+         reads=['cutcopy-selfplay.json']),
+]
+
+REGISTRY_TS = r"""
+import { OPENERS } from '%(sim)s/route-openers.ts';
+import { TECHNIQUES, TECHNIQUE_DEMOS, TECHNIQUE_OWN } from '%(sim)s/techniques.ts';
+const flat = (h: any) => Object.values(h ?? {}).flat();
+const out: any = { openers: {}, techniques: {}, demos: {}, own: {} };
+for (const [k, P] of Object.entries(OPENERS) as any)
+  out.openers[k] = { facts: P.artefactPath, demos: P.demosPath, hashed: flat(P.hashFiles) };
+for (const [k, P] of Object.entries(TECHNIQUES) as any)
+  out.techniques[k] = { facts: P.artefactPath, hashed: flat(P.hashFiles), reads: P.crossRoute ? [P.crossRoute.artefact] : [] };
+for (const [k, P] of Object.entries(TECHNIQUE_DEMOS) as any)
+  out.demos[k] = { out: P.artefactPath, hashed: flat(P.hashFiles) };
+for (const [k, P] of Object.entries(TECHNIQUE_OWN) as any)
+  out.own[k] = { out: P.artefactPath, hashed: flat(P.hashFiles) };
+console.log(JSON.stringify(out));
+"""
+
+
+@dataclass
+class Node:
+    name: str
+    out: str                       # file name under analysis/
+    argv: list[str]                # after `bun pipeline/sim/`
+    sessions: bool = False         # reads sessions/* itself
+    data: set[str] = field(default_factory=set)    # out-names of artefacts it reads or hashes
+    order: set[str] = field(default_factory=set)   # out-names it must run after (no data)
+    skip_why: str | None = None
+    tier: str = 'constructed'
+
+
+def in_analysis(p: str) -> str | None:
+    q = Path(os.path.normpath(p))
+    return q.name if q.parent == ANALYSIS and q.suffix == '.json' else None
+
+
+def registry() -> dict:
+    r = subprocess.run(['bun', '-e', REGISTRY_TS % {'sim': SIM}], cwd=REPO, capture_output=True, text=True)
+    if r.returncode != 0:
+        sys.exit(f'emit-corpus: could not read the emitter registries through bun:\n{r.stderr}')
+    return json.loads(r.stdout)
+
+
+def plan() -> dict[str, Node]:
+    reg = registry()
+    nodes: list[Node] = []
+    for k, o in reg['openers'].items():
+        facts, demos = in_analysis(o['facts']), in_analysis(o['demos'])
+        nodes.append(Node(facts[:-5], facts, ['emit-route-facts.ts', '--opener', k], sessions=True))
+        # CLAUDE.md: emit the facts before the demos (the demos test classifies with the facts' classifier)
+        nodes.append(Node(demos[:-5], demos, ['emit-route-demos.ts', '--opener', k], order={facts}))
+    for k, t in reg['techniques'].items():
+        facts = in_analysis(t['facts'])
+        data = {a for a in map(in_analysis, t['hashed'] + t['reads']) if a and a != facts}
+        nodes.append(Node(facts[:-5], facts, ['emit-technique-facts.ts', '--technique', k], sessions=True, data=data))
+    for k, d in reg['demos'].items():
+        out = in_analysis(d['out'])
+        facts = in_analysis(reg['techniques'][k]['facts'])
+        # a technique demo hashes its matcher's classifier files, so whatever the facts hash, it hashes too
+        data = {a for a in map(in_analysis, d['hashed'] + reg['techniques'][k]['hashed']) if a}
+        nodes.append(Node(out[:-5], out, ['emit-technique-demos.ts', '--technique', k], data=data - {facts},
+                          order={facts}))
+    for k, d in reg['own'].items():
+        out = in_analysis(d['out'])
+        data = {a for a in map(in_analysis, d['hashed'] + reg['techniques'][k]['hashed']) if a}
+        nodes.append(Node(out[:-5], out, ['emit-technique-own.ts', '--technique', k], data=data))
+    for e in EXTRA:
+        n = Node(e['name'], e['out'], list(e['argv']), sessions=e.get('sessions', False),
+                 data=set(e.get('reads', [])) - {e['out']})
+        if e.get('needs') and not (shutil.which(e['needs']) or (REPO / 'result' / 'bin' / e['needs']).exists()):
+            n.skip_why = e['skip_why']
+        nodes.append(n)
+
+    by_out = {n.out: n for n in nodes}
+    if len(by_out) != len(nodes):
+        sys.exit('emit-corpus: two nodes write one artefact')
+    # completeness, both directions
+    on_disk = {p.name for p in ANALYSIS.glob('*.json')}
+    errors = [f'analysis/{f}: no emitter here produces it and EXCLUDED does not name it'
+              for f in sorted(on_disk - set(by_out) - set(EXCLUDED))]
+    errors += [f'EXCLUDED names analysis/{f}, which a node produces' for f in sorted(set(EXCLUDED) & set(by_out))]
+    for n in nodes:
+        for d in n.data | n.order:
+            if d not in by_out and d not in EXCLUDED:
+                errors.append(f'{n.name} depends on analysis/{d}, which nothing produces')
+    if errors:
+        sys.exit('emit-corpus: plan is incomplete:\n  ' + '\n  '.join(errors))
+    # tiers: corpus = reads sessions, or a data edge (transitively) to a corpus node
+    changed = True
+    for n in nodes:
+        n.tier = 'corpus' if n.sessions else 'constructed'
+    while changed:
+        changed = False
+        for n in nodes:
+            if n.tier != 'corpus' and any(by_out[d].tier == 'corpus' for d in n.data if d in by_out):
+                n.tier, changed = 'corpus', True
+    return {n.name: n for n in nodes}
+
+
+def md5(p: Path) -> str | None:
+    return hashlib.md5(p.read_bytes()).hexdigest() if p.exists() else None
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__.split('\n\n')[0])
+    ap.add_argument('--all', action='store_true')
+    ap.add_argument('--check', action='store_true')
+    ap.add_argument('--only', action='append', default=[])
+    ap.add_argument('--jobs', type=int, default=os.cpu_count() or 1)
+    ap.add_argument('--list', action='store_true')
+    a = ap.parse_args()
+
+    nodes = plan()
+    by_out = {n.out: n for n in nodes.values()}
+    if a.only:
+        bad = [o for o in a.only if o not in nodes]
+        if bad:
+            sys.exit(f'emit-corpus: --only: unknown {bad}; known: {", ".join(sorted(nodes))}')
+        chosen = {o: nodes[o] for o in a.only}
+    else:
+        chosen = {k: n for k, n in nodes.items() if a.all or n.tier == 'corpus'}
+
+    if a.list:
+        for tier in ('corpus', 'constructed'):
+            print(f'[{tier}]' + ('' if tier == 'corpus' else '   (only with --all)'))
+            for n in sorted((n for n in nodes.values() if n.tier == tier), key=lambda n: n.name):
+                edges = sorted(n.data) + [f'(after {o})' for o in sorted(n.order)]
+                print(f'  {n.name:<22} {" ".join(n.argv)}' + (f'\n  {"":<22} <- {", ".join(edges)}' if edges else '')
+                      + (f'\n  {"":<22} SKIPPED: {n.skip_why}' if n.skip_why else ''))
+        for f, why in EXCLUDED.items():
+            print(f'[excluded] {f}: {why}')
+        return 0
+
+    tmp = Path(tempfile.mkdtemp(prefix='emit-corpus-'))
+    results: dict[str, tuple[str, float]] = {}
+    skipped = [(n.name, n.skip_why) for n in chosen.values() if n.skip_why]
+    todo = {k: n for k, n in chosen.items() if not n.skip_why}
+    deps = {k: {by_out[d].name for d in n.data | n.order if d in by_out and by_out[d].name in todo}
+            for k, n in todo.items()}
+    lock = threading.Lock()
+    t0 = time.monotonic()
+
+    def run(n: Node) -> tuple[str, str, float, str]:
+        tgt, dst = tmp / n.out, ANALYSIS / n.out
+        s = time.monotonic()
+        r = subprocess.run(['bun', str(SIM / n.argv[0]), *n.argv[1:], '--out', str(tgt)], cwd=REPO,
+                           capture_output=True, text=True)
+        dt = time.monotonic() - s
+        if r.returncode != 0 or not tgt.exists():
+            return n.name, 'FAILED', dt, (r.stderr or r.stdout)[-4000:]
+        if not dst.exists():
+            state = 'new'
+        elif md5(tgt) == md5(dst):
+            state = 'unchanged'
+        else:
+            state = 'DIFFERS' if a.check else 'CHANGED'
+        if not a.check and state != 'unchanged':
+            with lock:
+                os.replace(tgt, dst) if tgt.stat().st_dev == dst.parent.stat().st_dev else shutil.copyfile(tgt, dst)
+        return n.name, state, dt, ''
+
+    failed_logs = {}
+    done: set[str] = set()
+    with cf.ThreadPoolExecutor(max_workers=max(1, a.jobs)) as ex:
+        running: dict[cf.Future, str] = {}
+        while len(done) < len(todo):
+            for k in sorted(todo):
+                if k not in done and k not in running.values() and deps[k] <= done \
+                        and len(running) < max(1, a.jobs):
+                    if any(results.get(d, ('', 0))[0] == 'FAILED' for d in deps[k]):
+                        results[k] = ('NOT RUN (an input failed)', 0.0)
+                        done.add(k)
+                        continue
+                    running[ex.submit(run, todo[k])] = k
+            if not running:
+                if len(done) < len(todo):
+                    sys.exit(f'emit-corpus: dependency cycle among {sorted(set(todo) - done)}')
+                break
+            fin, _ = cf.wait(running, return_when=cf.FIRST_COMPLETED)
+            for f in fin:
+                name, state, dt, log = f.result()
+                del running[f]
+                done.add(name)
+                results[name] = (state, dt)
+                if log:
+                    failed_logs[name] = log
+                print(f'  {state:<10} {dt:7.1f} s  analysis/{todo[name].out}', flush=True)
+    wall = time.monotonic() - t0
+    shutil.rmtree(tmp, ignore_errors=True)
+
+    for name, why in skipped:
+        print(f'  {"SKIPPED":<10} {"":>9}  analysis/{nodes[name].out}: {why}')
+    if not a.only and not a.all:
+        n_con = sum(1 for n in nodes.values() if n.tier == 'constructed')
+        print(f'  ({n_con} constructed artefacts no session feeds were not run; --all runs them)')
+    for f, why in EXCLUDED.items():
+        print(f'  {"EXCLUDED":<10} {"":>9}  analysis/{f}: {why}')
+    for name, log in failed_logs.items():
+        print(f'\n--- {name} failed:\n{log}', file=sys.stderr)
+    serial = sum(dt for _, dt in results.values())
+    states = [s for s, _ in results.values()]
+    print(f'emit-corpus: {len(results)} run, serial-equivalent {serial:.1f} s, wall {wall:.1f} s '
+          f'(--jobs {a.jobs}); ' + ', '.join(f'{states.count(s)} {s}' for s in sorted(set(states))))
+    bad = any(s in ('FAILED', 'DIFFERS', 'new') or s.startswith('NOT RUN') for s in states) if a.check \
+        else any(s == 'FAILED' or s.startswith('NOT RUN') for s in states)
+    return 1 if bad else 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

@@ -34,7 +34,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
    '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22',
-   '2026-10-29', '2026-11-01', '2026-11-05']);
+   '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17']);
 
 /** Bag 1 missed the 7-lock board, matched the 6-lock L-held field, and the 7th piece was NOT the
  *  mirror-aware bag-1 L (J when mirrored): a hold. Most of them go on to place the held L on its tower
@@ -183,12 +183,13 @@ const MIRRORED_BAG1 = { yachi: 169, pinglamb: 25 };
  *  2.compromise past its TST: those zeros are COMPARED (the classifier detects all three PC kinds and
  *  the bag-3 and bag-4 snapshot boards; the demos test reaches each one), never "not compared". */
 const NODE_CASES: Record<string, number> = {
-  'bag1.l_top': 398, 'bag1.l_hold': 97, 'bag1.l_placed_elsewhere': 1,
+  'bag1.l_top': 399, 'bag1.l_hold': 97, 'bag1.l_placed_elsewhere': 1,
   '2.pc4#1': 0, '2.pc4#2': 0, '2.pc4#3': 0,
-  '2.ideal': 252, '2.normal#1': 103, '2.normal#2': 0, '2.normal#3': 0, '2.compromise': 19,
+  '2.ideal': 253, '2.normal#1': 103, '2.normal#2': 0, '2.normal#3': 0, '2.compromise': 19,
+  // 2026-11-17 adds one pc#2, yachi's m1r5, as drawn, at lock 19 past a prefix verified to 18 (`verified: false`).
   // 2026-11-01 adds two pc#3, both yachi's, at lock 19 past the verified prefix (`verified: false`):
   // m3r6 mirrored (prefix 15), m8r3 as drawn (prefix 14).
-  '2.ideal.pc#1': 5, '2.ideal.pc#2': 13, '2.ideal.pc#3': 20, '2.ideal.pc#4': 0, '2.ideal.pc#5': 0,
+  '2.ideal.pc#1': 5, '2.ideal.pc#2': 14, '2.ideal.pc#3': 20, '2.ideal.pc#4': 0, '2.ideal.pc#5': 0,
   '2.ideal.pc#6': 0, '2.ideal.pc#7': 1, '2.ideal.pc#8': 0, '2.ideal.pc#9': 0, '2.ideal.pc#10': 0,
   '2.ideal.pc#11': 0, '2.ideal.pc#12': 0, '2.ideal.pc#13': 0, '2.ideal.pc#14': 0,
   '2.normal.pc#1': 3, '2.normal.pc#2': 0, '2.normal.pc#3': 0, '2.normal.pc#4': 0, '2.normal.pc#5': 0,
@@ -214,7 +215,7 @@ const UNMEASURED: Record<string, string> = {
  *  trigger is a pair of early pairs with no threshold, so it never decides. A sizeable minority of
  *  2.ideal rounds dealt O before S, so the condition is a description of the page, not of the play. */
 const CONDITIONS = {
-  '2.ideal': { '2.compromise': 48, '2.ideal': 204 },
+  '2.ideal': { '2.compromise': 48, '2.ideal': 205 },
   '2.compromise': { '2.compromise': 19 },
   '2.normal#1': { '2.compromise': 99, '2.ideal': 4 },
 };

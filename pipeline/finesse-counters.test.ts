@@ -57,13 +57,14 @@ const SESSIONS = [
   { dir: '2026-10-29', rounds: 136, strict: 114, equal: 22, faults: 1696, perfect: 10861, pieces: 11851 },
   { dir: '2026-11-01', rounds: 260, strict: 230, equal: 30, faults: 3847, perfect: 22515, pieces: 24718 },
   { dir: '2026-11-05', rounds: 134, strict: 122, equal: 12, faults: 2151, perfect: 12912, pieces: 14152 },
+  { dir: '2026-11-17', rounds:  48, strict:  39, equal:  9, faults:  638, perfect:  4292, pieces:  4675 },
 ];
 
 // At module scope, not inside a test: a membership check that lives in a test can be skipped
 // by whatever skips the test, and the whole point is that it runs before any literal is read.
 assertCorpusIsEverySessionOnDisk(`${import.meta.dir}/../sessions`, SESSIONS.map(s => s.dir));
 
-const CORPUS = { rounds: 3344, strict: 2885, equal: 459, faults: 52943, perfect: 282596, pieces: 314749 };
+const CORPUS = { rounds: 3392, strict: 2924, equal: 468, faults: 53581, perfect: 286888, pieces: 319424 };
 
 interface Row {
   session: string; file: string; round: number; who: string;
@@ -173,7 +174,7 @@ test('a fault-free round is a round of nothing but perfect pieces', () => {
   // 2026-09-03 joined, 20 -> 23 when 2026-09-10 did, 23 -> 26 when 2026-09-11 did — the last two
   // contributing 3 apiece — 26 -> 28 when 2026-09-17 did, 28 -> 33 when 2026-09-19 did,
   // 33 -> 40 when 2026-09-18 did, 40 -> 49 when 2026-10-03 did, 49 -> 57 when 2026-10-09
-  // did, 57 -> 61 when 2026-10-12 did, 61 -> 62 when 2026-10-20 did, 62 -> 70 when 2026-10-22 did, 70 -> 79 when 2026-10-29 did, 79 -> 90 when 2026-11-01 did, and 90 -> 91 when 2026-11-05 did). The count read 「33 rounds,
+  // did, 57 -> 61 when 2026-10-12 did, 61 -> 62 when 2026-10-20 did, 62 -> 70 when 2026-10-22 did, 70 -> 79 when 2026-10-29 did, 79 -> 90 when 2026-11-01 did, 90 -> 91 when 2026-11-05 did, and 91 -> 94 when 2026-11-17 did). The count read 「33 rounds,
   // all thirteen sessions」 for a session after the pin beside it had moved to 40 — the pin was
   // updated and the prose was not, which is CLAUDE.md's 冇第二份 class inside a single comment.
   // 2026-10-03's nine are the largest COUNT any session has added (09-18's 7 is next), and at
@@ -193,8 +194,9 @@ test('a fault-free round is a round of nothing but perfect pieces', () => {
   // 2026-11-01 adds eleven on 260 player-rounds, 4.2% — the largest COUNT any session has added,
   // past 10-03's and 10-29's nine, at a rate under the last two sessions'. Recorded, not read.
   // 2026-11-05 adds one on 134 player-rounds, 0.7%. Recorded, not read.
+  // 2026-11-17 adds three on 48 player-rounds, 6.3%. Recorded, not read.
   const clean = rows.filter(r => r.faults === 0);
-  expect(clean.length).toBe(91);
+  expect(clean.length).toBe(94);
   for (const r of clean) {
     expect(r.perfect).toBe(r.pieces);
     expect(r.combo).toBe(r.perfect);
@@ -251,10 +253,12 @@ test('the four finesse rates are four different numbers, so a rate must name its
   // share > event rate > the meaningless one > faulty share). A reader who took 17.16 away as
   // "the" fault rate would be wrong twice over: it is one corpus-state's reading of a quantity
   // that moves, and it is one of four defensible ones.
-  expect(pct(faults / pieces)).toBe(16.82);               // fault EVENTS per piece
-  expect(pct(1 - perfect / pieces)).toBe(10.22);          // share of pieces that were faulty
-  expect(pct(perfect / pieces)).toBe(89.78);              // TETR.IO's own displayed figure
-  expect(pct(faults / (faults + perfect))).toBe(15.78);    // on no meaningful denominator
+  // Twenty-three-session figures (2026-11-17 added): 16.82 -> 16.77, 10.22 -> 10.19, 89.78 -> 89.81,
+  // 15.78 -> 15.74, 1.647 -> 1.647. 11-17 is 48 player-rounds (1.4% of the pool).
+  expect(pct(faults / pieces)).toBe(16.77);               // fault EVENTS per piece
+  expect(pct(1 - perfect / pieces)).toBe(10.19);          // share of pieces that were faulty
+  expect(pct(perfect / pieces)).toBe(89.81);              // TETR.IO's own displayed figure
+  expect(pct(faults / (faults + perfect))).toBe(15.74);    // on no meaningful denominator
   // and the mechanism behind the gap: fault events per FAULTY piece, > 1 by construction
   expect(Math.round(faults / (pieces - perfect) * 1000) / 1000).toBe(1.647);
   expect(faults / (pieces - perfect)).toBeGreaterThan(1);
