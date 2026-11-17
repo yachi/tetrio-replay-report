@@ -1,0 +1,287 @@
+#!/usr/bin/env python3
+"""Print the hand-typed CLAUDE.md figures a session pass has to update.  Read-only, ~20 s.
+
+    bin/derive-doc-numbers 2026-11-17            the corpus up to and including that date
+    bin/derive-doc-numbers 2026-11-17 --all      also every session's AUC row, not just the
+                                                 date's and the one before it
+
+ADVISORY.  It writes nothing and gates nothing.  CLAUDE.md says of each of these rows that it
+「was computed … by a probe … none of it is gated」; this is that probe, committed, so a pass
+re-derives instead of re-typing.  Reading its output is still a person's job: which figures
+are live, which are 「kept as measured」 records that must NOT move, and what a number means.
+
+TWO ROUNDINGS, SIDE BY SIDE, ON PURPOSE.  The document does not round its prose p-values and
+its shortfall/regime rows under one rule (22- and 23-session revisions disagree; see the
+brief).  Choosing the rule is the maintainer's decision, not this tool's, so every such
+figure is printed both ways — `ceil|round` for a p, `floor|round` for a percentage — and the
+pass copies the one its sentence's rule names.  Inputs: sessions/*/report/facts.json only.
+
+Definitions (each reproduces the published rows): AUC counts ties as half (Mann-Whitney);
+送 = garbagesent; 食 = garbage_received_raw; 射埋 = sum(garbage_events[].amt);
+DS = garbage_cleared/pieces; KPP = inputs/pieces; FIN% = finesse_perfect/pieces; the raw
+T-spin column = tspins; p = exact two-sided binomial over decided pairs, ×17 Bonferroni.
+"""
+import argparse
+import glob
+import itertools
+import json
+import math
+import os
+import statistics as st
+import sys
+import time
+from fractions import Fraction as F
+from math import comb
+
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+Y, P = "yachi", "pinglamb"
+
+
+def rate(n, d):
+    return F(n, d) if d else F(0)
+
+
+COLS = [
+    ("VS", lambda p: p["vs_x1000"]), ("APM", lambda p: p["apm_x1000"]),
+    ("攻", lambda p: p["garbage_attack"]), ("APP", lambda p: rate(p["garbage_attack"], p["pieces"])),
+    ("送", lambda p: p["garbagesent"]), ("分", lambda p: p["score"]),
+    ("DS", lambda p: rate(p["garbage_cleared"], p["pieces"])),
+    ("食", lambda p: p["garbage_received_raw"]),
+    ("射埋", lambda p: sum(e["amt"] for e in p["garbage_events"])),
+    ("KPP", lambda p: rate(p["inputs"], p["pieces"])),
+    ("FIN%", lambda p: rate(p["finesse_perfect"], p["pieces"])),
+    ("COMBO", lambda p: p["topcombo"]), ("PC", lambda p: p["clears"]["allclear"]),
+    ("TST", lambda p: p["clears"]["tspin_triples"]), ("TSD", lambda p: p["clears"]["tspin_doubles"]),
+    ("QUAD", lambda p: p["clears"]["quads"]), ("TSPIN", lambda p: p["tspins"]),
+]
+EXTRA = [("DSraw", lambda p: p["garbage_cleared"])]
+POOLED = ("COMBO", "TST", "KPP", "PC")
+
+
+def sh(d):
+    return d[5:]
+
+
+# ------------------------------------------------------------------ rounding, both ways
+
+def _sig(p, d, op):
+    if p == 0:
+        return "0"
+    e = math.floor(math.log10(p))
+    q = 10 ** (e - d + 1)
+    m = op(p / q) * q
+    if m >= 10 ** (e + 1):            # rounding carried into the next decade
+        e += 1
+    return f"{m:.{d-1}e}" if e < -3 else f"{m:.{max(0, -(e - d + 1))}f}"
+
+
+def p2(p, d=2):
+    """A p both ways: `ceil|round` to d significant figures."""
+    c = _sig(p, d, lambda x: math.ceil(x - 1e-12))
+    r = _sig(p, d, lambda x: math.floor(x + 0.5))
+    return c if c == r else f"{c}|{r}"
+
+
+def pct2(x, k=2, signed=True):
+    """A percentage both ways: magnitude `floor|round` to k places."""
+    s = ("-" if x < 0 else "+") if signed else ("-" if x < 0 else "")
+    f = math.floor(abs(x) * 10 ** k + 1e-9) / 10 ** k
+    r = math.floor(abs(x) * 10 ** k + 0.5) / 10 ** k
+    a, b = f"{s}{f:.{k}f}", f"{s}{r:.{k}f}"
+    return a if a == b else f"{a}|{b}"
+
+
+# ------------------------------------------------------------------ data
+
+def load(upto):
+    paths = glob.glob(os.path.join(REPO, "sessions", "*", "report", "facts.json"))
+    dates = sorted(d for d in (os.path.basename(os.path.dirname(os.path.dirname(p))) for p in paths)
+                   if d <= upto)
+    return dates, {d: json.load(open(os.path.join(REPO, "sessions", d, "report", "facts.json")))
+                   for d in dates}
+
+
+def rounds(S, d):
+    for m in S[d]["matches"]:
+        for r in m["rounds"]:
+            yield m, r
+
+
+def pairs(S, d, f):
+    w = l = t = 0
+    for _, r in rounds(S, d):
+        win = r["winner"]
+        los = Y if win == P else P
+        a, b = f(r["players"][win]), f(r["players"][los])
+        w, l, t = w + (a > b), l + (a < b), t + (a == b)
+    return w, l, t
+
+
+def auc(w, l, t):
+    return 100 * (w + t / 2) / (w + l + t)
+
+
+def binom2(k, n):
+    """Exact two-sided binomial at p=.5 (R's binom.test; symmetric)."""
+    if n == 0:
+        return 1.0
+    k = min(k, n - k)
+    return min(1.0, sum(comb(n, i) for i in range(k + 1)) * 2 / 2 ** n)
+
+
+def spearman(xs, ys):
+    def rk(v):
+        o = sorted(range(len(v)), key=lambda i: v[i])
+        r = [0] * len(v)
+        for k, i in enumerate(o):
+            r[i] = k + 1
+        return r
+    a, b = rk(xs), rk(ys)
+    n = len(xs)
+    return 1 - 6 * sum((p - q) ** 2 for p, q in zip(a, b)) / (n * (n * n - 1))
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap.add_argument("date", help="the newest session to include, e.g. 2026-11-17")
+    ap.add_argument("--all", action="store_true", help="print every session's AUC row")
+    a = ap.parse_args()
+    t0 = time.monotonic()
+    dates, S = load(a.date)
+    if not dates or dates[-1] != a.date:
+        print(f"no sessions/{a.date}/report/facts.json", file=sys.stderr)
+        return 2
+    n = len(dates)
+    last = dates[-1]
+    prev = dates[-2] if n > 1 else None
+    show = dates if a.all else [d for d in (prev, last) if d]
+    print(f"derive-doc-numbers: {n} sessions, {sh(dates[0])} .. {sh(last)}  "
+          f"(p: ceil|round to 2 sig; %: floor|round; one value = both agree)\n")
+
+    # ---- 1. per-session AUC rows
+    tab = {(d, name): pairs(S, d, f) for d in dates for name, f in COLS + EXTRA}
+    print("== per-session AUC rows (ties as half; w-l over decided) ==")
+    for d in show:
+        cells = []
+        for name, _ in COLS + EXTRA:
+            w, l, t = tab[(d, name)]
+            cells.append(f"{name} {auc(w, l, t):.1f}"
+                         + (f" ({w}-{l})" if name in ("APM", "KPP", "COMBO", "PC", "TST") else ""))
+        print(f"{sh(d)}: " + " · ".join(cells))
+
+    def rank(d, name, hi):
+        v = round(auc(*tab[(d, name)]), 1)
+        col = [round(auc(*tab[(e, name)]), 1) for e in dates]
+        better = sum(1 for c in col if (c > v if hi else c < v))
+        tie = sum(1 for c in col if c == v) - 1
+        return f"{better + 1}" + (f"(tie{tie})" if tie else "")
+    print(f"{sh(last)} rank from the top:    "
+          + ", ".join(f"{nm} {rank(last, nm, True)}" for nm, _ in COLS))
+    print(f"{sh(last)} rank from the bottom: "
+          + ", ".join(f"{nm} {rank(last, nm, False)}" for nm, _ in COLS))
+    for nm in ("COMBO", "KPP"):
+        print(f"{nm} series: " + " · ".join(f"{auc(*tab[(d, nm)]):.1f}" for d in dates))
+    kb = sum(auc(*tab[(d, "KPP")]) < 50 for d in dates)
+    print(f"KPP below chance in {kb} of {n}")
+
+    # ---- 2. pooled table and its drops
+    print(f"\n== pooled over {n} sessions (exact two-sided binomial, ×17) ==")
+
+    def pooled(name, drop=()):
+        w = l = t = 0
+        for d in dates:
+            if d not in drop:
+                x = tab[(d, name)]
+                w, l, t = w + x[0], l + x[1], t + x[2]
+        p = binom2(w, w + l)
+        return auc(w, l, t), w, w + l, p, min(1.0, 17 * p)
+    for name in POOLED:
+        A, w, dec, p, pc = pooled(name)
+        singles = sorted(((pooled(name, (d,))[4], sh(d)) for d in dates), reverse=True)
+        prs = sorted(((pooled(name, pr)[4], " + ".join(map(sh, pr)))
+                      for pr in itertools.combinations(dates, 2)), reverse=True)
+        over = [x for x in prs if x[0] >= 0.05]
+        print(f"{name}: AUC {A:.2f}  decided {w}/{dec}  raw {p2(p)}  ×17 {p2(pc)}")
+        print(f"   worst single drops: " + ", ".join(f"{k} {p2(v)}" for v, k in singles[:3]))
+        print(f"   pairs over 0.05: {len(over)} of {len(prs)}; worst {prs[0][1]} {p2(prs[0][0])}, "
+              f"next {prs[1][1]} {p2(prs[1][0])}")
+        if over and len(over) <= 30:
+            print("   over: " + ", ".join(f"{k} ({p2(v, 3)})" for v, k in over))
+
+    # ---- 3. scoreline and size
+    print("\n== matches and rounds ==")
+    sc = {}
+    for d in dates:
+        mw, rw = {Y: 0, P: 0}, {Y: 0, P: 0}
+        for m in S[d]["matches"]:
+            mw[m["winner"]] += 1
+            for r in m["rounds"]:
+                rw[r["winner"]] += 1
+        sc[d] = (mw, rw)
+    nm = {d: sum(sc[d][0].values()) for d in dates}
+    nr = {d: sum(sc[d][1].values()) for d in dates}
+    byr = sorted(dates, key=lambda d: (-nr[d], d))
+    print("by rounds (rounds/matches): " + " ".join(f"{sh(d)}:{nr[d]}/{nm[d]}" for d in byr))
+    mw, rw = sc[last]
+    print(f"{sh(last)}: matches yachi {mw[Y]} pinglamb {mw[P]}, rounds yachi {rw[Y]} pinglamb "
+          f"{rw[P]}; rank by rounds {byr.index(last) + 1} of {n}; pinglamb's share "
+          f"{pct2(100 * rw[P] / nr[last], signed=False)}% of rounds, "
+          f"{pct2(100 * mw[P] / nm[last], signed=False)}% of matches")
+    tot = sum(nr.values())
+    top3 = sorted(dates, key=lambda d: -nr[d])[:3]
+    print(f"three largest by rounds: {', '.join(sh(d) for d in top3)} = "
+          f"{pct2(100 * sum(nr[d] for d in top3) / tot, 1, False)}% of {tot} rounds")
+
+    # ---- 4. regime gaps and the shortfall ordering
+    print("\n== regime gaps and the shortfall ==")
+    reg = {}
+    for d in dates:
+        acc = {(w, pl): [0, 0] for w in (True, False) for pl in (Y, P)}
+        tt = {Y: [0, 0], P: [0, 0]}
+        for _, r in rounds(S, d):
+            for pl in (Y, P):
+                x = r["players"][pl]
+                k = (r["winner"] == pl, pl)
+                acc[k][0] += x["garbage_attack"]
+                acc[k][1] += x["pieces"]
+                tt[pl][0] += x["garbage_attack"]
+                tt[pl][1] += x["pieces"]
+        g = lambda a_, b_: 100 * (F(a_[0], a_[1]) / F(b_[0], b_[1]) - 1)  # noqa: E731
+        won, lost = g(acc[(True, P)], acc[(True, Y)]), g(acc[(False, P)], acc[(False, Y)])
+        gap = g(tt[P], tt[Y])
+        surplus = 100 * (F(tt[Y][1], tt[P][1]) - 1)
+        att = 100 * F(tt[Y][0] - tt[P][0], tt[P][0])
+        reg[d] = dict(won=float(won), lost=float(lost), gap=float(gap), surplus=float(surplus),
+                      short=float(gap - surplus), att=float(att), att_raw=tt[Y][0] - tt[P][0],
+                      pieces=tt[Y][1] - tt[P][1])
+    for key in ("won", "lost"):
+        col = sorted((reg[e][key] for e in dates), reverse=True)
+        print(f"{key}-gap row: " + " ".join(pct2(reg[d][key], 1) for d in dates))
+        for e in show:
+            print(f"   {sh(e)} {key} {pct2(reg[e][key])}  rank {col.index(reg[e][key]) + 1} of "
+                  f"{len(col)} (from the top)  column median {pct2(st.median(col))}")
+    r = reg[last]
+    print(f"{sh(last)}: session gap {pct2(r['gap'])}%, piece surplus {r['pieces']:+d} = "
+          f"{pct2(r['surplus'])}%, shortfall {pct2(r['short'])} pp, attack "
+          f"{pct2(r['att'])}% ({r['att_raw']:+d} lines)")
+    order = sorted(dates, key=lambda d: reg[d]["short"])
+    print("shortfall ordering (shortfall pp | attack % | raw lines):")
+    for d in order:
+        print(f"   {sh(d)}  {pct2(reg[d]['short']):>13}  {pct2(reg[d]['att']):>13}  "
+              f"{reg[d]['att_raw']:+d}")
+    xs = [reg[d]["short"] for d in dates]
+    yr = [-reg[d]["att"] for d in dates]
+    yw = [-reg[d]["att_raw"] for d in dates]
+
+    def disc(ys):
+        return sum(1 for i, j in itertools.combinations(range(n), 2)
+                   if (xs[i] - xs[j]) * (ys[i] - ys[j]) < 0)
+    print(f"Spearman rho: rate axis {spearman(xs, yr):.6f} ({disc(yr)} discordant pairs), "
+          f"raw axis {spearman(xs, yw):.6f} ({disc(yw)} discordant pairs)")
+    print(f"\n  ..  {time.monotonic() - t0:.1f}s.  Not derived here: the exact permutation p, "
+          f"the APP-ordering tiers, the topout and separation series, the opener/sim counts.")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

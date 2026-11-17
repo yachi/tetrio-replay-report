@@ -1,0 +1,146 @@
+#!/usr/bin/env python3
+"""bin/fold-hand-claims <date> — fold a session's hand claims into every proof artefact.
+
+    bin/fold-hand-claims 2026-11-17
+    bin/fold-hand-claims 2026-11-17 --no-dafny   # every step but the Dafny pass (see below)
+
+What bin/new-session's epilogue lists as six commands typed by hand (and runs dafny TWICE
+for: `dafny verify`, then `build_proof_map`, which runs it again), in one pass:
+
+  1. rebuild every hand ledger from its hand_claims*.py (`build_hand.hand_ledgers`, which
+     raises on a ledger no module rebuilds) and check every ledger against facts.json
+  2. codegen the Dafny over every ledger, in `codegen.session_ledgers`' canonical order
+  3. build_proof_map — the ONE dafny pass. Its status column comes from the verifier's own
+     output (never stamped here); this script additionally refuses a verifier summary that
+     does not say `0 errors`, because build_proof_map attributes errors to lemmas and an
+     error outside every lemma (a Facts.dfy that does not resolve) would otherwise leave
+     every row `verified`
+  4. codegen_smt over every ledger
+  5. check_dead_consts, check_proof_links, and check_smt --mutate 12 when z3 is on PATH
+  6. the corpus artefacts that hold this session's figures: check_loo --write (all
+     sessions, ~1 s) and check_equiv_coverage --write --session <date> (this session only)
+
+Then run `bin/session-loop <date>` to rebuild the report against the new ledger.
+
+Without dafny on PATH it refuses before writing anything, unless --no-dafny is given; then
+step 3 is skipped and says so, the committed claims-proof-map.json is left as it is, and the
+run FAILS if that map no longer names exactly the ledgers' claim ids — a stale map is the
+one thing a skipped Dafny pass must not leave looking current.
+"""
+import argparse
+import json
+import os
+import shutil
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO))
+
+from pipeline.claims.build_hand import hand_ledgers  # noqa: E402
+from pipeline.codegen import partition_spec_ledgers, session_ledgers  # noqa: E402
+
+
+def step(label, argv, failed, quiet=True):
+    t = time.monotonic()
+    p = subprocess.run(argv, cwd=REPO, capture_output=True, text=True)
+    out = (p.stdout + p.stderr).strip()
+    ok = p.returncode == 0
+    print(f"  {'ok' if ok else 'FAIL'}  {label}  ({time.monotonic() - t:.1f}s)")
+    if not ok or not quiet:
+        tail = "\n".join(out.splitlines()[-25:])
+        if tail:
+            print("    " + tail.replace("\n", "\n    "))
+    if not ok:
+        failed.append(label)
+    return ok, out
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("date")
+    ap.add_argument("--no-dafny", action="store_true",
+                    help="skip the Dafny pass and leave claims-proof-map.json as committed")
+    args = ap.parse_args(argv)
+    W = f"sessions/{args.date}/report"
+    if not (REPO / W / "facts.json").exists():
+        raise SystemExit(f"fold-hand-claims: no {W}/facts.json")
+    has_dafny = shutil.which("dafny") is not None
+    if not has_dafny and not args.no_dafny:
+        raise SystemExit("fold-hand-claims: dafny is not on PATH, so the proof map cannot be "
+                         "rebuilt; nothing was written. Install dafny, or pass --no-dafny to run "
+                         "every other step and keep the committed map.")
+    pairs = hand_ledgers(str(REPO / W))
+    if not pairs:
+        raise SystemExit(f"fold-hand-claims: {W} has no hand_claims*.py")
+    t0 = time.monotonic()
+    failed = []
+    py = [sys.executable, "-m"]
+
+    print("== 1. hand ledgers")
+    for mod, ledger in pairs:
+        step(f"build_hand {os.path.relpath(mod, REPO)} -> {os.path.relpath(ledger, REPO)}",
+             py + ["pipeline.claims.build_hand", mod, "--facts", f"{W}/facts.json", "--out", ledger],
+             failed)
+    ledgers = [os.path.relpath(p, REPO) if os.path.isabs(p) else p for p in session_ledgers(W)]
+    spec, without = partition_spec_ledgers(ledgers)
+    if without:
+        raise SystemExit(f"fold-hand-claims: ledgers with no spec cannot be folded: {without}")
+    for led in ledgers:
+        step(f"check_claims {led}", py + ["pipeline.check_claims", led, f"{W}/facts.json"], failed)
+    if failed:
+        print("ledger step failed; stopping before codegen")
+        return 1
+
+    print(f"== 2. codegen over {len(ledgers)} ledgers")
+    step("codegen -> dafny/", py + ["pipeline.codegen", f"{W}/facts.json", "--outdir", f"{W}/dafny",
+                                    "--claims", *ledgers], failed)
+
+    print("== 3. Dafny (one pass, inside build_proof_map)")
+    if args.no_dafny:
+        print("  --  SKIPPED (--no-dafny): claims-proof-map.json NOT rebuilt; nothing here is proved")
+        ids = [c["id"] for led in ledgers for c in json.loads((REPO / led).read_text(encoding="utf-8"))]
+        rows = json.loads((REPO / W / "claims-proof-map.json").read_text(encoding="utf-8"))
+        if [r["id"] for r in rows] != ids:
+            print(f"  FAIL  the committed map names {len(rows)} claims, the ledgers {len(ids)}: "
+                  f"it is stale, and only a Dafny run can rebuild it")
+            failed.append("stale proof map")
+        else:
+            print(f"  ok  the committed map still names the ledgers' {len(ids)} claims, in order")
+    else:
+        ok, out = step("build_proof_map", py + ["pipeline.build_proof_map", "--dafny-dir", f"{W}/dafny",
+                                                "--out", f"{W}/claims-proof-map.json", *ledgers],
+                       failed, quiet=False)
+        said = [ln for ln in out.splitlines() if ln.startswith("verifier said:")]
+        if ok and not (said and " 0 errors" in said[-1]):
+            print(f"  FAIL  the verifier's summary does not say 0 errors: {said[-1] if said else '(none)'}")
+            failed.append("dafny summary")
+
+    print("== 4. SMT-LIB")
+    step("codegen_smt -> claims.smt2", py + ["pipeline.codegen_smt", f"{W}/facts.json",
+                                             "--out", f"{W}/claims.smt2", "--claims", *ledgers], failed)
+
+    print("== 5. gates")
+    step("check_dead_consts", py + ["pipeline.check_dead_consts", W], failed)
+    step("check_proof_links", py + ["pipeline.check_proof_links", W], failed)
+    if shutil.which("z3"):
+        step("check_smt --mutate 12", py + ["pipeline.check_smt", W, "--mutate", "12"], failed)
+    else:
+        print("  --  check_smt skipped: no z3 on PATH (CI runs it with --regen --mutate 96)")
+
+    print("== 6. corpus artefacts holding this session")
+    step("check_loo --write", py + ["pipeline.check_loo", "--write"], failed)
+    step(f"check_equiv_coverage --write --session {args.date}",
+         py + ["pipeline.claims.check_equiv_coverage", "--write", "--session", args.date], failed)
+
+    print(f"== fold-hand-claims {args.date}: {'FAIL ' + '; '.join(failed) if failed else 'ok'} "
+          f"({time.monotonic() - t0:.1f}s){'  [Dafny NOT run]' if args.no_dafny else ''}")
+    if not failed:
+        print(f"next: bin/session-loop {args.date}   (rebuild the report against the ledgers)")
+    return 1 if failed else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

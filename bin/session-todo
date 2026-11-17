@@ -46,22 +46,21 @@ GATES = [
      "rebuild the reports (see build_report below), then paste "
      "`python3 -m pipeline.check_intense_corpus --render`"),
     ("equiv coverage", [PY, "-m", "pipeline.claims.check_equiv_coverage", "--check-prose"],
-     "`python3 -m pipeline.claims.check_equiv_coverage --write --jobs 2` (slow), then paste "
-     "`python3 -m pipeline.claims.check_equiv_coverage --render`"),
+     "`python3 -m pipeline.claims.check_equiv_coverage --write --session {d}` (this session "
+     "only, seconds), then `bin/paste-fragments --only equiv`; the per-session table lines in "
+     "`python3 -m pipeline.claims.check_equiv_coverage --render` are not fragments and are pasted "
+     "by hand"),
     ("rate records", [PY, "-m", "pipeline.check_rate_records"],
-     "`Rscript analysis/rate_records.R --json analysis/rate-records.json`, then paste "
-     "`python3 -m pipeline.check_rate_records --render` into CLAUDE.md"),
+     "`Rscript analysis/rate_records.R --json analysis/rate-records.json`, then "
+     "`bin/paste-fragments --only rate`"),
     ("stat sources", [PY, "-m", "pipeline.check_stat_sources"],
-     "paste `python3 -m pipeline.check_stat_sources --render` into CLAUDE.md"),
+     "`bin/paste-fragments --only stat`"),
     ("app decomposition", [PY, "-m", "pipeline.check_app_decomposition"],
-     "needs sessions/{d}/sim/attack-facts.json; then paste "
-     "`python3 -m pipeline.check_app_decomposition --render` into CLAUDE.md"),
+     "needs sessions/{d}/sim/attack-facts.json; then `bin/paste-fragments --only app`"),
     ("donation bands", [PY, "-m", "pipeline.check_donation_bands"],
-     "needs sessions/{d}/sim/opener-facts.json; then paste "
-     "`python3 -m pipeline.check_donation_bands --render` into CLAUDE.md"),
+     "needs sessions/{d}/sim/opener-facts.json; then `bin/paste-fragments --only don`"),
     ("dual engine", [PY, "-m", "pipeline.check_dual_engine"],
-     "needs sessions/{d}/sim/opener-facts.json; then paste "
-     "`python3 -m pipeline.check_dual_engine --render` into CLAUDE.md"),
+     "needs sessions/{d}/sim/opener-facts.json; then `bin/paste-fragments --only dual`"),
 ]
 CORPUS_GATE = ("corpus artefacts", [PY, "bin/emit-corpus", "--check", "--jobs", "2"],
                "`python3 bin/emit-corpus --jobs 2` re-emits every analysis/*.json the sessions feed")
