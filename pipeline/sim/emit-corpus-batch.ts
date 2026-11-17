@@ -37,10 +37,10 @@
  * it waits for (in `bin/emit-corpus`, the route facts 基本的なドネイト and STSD read from analysis/).
  */
 import { writeFileSync, readSync } from 'node:fs';
-import * as RF from './route-facts.ts';
-import * as TF from './technique-facts.ts';
-import * as DPC from './dpc-facts.ts';
-import * as SPC from './secondpc-facts.ts';
+import { build as rfBuild, digestCorpus as rfDigestCorpus, serialise as rfSerialise } from './route-facts.ts';
+import { build as tfBuild, digestCorpus as tfDigestCorpus, serialise as tfSerialise } from './technique-facts.ts';
+import { build as dpcBuild, serialise as dpcSerialise } from './dpc-facts.ts';
+import { build as spcBuild, serialise as spcSerialise } from './secondpc-facts.ts';
 import { OPENERS } from './route-openers.ts';
 import { TECHNIQUES } from './techniques.ts';
 
@@ -98,7 +98,7 @@ export function routeGroups(jobs: Job[], openers: Record<string, { snapshotLocks
  *  digest without building a real one. */
 export function* run(jobs: Job[], gate: (j: Job) => boolean = () => true,
                      builders: Partial<Record<Kind, (j: Job, d: any) => string>> = {},
-                     techniqueDigest: () => any = () => TF.digestCorpus()): Generator<Event> {
+                     techniqueDigest: () => any = () => tfDigestCorpus()): Generator<Event> {
   const seen = new Set<string>();
   for (const j of jobs) {
     if (seen.has(j.name)) throw new Error(`emit-corpus-batch: job ${j.name} given twice`);
@@ -106,10 +106,10 @@ export function* run(jobs: Job[], gate: (j: Job) => boolean = () => true,
     profileOf(j);                                         // unknown keys fail before any digest is built
   }
   const B: Record<Kind, (j: Job, d: any) => string> = {
-    route: (j, d) => RF.serialise(RF.build(OPENERS[j.key]!, {}, d)),
-    technique: (j, d) => TF.serialise(TF.build(TECHNIQUES[j.key]!, {}, d)),
-    dpc: (_j, d) => DPC.serialise(DPC.build({}, d)),
-    secondpc: (_j, d) => SPC.serialise(SPC.build({}, d)),
+    route: (j, d) => rfSerialise(rfBuild(OPENERS[j.key]!, {}, d)),
+    technique: (j, d) => tfSerialise(tfBuild(TECHNIQUES[j.key]!, {}, d)),
+    dpc: (_j, d) => dpcSerialise(dpcBuild({}, d)),
+    secondpc: (_j, d) => spcSerialise(spcBuild({}, d)),
     ...builders,
   };
   const order = (xs: Job[]) => [...xs.filter(j => !j.wait), ...xs.filter(j => j.wait)];
@@ -125,7 +125,7 @@ export function* run(jobs: Job[], gate: (j: Job) => boolean = () => true,
   }
   for (const xs of routeGroups(jobs).values()) {
     const t = performance.now();
-    const d = deepFreeze(RF.digestCorpus(OPENERS[xs[0]!.key]!));
+    const d = deepFreeze(rfDigestCorpus(OPENERS[xs[0]!.key]!));
     yield { ev: 'DIGEST', group: 'route', seconds: sec(t) };
     yield* buildAll(xs, d);
   }

@@ -46,7 +46,7 @@ IMPORT = re.compile(r'^import\s+(?P<what>.*?)\s+from\s+[\'"](?P<spec>[^\'"]+)[\'
 NAMED_ONLY = re.compile(r'^(?:type\s+)?\{(?P<names>[^}]*)\}$', re.S)
 DECL = re.compile(
     r'^export\s+(?:declare\s+)?(?:async\s+)?'
-    r'(?:function|const|let|var|class|type|interface|enum)\s+([A-Za-z_$][\w$]*)', re.M)
+    r'(?:function\s*\*?|const|let|var|class|type|interface|enum)\s+([A-Za-z_$][\w$]*)', re.M)
 DECL_LIST = re.compile(r'^export\s+(?:type\s+)?\{(?P<names>[^}]*)\}', re.M)
 STAR = re.compile(r'^export\s+\*\s', re.M)
 DECL_MULTI = re.compile(r'^export\s+(?:const|let|var)\s+[A-Za-z_$]', re.M)
@@ -161,11 +161,12 @@ def selftest() -> int:
         d = pathlib.Path(tmp)
         # `export type { … }` is an export list too (a shim re-exporting types uses it)
         (d / 'lib.ts').write_text('export const real = 1;\nexport { real as aliased };\n'
-                                  'type Shape = number;\nexport type { Shape };\n')
+                                  'type Shape = number;\nexport type { Shape };\n'
+                                  'export function* gen() { yield 1; }\n')
         # `export const a = …, b = …` exports b too (the vendored kick tables do this)
         (d / 'multi.ts').write_text("export const one = { a: [1, 2], s: 'x, y = 3' }, two = 2,\n"
                                     "  three = (4, 5);\nexport const four = 4;\n")
-        (d / 'ok.ts').write_text("import { real, aliased, type Shape } from './lib.ts';\n"
+        (d / 'ok.ts').write_text("import { real, aliased, gen, type Shape } from './lib.ts';\n"
                                  "import { one, two, three, four } from './multi.ts';\n")
         if scan(d):
             print('SELFTEST FAIL: a sound import was reported', file=sys.stderr)
