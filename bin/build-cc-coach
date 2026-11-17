@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+# Build the cold-clear coach (tools/cc-coach) that step 6 of bin/new-session needs for the C-Spin 冇砌
+# artefact, into a cache keyed by exactly what goes into the binary, and print its path.
+#
+#   bin/build-cc-coach            build if missing, print the binary's path
+#   bin/build-cc-coach --path     print the path it would have; exit 1 (printing nothing) if not built
+#
+# The binary is cold-clear at the rev nix/cold-clear-oracle pins (279edd7, the rev cspin-miss.ts records
+# as CC.rev), with tools/cc-coach/cold-clear-coach.patch applied, tools/cc-coach/cc-coach.rs as
+# bot/src/bin/cc-coach.rs and tools/cc-coach/Cargo.lock — the procedure in tools/cc-coach/README.md,
+# scripted. The cache directory is
+#
+#   ${XDG_CACHE_HOME:-~/.cache}/tetrio-cc-coach/<sha256>/cc-coach
+#
+# where <sha256> is over the rev and those three files, so editing any of them (the patch and the
+# harness are the two files cspin-miss.ts hashes into every artefact's md5s) builds a new binary instead
+# of reusing a stale one. A build goes into a temp dir and is moved into place only when cargo succeeds,
+# so a half-built cache entry cannot exist. Needs git, cargo and network access (crates.io and github).
+set -euo pipefail
+
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REV=279edd7c3177ff8077f6a930193397814b281f27
+URL=https://github.com/MinusKelvin/cold-clear
+CC="$REPO/tools/cc-coach"
+FILES=("$CC/cold-clear-coach.patch" "$CC/cc-coach.rs" "$CC/Cargo.lock")
+
+# keep the rev in step with the two places that already pin it; a drift is an error, not a guess
+grep -q "rev = \"$REV\"" "$REPO/nix/cold-clear-oracle/default.nix" \
+  || { echo "build-cc-coach: nix/cold-clear-oracle/default.nix no longer pins $REV" >&2; exit 1; }
+grep -q "rev: '${REV:0:7}'" "$REPO/pipeline/sim/cspin-miss.ts" \
+  || { echo "build-cc-coach: pipeline/sim/cspin-miss.ts CC.rev is no longer ${REV:0:7}" >&2; exit 1; }
+
+sha() { if command -v sha256sum >/dev/null; then sha256sum "$@"; else shasum -a 256 "$@"; fi; }
+KEY="$( { echo "$REV"; for f in "${FILES[@]}"; do printf '%s ' "$(basename "$f")"; sha "$f" | cut -d' ' -f1; done; } \
+        | sha | cut -d' ' -f1)"
+DIR="${XDG_CACHE_HOME:-$HOME/.cache}/tetrio-cc-coach/$KEY"
+BIN="$DIR/cc-coach"
+
+if [ "${1:-}" = "--path" ]; then
+  [ -x "$BIN" ] && { echo "$BIN"; exit 0; }
+  exit 1
+fi
+[ $# -eq 0 ] || { echo "usage: bin/build-cc-coach [--path]" >&2; exit 2; }
+
+if [ -x "$BIN" ]; then
+  echo "$BIN"
+  exit 0
+fi
+
+command -v git >/dev/null   || { echo "build-cc-coach: git not installed" >&2; exit 1; }
+command -v cargo >/dev/null || { echo "build-cc-coach: cargo not installed" >&2; exit 1; }
+
+mkdir -p "$(dirname "$DIR")"
+WORK="$(mktemp -d "$(dirname "$DIR")/build.XXXXXX")"
+trap 'rm -rf "$WORK"' EXIT
+echo "build-cc-coach: building cold-clear ${REV:0:7} + patch into $DIR (about a minute)" >&2
+git -C "$WORK" init -q src
+git -C "$WORK/src" fetch -q --depth 1 "$URL" "$REV"
+git -C "$WORK/src" checkout -q FETCH_HEAD
+git -C "$WORK/src" apply "$CC/cold-clear-coach.patch"
+mkdir -p "$WORK/src/bot/src/bin"
+cp "$CC/cc-coach.rs" "$WORK/src/bot/src/bin/cc-coach.rs"
+cp "$CC/Cargo.lock" "$WORK/src/Cargo.lock"
+# --locked: the committed Cargo.lock is part of the key, so cargo must not resolve around it
+(cd "$WORK/src" && cargo build --release --locked -p cold-clear --bin cc-coach >&2)
+mkdir -p "$WORK/out"
+cp "$WORK/src/target/release/cc-coach" "$WORK/out/cc-coach"
+for f in "${FILES[@]}"; do printf '%s  %s\n' "$(sha "$f" | cut -d' ' -f1)" "tools/cc-coach/$(basename "$f")"; done \
+  > "$WORK/out/INPUTS"
+echo "$REV" >> "$WORK/out/INPUTS"
+# another build may have finished first; theirs is the same inputs, so keep whichever landed
+mv -T "$WORK/out" "$DIR" 2>/dev/null || [ -x "$BIN" ]
+echo "$BIN"
