@@ -10,6 +10,8 @@
                                      read from analysis/ as committed)
     bin/emit-corpus --jobs N         run up to N emitters at once (default: nproc)
     bin/emit-corpus --list           print the plan (tiers, edges, skips) and exit
+    bin/emit-corpus --unbatched      run each node's own entry file (the route facts, technique facts, DPC and
+                                     Second PC facts otherwise share digests in emit-corpus-batch.ts)
 
 WHY THIS EXISTS.  The ~24 corpus emitters that write analysis/*.json were run one by one by hand, in an
 order written down only in prose (CLAUDE.md: route facts before 基本的なドネイト's facts, which hash the
@@ -29,6 +31,16 @@ CORPUS tier when it reads the sessions itself or has a data edge to a corpus nod
 basicdonating-demos is corpus-tier (its classifier hash covers the route facts) while the other demos
 are not.  ORDER edges (demos after their own facts, as CLAUDE.md asks) only sequence; they do not move a
 node between tiers.
+
+TWENTY-TWO NODES SHARE TWO DIGESTS.  Every route-facts node rebuilds one route digest, and every
+technique-facts node, the DPC and the Second PC facts one technique digest, none of which depends on the
+opener or technique.  So those nodes run as two `pipeline/sim/emit-corpus-batch.ts` processes (one per
+digest) that print a DONE line per artefact; each artefact is then compared and installed exactly as a
+node's own run would be.  A member that reads an artefact (基本的なドネイト the route facts, STSD's
+cross-route) is built last in its process and only after this script answers its WAIT, i.e. after the
+inputs are installed.  `--unbatched` runs the old way, and `--check` must say the same both ways: the batch
+calls the same `build()` and `serialise()` as the entry files, which record their own md5 as `emitter_md5`
+(the batch file is hashed into nothing).
 
 --check READS COMMITTED INPUTS.  An emitter reads its upstream artefacts from analysis/ (the paths are
 compiled into the profiles), never from the temp dir, so under --check a dependent is checked against the
@@ -178,6 +190,21 @@ def plan() -> dict[str, Node]:
     return {n.name: n for n in nodes}
 
 
+#: entry files whose node may run inside one emit-corpus-batch.ts process instead: group, and the job's
+#: <kind>:<key> there.  Route facts share a route digest, the rest one technique digest.
+def batch_of(n: Node) -> tuple[str, str] | None:
+    e, rest = n.argv[0], n.argv[1:]
+    if e == 'emit-route-facts.ts' and rest[:1] == ['--opener']:
+        return 'route', f'route:{rest[1]}'
+    if e == 'emit-technique-facts.ts' and rest[:1] == ['--technique']:
+        return 'technique', f'technique:{rest[1]}'
+    if e == 'emit-dpc-facts.ts' and not rest:
+        return 'technique', 'dpc:-'
+    if e == 'emit-secondpc-facts.ts' and not rest:
+        return 'technique', 'secondpc:-'
+    return None
+
+
 def md5(p: Path) -> str | None:
     return hashlib.md5(p.read_bytes()).hexdigest() if p.exists() else None
 
@@ -189,6 +216,8 @@ def main() -> int:
     ap.add_argument('--only', action='append', default=[])
     ap.add_argument('--jobs', type=int, default=os.cpu_count() or 1)
     ap.add_argument('--list', action='store_true')
+    ap.add_argument('--unbatched', action='store_true',
+                    help='run every node through its own entry file, with no shared digest')
     a = ap.parse_args()
 
     nodes = plan()
@@ -206,7 +235,8 @@ def main() -> int:
             print(f'[{tier}]' + ('' if tier == 'corpus' else '   (only with --all)'))
             for n in sorted((n for n in nodes.values() if n.tier == tier), key=lambda n: n.name):
                 edges = sorted(n.data) + [f'(after {o})' for o in sorted(n.order)]
-                print(f'  {n.name:<22} {" ".join(n.argv)}' + (f'\n  {"":<22} <- {", ".join(edges)}' if edges else '')
+                b = batch_of(n)
+                print(f'  {n.name:<22} {" ".join(n.argv)}' + (f'   [batched: {b[0]} digest]' if b else '') + (f'\n  {"":<22} <- {", ".join(edges)}' if edges else '')
                       + (f'\n  {"":<22} SKIPPED: {n.skip_why}' if n.skip_why else ''))
         for f, why in EXCLUDED.items():
             print(f'[excluded] {f}: {why}')
@@ -218,17 +248,40 @@ def main() -> int:
     todo = {k: n for k, n in chosen.items() if not n.skip_why}
     deps = {k: {by_out[d].name for d in n.data | n.order if d in by_out and by_out[d].name in todo}
             for k, n in todo.items()}
+    # a cycle would leave every thread below waiting forever, so refuse one up front
+    left, ready = dict(deps), set()
+    while left:
+        free = [k for k, d in left.items() if d <= ready]
+        if not free:
+            sys.exit(f'emit-corpus: dependency cycle among {sorted(left)}')
+        for k in free:
+            ready.add(k)
+            del left[k]
+    groups: dict[str, list[str]] = {}
+    if not a.unbatched:
+        for k, n in sorted(todo.items()):
+            g = batch_of(n)
+            if g:
+                groups.setdefault(g[0], []).append(k)
+        # a member reading a sibling of its own group cannot be gated inside the one process: run it alone
+        for g, ks in list(groups.items()):
+            alone = {k for k in ks if deps[k] & set(ks)}
+            groups[g] = [k for k in ks if k not in alone]
+            if len(groups[g]) == 0:
+                del groups[g]
+    in_group = {k for ks in groups.values() for k in ks}
     lock = threading.Lock()
+    slots = threading.Semaphore(max(1, a.jobs))
+    finished = {k: threading.Event() for k in todo}
+    failed_logs: dict[str, str] = {}
+    digests: list[tuple[str, int, float]] = []
     t0 = time.monotonic()
 
-    def run(n: Node) -> tuple[str, str, float, str]:
-        tgt, dst = tmp / n.out, ANALYSIS / n.out
-        s = time.monotonic()
-        r = subprocess.run(['bun', str(SIM / n.argv[0]), *n.argv[1:], '--out', str(tgt)], cwd=REPO,
-                           capture_output=True, text=True)
-        dt = time.monotonic() - s
-        if r.returncode != 0 or not tgt.exists():
-            return n.name, 'FAILED', dt, (r.stderr or r.stdout)[-4000:]
+    def settle(name: str, tgt: Path) -> str:
+        """Compare a freshly written artefact with the committed one; outside --check, install it."""
+        dst = ANALYSIS / todo[name].out
+        if not tgt.exists():
+            return 'FAILED'
         if not dst.exists():
             state = 'new'
         elif md5(tgt) == md5(dst):
@@ -238,34 +291,91 @@ def main() -> int:
         if not a.check and state != 'unchanged':
             with lock:
                 os.replace(tgt, dst) if tgt.stat().st_dev == dst.parent.stat().st_dev else shutil.copyfile(tgt, dst)
-        return n.name, state, dt, ''
+        return state
 
-    failed_logs = {}
-    done: set[str] = set()
-    with cf.ThreadPoolExecutor(max_workers=max(1, a.jobs)) as ex:
-        running: dict[cf.Future, str] = {}
-        while len(done) < len(todo):
-            for k in sorted(todo):
-                if k not in done and k not in running.values() and deps[k] <= done \
-                        and len(running) < max(1, a.jobs):
-                    if any(results.get(d, ('', 0))[0] == 'FAILED' for d in deps[k]):
-                        results[k] = ('NOT RUN (an input failed)', 0.0)
-                        done.add(k)
-                        continue
-                    running[ex.submit(run, todo[k])] = k
-            if not running:
-                if len(done) < len(todo):
-                    sys.exit(f'emit-corpus: dependency cycle among {sorted(set(todo) - done)}')
-                break
-            fin, _ = cf.wait(running, return_when=cf.FIRST_COMPLETED)
-            for f in fin:
-                name, state, dt, log = f.result()
-                del running[f]
-                done.add(name)
-                results[name] = (state, dt)
-                if log:
-                    failed_logs[name] = log
-                print(f'  {state:<10} {dt:7.1f} s  analysis/{todo[name].out}', flush=True)
+    def record(name: str, state: str, dt: float, log: str = '') -> None:
+        with lock:
+            results[name] = (state, dt)
+            if log:
+                failed_logs[name] = log
+            print(f'  {state:<10} {dt:7.1f} s  analysis/{todo[name].out}', flush=True)
+        finished[name].set()
+
+    def inputs_ok(name: str) -> bool:
+        for d in deps[name]:
+            finished[d].wait()
+        return not any(results[d][0] == 'FAILED' or results[d][0].startswith('NOT RUN') for d in deps[name])
+
+    def run_one(name: str) -> None:
+        n = todo[name]
+        if not inputs_ok(name):
+            return record(name, 'NOT RUN (an input failed)', 0.0)
+        tgt = tmp / n.out
+        with slots:
+            s = time.monotonic()
+            r = subprocess.run(['bun', str(SIM / n.argv[0]), *n.argv[1:], '--out', str(tgt)], cwd=REPO,
+                               capture_output=True, text=True)
+            dt = time.monotonic() - s
+        if r.returncode != 0 or not tgt.exists():
+            return record(name, 'FAILED', dt, (r.stderr or r.stdout)[-4000:])
+        record(name, settle(name, tgt), dt)
+
+    def run_group(group: str, members: list[str]) -> None:
+        """One emit-corpus-batch.ts process for every member: one digest, a DONE line per artefact."""
+        waits = [k for k in members if deps[k]]
+        argv = ['bun', str(SIM / 'emit-corpus-batch.ts')]
+        for k in members:
+            argv += ['--job', f'{k}:{batch_of(todo[k])[1]}:{tmp / todo[k].out}']
+        for k in waits:
+            argv += ['--wait', k]
+        errf = tempfile.TemporaryFile(mode='w+')
+        slots.acquire()
+        held = True
+        s = time.monotonic()
+        p = subprocess.Popen(argv, cwd=REPO, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=errf, text=True)
+        try:
+            for line in p.stdout:
+                ev, _, rest = line.rstrip('\n').partition(' ')
+                if ev == 'DIGEST':
+                    with lock:
+                        digests.append((rest.split()[0], len(members), float(rest.split()[1])))
+                elif ev == 'DONE':
+                    name, dt = rest.split()
+                    record(name, settle(name, tmp / todo[name].out), float(dt))
+                elif ev == 'FAILED':
+                    name, msg = rest.split(' ', 1)
+                    record(name, 'FAILED', 0.0, json.loads(msg)[-4000:])
+                elif ev == 'SKIPPED':
+                    record(rest, 'NOT RUN (an input failed)', 0.0)
+                elif ev == 'WAIT':
+                    slots.release()           # idle while it waits: the slot may be the one its inputs need
+                    held = False
+                    ok = inputs_ok(rest)
+                    slots.acquire()
+                    held = True
+                    p.stdin.write('GO\n' if ok else 'SKIP\n')
+                    p.stdin.flush()
+                else:
+                    raise RuntimeError(f'emit-corpus-batch.ts said {line!r}')
+            p.wait()
+        finally:
+            if held:
+                slots.release()
+            if p.poll() is None:
+                p.kill()
+            errf.seek(0)
+            err = errf.read()
+            errf.close()
+        for k in members:
+            if not finished[k].is_set():
+                record(k, 'FAILED', time.monotonic() - s, err[-4000:] or f'emit-corpus-batch.ts exited {p.returncode}')
+
+    threads = [threading.Thread(target=run_group, args=(g, ks)) for g, ks in groups.items()]
+    threads += [threading.Thread(target=run_one, args=(k,)) for k in sorted(todo) if k not in in_group]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
     wall = time.monotonic() - t0
     shutil.rmtree(tmp, ignore_errors=True)
 
@@ -278,10 +388,12 @@ def main() -> int:
         print(f'  {"EXCLUDED":<10} {"":>9}  analysis/{f}: {why}')
     for name, log in failed_logs.items():
         print(f'\n--- {name} failed:\n{log}', file=sys.stderr)
-    serial = sum(dt for _, dt in results.values())
+    for group, n, dt in digests:
+        print(f'  {"DIGEST":<10} {dt:7.1f} s  one {group} digest, shared by the batched artefacts above')
+    serial = sum(dt for _, dt in results.values()) + sum(dt for _, _, dt in digests)
     states = [s for s, _ in results.values()]
     print(f'emit-corpus: {len(results)} run, serial-equivalent {serial:.1f} s, wall {wall:.1f} s '
-          f'(--jobs {a.jobs}); ' + ', '.join(f'{states.count(s)} {s}' for s in sorted(set(states))))
+          f'(--jobs {a.jobs}{", unbatched" if a.unbatched else ""}); ' + ', '.join(f'{states.count(s)} {s}' for s in sorted(set(states))))
     bad = any(s in ('FAILED', 'DIFFERS', 'new') or s.startswith('NOT RUN') for s in states) if a.check \
         else any(s == 'FAILED' or s.startswith('NOT RUN') for s in states)
     return 1 if bad else 0

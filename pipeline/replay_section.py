@@ -36,9 +36,11 @@ the browser and FLOORED there, like `fmt` floors, because 約 means "at least" i
 player's script lives in `replay_player.js` and is inlined verbatim, so the drift gate's re-render
 covers it too.
 """
+import hashlib
 import html
 import json
 import os
+import pickle
 import re
 
 from pipeline.claims import generators
@@ -162,7 +164,7 @@ def decode_boards(data, seq, locks, shown):
         for c in _place_cells(shapes, width, rows, piece, place):
             y, x = divmod(c, width)
             board[y][x] = piece
-        full = [y for y in range(rows) if all(v is not None for v in board[y])]
+        full = [y for y in range(rows) if None not in board[y]]
         _need(len(full) == lines, f"decoder found {len(full)} full rows, lock says {lines}")
         for y in reversed(full):
             del board[y]
@@ -170,10 +172,85 @@ def decode_boards(data, seq, locks, shown):
         yield piece, full, board
 
 
+class Memo:
+    """A build-time memo whose values are SHARED with every caller, so a caller that mutates one
+    corrupts every later hit. Each entry keeps a digest of its value taken when it was stored, and
+    `cache_problems()` re-digests every entry: `bin/build-docs` runs it (and `cache_control()`, which
+    plants a mutation and requires it caught) at the end of every render and every --check.
+
+    A key may hold `id()`s; `anchors` are the objects those ids name, kept in the entry (so the ids
+    cannot be reused while it lives) and compared by identity on every hit."""
+
+    def __init__(self, name):
+        self.name, self.d = name, {}
+        MEMOS.append(self)
+
+    def get(self, key, anchors=()):
+        hit = self.d.get(key)
+        if hit is not None and len(hit[0]) == len(anchors) and all(a is b for a, b in zip(hit[0], anchors)):
+            return hit[1]
+        return None
+
+    def put(self, key, value, anchors=()):
+        self.d[key] = (tuple(anchors), value, _digest(value))
+        return value
+
+    def changed(self):
+        return [k for k, (_a, v, dg) in self.d.items() if _digest(v) != dg]
+
+
+MEMOS = []
+
+
+def _digest(value):
+    return hashlib.blake2b(pickle.dumps(value, 5), digest_size=16).digest()
+
+
+def cache_problems():
+    """Every memo entry whose value changed since it was stored: a caller mutated a shared value."""
+    return [f"{m.name}: a cached value was mutated after it was stored ({len(ks)} entr{'y' if len(ks) == 1 else 'ies'})"
+            for m in MEMOS for ks in [m.changed()] if ks]
+
+
+def cache_control():
+    """The guard's own control: plant a mutation in one entry of each non-empty memo, require
+    `cache_problems()` to name that memo, restore it and require silence. Returns failures."""
+    bad = []
+    for m in MEMOS:
+        if not m.d:
+            continue
+        _a, v, _dg = next(iter(m.d.values()))
+        target = v[-1] if isinstance(v, tuple) else v
+        if isinstance(target, dict):
+            target["__planted__"] = 1
+            undo = lambda t=target: t.pop("__planted__")
+        elif isinstance(target, list):
+            target.append(None)
+            undo = target.pop
+        else:
+            bad.append(f"{m.name}: no mutable value to plant a mutation in")
+            continue
+        caught = any(p.startswith(m.name + ":") for p in cache_problems())
+        undo()
+        if not caught:
+            bad.append(f"{m.name}: a planted mutation of a cached value was not caught")
+        if any(p.startswith(m.name + ":") for p in cache_problems()):
+            bad.append(f"{m.name}: still reported after the planted mutation was undone")
+    return bad
+
+
+_DECODE_MEMO = Memo("replay_section.decode")
+
+
 def decode(data, seq, locks, shown):
-    """Per lock: (piece, cleared row count, board empty afterwards)."""
-    return [(piece, len(full), all(v is None for row in board for v in row))
-            for piece, full, board in decode_boards(data, seq, locks, shown)]
+    """Per lock: (piece, cleared row count, board empty afterwards). Memoised per (data, seq, locks)
+    object: the replay page, the route pages and the technique pages decode the same rounds."""
+    key, anchors = (id(data), id(seq), id(locks), shown), (data, seq, locks)
+    hit = _DECODE_MEMO.get(key, anchors)
+    if hit is not None:
+        return hit
+    return _DECODE_MEMO.put(key, [(piece, len(full), all(row.count(None) == len(row) for row in board))
+                                  for piece, full, board in decode_boards(data, seq, locks, shown)], anchors)
 
 
 # ---------------------------------------------------------------- the payload
@@ -230,7 +307,21 @@ def payload(data, facts):
     return round_payload(data, facts, mi, ri)
 
 
+_RP_MEMO = Memo("replay_section.round_payload")
+
+
 def round_payload(data, facts, mi, ri, extra=()):
+    """`_round_payload`, memoised when `extra` is empty (the value is shared: never mutate it)."""
+    if extra:
+        return _round_payload(data, facts, mi, ri, extra)
+    key, anchors = (id(data), id(facts), mi, ri), (data, facts)
+    hit = _RP_MEMO.get(key, anchors)
+    if hit is not None:
+        return hit
+    return _RP_MEMO.put(key, _round_payload(data, facts, mi, ri, extra), anchors)
+
+
+def _round_payload(data, facts, mi, ri, extra=()):
     """The player's JSON for match `mi`, round `ri` (both 0-based list positions in facts.json).
     The caller has run `check_artefact`. `extra` adds key moments the caller has already checked, as
     (user, lock index, before, kind, label): at the merged position after that lock, or just before

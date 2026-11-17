@@ -301,6 +301,15 @@ bin/session-todo sessions/<date> [--jobs N] [--corpus]  # read-only: what the co
 bin/emit-corpus [--check] [--only <name>] [--jobs N] [--list]  # re-emit every analysis/*.json in dependency order (--all adds the constructed ones; --check writes nothing)
 bin/verify-repo --session <date>               # the repo-wide gates plus both matrices for that session only
 bin/verify-repo --only verify --only pipeline --session <date>  # just the two per-session matrices for it
+bin/verify-repo --jobs 4 [--changed] [--timings t.json]  # run jobs in parallel (verify matrix stays serial); --changed skips a job whose input closure is unchanged since a local green run
+bin/verify-repo --audit-inputs --only <job>    # run under strace; fail on a file opened outside the job's derived input closure
+bin/input-hash hash <job> [<matrix value>]     # the closure digest CI's `Input gate` step looks up (gate/record/audit are CI's)
+bin/build-docs --only <date> --out <dir>       # render one night's report + replay page only (preview; --check refuses it)
+bin/session-loop <date>                        # rebuild one session's report and run its per-session gates (read from verify.yml)
+bin/fold-hand-claims <date> [--no-dafny]       # refold hand claims: one Dafny pass, proof map, equiv for that session
+bin/paste-fragments [--check] [--only <name>]  # run every --render and paste each marked fragment in place
+bin/derive-doc-numbers <date>                  # read-only: the hand-typed per-session doc figures, re-derived
+bin/build-cc-coach [--path]                    # build/cached cold-clear coach; bin/new-session uses it as CC_COACH by default
 python3 -m pipeline.build_report sessions/<date>/report         # regenerate the derived report sections
 python3 -m pipeline.build_report sessions/<date>/report --check # CI gate: fail if they drifted from facts.json
 python3 -m pipeline.check_prose_figures sessions/<date>/report   # CI gate: every 約-figure is floored
@@ -786,6 +795,15 @@ equivalent marker pair.
   refuse-a-text-change check. report.html is still untouched.
 - **I commit; the user pushes.** `git push` and remote changes are blocked for the agent.
   Stage, commit with a Conventional Commit message, then tell the user to push.
+- **CI skips a job whose input closure is unchanged since a green run (since 2026-11-17, yachi's decision).**
+  `pipeline/input_closure.py` derives each job's closure (its PLAN roots, `bin/`, its workflow text, every entry
+  point its `run:` blocks name and their import closures); each gated job's `Input gate` step looks the digest up
+  among green-run artifacts and, on a hit, every later step is skipped and the check reports 「skipped: inputs
+  unchanged」. PR and main pushes may skip; a daily schedule runs everything with no skip and audits the closures.
+  `bin/verify-repo --check` refuses a gated job missing any part of the gate. `emit-corpus` builds the 22
+  route/technique nodes off two shared digests (`pipeline/sim/emit-corpus-batch.ts`), so a batched artefact's
+  `emitter_md5` names an entry file that did not literally run; `emit-corpus-batch.test.ts` holds the two paths
+  byte-equal and `--unbatched` keeps the old one.
 - CI re-runs every gate on push, including regenerating each ledger and checking it is
   byte-identical to what is committed. Weekly runs add mutation testing. **22 job definitions
   across 4 workflows; the 13 of 2026-08-20 expanded to 26 check runs that day** — `verify` is a matrix over

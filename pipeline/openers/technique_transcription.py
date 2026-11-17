@@ -502,7 +502,19 @@ def node_rows(data: dict, nid: str) -> list[str]:
     return next(n for n in data['nodes'] if n['id'] == nid)['rows']
 
 
+_TP_MEMO = {}
+
+
 def t_placements(board: list[str], spec: TechniqueSpec) -> list[set]:
+    """`_t_placements`, memoised by (board, empty letters) — the only spec field it reads; the
+    selftests ask about the same boards tens of thousands of times. Callers get fresh sets."""
+    key = (tuple(board), spec.empty_letters)
+    if key not in _TP_MEMO:
+        _TP_MEMO[key] = _t_placements(board, spec)
+    return [set(cs) for cs in _TP_MEMO[key]]
+
+
+def _t_placements(board: list[str], spec: TechniqueSpec) -> list[set]:
     """Every resting placement of a T on a drawn board: four empty cells in a T shape, one of them
     on a filled cell or the floor."""
     shapes = {RT._norm(s) for s in RT._shapes('t')}

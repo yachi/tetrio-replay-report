@@ -1,9 +1,21 @@
 name: verify
 
 # The repo's whole claim is that the numbers in the reports are machine-checked.
-# This workflow re-establishes that on every push: it does not trust a single
-# committed artefact, it re-runs the extractors, the claim predicates, the Dafny
-# verifier, the codegen consistency check and (nightly) the mutation test.
+# This workflow re-establishes that: it does not trust a single committed artefact,
+# it re-runs the extractors, the claim predicates, the Dafny verifier, the codegen
+# consistency check and (weekly) the mutation test.
+#
+# WHICH RUNS RE-CHECK EVERYTHING — yachi's decision of 2026-11-17. A pull request or a
+# push to main may SKIP a job whose input closure is unchanged since a green run of it:
+# each job's `Input gate` step hashes that closure (bin/input-hash, pipeline/input_closure.py)
+# and looks the hash up among the `green-*` artifacts its own `Record green inputs` step
+# uploads after every other step passed. A hit skips every later step, and the check stays
+# green with a notice saying why. A DAILY schedule runs every job in full, never consults
+# the store, and audits each closure against the files the job actually opened; the weekly
+# schedule adds the mutation tests. So "every push re-checks everything" is no longer the
+# property this file holds: an unchanged job is re-checked at least once a day, and on any
+# push that changes one of its inputs. GitHub's path filters are still not used here — the
+# closure is derived from each job's own commands, not a list someone maintains.
 
 on:
   push:
@@ -11,6 +23,7 @@ on:
   pull_request:
   schedule:
     - cron: '17 6 * * 1'   # weekly, with mutation testing enabled
+    - cron: '41 5 * * *'   # daily: every job in full, no green store, the closure audited
   workflow_dispatch:
     inputs:
       mutation:
@@ -20,6 +33,7 @@ on:
 
 permissions:
   contents: read
+  actions: read       # the Input gate reads this repo's green-* artifacts
 
 env:
   DAFNY_VERSION: 4.11.0
@@ -121,7 +135,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
+      # Input gate (yachi's decision of 2026-11-17, see the header): hashes the job's input
+      # closure (pipeline/input_closure.py) and, on a PR or a push, looks the hash up in the green
+      # store. A hit sets INPUTS_UNCHANGED=1 and every later step is skipped; the check stays green
+      # and its notice says why. On a schedule or a dispatch the store is never consulted.
+      - name: Input gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 bin/input-hash gate verify "${{ matrix.artefact }}"
+
       - name: Install Dafny ${{ env.DAFNY_VERSION }} (pinned by sha256)
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           URL="https://github.com/dafny-lang/dafny/releases/download/v${DAFNY_VERSION}/dafny-${DAFNY_VERSION}-x64-${DAFNY_ASSET_OS}.zip"
@@ -181,6 +205,7 @@ jobs:
       # asset has no attestation either (checked, still 404). What changed is
       # zero authorities to one, which is worth having and is not the same claim.
       - name: Install z3 ${{ env.Z3_VERSION }} (pinned by sha256)
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           URL="https://github.com/Z3Prover/z3/releases/download/z3-${Z3_VERSION}/z3-${Z3_VERSION}-x64-glibc-2.39.zip"
@@ -192,6 +217,7 @@ jobs:
           echo "$HOME/bin" >> "$GITHUB_PATH"
 
       - name: Show tool versions
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           dafny --version
           z3 --version
@@ -199,14 +225,16 @@ jobs:
           jq --version
 
       - name: Verify ${{ matrix.artefact }}
+        if: env.INPUTS_UNCHANGED != '1'
         env:
-          MUTATION: ${{ (github.event_name == 'schedule' || inputs.mutation) && '1' || '0' }}
+          MUTATION: ${{ (github.event.schedule == '17 6 * * 1' || inputs.mutation) && '1' || '0' }}
         run: bin/verify-session "${{ matrix.artefact }}"
 
       # A badge links a claim to its lemma through the proof map, and codegen
       # derives lemma names from each claim's gloss — so editing a gloss can
       # strand the link while the verifier still reports 0 errors.
       - name: Check every proof link names a lemma that exists
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.check_proof_links "${{ matrix.artefact }}"
 
       # A const no lemma reads cannot be killed by a mutation, so it inflates the
@@ -217,6 +245,7 @@ jobs:
       # exactly what a clean run prints. The planted cases include the prefix/suffix
       # substrings that a naive containment test would wave through.
       - name: Check no Dafny constant is dead (and that the gate can fail)
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           python3 -m pipeline.check_dead_consts --selftest
@@ -228,6 +257,7 @@ jobs:
       # class deterministically. Skipped for the 07-24 proof/ artefact, which has
       # no rate-record family.
       - name: Check short rounds' rate constants are still pinned
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           if [ -f "${{ matrix.artefact }}/claims-generated.json" ]; then
             python3 -m pipeline.check_rate_coverage "${{ matrix.artefact }}"
@@ -242,7 +272,22 @@ jobs:
       # callers fingerprint the tree either side of their sweep; this plants a broken restore
       # and requires that fingerprint to catch it.
       - name: Check the in-place perturbation always restores (and that the guard can fail)
+        if: env.INPUTS_UNCHANGED != '1'
         run: bash pipeline/test_perturb.sh "${{ matrix.artefact }}"
+
+      - name: Audit the input closure
+        if: env.INPUTS_UNCHANGED != '1' && github.event.schedule == '41 5 * * *'
+        run: python3 bin/input-hash audit verify "${{ matrix.artefact }}"
+
+      - name: Record green inputs
+        if: success() && env.INPUTS_UNCHANGED != '1'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: ${{ env.INPUTS_ARTIFACT }}
+          path: ${{ runner.temp }}/green-inputs/
+          retention-days: 90
+          if-no-files-found: error
+          overwrite: true
 
   # The generator pipeline: regenerate each session's ledger from facts.json, check it
   # is byte-identical to what is committed, then generate and verify its Dafny. This is
@@ -263,7 +308,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
+      - name: Input gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 bin/input-hash gate pipeline "${{ matrix.session }}"
+
       - name: Install Dafny ${{ env.DAFNY_VERSION }} (pinned by sha256)
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           URL="https://github.com/dafny-lang/dafny/releases/download/v${DAFNY_VERSION}/dafny-${DAFNY_VERSION}-x64-${DAFNY_ASSET_OS}.zip"
@@ -273,6 +324,7 @@ jobs:
           echo "$HOME/dafny-dist/dafny" >> "$GITHUB_PATH"
 
       - name: Regenerate the ledger and compare with the committed one
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           W="sessions/${{ matrix.session }}/report"
@@ -292,6 +344,7 @@ jobs:
       # split its hand claims across two modules (07-22 and 07-24 do) would have had
       # both ledgers silently unchecked.
       - name: Regenerate the hand ledgers and compare with the committed ones
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           W="sessions/${{ matrix.session }}/report"
@@ -319,6 +372,7 @@ jobs:
       # claim's spec drops a row from a table that still looks complete. Each guard gets
       # a planted defect here and must reject it.
       - name: Regenerate the report's derived sections and compare with the committed report
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           python3 -m pipeline.build_report "sessions/${{ matrix.session }}/report" --selftest
@@ -328,18 +382,21 @@ jobs:
       # construction; hand-written Cantonese and glosses are where a rounded
       # figure gets in, and 約262.6 vs 約262.5 for one integer shipped for weeks.
       - name: Check every 約-figure in hand-written text is floored
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.check_prose_figures "sessions/${{ matrix.session }}/report"
 
       # A generated section's <style> is injected into the body, so at equal
       # specificity it beats the report's own stylesheet. 全場之最 defining
       # .rec-grid silently collapsed 建議's two columns; nothing failed.
       - name: Check no generated CSS reaches outside its region
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.check_generated_css "sessions/${{ matrix.session }}/report"
 
       # 每粒攻擊 (the `app` region): built twice byte-identical, renders the same with every
       # player name renamed (and no typed name survives), its CSS stays in #app, and no app_*
       # module rounds outside fmt — each property with a planted mutant that must be caught.
       - name: Selftest the 每粒攻擊 section
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.app_section --selftest "sessions/${{ matrix.session }}/report"
 
       # `finesse.faults` counts fault EVENTS and `pieces` counts pieces — 1.580
@@ -352,6 +409,7 @@ jobs:
       # `build_report --check` never saw it. --selftest carries the mutants,
       # including two negative controls so it cannot pass by banning percentages.
       - name: Check every per-piece rate names its denominator
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           W="sessions/${{ matrix.session }}/report"
@@ -365,6 +423,7 @@ jobs:
       # `[CR]\d{3}`, so every <b>G0xx</b> in match copy stayed literal text and
       # only a screenshot caught it).
       - name: Check every badge citation resolves
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.check_badge_links "sessions/${{ matrix.session }}/report"
 
       # The report body is generated from prose files into marker regions; the
@@ -373,6 +432,7 @@ jobs:
       # is fully generated" was once written down while <section id="matches">
       # sat there hand-written, because it was checked the other way.
       - name: Check no hand-written section survives in the body
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.check_report_shell "sessions/${{ matrix.session }}/report"
 
       # The forecast section is simulator-derived and sits OUTSIDE the proof
@@ -390,6 +450,7 @@ jobs:
       # statistic in the method note was exactly that. A gate whose failure has
       # never been demonstrated is not evidence of anything.
       - name: Check the simulator-derived forecast section
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           W="sessions/${{ matrix.session }}/report"
@@ -410,6 +471,7 @@ jobs:
       # opener BOTH sources draw, which is the mutant that proves the
       # dual-source check rather than the shape checks.
       - name: Check the harddrop wiki opener transcription
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           python3 -m pipeline.openers.extract_wiki_openers
@@ -424,6 +486,7 @@ jobs:
       # live here. --selftest plants every defect verify() claims to catch,
       # including a cave narrowed to 2 wide and Sky Prop dropped from the class.
       - name: Check the harddrop wiki T-spin technique transcription
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           python3 -m pipeline.openers.extract_wiki_techniques
@@ -437,6 +500,7 @@ jobs:
       # which is the misreading the cross-tab exists to prevent — so the control
       # sentence is checked for, and --selftest deletes it to prove the check bites.
       - name: Check the simulator-derived C-Spin / DT Cannon section
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           W="sessions/${{ matrix.session }}/report"
@@ -455,6 +519,7 @@ jobs:
       # corrupt, so it runs where the artefact exists — the plain check already
       # fails a session whose artefact exists and whose region does not.
       - name: Check the simulator-derived round replay section
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           W="sessions/${{ matrix.session }}/report"
@@ -470,6 +535,7 @@ jobs:
       # not-about-who-won sentence, the rounding note) and no badge. --selftest deletes each
       # sentence and plants the other corruptions, so it runs where the artefact exists.
       - name: Check the simulator-derived attack-sources section
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           W="sessions/${{ matrix.session }}/report"
@@ -484,6 +550,7 @@ jobs:
       # replay's own finesse counters, the fitted-rule caveat, the softDrop exclusion, the unit note)
       # and no badge. --selftest plants each corruption, so it runs where the artefact exists.
       - name: Check the simulator-derived finesse-placements section
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           W="sessions/${{ matrix.session }}/report"
@@ -497,6 +564,7 @@ jobs:
       # every sentence in pc_miss_section.REQUIRED and no badge; the gate also recomputes every
       # category and replays every plan. --selftest plants each corruption.
       - name: Check the simulator-derived pc-miss section
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           W="sessions/${{ matrix.session }}/report"
@@ -511,6 +579,7 @@ jobs:
       # cspin_miss_section.REQUIRED and no badge; the gate recounts every tally from the windows and
       # reads each case's first move back off the replay. --selftest plants each corruption.
       - name: Check the simulator-derived cspin-miss section
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           W="sessions/${{ matrix.session }}/report"
@@ -525,6 +594,7 @@ jobs:
       # own section draws. report_order --selftest checks the tier order the report is read in and
       # that hand-written markup, an untiered region or a duplicated one is refused.
       - name: Check the practice cards and the report's reading order
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           W="sessions/${{ matrix.session }}/report"
@@ -541,6 +611,7 @@ jobs:
       # must render with its tag, carry no badge, and print only figures the region prints.
       # --selftest plants each corruption, so it runs where the section exists.
       - name: Check the simulator-derived routes and techniques section and tagged advice
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           W="sessions/${{ matrix.session }}/report"
@@ -550,6 +621,7 @@ jobs:
           fi
 
       - name: Generate and verify the Dafny proofs
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           W="sessions/${{ matrix.session }}/report"
@@ -564,6 +636,7 @@ jobs:
       # The generated ledger's lemmas are not committed, so its proof map can only
       # be checked against the directory they were just generated into.
       - name: Check the generated proof map's links resolve
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           W="sessions/${{ matrix.session }}/report"
@@ -575,7 +648,7 @@ jobs:
             --map claims-generated-proof-map.json --dafny-dir "$RUNNER_TEMP/dfy"
 
       - name: Mutation-test the generated proofs
-        if: github.event_name == 'schedule' || inputs.mutation
+        if: env.INPUTS_UNCHANGED != '1' && (github.event.schedule == '17 6 * * 1' || inputs.mutation)
         run: bash pipeline/mutation_test.sh "$RUNNER_TEMP/dfy" 12
 
       # cvc5 is the SECOND solver: independently implemented from Z3, checking the
@@ -593,6 +666,7 @@ jobs:
       # that sentence into a gated one. Its per-solver line prints the claim
       # count, which is why no count is written here.
       - name: Install cvc5 ${{ env.CVC5_VERSION }} and z3 ${{ env.Z3_VERSION }} (pinned by sha256)
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           mkdir -p "$HOME/bin"
@@ -617,9 +691,24 @@ jobs:
       # of datum, and a 12-constant sample is what let two operator bugs through.
       # Costs ~5s.
       - name: Check the SMT-LIB artefact (regenerates, then solves and mutates)
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           python3 -m pipeline.check_smt "sessions/${{ matrix.session }}/report" \
             --regen --mutate 96
+
+      - name: Audit the input closure
+        if: env.INPUTS_UNCHANGED != '1' && github.event.schedule == '41 5 * * *'
+        run: python3 bin/input-hash audit pipeline "${{ matrix.session }}"
+
+      - name: Record green inputs
+        if: success() && env.INPUTS_UNCHANGED != '1'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: ${{ env.INPUTS_ARTIFACT }}
+          path: ${{ runner.temp }}/green-inputs/
+          retention-days: 90
+          if-no-files-found: error
+          overwrite: true
 
   # The second extractor is a genuinely independent implementation; re-running it
   # is what makes the "two parsers agree" claim mean something.
@@ -630,7 +719,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
+      - name: Input gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 bin/input-hash gate cross-extractor
+
       - name: Setup Bun
+        if: env.INPUTS_UNCHANGED != '1'
         uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76  # v2.0.2
         with:
           bun-version: ${{ env.BUN_VERSION }}
@@ -651,6 +746,7 @@ jobs:
       # pattern and the loop then "sweeps" one nonexistent directory. And no `compgen` — it is
       # a bash builtin, and while this `run:` is bash the inner `sh -c` is not.
       - name: Re-run the TypeScript extractor and compare against committed output
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           DIRS=$(find sessions -mindepth 2 -maxdepth 2 -type d \
@@ -683,6 +779,7 @@ jobs:
       # that their figures are twice-derived, so this is the step that makes that sentence true
       # rather than historical.
       - name: Compare extractor A against extractor B
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           DIRS=$(find sessions -mindepth 2 -maxdepth 2 -type d \
@@ -722,10 +819,25 @@ jobs:
       # artefacts carry different schemas, and 30 report-only fields are named rather than
       # silently intersected), so a run that has never been shown to fail proves little.
       - name: Compare the two artefacts of one session against each other
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           python3 -m pipeline.check_cross_artefact --selftest
           python3 -m pipeline.check_cross_artefact
+
+      - name: Audit the input closure
+        if: env.INPUTS_UNCHANGED != '1' && github.event.schedule == '41 5 * * *'
+        run: python3 bin/input-hash audit cross-extractor
+
+      - name: Record green inputs
+        if: success() && env.INPUTS_UNCHANGED != '1'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: ${{ env.INPUTS_ARTIFACT }}
+          path: ${{ runner.temp }}/green-inputs/
+          retention-days: 90
+          if-no-files-found: error
+          overwrite: true
 
   # docs/ is the published GitHub Pages site, copied from the sessions by
   # bin/build-docs — and nothing reran it automatically. Every other gate here
@@ -739,40 +851,36 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
-      # The per-session replay pages are RENDERED by build-docs (not copied), and every
-      # render runs replay_page.audit: quarantine sentences, no badge, no markup sink, no
-      # external request. --selftest plants one corruption per rule and requires that
-      # rule's own message, so the audit is shown to fire before --check leans on it.
-      - name: Check the replay page audit catches its corruptions
-        run: python3 -m pipeline.replay_page --selftest
+      - name: Input gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 bin/input-hash gate docs
 
       # Each session's docs/<date>.html is report.html with every match and round it names
       # linked to that night's replay page (pipeline/replay_links.py). Every render refuses a
       # link pass that changed the page's text; --selftest plants the patterns, the
       # out-of-range and raw-text cases, the openers table's export numbering and that refusal.
       - name: Check the replay-link pass
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.replay_links --selftest
       # Every published report's section titles link to their own section (pipeline/section_anchors.py);
       # every render refuses a pass that changes the page's text or links a title anywhere else.
       - name: Check the section-anchor pass
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.section_anchors --selftest
       # A session's video/video.json (pipeline/video_section.py) links every match and round to
       # the recording; --selftest plants overlapping rounds, a wrong recovered score and the rest.
       - name: Check the video section
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.video_section --selftest
       # pipeline/video_clock.py writes the video.json of every night not frame-snapped (stream
       # clock + replay ts); --check the committed files are its output, --selftest its fit on 11-05.
       - name: Check the stream-clock video alignment
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           python3 -m pipeline.video_clock --check
           python3 -m pipeline.video_clock --selftest
           python3 -m pipeline.video_links --selftest
-
-      # The replay pages' opener / technique labels are re-checked against each page's own
-      # decode as build-docs renders them. --selftest plants a wrong lock, a wrong hand and a
-      # stale artefact and requires each to be refused, so that check is shown to fire.
-      - name: Check the replay labels refuse a wrong label
-        run: python3 -m pipeline.replay_labels --selftest
 
       # The Stray Cannon route pages render from a hand-checked transcription of the
       # shiwehi.com page. Gate the transcription first (grammar, the cross-check against
@@ -783,40 +891,29 @@ jobs:
       # demo's end state: the bun-less second implementation of what
       # pipeline/openers/stray-cannon-demos.test.ts checks in the typescript job.
       - name: Check the Stray Cannon route transcription
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_meisou_routes
-
-      - name: Check the Stray Cannon route transcription gate catches its mutants
-        run: python3 -m pipeline.openers.extract_meisou_routes --selftest
-
-      - name: Check the Stray Cannon page audit catches its corruptions
-        run: python3 -m pipeline.stray_cannon_page --selftest
 
       # The Honey Cup (はちみつ砲) route transcription, through the same shared gate
       # (pipeline/openers/route_transcription.py) plus its own rules. Its corpus artefact is
       # checked by pipeline/openers/honey-cup.test.ts in the typescript job.
       - name: Check the Honey Cup route transcription
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_honeycup_routes
-
-      - name: Check the Honey Cup route transcription gate catches its mutants
-        run: python3 -m pipeline.openers.extract_honeycup_routes --selftest
 
       # The 山岳積み2号 (Mountainous Stacking 2) route transcription, through the same shared gate.
       # Its snapshot is the page's raw HTML rather than a markdown rendering (see the script's
       # docstring); neither is committed, so CI checks the transcription and the gate's teeth only.
       - name: Check the Mountainous Stacking 2 route transcription
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_mountainous2_routes
-
-      - name: Check the Mountainous Stacking 2 route transcription gate catches its mutants
-        run: python3 -m pipeline.openers.extract_mountainous2_routes --selftest
 
       # The stick spin (SDパフェ) route transcription, through the same shared gate. Its snapshot is
       # raw HTML like 山岳積み2号's and is not committed; its cross-source is Ivan's opener database
       # (opener-fields.json), not harddrop, whose transcription carries no stick spin field.
       - name: Check the stick spin route transcription
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_stickspin_routes
-
-      - name: Check the stick spin route transcription gate catches its mutants
-        run: python3 -m pipeline.openers.extract_stickspin_routes --selftest
 
       # The ガムシロ積み (Gamushiro Stacking) route transcription, through the same shared gate. Its
       # snapshot is raw HTML and is not committed; its cross-source is harddrop's own
@@ -824,10 +921,8 @@ jobs:
       # cross_source with the page's oldid and hash), since neither wiki-openers.json nor
       # opener-fields.json carries the opener.
       - name: Check the Gamushiro Stacking route transcription
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_gamushiro_routes
-
-      - name: Check the Gamushiro Stacking route transcription gate catches its mutants
-        run: python3 -m pipeline.openers.extract_gamushiro_routes --selftest
 
       # harddrop's own ガムシロ積み page (Gamushiro_Stacking, read as wikitext and pinned by revision),
       # through the same shared gate: its bag 1 and its four bag-2 forms with the three PC lists under
@@ -835,10 +930,8 @@ jobs:
       # pinned revision is refetched weekly by wikitext-sources.yml. Its corpus artefact and demos are
       # checked by hdgamushiro.test.ts and hdgamushiro-demos.test.ts in the whole-suite `bun test`.
       - name: Check the harddrop Gamushiro Stacking route transcription
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_hdgamushiro_routes
-
-      - name: Check the harddrop Gamushiro Stacking route transcription gate catches its mutants
-        run: python3 -m pipeline.openers.extract_hdgamushiro_routes --selftest
 
       # The SDPC Spin route transcription, through the same shared gate. Its source is harddrop's
       # SDPC_Spin page read as wikitext (not shiwehi.com HTML), and bag 1 is cross-checked against
@@ -848,59 +941,8 @@ jobs:
       # pipeline/openers/sdpcspin.test.ts and sdpcspin-demos.test.ts, which the typescript job's
       # whole-suite `bun test` picks up.
       - name: Check the SDPC Spin route transcription
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_sdpcspin_routes
-
-      - name: Check the SDPC Spin route transcription gate catches its mutants
-        run: python3 -m pipeline.openers.extract_sdpcspin_routes --selftest
-
-      # The SDPC Spin pages are pinned by revision (oldid, revision_sha1, snapshot_sha256) and are
-      # refetched and re-checked weekly by wikitext-sources.yml, which needs the network. Its offline
-      # half runs here on every push: the refetch gate's mutants against a fake MediaWiki API (wrong
-      # or disagreeing sha1s, a newer upstream revision, HTTP 403, a missing revision, a network error,
-      # a board edited under re-pinned hashes, which only the extractor's --html-dir can see).
-      - name: Check the wikitext refetch gate catches its mutants
-        run: python3 -m pipeline.openers.check_wikitext_sources --selftest
-
-      # The Honey Cup route pages are the shared pipeline/route_page.py renderer bound to
-      # pipeline/honey_cup_page.py; build-docs --check below re-renders them, and the constructed
-      # demos (honey-cup-demos.html) are checked by pipeline/openers/honey-cup-demos.test.ts in the
-      # typescript job.
-      - name: Check the Honey Cup page audit catches its corruptions
-        run: python3 -m pipeline.honey_cup_page --selftest
-
-      # The 山岳積み2号 route pages are the same shared renderer bound to
-      # pipeline/mountainous2_page.py; build-docs --check below re-renders them, and the constructed
-      # demos (mountainous2-demos.html) are checked by pipeline/openers/mountainous2-demos.test.ts in
-      # the typescript job.
-      - name: Check the Mountainous Stacking 2 page audit catches its corruptions
-        run: python3 -m pipeline.mountainous2_page --selftest
-
-      # The stick spin (SDパフェ) route pages are the same shared renderer bound to
-      # pipeline/stickspin_page.py; build-docs --check below re-renders them, and the constructed
-      # demos (stickspin-demos.html) are checked by pipeline/openers/stickspin-demos.test.ts in the
-      # typescript job. No corpus round reaches bag 2, so it has no per-branch node page.
-      - name: Check the stick spin page audit catches its corruptions
-        run: python3 -m pipeline.stickspin_page --selftest
-
-      # The ガムシロ積み (Gamushiro Stacking) route pages, the same shared renderer bound to
-      # pipeline/gamushiro_page.py; build-docs --check below re-renders them, and the constructed
-      # demos (gamushiro-demos.html) are checked by pipeline/openers/gamushiro-demos.test.ts in the
-      # typescript job. A reference opener the corpus barely plays: only the bag-1-only node page.
-      - name: Check the Gamushiro Stacking page audit catches its corruptions
-        run: python3 -m pipeline.gamushiro_page --selftest
-
-      # The harddrop ガムシロ積み route pages, the same shared renderer bound to
-      # pipeline/hdgamushiro_page.py. A page-only site (pipeline.sites.PAGE_ONLY_ROUTE_SITES): a card
-      # on the index and no report column or replay label, since gamushiro's already cover its cases.
-      - name: Check the harddrop Gamushiro Stacking page audit catches its corruptions
-        run: python3 -m pipeline.hdgamushiro_page --selftest
-
-      # The SDPC Spin route pages, the same shared renderer bound to pipeline/sdpcspin_page.py;
-      # build-docs --check below re-renders them, and the constructed demos (sdpcspin-demos.html) are
-      # checked by pipeline/openers/sdpcspin-demos.test.ts in the typescript job. One bag-2 page
-      # (sdpcspin-tsd.html), since the source draws one bag-2 board, plus the bag-1-only page.
-      - name: Check the SDPC Spin page audit catches its corruptions
-        run: python3 -m pipeline.sdpcspin_page --selftest
 
       # The first mid-game technique page, STSD (shiwehi.com's template/stsd.php): a local-shape
       # transcription gated by the shared pipeline/openers/technique_transcription.py (its window
@@ -910,13 +952,8 @@ jobs:
       # transcription and the gate's teeth only. The corpus artefact and the constructed demos are
       # checked by pipeline/openers/stsd.test.ts and stsd-demos.test.ts in the typescript job.
       - name: Check the STSD technique transcription
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_stsd_shapes
-
-      - name: Check the STSD technique transcription gate catches its mutants
-        run: python3 -m pipeline.openers.extract_stsd_shapes --selftest
-
-      - name: Check the STSD technique page audit catches its corruptions
-        run: python3 -m pipeline.stsd_page --selftest
 
       # The second technique page, STMB Cave (shiwehi.com's template/stmbcave.php): the same gate and
       # renderer, its window the AGREEMENT BOX of the page's drawings and harddrop's STMB_Cave diagrams
@@ -924,13 +961,8 @@ jobs:
       # artefact and the (all unbuilt) demos are checked by pipeline/openers/stmbcave.test.ts and
       # stmbcave-demos.test.ts in the typescript job.
       - name: Check the STMB Cave technique transcription
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_stmbcave_shapes
-
-      - name: Check the STMB Cave technique transcription gate catches its mutants
-        run: python3 -m pipeline.openers.extract_stmbcave_shapes --selftest
-
-      - name: Check the STMB Cave technique page audit catches its corruptions
-        run: python3 -m pipeline.stmbcave_page --selftest
 
       # The third technique page, インペリアルクロス (shiwehi.com's template/imperialcross.php): the same gate and
       # renderer, a T stood into a cross whose two cleared rows are not adjacent. Its window is the
@@ -940,13 +972,8 @@ jobs:
       # unbuilt) demos are checked by pipeline/openers/imperialcross.test.ts and imperialcross-demos.test.ts
       # in the typescript job.
       - name: Check the Imperial Cross technique transcription
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_imperialcross_shapes
-
-      - name: Check the Imperial Cross technique transcription gate catches its mutants
-        run: python3 -m pipeline.openers.extract_imperialcross_shapes --selftest
-
-      - name: Check the Imperial Cross technique page audit catches its corruptions
-        run: python3 -m pipeline.imperialcross_page --selftest
 
       # The fourth technique page, ダブルダガー (shiwehi.com's template/doubledagger.php): the same gate and
       # renderer, two TSD slots stacked, the T laid flat into the upper one. Its window is STMB Cave's T
@@ -956,13 +983,8 @@ jobs:
       # artefact and the (all unbuilt) demos are checked by pipeline/openers/doubledagger.test.ts and
       # doubledagger-demos.test.ts in the typescript job.
       - name: Check the Double Dagger technique transcription
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_doubledagger_shapes
-
-      - name: Check the Double Dagger technique transcription gate catches its mutants
-        run: python3 -m pipeline.openers.extract_doubledagger_shapes --selftest
-
-      - name: Check the Double Dagger technique page audit catches its corruptions
-        run: python3 -m pipeline.doubledagger_page --selftest
 
       # The fifth technique page, BT砲 (途中BT, shiwehi.com's template/btcannon.php): the same gate and
       # renderer, a flat T into a TSD whose clear joins a TST slot (the follow-up is a TST). Its window is
@@ -972,13 +994,8 @@ jobs:
       # recorded drawing) and the (all unbuilt) demos are checked by pipeline/openers/btcannon.test.ts and
       # btcannon-demos.test.ts in the typescript job.
       - name: Check the BT Cannon technique transcription
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_btcannon_shapes
-
-      - name: Check the BT Cannon technique transcription gate catches its mutants
-        run: python3 -m pipeline.openers.extract_btcannon_shapes --selftest
-
-      - name: Check the BT Cannon technique page audit catches its corruptions
-        run: python3 -m pipeline.btcannon_page --selftest
 
       # The sixth technique page, 千鳥格子 (Cut Copy, shiwehi.com's template/cutcopy.php): the same gate and
       # renderer, a flat T into the inner of two TSD slots interleaved a column apart, whose clear joins the
@@ -994,13 +1011,8 @@ jobs:
       # cold-clear's self-play Cut Copies (analysis/cutcopy-selfplay.json, replayed from their committed placements)
       # by cutcopy-selfplay.test.ts there.
       - name: Check the Cut Copy technique transcription
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_cutcopy_shapes
-
-      - name: Check the Cut Copy technique transcription gate catches its mutants
-        run: python3 -m pipeline.openers.extract_cutcopy_shapes --selftest
-
-      - name: Check the Cut Copy technique page audit catches its corruptions
-        run: python3 -m pipeline.cutcopy_page --selftest
 
       # The seventh technique page, 社畜トレイン (Shachiku Train, shiwehi.com's template/shachikutrain.php): the same
       # gate and renderer, a flat T into the slot an S one column off a wall and an L hung over its far end make,
@@ -1011,13 +1023,8 @@ jobs:
       # windows. The corpus artefact and the (all unbuilt) demos are checked by
       # pipeline/openers/shachikutrain.test.ts and shachikutrain-demos.test.ts in the typescript job.
       - name: Check the Shachiku Train technique transcription
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_shachikutrain_shapes
-
-      - name: Check the Shachiku Train technique transcription gate catches its mutants
-        run: python3 -m pipeline.openers.extract_shachikutrain_shapes --selftest
-
-      - name: Check the Shachiku Train technique page audit catches its corruptions
-        run: python3 -m pipeline.shachikutrain_page --selftest
 
       # The eighth technique page, 欄干 (Parapet, shiwehi.com's template/parapet.php): the same gate and renderer,
       # TWO variants on one terrain (the flat T's TSD and the stood T's TSS, each measured at its own spin), and a
@@ -1028,13 +1035,8 @@ jobs:
       # (all unbuilt) demos are checked by pipeline/openers/parapet.test.ts and parapet-demos.test.ts in the
       # typescript job.
       - name: Check the Parapet technique transcription
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_parapet_shapes
-
-      - name: Check the Parapet technique transcription gate catches its mutants
-        run: python3 -m pipeline.openers.extract_parapet_shapes --selftest
-
-      - name: Check the Parapet technique page audit catches its corruptions
-        run: python3 -m pipeline.parapet_page --selftest
 
       # The ninth technique page, 階段のドネイト (Kaidan Setups, shiwehi.com's template/kaidansetup.php): the same gate
       # and renderer, no shared RULE file changed (the shared files that moved are named in CLAUDE.md). The flat T's
@@ -1045,13 +1047,8 @@ jobs:
       # The corpus artefact and the (all unbuilt) demos are checked by pipeline/openers/kaidan.test.ts and
       # kaidan-demos.test.ts in the typescript job.
       - name: Check the Kaidan technique transcription
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_kaidan_shapes
-
-      - name: Check the Kaidan technique transcription gate catches its mutants
-        run: python3 -m pipeline.openers.extract_kaidan_shapes --selftest
-
-      - name: Check the Kaidan technique page audit catches its corruptions
-        run: python3 -m pipeline.kaidan_page --selftest
 
       # The tenth technique page, 途中DT砲 (mid-game DT Cannon, shiwehi.com's template/dtcannon.php): the same gate
       # and renderer. The flat T's TSD with a TST slot standing over its nub, then the TST. Its window is the
@@ -1061,13 +1058,8 @@ jobs:
       # unbuilt) demos are checked by pipeline/openers/dtcannon.test.ts and dtcannon-demos.test.ts in the
       # typescript job.
       - name: Check the mid-game DT Cannon technique transcription
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_dtcannon_shapes
-
-      - name: Check the mid-game DT Cannon technique transcription gate catches its mutants
-        run: python3 -m pipeline.openers.extract_dtcannon_shapes --selftest
-
-      - name: Check the mid-game DT Cannon technique page audit catches its corruptions
-        run: python3 -m pipeline.dtcannon_page --selftest
 
       # The eleventh technique page, 基本的なドネイト (basic donating, shiwehi.com's template/basicdonating.php): the
       # same gate and renderer. A piece laid over a hole fills exactly the two rows a flat T's TSD clears, so the hole
@@ -1076,13 +1068,8 @@ jobs:
       # unbuilt) demos are checked by pipeline/openers/basicdonating.test.ts and basicdonating-demos.test.ts in the
       # typescript job.
       - name: Check the basic donating technique transcription
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_basicdonating_shapes
-
-      - name: Check the basic donating technique transcription gate catches its mutants
-        run: python3 -m pipeline.openers.extract_basicdonating_shapes --selftest
-
-      - name: Check the basic donating technique page audit catches its corruptions
-        run: python3 -m pipeline.basicdonating_page --selftest
 
       # The twelfth technique page, King Crimson (harddrop's King_Crimson page — the first technique page whose
       # primary source is not shiwehi.com, which draws none): the same gate and renderer. A stood T's TST layered
@@ -1092,13 +1079,8 @@ jobs:
       # demos are checked by pipeline/openers/kingcrimson.test.ts and kingcrimson-demos.test.ts in the
       # typescript job.
       - name: Check the King Crimson technique transcription
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_kingcrimson_shapes
-
-      - name: Check the King Crimson technique transcription gate catches its mutants
-        run: python3 -m pipeline.openers.extract_kingcrimson_shapes --selftest
-
-      - name: Check the King Crimson technique page audit catches its corruptions
-        run: python3 -m pipeline.kingcrimson_page --selftest
 
       # The thirteenth technique page, Cave TSS to TST (harddrop's T-Spin_Triple_Setups page, Garbage Manipulation,
       # and the short that shows it): a T into a cave under an L roof, credited by the engine as a MINI T-spin
@@ -1106,13 +1088,8 @@ jobs:
       # and the short's board; the corpus artefact and the demos are checked by pipeline/openers/cavetsstst.test.ts and
       # cavetsstst-demos.test.ts in the typescript job.
       - name: Check the Cave TSS to TST technique transcription
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_cavetsstst_shapes
-
-      - name: Check the Cave TSS to TST technique transcription gate catches its mutants
-        run: python3 -m pipeline.openers.extract_cavetsstst_shapes --selftest
-
-      - name: Check the Cave TSS to TST technique page audit catches its corruptions
-        run: python3 -m pipeline.cavetsstst_page --selftest
 
       # The DPC page: what the first T-spin after each Perfect Clear was built on, against the setups
       # とんぼ's DPC video catalogues (read off its frames; nothing refetches it, a re-read needs the video
@@ -1120,33 +1097,16 @@ jobs:
       # anchored to the replay's own clears.allclear; the corpus artefact is checked by
       # pipeline/openers/dpc.test.ts in the typescript job.
       - name: Check the DPC setups transcription
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_dpc_setups
-
-      - name: Check the DPC setups transcription gate catches its mutants
-        run: python3 -m pipeline.openers.extract_dpc_setups --selftest
-
-      - name: Check the DPC page audit catches its corruptions
-        run: python3 -m pipeline.dpc_page --selftest
 
       # The Second PC page: a Perfect Clear straight into a four-line one, against harddrop's Second
       # Perfect Clear page (pinned revision, refetched weekly by check_wikitext_sources). Its PC points
       # are the DPC page's, anchored to clears.allclear; the corpus artefact is checked by
       # pipeline/openers/secondpc.test.ts in the typescript job.
       - name: Check the Second PC setups transcription
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_secondpc_setups
-
-      - name: Check the Second PC setups transcription gate catches its mutants
-        run: python3 -m pipeline.openers.extract_secondpc_setups --selftest
-
-      - name: Check the Second PC page audit catches its corruptions
-        run: python3 -m pipeline.secondpc_page --selftest
-
-      # The T-spin Forecast page: every counted forecast (analysis/forecast-events.json, held equal to
-      # each session's forecast-facts.json by pipeline/sim/forecast-events.test.ts in the whole-suite
-      # bun test) plus the examples read off one live video (pipeline/openers/forecast-video.json,
-      # video tier, in no count).
-      - name: Check the Forecast page audit catches its corruptions
-        run: python3 -m pipeline.forecast_page --selftest
 
       # The SDPC loop page: JayKob's SDPC loop video, read against stick spin's SDパフェ and the
       # くるまDPC setup. The video is not committed; --video <mp4> re-reads every frame by hand.
@@ -1154,19 +1114,8 @@ jobs:
       # analysis/sdpc-loop-demos.json, whose engine re-run is pipeline/openers/sdpc-loop-demos.test.ts
       # in the typescript job's whole-suite bun test.
       - name: Check the SDPC loop video read
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.check_sdpc_loop
-
-      - name: Check the SDPC loop gate catches its mutants
-        run: python3 -m pipeline.openers.check_sdpc_loop --selftest
-
-      - name: Check the SDPC loop page audit catches its corruptions
-        run: python3 -m pipeline.sdpc_loop_page --selftest
-
-      - name: Check the pc-miss page audit catches its corruptions
-        run: python3 -m pipeline.pc_miss_page --selftest
-
-      - name: Check the cspin-miss page audit catches its corruptions
-        run: python3 -m pipeline.cspin_miss_page --selftest
 
       # 影片實戰例子: boards read off one match video (pipeline/openers/video-examples.json), drawn on
       # the DPC page and on each technique page beside the source drawings, never in any count. The
@@ -1174,29 +1123,355 @@ jobs:
       # (pipeline/openers/video-examples.test.ts, in the whole-suite bun test) ties the key cells and
       # whole-shape boards to each page's own qualify module and the corpus whole-shape rule.
       - name: Check the video examples
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.check_video_examples
-
-      - name: Check the video examples gate catches its mutants
-        run: python3 -m pipeline.openers.check_video_examples --selftest
-
-      - name: Check the video examples section audit catches its corruptions
-        run: python3 -m pipeline.video_examples --selftest
 
       # The site is rendered here and NOT committed (since 2026-10-23): every render-time audit
       # above runs again inside this build, the second render must reproduce the first byte for
       # byte, and the `deploy` job publishes exactly this upload once every job in this workflow
       # has passed on a push to main.
       - name: Render the Pages site
+        if: env.INPUTS_UNCHANGED != '1' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
         run: python3 bin/build-docs --out _site
 
       - name: Check a second render of the site is byte-identical
+        if: env.INPUTS_UNCHANGED != '1'
         run: python3 bin/build-docs --check --out _site
 
       - name: Upload the site for the deploy job
+        if: env.INPUTS_UNCHANGED != '1' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
         uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b  # v4.0.0
         with:
           path: _site
 
+      - name: Audit the input closure
+        if: env.INPUTS_UNCHANGED != '1' && github.event.schedule == '41 5 * * *'
+        run: python3 bin/input-hash audit docs
+
+      - name: Record green inputs
+        if: success() && env.INPUTS_UNCHANGED != '1'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: ${{ env.INPUTS_ARTIFACT }}
+          path: ${{ runner.temp }}/green-inputs/
+          retention-days: 90
+          if-no-files-found: error
+          overwrite: true
+
+
+  # The `docs` job's corpus-independent selftests, split out on 2026-11-17 so the site render does not
+  # wait behind them: every transcription gate's planted mutants, the wikitext refetch gate's, the SDPC
+  # loop's and the video examples'. They read the committed transcriptions and their fixtures, not the
+  # corpus, so a session landing leaves this job's input closure unchanged. Steps moved verbatim.
+  docs-transcriptions:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Input gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 bin/input-hash gate docs-transcriptions
+
+      - name: Check the Stray Cannon route transcription gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_meisou_routes --selftest
+
+      - name: Check the Honey Cup route transcription gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_honeycup_routes --selftest
+
+      - name: Check the Mountainous Stacking 2 route transcription gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_mountainous2_routes --selftest
+
+      - name: Check the stick spin route transcription gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_stickspin_routes --selftest
+
+      - name: Check the Gamushiro Stacking route transcription gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_gamushiro_routes --selftest
+
+      - name: Check the harddrop Gamushiro Stacking route transcription gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_hdgamushiro_routes --selftest
+
+      - name: Check the SDPC Spin route transcription gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_sdpcspin_routes --selftest
+
+      # The SDPC Spin pages are pinned by revision (oldid, revision_sha1, snapshot_sha256) and are
+      # refetched and re-checked weekly by wikitext-sources.yml, which needs the network. Its offline
+      # half runs here on every push: the refetch gate's mutants against a fake MediaWiki API (wrong
+      # or disagreeing sha1s, a newer upstream revision, HTTP 403, a missing revision, a network error,
+      # a board edited under re-pinned hashes, which only the extractor's --html-dir can see).
+      - name: Check the wikitext refetch gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.check_wikitext_sources --selftest
+
+      - name: Check the STSD technique transcription gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_stsd_shapes --selftest
+
+      - name: Check the STMB Cave technique transcription gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_stmbcave_shapes --selftest
+
+      - name: Check the Imperial Cross technique transcription gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_imperialcross_shapes --selftest
+
+      - name: Check the Double Dagger technique transcription gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_doubledagger_shapes --selftest
+
+      - name: Check the BT Cannon technique transcription gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_btcannon_shapes --selftest
+
+      - name: Check the Cut Copy technique transcription gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_cutcopy_shapes --selftest
+
+      - name: Check the Shachiku Train technique transcription gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_shachikutrain_shapes --selftest
+
+      - name: Check the Parapet technique transcription gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_parapet_shapes --selftest
+
+      - name: Check the Kaidan technique transcription gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_kaidan_shapes --selftest
+
+      - name: Check the mid-game DT Cannon technique transcription gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_dtcannon_shapes --selftest
+
+      - name: Check the basic donating technique transcription gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_basicdonating_shapes --selftest
+
+      - name: Check the King Crimson technique transcription gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_kingcrimson_shapes --selftest
+
+      - name: Check the Cave TSS to TST technique transcription gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_cavetsstst_shapes --selftest
+
+      - name: Check the DPC setups transcription gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_dpc_setups --selftest
+
+      - name: Check the Second PC setups transcription gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_secondpc_setups --selftest
+
+      - name: Check the SDPC loop gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.check_sdpc_loop --selftest
+
+      - name: Check the video examples gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.check_video_examples --selftest
+
+      - name: Check the video examples section audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.video_examples --selftest
+
+      - name: Audit the input closure
+        if: env.INPUTS_UNCHANGED != '1' && github.event.schedule == '41 5 * * *'
+        run: python3 bin/input-hash audit docs-transcriptions
+
+      - name: Record green inputs
+        if: success() && env.INPUTS_UNCHANGED != '1'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: ${{ env.INPUTS_ARTIFACT }}
+          path: ${{ runner.temp }}/green-inputs/
+          retention-days: 90
+          if-no-files-found: error
+          overwrite: true
+
+  # The `docs` job's page-audit selftests, split out on 2026-11-17 so they run beside the render rather
+  # than before it. Each plants corruptions into a page rendered from the corpus artefacts and requires
+  # its audit to catch them. Steps moved verbatim.
+  docs-pages:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Input gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 bin/input-hash gate docs-pages
+
+      # The per-session replay pages are RENDERED by build-docs (not copied), and every
+      # render runs replay_page.audit: quarantine sentences, no badge, no markup sink, no
+      # external request. --selftest plants one corruption per rule and requires that
+      # rule's own message, so the audit is shown to fire before --check leans on it.
+      - name: Check the replay page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.replay_page --selftest
+
+      # The replay pages' opener / technique labels are re-checked against each page's own
+      # decode as build-docs renders them. --selftest plants a wrong lock, a wrong hand and a
+      # stale artefact and requires each to be refused, so that check is shown to fire.
+      - name: Check the replay labels refuse a wrong label
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.replay_labels --selftest
+
+      - name: Check the Stray Cannon page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.stray_cannon_page --selftest
+
+      # The Honey Cup route pages are the shared pipeline/route_page.py renderer bound to
+      # pipeline/honey_cup_page.py; build-docs --check below re-renders them, and the constructed
+      # demos (honey-cup-demos.html) are checked by pipeline/openers/honey-cup-demos.test.ts in the
+      # typescript job.
+      - name: Check the Honey Cup page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.honey_cup_page --selftest
+
+      # The 山岳積み2号 route pages are the same shared renderer bound to
+      # pipeline/mountainous2_page.py; build-docs --check below re-renders them, and the constructed
+      # demos (mountainous2-demos.html) are checked by pipeline/openers/mountainous2-demos.test.ts in
+      # the typescript job.
+      - name: Check the Mountainous Stacking 2 page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.mountainous2_page --selftest
+
+      # The stick spin (SDパフェ) route pages are the same shared renderer bound to
+      # pipeline/stickspin_page.py; build-docs --check below re-renders them, and the constructed
+      # demos (stickspin-demos.html) are checked by pipeline/openers/stickspin-demos.test.ts in the
+      # typescript job. No corpus round reaches bag 2, so it has no per-branch node page.
+      - name: Check the stick spin page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.stickspin_page --selftest
+
+      # The ガムシロ積み (Gamushiro Stacking) route pages, the same shared renderer bound to
+      # pipeline/gamushiro_page.py; build-docs --check below re-renders them, and the constructed
+      # demos (gamushiro-demos.html) are checked by pipeline/openers/gamushiro-demos.test.ts in the
+      # typescript job. A reference opener the corpus barely plays: only the bag-1-only node page.
+      - name: Check the Gamushiro Stacking page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.gamushiro_page --selftest
+
+      # The harddrop ガムシロ積み route pages, the same shared renderer bound to
+      # pipeline/hdgamushiro_page.py. A page-only site (pipeline.sites.PAGE_ONLY_ROUTE_SITES): a card
+      # on the index and no report column or replay label, since gamushiro's already cover its cases.
+      - name: Check the harddrop Gamushiro Stacking page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.hdgamushiro_page --selftest
+
+      # The SDPC Spin route pages, the same shared renderer bound to pipeline/sdpcspin_page.py;
+      # build-docs --check below re-renders them, and the constructed demos (sdpcspin-demos.html) are
+      # checked by pipeline/openers/sdpcspin-demos.test.ts in the typescript job. One bag-2 page
+      # (sdpcspin-tsd.html), since the source draws one bag-2 board, plus the bag-1-only page.
+      - name: Check the SDPC Spin page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.sdpcspin_page --selftest
+
+      - name: Check the STSD technique page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.stsd_page --selftest
+
+      - name: Check the STMB Cave technique page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.stmbcave_page --selftest
+
+      - name: Check the Imperial Cross technique page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.imperialcross_page --selftest
+
+      - name: Check the Double Dagger technique page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.doubledagger_page --selftest
+
+      - name: Check the BT Cannon technique page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.btcannon_page --selftest
+
+      - name: Check the Cut Copy technique page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.cutcopy_page --selftest
+
+      - name: Check the Shachiku Train technique page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.shachikutrain_page --selftest
+
+      - name: Check the Parapet technique page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.parapet_page --selftest
+
+      - name: Check the Kaidan technique page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.kaidan_page --selftest
+
+      - name: Check the mid-game DT Cannon technique page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.dtcannon_page --selftest
+
+      - name: Check the basic donating technique page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.basicdonating_page --selftest
+
+      - name: Check the King Crimson technique page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.kingcrimson_page --selftest
+
+      - name: Check the Cave TSS to TST technique page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.cavetsstst_page --selftest
+
+      - name: Check the DPC page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.dpc_page --selftest
+
+      - name: Check the Second PC page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.secondpc_page --selftest
+
+      # The T-spin Forecast page: every counted forecast (analysis/forecast-events.json, held equal to
+      # each session's forecast-facts.json by pipeline/sim/forecast-events.test.ts in the whole-suite
+      # bun test) plus the examples read off one live video (pipeline/openers/forecast-video.json,
+      # video tier, in no count).
+      - name: Check the Forecast page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.forecast_page --selftest
+
+      - name: Check the SDPC loop page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.sdpc_loop_page --selftest
+
+      - name: Check the pc-miss page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.pc_miss_page --selftest
+
+      - name: Check the cspin-miss page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.cspin_miss_page --selftest
+
+      - name: Audit the input closure
+        if: env.INPUTS_UNCHANGED != '1' && github.event.schedule == '41 5 * * *'
+        run: python3 bin/input-hash audit docs-pages
+
+      - name: Record green inputs
+        if: success() && env.INPUTS_UNCHANGED != '1'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: ${{ env.INPUTS_ARTIFACT }}
+          path: ${{ runner.temp }}/green-inputs/
+          retention-days: 90
+          if-no-files-found: error
+          overwrite: true
   # A pooled figure that one round carries, published as if the session carried it. 2026-08-14's
   # lost-regime APP gap moves 2.874 pp when m11r2 is dropped — rank 1 of 84, 1.72x the next — and
   # 「the floors have met」 did not say so. The gate fails a figure whose largest single-round
@@ -1219,11 +1494,31 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
+      - name: Input gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 bin/input-hash gate leave-one-out
+
       - name: Check no published pooled figure rests on one round in silence
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           python3 -m pipeline.check_loo --selftest
           python3 -m pipeline.check_loo --check
+
+      - name: Audit the input closure
+        if: env.INPUTS_UNCHANGED != '1' && github.event.schedule == '41 5 * * *'
+        run: python3 bin/input-hash audit leave-one-out
+
+      - name: Record green inputs
+        if: success() && env.INPUTS_UNCHANGED != '1'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: ${{ env.INPUTS_ARTIFACT }}
+          path: ${{ runner.temp }}/green-inputs/
+          retention-days: 90
+          if-no-files-found: error
+          overwrite: true
 
   # The simulator's own test suite ran nowhere. `cross-extractor` above is the only job that
   # touches Bun and it only re-runs the extractors, so every assertion about the T-Spin Forecast
@@ -1263,32 +1558,66 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
+      - name: Input gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 bin/input-hash gate intense-round-corpus
+
       - name: Check the corpus figures 最癲一局 publishes are the ones the data gives
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           python3 -m analysis.corpus_stats --selftest
           python3 -m pipeline.check_intense_corpus --selftest
           python3 -m pipeline.check_intense_corpus --check
 
+      - name: Audit the input closure
+        if: env.INPUTS_UNCHANGED != '1' && github.event.schedule == '41 5 * * *'
+        run: python3 bin/input-hash audit intense-round-corpus
+
+      - name: Record green inputs
+        if: success() && env.INPUTS_UNCHANGED != '1'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: ${{ env.INPUTS_ARTIFACT }}
+          path: ${{ runner.temp }}/green-inputs/
+          retention-days: 90
+          if-no-files-found: error
+          overwrite: true
+
   typescript:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
+    # Two shards, each a runner of its own: bun splits the test FILES between them
+    # (`--shard=k/2`), and the step after the suite checks each ran its share.
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
+      - name: Input gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 bin/input-hash gate typescript "${{ matrix.shard }}"
+
       - name: Setup Bun
+        if: env.INPUTS_UNCHANGED != '1'
         uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76  # v2.0.2
         with:
           bun-version: ${{ env.BUN_VERSION }}
 
       - name: Check every named import resolves to an export (and that the gate can fail)
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           python3 -m pipeline.check_ts_imports --selftest
           python3 -m pipeline.check_ts_imports
 
       - name: Check every forecast count routes through isVerifiedForecast (and that the gate can fail)
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           python3 -m pipeline.check_forecast_numerator --selftest
@@ -1316,6 +1645,7 @@ jobs:
       # once, keeps four parallel workers from each waiting on cargo's lock. The runner image ships
       # rustup's stable toolchain; the crate has no dependencies, so Cargo.lock pins nothing external.
       - name: Build the native PC solver
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           cargo --version
@@ -1333,6 +1663,7 @@ jobs:
       # So do the attack and finesse emitters' engine runs (src/facts.rs, facts-native.ts;
       # ATTACK_NATIVE=off / FINESSE_NATIVE=off), held equal by attack-native.test.ts and finesse-native.test.ts.
       - name: Build the native oracle
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           cargo build --release --locked --manifest-path pipeline/sim/oracle-rs/Cargo.toml
@@ -1342,18 +1673,58 @@ jobs:
       # for the same reason as the two above. forecast-native.test.ts holds the two equal on the
       # boards the metric asks about; on the weekly schedule over every player-round.
       - name: Build the native forecast search
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           cargo build --release --locked --manifest-path pipeline/sim/forecast-rs/Cargo.toml
 
       - name: Warm the oracle cache
+        if: env.INPUTS_UNCHANGED != '1'
         run: bun pipeline/sim/oracle-cache.ts --warm --jobs 4
 
       - name: Run the simulator test suite
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           if [ "$GITHUB_EVENT_NAME" = schedule ]; then export ORACLE_CACHE=off ORACLE_NATIVE_FULL=1 FORECAST_NATIVE_FULL=1 REPLAY_NATIVE_FULL=1 REACH_NATIVE_FULL=1 ATTACK_NATIVE_FULL=1 FINESSE_NATIVE_FULL=1; fi
-          REPLAY_DIR=sessions/2026-07-22 bun test --parallel
+          REPLAY_DIR=sessions/2026-07-22 bun test --parallel --shard=${{ matrix.shard }}/2 2>&1 | tee "$RUNNER_TEMP/bun-shard.log"
+
+      # A shard that ran fewer files than its share would read green over tests nobody ran. bun
+      # prints `--shard=k/2: running X/Y test files`; Y must be every test file git tracks (the count
+      # is re-derived here, never typed) and X the share bun's split gives shard k: ceil for 1, floor
+      # for 2, so the two shards together run all Y.
+      - name: Check the shard ran its share of the test files
+        if: env.INPUTS_UNCHANGED != '1'
+        run: |
+          set -euo pipefail
+          python3 - "${{ matrix.shard }}" "$RUNNER_TEMP/bun-shard.log" <<'EOF'
+          import re, subprocess, sys
+          k, log = int(sys.argv[1]), open(sys.argv[2], encoding='utf-8', errors='replace').read()
+          m = re.search(r'--shard=%d/2: running (\d+)/(\d+) test files' % k, log)
+          if not m:
+              sys.exit(f'no `--shard={k}/2: running X/Y test files` line in the bun output')
+          x, y = int(m[1]), int(m[2])
+          tracked = subprocess.run(['git', 'ls-files'], capture_output=True, text=True, check=True).stdout.split('\n')
+          want = sum(1 for f in tracked if re.search(r'(\.|_)(test|spec)\.(ts|tsx|js|mjs|cjs|jsx)$', f))
+          share = (y + 2 - k) // 2
+          print(f'shard {k}/2 ran {x} of {y} test files; git tracks {want}; its share is {share}')
+          if y != want or x != share:
+              sys.exit('FAIL: the shard did not run its share of the tracked test files')
+          EOF
+
+      - name: Audit the input closure
+        if: env.INPUTS_UNCHANGED != '1' && github.event.schedule == '41 5 * * *'
+        run: python3 bin/input-hash audit typescript "${{ matrix.shard }}"
+
+      - name: Record green inputs
+        if: success() && env.INPUTS_UNCHANGED != '1'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: ${{ env.INPUTS_ARTIFACT }}
+          path: ${{ runner.temp }}/green-inputs/
+          retention-days: 90
+          if-no-files-found: error
+          overwrite: true
 
   # The HAND-WRITTEN spec. Distinct from the `verify` job, which checks the GENERATED per-session
   # claims (Facts.dfy / Claims.dfy) — that job installs Dafny and never touches spec/Forecast.dfy.
@@ -1367,7 +1738,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
+      - name: Input gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 bin/input-hash gate spec
+
       - name: Install Dafny ${{ env.DAFNY_VERSION }} (pinned by sha256)
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           URL="https://github.com/dafny-lang/dafny/releases/download/v${DAFNY_VERSION}/dafny-${DAFNY_VERSION}-x64-${DAFNY_ASSET_OS}.zip"
@@ -1380,6 +1757,7 @@ jobs:
       # shipped one harness that scored a timeout as a pass by trusting `$?` — see the note in
       # spec/mutate-forecast-spec.sh. `0 errors` is the only thing that means verified.
       - name: Verify the spec
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           for f in spec/Forecast.dfy spec/ForecastExamples.dfy spec/BfsKey.dfy spec/DonationCave.dfy spec/RouteOrders.dfy; do
@@ -1398,16 +1776,11 @@ jobs:
       # refuses a module it has no controls for — a shared, module-agnostic control would still pass
       # with a broken `include`, which is half of what a control is for.
       - name: Check no lemma is vacuously true
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           python3 spec/check_spec_vacuity.py
           python3 spec/check_spec_vacuity.py spec/DonationCave.dfy
           python3 spec/check_spec_vacuity.py spec/RouteOrders.dfy
-
-      # T3 of the route-order proofs: the proved AcceptsMemo, compiled to Python, recounts every
-      # node of analysis/sdpcspin-orders.json over all 5040 dealt orders in both hold modes and must
-      # reproduce the artefact's counts AND bitsets. The data module is generated into a temp dir.
-      - name: Recount the route orders with the proved procedure
-        run: python3 spec/route_orders_data.py analysis/sdpcspin-orders.json --check
 
       # This repo asks one anti-vacuity question twice — `check_smt --mutate` of
       # `claims.smt2`, `pipeline/mutation_test.sh` of `Facts.dfy` — and until
@@ -1418,6 +1791,7 @@ jobs:
       # vacuity gates already are, and it runs on every push rather than weekly,
       # because the drift happens at edit time and the weekly is where it gets found.
       - name: The two anti-vacuity ladders agree
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           python3 -m pipeline.check_mutation_ladder --selftest
           python3 -m pipeline.check_mutation_ladder
@@ -1428,6 +1802,7 @@ jobs:
       # board and stay green. This parses both and fails on any mismatch (event, setup step, verdict
       # derived from the ensures, failing clause), then checks the committed JSON is byte-identical.
       - name: The drawn boards agree with the proven examples
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           python3 -m pipeline.forecast_examples --selftest
           python3 -m pipeline.forecast_examples
@@ -1435,13 +1810,72 @@ jobs:
       # Slow (each mutant is a full re-verification), so it runs on the schedule and on demand,
       # matching how the `verify` job gates its own mutation testing.
       - name: Mutation-test the spec
-        if: github.event_name == 'schedule' || inputs.mutation
+        if: env.INPUTS_UNCHANGED != '1' && (github.event.schedule == '17 6 * * 1' || inputs.mutation)
         run: |
           bash spec/mutate-forecast-spec.sh
           bash spec/mutate-donationcave.sh
           bash spec/mutate-routeorders.sh
           python3 spec/route_orders_data.py analysis/sdpcspin-orders.json --mutants
 
+      - name: Audit the input closure
+        if: env.INPUTS_UNCHANGED != '1' && github.event.schedule == '41 5 * * *'
+        run: python3 bin/input-hash audit spec
+
+      - name: Record green inputs
+        if: success() && env.INPUTS_UNCHANGED != '1'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: ${{ env.INPUTS_ARTIFACT }}
+          path: ${{ runner.temp }}/green-inputs/
+          retention-days: 90
+          if-no-files-found: error
+          overwrite: true
+
+
+  # spec's T3 recount, split out on 2026-11-17 so it does not wait behind `dafny verify` of the whole
+  # spec. It still verifies its own runner with Dafny first, so it installs the same pinned Dafny.
+  spec-recount:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Input gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 bin/input-hash gate spec-recount
+
+      - name: Install Dafny ${{ env.DAFNY_VERSION }} (pinned by sha256)
+        if: env.INPUTS_UNCHANGED != '1'
+        run: |
+          set -euo pipefail
+          URL="https://github.com/dafny-lang/dafny/releases/download/v${DAFNY_VERSION}/dafny-${DAFNY_VERSION}-x64-${DAFNY_ASSET_OS}.zip"
+          curl -fsSL "$URL" -o dafny.zip
+          echo "${DAFNY_SHA256}  dafny.zip" | sha256sum -c -
+          unzip -q dafny.zip -d "$HOME/dafny-dist"
+          echo "$HOME/dafny-dist/dafny" >> "$GITHUB_PATH"
+
+      # T3 of the route-order proofs: the proved AcceptsMemo, compiled to Python, recounts every
+      # node of analysis/sdpcspin-orders.json over all 5040 dealt orders in both hold modes and must
+      # reproduce the artefact's counts AND bitsets. The data module is generated into a temp dir.
+      - name: Recount the route orders with the proved procedure
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 spec/route_orders_data.py analysis/sdpcspin-orders.json --check
+
+      - name: Audit the input closure
+        if: env.INPUTS_UNCHANGED != '1' && github.event.schedule == '41 5 * * *'
+        run: python3 bin/input-hash audit spec-recount
+
+      - name: Record green inputs
+        if: success() && env.INPUTS_UNCHANGED != '1'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: ${{ env.INPUTS_ARTIFACT }}
+          path: ${{ runner.temp }}/green-inputs/
+          retention-days: 90
+          if-no-files-found: error
+          overwrite: true
   # The Lean half of the route-order proofs, written independently of spec/RouteOrders.dfy: T1, T2
   # and T4 kernel-checked, T3 by native_decide over data gen_data.py writes from the committed
   # artefact. check.sh also gates every theorem's #print axioms output, so a proof hole or an
@@ -1453,7 +1887,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
+      - name: Input gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 bin/input-hash gate lean
+
       - name: Install Lean ${{ env.LEAN_VERSION }} (pinned by sha256)
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           URL="https://github.com/leanprover/lean4/releases/download/v${LEAN_VERSION}/lean-${LEAN_VERSION}-linux.tar.zst"
@@ -1464,6 +1904,7 @@ jobs:
           echo "$HOME/lean-dist/bin" >> "$GITHUB_PATH"
 
       - name: Build and check the Lean proofs
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           lean --version
@@ -1471,8 +1912,22 @@ jobs:
 
       # Slow (each mutant is a full lake build), so schedule and on demand, like the spec job's.
       - name: Mutation-test the Lean proofs
-        if: github.event_name == 'schedule' || inputs.mutation
+        if: env.INPUTS_UNCHANGED != '1' && (github.event.schedule == '17 6 * * 1' || inputs.mutation)
         run: bash lean/mutate.sh
+
+      - name: Audit the input closure
+        if: env.INPUTS_UNCHANGED != '1' && github.event.schedule == '41 5 * * *'
+        run: python3 bin/input-hash audit lean
+
+      - name: Record green inputs
+        if: success() && env.INPUTS_UNCHANGED != '1'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: ${{ env.INPUTS_ARTIFACT }}
+          path: ${{ runner.temp }}/green-inputs/
+          retention-days: 90
+          if-no-files-found: error
+          overwrite: true
 
   # The cc-oracle container image, built the way the local Mac could not: on a native aarch64-linux
   # runner. No cross-compile (so no zstd-sys/libiconv snag), no linux-builder, no root — cc-oracle
@@ -1486,13 +1941,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
+      - name: Input gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 bin/input-hash gate oracle-image
+
       - name: Install Nix (flakes on by default)
+        if: env.INPUTS_UNCHANGED != '1'
         uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25  # v22
 
       - name: Build the OCI image (native aarch64-linux)
+        if: env.INPUTS_UNCHANGED != '1'
         run: nix build .#cc-oracle-image -L
 
       - name: The image's oracle detects a real T-slot and clears an empty board
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           nix build .#cc-oracle -L          # the aarch64-linux binary the image wraps
@@ -1505,6 +1968,7 @@ jobs:
           echo "oracle smoke test passed"
 
       - name: Setup Bun
+        if: env.INPUTS_UNCHANGED != '1'
         uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76  # v2.0.2
         with:
           bun-version: ${{ env.BUN_VERSION }}
@@ -1549,6 +2013,7 @@ jobs:
       # Keying this on `extract2*.ts` would iterate two directories per session and run the gate twice
       # over the same replays.
       - name: Every T-spin line count matches the Rust original across the corpus
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           SESSIONS=$(find sessions -mindepth 1 -maxdepth 1 -type d \
@@ -1576,6 +2041,7 @@ jobs:
       # comment carried before, both measured at a narrower scope and both replaced by runs at this
       # one: "0 of 7,544" (four sessions, hand-port) and "0 of 20,226" (six sessions, hand-port).
       - name: Multi-slot cutout never exceeds the scalar the metric consumes
+        if: env.INPUTS_UNCHANGED != '1'
         env:
           CC_ORACLE_SLOTS: '1'
         run: bun pipeline/sim/cross-tslot-multi.ts ./result/bin/cc-oracle
@@ -1596,10 +2062,25 @@ jobs:
       # search in oracle-rs, and this job builds no Rust crate. The TS search is the reference the
       # Rust one is held equal to (reach-native.test.ts, typescript job), so the cross-check runs on it.
       - name: Reachability (cross-movegen), kick tables (cross-srs-tables), T-spin rule (cross-tspin), own Cut Copy designs (cutcopy-own-cc) vs cold-clear
+        if: env.INPUTS_UNCHANGED != '1'
         env:
           CC_ORACLE: ./result/bin/cc-oracle
           REACH_NATIVE: 'off'
         run: bun test pipeline/sim/cross-movegen.test.ts pipeline/sim/cross-srs-tables.test.ts pipeline/sim/cross-tspin.test.ts pipeline/openers/cutcopy-own-cc.test.ts pipeline/openers/route-orders-cc.test.ts
+
+      - name: Audit the input closure
+        if: env.INPUTS_UNCHANGED != '1' && github.event.schedule == '41 5 * * *'
+        run: python3 bin/input-hash audit oracle-image
+
+      - name: Record green inputs
+        if: success() && env.INPUTS_UNCHANGED != '1'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: ${{ env.INPUTS_ARTIFACT }}
+          path: ${{ runner.temp }}/green-inputs/
+          retention-days: 90
+          if-no-files-found: error
+          overwrite: true
 
   # A pre-registration is a script plus a pinned hash plus a gate, or it is a wish. This repo has
   # now measured three times in one week that an obligation recorded only in prose does not survive
@@ -1621,11 +2102,31 @@ jobs:
           # commits, so full depth is cheap.
           fetch-depth: 0
 
+      - name: Input gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 bin/input-hash gate preregistrations
+
       - name: Check every pre-registration is pinned, classified and undrifted (and that the gate can fail)
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           python3 -m pipeline.check_preregistrations --selftest
           python3 -m pipeline.check_preregistrations
+
+      - name: Audit the input closure
+        if: env.INPUTS_UNCHANGED != '1' && github.event.schedule == '41 5 * * *'
+        run: python3 bin/input-hash audit preregistrations
+
+      - name: Record green inputs
+        if: success() && env.INPUTS_UNCHANGED != '1'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: ${{ env.INPUTS_ARTIFACT }}
+          path: ${{ runner.temp }}/green-inputs/
+          retention-days: 90
+          if-no-files-found: error
+          overwrite: true
 
   # The two long CLAUDE.md bullets about a round's THREE stat objects are almost entirely counts
   # of how often those three disagree, and every one of them was measured once by hand over the
@@ -1655,7 +2156,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
+      - name: Input gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 bin/input-hash gate stat-sources
+
       - name: Check every three-stat-objects figure is the one the corpus gives (and that the gate can fail)
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           python3 -m pipeline.check_stat_sources --selftest
@@ -1666,10 +2173,25 @@ jobs:
       # 2026-10-11 scratchpad probe measured, the committed route must reproduce every value
       # that probe printed, so the gate measures the original quantity and not an adjacent one.
       - name: Check every APP-gap figure is the one the corpus gives (and that the gate can fail)
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           python3 -m pipeline.check_app_decomposition --selftest
           python3 -m pipeline.check_app_decomposition
+
+      - name: Audit the input closure
+        if: env.INPUTS_UNCHANGED != '1' && github.event.schedule == '41 5 * * *'
+        run: python3 bin/input-hash audit stat-sources
+
+      - name: Record green inputs
+        if: success() && env.INPUTS_UNCHANGED != '1'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: ${{ env.INPUTS_ARTIFACT }}
+          path: ${{ runner.temp }}/green-inputs/
+          retention-days: 90
+          if-no-files-found: error
+          overwrite: true
 
   # The evidence for QUALIFYING_MS. `analysis/rate_records.R` needs R, which is not a
   # CI dependency and does not need to be: the artefact it writes records the md5 of
@@ -1688,11 +2210,31 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
+      - name: Input gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 bin/input-hash gate rate-records
+
       - name: Check the R analysis is current and every figure it feeds agrees (and that the gate can fail)
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           python3 -m pipeline.check_rate_records --selftest
           python3 -m pipeline.check_rate_records --rerun
+
+      - name: Audit the input closure
+        if: env.INPUTS_UNCHANGED != '1' && github.event.schedule == '41 5 * * *'
+        run: python3 bin/input-hash audit rate-records
+
+      - name: Record green inputs
+        if: success() && env.INPUTS_UNCHANGED != '1'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: ${{ env.INPUTS_ARTIFACT }}
+          path: ${{ runner.temp }}/green-inputs/
+          retention-days: 90
+          if-no-files-found: error
+          overwrite: true
 
   donation-bands:
     runs-on: ubuntu-24.04
@@ -1701,11 +2243,31 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
+      - name: Input gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 bin/input-hash gate donation-bands
+
       - name: Check the Donation ablation bands against the artefacts (and that the gate can fail)
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           python3 -m pipeline.check_donation_bands --selftest
           python3 -m pipeline.check_donation_bands
+
+      - name: Audit the input closure
+        if: env.INPUTS_UNCHANGED != '1' && github.event.schedule == '41 5 * * *'
+        run: python3 bin/input-hash audit donation-bands
+
+      - name: Record green inputs
+        if: success() && env.INPUTS_UNCHANGED != '1'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: ${{ env.INPUTS_ARTIFACT }}
+          path: ${{ runner.temp }}/green-inputs/
+          retention-days: 90
+          if-no-files-found: error
+          overwrite: true
 
   dual-engine:
     runs-on: ubuntu-24.04
@@ -1714,11 +2276,31 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
+      - name: Input gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 bin/input-hash gate dual-engine
+
       - name: Check the dual-engine corpus figures against the artefacts (and that the gate can fail)
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           python3 -m pipeline.check_dual_engine --selftest
           python3 -m pipeline.check_dual_engine
+
+      - name: Audit the input closure
+        if: env.INPUTS_UNCHANGED != '1' && github.event.schedule == '41 5 * * *'
+        run: python3 bin/input-hash audit dual-engine
+
+      - name: Record green inputs
+        if: success() && env.INPUTS_UNCHANGED != '1'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: ${{ env.INPUTS_ARTIFACT }}
+          path: ${{ runner.temp }}/green-inputs/
+          retention-days: 90
+          if-no-files-found: error
+          overwrite: true
 
   rounding:
     runs-on: ubuntu-24.04
@@ -1727,12 +2309,32 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
+      - name: Input gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 bin/input-hash gate rounding
+
       - name: Check every rendered figure declares a rounding rule, and say which the corpus enforces
+        if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
           python3 -m pipeline.fmt --selftest
           python3 -m pipeline.check_rounding --selftest
           python3 -m pipeline.check_rounding
+
+      - name: Audit the input closure
+        if: env.INPUTS_UNCHANGED != '1' && github.event.schedule == '41 5 * * *'
+        run: python3 bin/input-hash audit rounding
+
+      - name: Record green inputs
+        if: success() && env.INPUTS_UNCHANGED != '1'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: ${{ env.INPUTS_ARTIFACT }}
+          path: ${{ runner.temp }}/green-inputs/
+          retention-days: 90
+          if-no-files-found: error
+          overwrite: true
 
   # `bin/verify-repo` is the local stand-in for the repo-wide jobs above — the
   # ones `bin/verify-session` cannot reach because it takes ONE artefact directory.
@@ -1777,7 +2379,7 @@ jobs:
   # out. The repository's Pages source must be "GitHub Actions" for this job to succeed.
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [verify, pipeline, cross-extractor, docs, leave-one-out, intense-round-corpus, typescript, spec, lean, oracle-image, preregistrations, stat-sources, rate-records, donation-bands, dual-engine, rounding, workflow-plan]
+    needs: [verify, pipeline, cross-extractor, docs, docs-transcriptions, docs-pages, leave-one-out, intense-round-corpus, typescript, spec, spec-recount, lean, oracle-image, preregistrations, stat-sources, rate-records, donation-bands, dual-engine, rounding, workflow-plan]
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:

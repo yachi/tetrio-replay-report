@@ -1,0 +1,262 @@
+#!/usr/bin/env python3
+"""bin/session-loop <date> — one authoring iteration over ONE session, locally.
+
+    bin/session-loop 2026-11-17            # rebuild, gate, scan, preview, hint
+    bin/session-loop 2026-11-17 --no-preview
+    bin/session-loop 2026-11-17 --list     # print the gates it would run, run nothing
+
+What it does, in order:
+
+  1. rebuild: build_report -> build_round_table -> build_report (the order bin/new-session
+     uses, so a skeleton round table is filled before the second pass reads it). Every
+     generator replaces only its own marker region, so on a finished session this writes
+     the same bytes back and `git status` stays clean.
+  2. gates: every per-session gate in verify.yml's `pipeline` job that is not a selftest,
+     READ FROM THE WORKFLOW through bin/verify-repo's own parser rather than kept as a list
+     here, plus `check_proof_links` over the session's committed map. The selection rule is
+     printed (--list shows the result): a single-line `python3 -m pipeline.…` command that
+     names the session's report dir and carries no `--selftest`, `--out`, `--regen` or
+     `$RUNNER_TEMP` (those regenerate committed files or need a scratch Dafny tree). They
+     run in parallel; each is internal to the session directory.
+  3. TODO scan: every `TODO` left in prose/*.json, report.html (the <title> included) and the
+     hand-written markdown. No gate refuses one, so this is the only thing that says so.
+  4. preview: that session's two published pages, `<date>.html` and `<date>-replay.html`,
+     through `bin/build-docs --only <date>` when build-docs has that flag; otherwise a full
+     `bin/build-docs --out <scratch>` (about 90 s) and the two pages are named from there.
+  5. citation hint (advisory, never a failure): every Arabic figure in prose/*.json whose
+     sentence cites no claim printing that number, with the claims that do print it.
+
+Exit status: 1 when a rebuild step or a gate fails, 0 otherwise. TODOs and citation hints
+are reported, never failed — they are the state of a session being written.
+"""
+import argparse
+import glob
+import importlib.machinery
+import importlib.util
+import json
+import os
+import re
+import shlex
+import subprocess
+import sys
+import tempfile
+import time
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parent.parent
+
+# The rule that picks a CI line as a local per-session gate. Each excluded token names
+# why: a selftest is not a check of THIS session's state, `--out`/`--regen` rewrite a
+# committed file, and $RUNNER_TEMP is the scratch Dafny tree the CI job builds first.
+EXCLUDE = ("--selftest", "--out", "--regen", "RUNNER_TEMP")
+
+
+def _verify_repo():
+    loader = importlib.machinery.SourceFileLoader("verify_repo", str(REPO / "bin" / "verify-repo"))
+    spec = importlib.util.spec_from_loader("verify_repo", loader)
+    mod = importlib.util.module_from_spec(spec)
+    loader.exec_module(mod)
+    return mod
+
+
+def gates(date):
+    """The pipeline job's per-session gate commands, as argv lists, in workflow order."""
+    vr = _verify_repo()
+    _, jobs = vr.load()
+    job = [j for j in jobs if j.name == "pipeline" and j.file == "verify.yml"]
+    if len(job) != 1:
+        raise SystemExit(f"session-loop: expected one `pipeline` job in verify.yml, found {len(job)}")
+    W = f"sessions/{date}/report"
+    out, seen = [], set()
+    for step in job[0].steps:
+        if not step.run:
+            continue
+        for line in step.run.splitlines():
+            line = line.strip()
+            if not line.startswith("python3 -m pipeline.") or line.endswith("\\"):
+                continue
+            if not ("$W" in line or "matrix.session" in line):
+                continue
+            if any(tok in line for tok in EXCLUDE):
+                continue
+            line = (line.replace("${{ matrix.session }}", date)
+                        .replace('"$W"', W).replace("$W", W))
+            if "${{" in line or "$" in line:
+                raise SystemExit(f"session-loop: cannot resolve {line!r} from step {step.name!r}")
+            argv = shlex.split(line)
+            key = tuple(argv)
+            if key not in seen:
+                seen.add(key)
+                out.append((step.name, argv))
+    if not out:
+        raise SystemExit("session-loop: the selection rule picked no gate from the pipeline job")
+    # The CI job checks the generated proof map's links only against a scratch Dafny tree;
+    # locally the session's own committed map and dafny/ directory are what it reads.
+    out.append(("Check every badge's lemma exists (committed map)",
+                ["python3", "-m", "pipeline.check_proof_links", W]))
+    return out
+
+
+def run(argv, label):
+    t = time.monotonic()
+    p = subprocess.run(argv, cwd=REPO, capture_output=True, text=True)
+    return label, argv, p.returncode, p.stdout + p.stderr, time.monotonic() - t
+
+
+def todo_scan(W):
+    hits = []
+    files = sorted(glob.glob(str(W / "prose" / "*.json"))) + [str(W / "report.html")]
+    files += sorted(glob.glob(str(W / "*.md")))
+    for f in files:
+        if not os.path.exists(f):
+            continue
+        for i, line in enumerate(Path(f).read_text(encoding="utf-8").splitlines(), 1):
+            if "TODO" in line:
+                hits.append(f"{os.path.relpath(f, REPO)}:{i}: {line.strip()[:110]}")
+    return hits
+
+
+def citation_hint(W):
+    """A port of the brief-5 probe: figures in prose whose sentence cites no claim printing them."""
+    claims = {}
+    for f in sorted(glob.glob(str(W / "claims-*.json"))):
+        if "proof-map" in f:
+            continue
+        for c in json.loads(Path(f).read_text(encoding="utf-8")):
+            claims[c["id"]] = c
+    num = re.compile(r"(?<![\w.])\d+(?:\.\d+)?")
+
+    def nums(s):
+        return set(num.findall(re.sub(r"<[^>]+>", "", s)))
+
+    idx = {}
+    for c in claims.values():
+        for n in nums(c.get("canto", "")):
+            idx.setdefault(n, []).append(c["id"])
+
+    def leaves(o, p=""):
+        if isinstance(o, str):
+            yield p, o
+        elif isinstance(o, dict):
+            for k, v in o.items():
+                yield from leaves(v, f"{p}.{k}")
+        elif isinstance(o, list):
+            for i, v in enumerate(o):
+                yield from leaves(v, f"{p}[{i}]")
+
+    rows, total = [], 0
+    for f in sorted(glob.glob(str(W / "prose" / "*.json"))):
+        for p, s in leaves(json.loads(Path(f).read_text(encoding="utf-8"))):
+            for sent in re.split(r"(?<=[。；！？])", s):
+                cited = set(re.findall(r'data-claim="([A-Z]\d{3})"', sent))
+                for n in sorted(nums(sent)):
+                    if n in ("1", "2", "3", "5"):     # ordinals and best-of counts, not figures
+                        continue
+                    total += 1
+                    if any(c in claims and n in nums(claims[c].get("canto", "")) for c in cited):
+                        continue
+                    rows.append(f"{Path(f).name}{p}: {n} cited={sorted(cited)} "
+                                f"printed-by={idx.get(n, [])[:6]}")
+    return total, rows
+
+
+def preview(date):
+    bd = REPO / "bin" / "build-docs"
+    help_ = subprocess.run([str(bd), "--help"], cwd=REPO, capture_output=True, text=True).stdout
+    out = Path(tempfile.mkdtemp(prefix=f"session-loop-{date}-"))
+    if "--only" in help_:
+        argv = [str(bd), "--only", date, "--out", str(out)]
+        how = "build-docs --only"
+    else:
+        argv = [str(bd), "--out", str(out)]
+        how = "full build-docs --out (no --only yet)"
+    t = time.monotonic()
+    p = subprocess.run(argv, cwd=REPO, capture_output=True, text=True)
+    dt = time.monotonic() - t
+    pages = [out / f"{date}.html", out / f"{date}-replay.html"]
+    return how, p.returncode, p.stdout + p.stderr, dt, pages
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("date")
+    ap.add_argument("--no-preview", action="store_true", help="skip rendering the two pages")
+    ap.add_argument("--list", action="store_true", help="print the selected gates and exit")
+    ap.add_argument("--jobs", type=int, default=os.cpu_count() or 4)
+    args = ap.parse_args(argv)
+    W = REPO / "sessions" / args.date / "report"
+    if not (W / "facts.json").exists():
+        raise SystemExit(f"session-loop: no {os.path.relpath(W, REPO)}/facts.json")
+    rel = os.path.relpath(W, REPO)
+    sel = gates(args.date)
+    if args.list:
+        print(f"{len(sel)} gates selected from verify.yml's pipeline job "
+              f"(excluding lines carrying {', '.join(EXCLUDE)}):")
+        for name, a in sel:
+            print(f"  {' '.join(a)}    # {name}")
+        return 0
+    t0 = time.monotonic()
+    failed = []
+
+    print("== 1. rebuild")
+    for a in (["python3", "-m", "pipeline.build_report", rel],
+              ["python3", "-m", "pipeline.build_round_table", rel],
+              ["python3", "-m", "pipeline.build_report", rel]):
+        label, _, rc, out, dt = run(a, " ".join(a[2:]))
+        print(f"  {'ok' if rc == 0 else 'FAIL'}  {label}  ({dt:.1f}s)")
+        if rc:
+            print(out)
+            failed.append(label)
+    if failed:
+        print("rebuild failed; gates not run")
+        return 1
+
+    print(f"== 2. {len(sel)} per-session gates from verify.yml's pipeline job (parallel, --jobs {args.jobs})")
+    t = time.monotonic()
+    with ThreadPoolExecutor(max_workers=args.jobs) as ex:
+        results = list(ex.map(lambda s: run(s[1], s[1][2]), sel))
+    for label, a, rc, out, dt in results:
+        print(f"  {'ok' if rc == 0 else 'FAIL'}  {' '.join(a[2:])}  ({dt:.1f}s)")
+        if rc:
+            print("    " + out.strip().replace("\n", "\n    "))
+            failed.append(" ".join(a[2:]))
+    print(f"  gates wall {time.monotonic() - t:.1f}s")
+
+    print("== 3. TODO scan")
+    todos = todo_scan(W)
+    print(f"  {len(todos)} TODO line(s)" + (":" if todos else ""))
+    for h in todos[:40]:
+        print("   ", h)
+    if len(todos) > 40:
+        print(f"    … and {len(todos) - 40} more")
+
+    if args.no_preview:
+        print("== 4. preview skipped (--no-preview)")
+    else:
+        print("== 4. preview")
+        how, rc, out, dt, pages = preview(args.date)
+        print(f"  {how}: {'ok' if rc == 0 else 'FAIL'} ({dt:.1f}s)")
+        if rc:
+            print("    " + out.strip()[-2000:].replace("\n", "\n    "))
+            failed.append("preview")
+        for p in pages:
+            print(f"  {'' if p.exists() else 'MISSING '}{p}")
+            if rc == 0 and not p.exists():
+                failed.append(f"preview page {p.name}")
+
+    print("== 5. citation hint (advisory)")
+    total, rows = citation_hint(W)
+    print(f"  {total} figures in prose/*.json; {len(rows)} sit in a sentence citing no claim that prints them")
+    for r in rows[:25]:
+        print("   ", r)
+    if len(rows) > 25:
+        print(f"    … and {len(rows) - 25} more")
+
+    print(f"== session-loop {args.date}: {'FAIL ' + '; '.join(failed) if failed else 'ok'} "
+          f"({time.monotonic() - t0:.1f}s)")
+    return 1 if failed else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
