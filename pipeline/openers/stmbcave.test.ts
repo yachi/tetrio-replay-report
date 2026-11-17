@@ -41,7 +41,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17']);
 const ART_PATH = `${import.meta.dir}/../../analysis/stmbcave-facts.json`;
 const TR = JSON.parse(readFileSync(STMBCAVE.transcriptionPath, 'utf8'));
 const H = 40;
@@ -189,7 +189,8 @@ const RECON_DROPPED_TSD: string[] = [];
 /** The opener metric's caves (>= 3 wide, overlapping the T) that are NOT STMB Cave hits, each with the
  *  geometric reason this test re-derives: `centred` the gap is the T's own three columns (the nub over its
  *  middle, nothing to hook an S over); `arm_only` the gap reaches under one arm only, the nub on a filled
- *  cell; `wall` the gap starts under the nub but the window's two cells behind the nub leave the board. */
+ *  cell; `wall` the gap starts under the nub but the window's two cells behind the nub leave the board;
+ *  `wall_wide` the same for a gap wider than three (2026-11-17 m1r4: width 5, nub on column 1). */
 const CAVE_METRIC_ONLY: string[] = [
   "2026-07-24 m2r3 pinglamb lock 131 (centred, width 3, depth 1)", "2026-07-24 m6r5 pinglamb lock 67 (centred, width 3, depth 1)",
   "2026-07-28 m7r1 yachi lock 98 (centred, width 3, depth 1)", "2026-07-28 m7r6 pinglamb lock 33 (centred, width 3, depth 1)",
@@ -220,6 +221,7 @@ const CAVE_METRIC_ONLY: string[] = [
   "2026-11-01 m5r5 pinglamb lock 25 (centred, width 3, depth 1)", "2026-11-01 m6r6 yachi lock 150 (centred, width 3, depth 1)",
   "2026-11-01 m7r6 yachi lock 60 (centred, width 3, depth 1)", "2026-11-01 m7r7 yachi lock 44 (centred, width 3, depth 1)",
   "2026-11-01 m8r7 pinglamb lock 33 (centred, width 3, depth 1)", "2026-11-01 m16r9 pinglamb lock 41 (centred, width 3, depth 1)",
+  "2026-11-17 m1r4 pinglamb lock 26 (wall_wide, width 5, depth 1)", "2026-11-17 m2r4 yachi lock 37 (centred, width 3, depth 1)",
 ];
 
 /** The SDPC Spin rounds that reached its STMB Cave with the node verified: a hit at the next T lock. */
@@ -234,8 +236,8 @@ const SDPC_CAVE_UNSCORED: string[] = [
 ];
 
 /** Per player: the opportunity (scored full TSDs), split at the 0-based opener window. */
-const TSD_DENOM = { pinglamb: { all: 6651, in_opener: 1302, mid_game: 5349 },
-                    yachi: { all: 6052, in_opener: 1548, mid_game: 4504 } };
+const TSD_DENOM = { pinglamb: { all: 6723, in_opener: 1318, mid_game: 5405 },
+                    yachi: { all: 6121, in_opener: 1565, mid_game: 4556 } };
 /** Per player: hits, their split, the mirrored ones, the follow-ups that fired. */
 const HITS = { pinglamb: { all: 57, in_opener: 1, mid_game: 56, mirrored: 30, garbage_in_window: 0 },
                yachi: { all: 96, in_opener: 4, mid_game: 92, mirrored: 30, garbage_in_window: 0 } };
@@ -244,12 +246,12 @@ const FOLLOWUP_FIRED = { pinglamb: 1, yachi: 4 };
 const CONTROLS = {
   under: { TSS: { pinglamb: 4, yachi: 0 }, TST: { pinglamb: 0, yachi: 0 },
            mini_TSS: { pinglamb: 0, yachi: 0 }, mini_TSD: { pinglamb: 0, yachi: 0 } },
-  ablation: { no_must_empty: { pinglamb: 4710, yachi: 4107 }, no_roof: { pinglamb: 57, yachi: 96 },
-              t_overlap: { pinglamb: 107, yachi: 120 } },
-  orientation_baseline: { pinglamb: 63, yachi: 86 },
+  ablation: { no_must_empty: { pinglamb: 4757, yachi: 4145 }, no_roof: { pinglamb: 57, yachi: 96 },
+              t_overlap: { pinglamb: 107, yachi: 121 } },
+  orientation_baseline: { pinglamb: 64, yachi: 89 },
 };
 /** window_off_board, per player: a count with a property check, not a list (see the header). */
-const WINDOW_OFF_BOARD = { pinglamb: 2743, yachi: 2732 };
+const WINDOW_OFF_BOARD = { pinglamb: 2778, yachi: 2771 };
 
 /** Measured byte-identical on this corpus, each for its reason; asserted to STAY identical. */
 const EQUIVALENT: Record<string, string> = {
@@ -337,7 +339,7 @@ test('quarantined: report_eligible false, no claim ids', () => {
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
   const n = checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT);
-  expect(n).toBe(17949);
+  expect(n).toBe(18177);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 
@@ -439,6 +441,12 @@ test('the opener metric: caveAt reproduced, every hit one of its caves, every ot
       const dir = cv!.start === n.col ? 1 : -1;
       const behind = [n.col - dir, n.col - 2 * dir];
       why = behind.some(c => c < 0 || c > 9) ? 'wall' : 'other';
+    } else if ((cv!.start === n.col && cv!.end > n.col + 3) || (cv!.start < n.col - 2 && cv!.end === n.col + 1)) {
+      // the same wall reading for a gap wider than three that still starts under the nub: the two cells
+      // behind the nub must leave the board, else it stays `other` and fails the check below
+      const dir = cv!.start === n.col ? 1 : -1;
+      const behind = [n.col - dir, n.col - 2 * dir];
+      why = behind.some(c => c < 0 || c > 9) ? 'wall_wide' : 'other';
     }
     only.push(`${nameOf(d, s.i)} (${why}, width ${cv!.width}, depth ${cv!.minDepth})`);
   }
@@ -492,7 +500,7 @@ test('cross-check: the SDPC Spin rounds that reached its STMB Cave', () => {
 test('the follow-up row map is verified against the engine at every step it uses', () => {
   const c = art().check;
   expect(c.rowmap_unverified).toBe(32);
-  expect(c.rowmap_steps).toBe(314749);
+  expect(c.rowmap_steps).toBe(319424);
   expect(art().hits.every((h: any) => h.followup.reason !== 'rowmap_unverified')).toBe(true);
 });
 

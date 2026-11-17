@@ -28,7 +28,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
    '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22',
-   '2026-10-29', '2026-11-01', '2026-11-05']);
+   '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17']);
 const H = 40, W = 10;
 
 let DIGESTS: TechDigest[] | null = null;
@@ -134,6 +134,8 @@ const MATCHED: [string, string, boolean, boolean][] = [
   ['2026-11-05 m5r1 yachi @27', 'p01.000', false, false],
   ['2026-11-05 m5r4 yachi @27', 'p01.000', false, false],
   ['2026-11-05 m6r6 pinglamb @27', 'p01.000', false, false],
+  ['2026-11-17 m1r2 pinglamb @27', 'p01.000', false, false],
+  ['2026-11-17 m3r8 pinglamb @27', 'p07.000', false, false],
 ];
 
 /** 社畜トレイン hits its qualifier calls `dpc` that are NOT a case here, with the reason */

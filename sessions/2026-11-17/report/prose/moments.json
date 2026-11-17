@@ -1,0 +1,30 @@
+{
+  "eyebrow": "關鍵時刻 · 三件事",
+  "title": "三件事：兩邊都重、粒數唔夠、同第三場",
+  "cards": [
+    {
+      "accent": "p",
+      "label": "贏局輸局都重",
+      "value": "+6.94% / +3.75%",
+      "body": "拆開贏同輸嘅局：贏嗰啲局 pinglamb 每粒方塊嘅攻擊高 6.94%，<strong>輸嗰啲局都高 3.75%</strong><span class=\"badge\" data-claim=\"C002\"></span>。即係唔係一兩局爆發，係成晚每粒都重啲。"
+    },
+    {
+      "accent": "y",
+      "label": "粒數唔夠",
+      "value": "+3.08% / +10.46%",
+      "body": "yachi 多疊 71 粒，即係多 3.08%<span class=\"badge\" data-claim=\"C005\"></span><span class=\"badge\" data-claim=\"C009\"></span>——呢條路最多填返 3.08 個百分點，<strong>10.46% 個窿填唔到三分一</strong><span class=\"badge\" data-claim=\"C004\"></span>，所以總攻擊少 97 條，即係 pinglamb 總攻擊嘅 6.68%<span class=\"badge\" data-claim=\"C005\"></span>。"
+    },
+    {
+      "accent": "g",
+      "label": "第三場",
+      "value": "+7 行 · 3-5",
+      "body": "逐場計總攻擊，打得多嗰個三場贏兩場；例外係第三場，yachi 多 7 條都係 3 比 5 輸<span class=\"badge\" data-claim=\"C015\"></span>。三場都係 pinglamb 每粒方塊嘅攻擊高<span class=\"badge\" data-claim=\"C014\"></span>。"
+    }
+  ],
+  "trivia": [
+    "最癲嗰局係 m2 第二局<span class=\"badge\" data-claim=\"G053\"></span>。pinglamb 贏，但佢清行數少過對手<span class=\"badge\" data-claim=\"G074\"></span>；佢贏喺每粒方塊嘅攻擊，約 0.890 對約 0.666<span class=\"badge\" data-claim=\"G075\"></span>。",
+    "All Clear pinglamb 5 個、yachi 4 個<span class=\"badge\" data-claim=\"G032\"></span>。淨係 pinglamb 做到全消嘅 3 局，佢一局都冇輸<span class=\"badge\" data-claim=\"G071\"></span>。",
+    "24 局每一局都係 VS 高嗰個贏，零例外<span class=\"badge\" data-claim=\"G019\"></span>；yachi 嘅場均 PPS 三場都高過對手<span class=\"badge\" data-claim=\"G045\"></span>。",
+    "KPP 今晚兩個人差唔多：yachi 3.592 下、pinglamb 3.632 下，pinglamb 高 1.10%<span class=\"badge\" data-claim=\"C008\"></span>。"
+  ]
+}

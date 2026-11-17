@@ -11,7 +11,10 @@
 #   3. generate the claim ledger; every predicate must evaluate True
 #   4. generate Dafny from the same specs; `dafny verify` must report 0 errors
 #   5. (MUTATION=1) flipping a datum must break verification
-#   6. the four simulator emitters -> sim/*.json (quarantined: no claim ids, no badges)
+#   6. the simulator emitters -> sim/*.json (quarantined: no claim ids, no badges):
+#      the five that need only bun, then pc-miss (its Rust solver builds on first use),
+#      then cspin-miss ONLY when CC_COACH names a built cold-clear coach binary
+#      (tools/cc-coach); without it a loud !! line prints the commands to run by hand
 #   7. emit a report skeleton — but only if the session has no report.html yet
 #
 # What it does NOT do is write the Cantonese prose — that is the part that needs
@@ -124,9 +127,55 @@ if command -v bun >/dev/null; then
     else state=CHANGED; fi
     echo "  ok  $out ($state)"
   done
+  # pc-miss reads sim/replay-facts.json, so it runs after the loop. Its PC solver is the
+  # Rust crate pipeline/sim/pc-solver-rs, which pc-solver-native.ts builds when stale, so
+  # cargo has to be on PATH the first time.
+  out="$DEST/sim/pc-miss-facts.json"
+  before="$( [ -f "$out" ] && shasum "$out" || true )"
+  # It prints one progress line per round to stderr; kept out of the way unless it fails.
+  log="$(mktemp)"
+  REPLAY_DIR="$DEST" bun pipeline/sim/pc-miss.ts --out "$out" >/dev/null 2>"$log" \
+    || { cat "$log" >&2; die "pc-miss.ts failed — see the error above (it needs cargo to build pc-solver-rs)"; }
+  rm -f "$log"
+  if [ -z "$before" ]; then state=new
+  elif [ "$before" = "$(shasum "$out")" ]; then state=unchanged
+  else state=CHANGED; fi
+  echo "  ok  $out ($state)"
+
+  # cspin-miss needs cold-clear itself: the windows go through the coach binary and its
+  # placements come back into the artefact. The binary is not built by anything here, so
+  # it runs only when CC_COACH names it; otherwise say so loudly, because a session
+  # without the artefact gets no C-Spin 冇砌 section and nothing else would mention it.
+  out="$DEST/sim/cspin-miss-facts.json"
+  if [ -n "${CC_COACH:-}" ]; then
+    [ -x "$CC_COACH" ] || die "CC_COACH=$CC_COACH is not an executable"
+    ccdir="$(mktemp -d)"
+    before="$( [ -f "$out" ] && shasum "$out" || true )"
+    REPLAY_DIR="$DEST" bun pipeline/sim/cspin-miss.ts --windows "$ccdir/in.jsonl" >/dev/null \
+      || die "cspin-miss.ts --windows failed"
+    CC_NODES=40000 COACH_MODE=rollout "$CC_COACH" < "$ccdir/in.jsonl" > "$ccdir/out.jsonl" \
+      || die "the cold-clear coach ($CC_COACH) failed"
+    REPLAY_DIR="$DEST" bun pipeline/sim/cspin-miss.ts --cc "$ccdir/out.jsonl" --out "$out" >/dev/null \
+      || die "cspin-miss.ts --cc failed"
+    rm -rf "$ccdir"
+    if [ -z "$before" ]; then state=new
+    elif [ "$before" = "$(shasum "$out")" ]; then state=unchanged
+    else state=CHANGED; fi
+    echo "  ok  $out ($state)"
+  elif [ -f "$out" ]; then
+    echo "  --  CC_COACH unset: $out left as it is (not re-derived)"
+  else
+    echo "  !!  CC_COACH unset: NO $out, so the report gets no C-Spin 冇砌 section."
+    echo "  !!  Build tools/cc-coach (see tools/cc-coach/README.md), then either re-run with"
+    echo "  !!  CC_COACH=<path to the cc-coach binary>, or run by hand:"
+    echo "  !!    REPLAY_DIR=$DEST bun pipeline/sim/cspin-miss.ts --windows /tmp/cc-in.jsonl"
+    echo "  !!    CC_NODES=40000 COACH_MODE=rollout <cc-coach> < /tmp/cc-in.jsonl > /tmp/cc-out.jsonl"
+    echo "  !!    REPLAY_DIR=$DEST bun pipeline/sim/cspin-miss.ts --cc /tmp/cc-out.jsonl --out $out"
+  fi
 else
-  echo "  !!  bun not installed: no sim/*.json, so the report gets none of the five"
-  echo "      quarantined sections (forecast, openers, attack-sources, finesse-placements, round-replay)"
+  echo "  !!  bun not installed: no sim/*.json, so the report gets none of the seven"
+  echo "      quarantined sections (forecast, openers, attack-sources, finesse-placements,"
+  echo "      round-replay, pc-miss, cspin-miss)"
 fi
 
 step "7/7 report skeleton"
@@ -189,4 +238,6 @@ checked in a browser as it goes:
        python3 -m pipeline.check_prose_figures $WORK
        python3 -m pipeline.check_badge_links $WORK
        python3 bin/build-docs
+  5. list what the corpus-wide gates still need for this session (read-only, seconds):
+       bin/session-todo $DEST
 EOF

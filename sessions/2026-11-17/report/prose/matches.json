@@ -1,0 +1,25 @@
+{
+  "eyebrow": "戰況直擊 · 三場",
+  "title": "三場 3 比 0",
+  "lede": "三場都係先贏五局嗰個贏<span class=\"badge\" data-claim=\"G003\"></span>，比數 2-5、4-5、3-5<span class=\"badge\" data-claim=\"G049\"></span>。第一場局數 2 比 5，尾兩場 7 比 10<span class=\"badge\" data-claim=\"C010\"></span>。",
+  "closer": "三場停喺 3 比 0<span class=\"badge\" data-claim=\"G001\"></span><span class=\"badge\" data-claim=\"C001\"></span>、15 比 9<span class=\"badge\" data-claim=\"G002\"></span><span class=\"badge\" data-claim=\"C010\"></span>。24 局裏面 21 局係俾垃圾頂爆、3 局自己頂到頂<span class=\"badge\" data-claim=\"G055\"></span>：yachi 2 局，pinglamb 1 局<span class=\"badge\" data-claim=\"C006\"></span>。",
+  "hero_match": 2,
+  "score_claim": null,
+  "cards": {
+    "1": {
+      "title": "第一場——開局連輸四局",
+      "flag": "pinglamb",
+      "body": "pinglamb 頭四局連贏，4 比 0，5 比 2 收<span class=\"badge\" data-claim=\"C011\"></span><span class=\"badge\" data-claim=\"G004\"></span>，嗰四局係全晚最長嘅連勝<span class=\"badge\" data-claim=\"G008\"></span>。第三局得約 12 秒，全晚最短<span class=\"badge\" data-claim=\"G017\"></span>，pinglamb 全局一行垃圾都冇食<span class=\"badge\" data-claim=\"G051\"></span>；第五局 yachi 打出全晚最大嘅 16 行 spike<span class=\"badge\" data-claim=\"G011\"></span>。<strong>呢場每粒方塊嘅攻擊 pinglamb 高超過 25%</strong>，三場差得最多<span class=\"badge\" data-claim=\"C014\"></span>。"
+    },
+    "2": {
+      "title": "第二場——3 比 2 領先，第九局輸",
+      "flag": "pinglamb",
+      "body": "yachi 0 比 2 落後，連贏三局追到 3 比 2，之後 4 比 4，第九局輸，4 比 5<span class=\"badge\" data-claim=\"C012\"></span><span class=\"badge\" data-claim=\"G005\"></span>。第五局 yachi 俾人射埋嚟 121 行，多過 pinglamb 嘅 74 行，照樣頂住贏返<span class=\"badge\" data-claim=\"G020\"></span>。生死局 pinglamb VS 約139.5 對 yachi 約111.3<span class=\"badge\" data-claim=\"G052\"></span>。第二局係全晚最癲嗰局<span class=\"badge\" data-claim=\"G053\"></span>，第六局 pinglamb 做出全晚最長嘅 8 段 B2B<span class=\"badge\" data-claim=\"G013\"></span>；以整場計，pinglamb 喺呢場打出全晚最高嘅 match APM 約56.8<span class=\"badge\" data-claim=\"G018\"></span>。"
+    },
+    "3": {
+      "title": "第三場——總攻擊多，照輸",
+      "flag": "pinglamb",
+      "body": "2 比 2 之後 pinglamb 連贏兩局，5 比 3 收<span class=\"badge\" data-claim=\"C013\"></span><span class=\"badge\" data-claim=\"G006\"></span>。<strong>呢場 yachi 總攻擊多 7 條，照輸</strong><span class=\"badge\" data-claim=\"C015\"></span>，係三場入面唯一一場打得多嗰個輸。第二局打咗約 199 秒，全晚最長<span class=\"badge\" data-claim=\"G016\"></span>：pinglamb 清咗全晚最多嘅 202 行<span class=\"badge\" data-claim=\"G015\"></span>，yachi 喺同一局打出全晚單局最多嘅 19 個 T-spin<span class=\"badge\" data-claim=\"G014\"></span>。"
+    }
+  }
+}

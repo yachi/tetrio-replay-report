@@ -91,7 +91,7 @@ def build(session):
                        "next. Both constants are fitted on 2026-11-05's frame-snapped video.json "
                        "(pipeline/video_clock.py --selftest)"),
             "max_snap_s": None,
-            "link_lead_s": 5},
+            "link_lead_s": 1},
         "matches": matches})
     return data
 

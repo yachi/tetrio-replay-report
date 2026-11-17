@@ -23,7 +23,7 @@
   "kind": "stream_clock",
   "method": "not frame-snapped: each match's replay ts (its end, UTC) less the stream's startDate, plus 7.25 s, is the end of its last round in the video; each earlier round starts 10.04 s plus its own replay length before the next. Both constants are fitted on 2026-11-05's frame-snapped video.json (pipeline/video_clock.py --selftest)",
   "max_snap_s": null,
-  "link_lead_s": 5
+  "link_lead_s": 1
  },
  "matches": [
   {

@@ -176,6 +176,10 @@
  * 10-09 four-mutant pass included. It was NOT re-run on this pass; until it is, it is a statement
  * about the seven-member file of 2026-10-09 and nothing more.
  *
+ * NOT RE-MEASURED 2026-11-17 either. The twenty-third session adds TWO candidates (clearAlone
+ * 58 -> 60, both `formed`) and no member; ACCESS_CLASS still holds the eight entries of 2026-11-05
+ * and the set test passed unchanged with the new session on disk.
+ *
  * The remaining mutants — the counterfactual branches and the engine-branch mutants — were NOT
  * re-run. They exercise code this change did not touch, and the 20-mutant score at the top of this
  * header is a statement about a two-member file and has been void since 2026-08-19; it is kept as
@@ -519,7 +523,7 @@ test('the class does not exist beyond the verified prefixes either', () => {
  *  which is `finesse-counters.test.ts`'s lesson arriving here: a test name cannot fail, so a name
  *  carrying figures is a 冇第二份 figure with a green build next to it. Derived from the same
  *  constants the assertions use, it moves when they do. */
-const DECOMP = { clearAlone: 58, formed: 33, overdetermined: 17, access: 8 };
+const DECOMP = { clearAlone: 60, formed: 35, overdetermined: 17, access: 8 };
 
 test(`the ${DECOMP.clearAlone} candidates decompose ${DECOMP.formed} formed / `
    + `${DECOMP.overdetermined} overdetermined / ${DECOMP.access} access, and nothing else`, () => {
@@ -620,6 +624,7 @@ test(`the ${DECOMP.clearAlone} candidates decompose ${DECOMP.formed} formed / `
   // formed 30 -> 33, overdetermined 16 -> 17, access 7 -> 8, `pieceBlocked` still 0. The `access`
   // one is ACCESS_CLASS's eighth member (yachi, replay-2026-11-05-08.ttrm r6 lock 28), the first
   // new member since 2026-10-09. The access share moves 7/53 -> 8/58.
+  // 2026-11-17 adds 2 `formed` (clearAlone 58 -> 60, formed 33 -> 35); no access member.
   expect(result.clearAlone).toBe(DECOMP.clearAlone);
   expect(result.formed).toBe(DECOMP.formed);
   expect(result.overdetermined).toBe(DECOMP.overdetermined);
@@ -649,6 +654,6 @@ test('the sweep reached the corpus it claims to have swept', () => {
   // count against a pin rather than one literal against another — a session arriving fails here,
   // which is the whole job. `localised` is the second half: discovery finding 7 directories says
   // nothing about the sweep having replayed them.
-  expect(SESSIONS.length).toBe(22);
-  expect(result.localised).toBe(7960);
+  expect(SESSIONS.length).toBe(23);
+  expect(result.localised).toBe(8057);   // 7960 + 97 with 2026-11-17
 });
