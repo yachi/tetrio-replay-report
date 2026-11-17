@@ -1,0 +1,25 @@
+{
+  "title": "千鳥格子練習場",
+  "h1": "千鳥格子砌形",
+  "desc": "千鳥格子（Cut Copy）嘅砌形練習：盤面倒返去個形未砌好之前，用跟住落嚟嗰幾粒砌返個形。",
+  "page_sentences": [
+    "呢度嘅題目係砌出嚟嘅練習盤面，唔係 corpus 嘅量度，唔入任何統計。",
+    "每條題目都寫明佢嘅來源：實戰邊一晚邊一局、cold-clear 自玩邊一局、頁面形狀，定係我哋自己由空板砌嘅設計。",
+    "垃圾行個窿喺邊一列係 replay 引擎用種子亂數揀嘅，唔係錄低嘅；淨係個窿喺原本嗰列先砌得到嘅題目已經剔走。"
+  ],
+  "play": [
+    "練「砌形」：盤面倒返去千鳥格子未成形之前，用接住落嚟嗰幾粒（跟原本次序，可以 Hold）砌到個形，唔使自己打 T。砌啱嘅定義：有一粒 T 打得出千鳥格子嘅 TSD，而且第二槽嘅蓋（槽外面高一行嗰格）已經擺好。砌好之後板上會標出個形：橙框係蓋，紫虛線係 T 位，黃虛線係第二槽。卡住可以撳「目標形」睇原本個形喺邊，或者「示範」睇原本點砌。"
+  ],
+  "drag": "拖放：用手指拖住塊去想擺嘅位置，鬆手就落。白框係會落到嘅位，紅色即係去唔到。拖之前撳 ↺ ↻ 180 揀方向，或者輕輕點一下盤面順轉。",
+  "keys": "鍵盤：<kbd>←</kbd><kbd>→</kbd> 移，<kbd>↓</kbd> 軟降一格，<kbd>Space</kbd> 硬降，<kbd>↑</kbd>/<kbd>X</kbd> 順轉，<kbd>Z</kbd> 逆轉，<kbd>A</kbd> 180，<kbd>C</kbd>/<kbd>Shift</kbd> Hold，<kbd>Backspace</kbd> 上一步，<kbd>R</kbd> 重新嚟過。冇地心吸力，慢慢諗。",
+  "recognise_summary": "千鳥格子係點樣認",
+  "recognise": "同千鳥格子頁用同一個窗口：第一粒 T 平放、凸位向下打完整 TSD；打之前，第二個槽嘅「蓋」（槽外面高一行嗰格）要已經擺好。清兩行之後，外面嗰個槽嘅頂行同底格接埋，變成第二個 TSD 槽。有兩個型：shiwehi 嘅基本形同 harddrop 嘅 Uncut copy，兩隻手（正、鏡像）都計。窗口係由千鳥格子頁嘅轉錄計出嚟，唔係呢版自己打落去。T-spin 判定用 TETR.IO 規則（SRS+、三角、180 轉）；呢版嘅引擎係練習用嘅細引擎，build 嘅時候逐題同參考引擎對過。",
+  "play_summary": "點玩",
+  "sources_summary": "題目一覽同來源",
+  "sources_note": "以下逐條列出題目、難度同來源。難度係用練習引擎搜出嚟：最少要擺幾多粒（唔計 T，可以 Hold）先砌得到個形；搜唔晒嘅寫「極難」。",
+  "counts": "一共 {drills} 條題目：實戰 {corpus} 條（{sessions} 晚），cold-clear 自玩 {selfplay} 條，頁面形狀 {page} 條，自家設計 {own} 條。",
+  "table": {"id": "題目", "difficulty": "難度", "need": "原本粒數", "source": "來源"},
+  "kinds": {"corpus": "{player} {session} 第{match}場第{round}局", "selfplay": "cold-clear 自玩，種子 {seed}", "page": "shiwehi 千鳥格子頁（{node}）", "own": "自家設計（{node}）"},
+  "back": "← 千鳥格子頁",
+  "links": "頁面形狀取自 <a href=\"https://shiwehi.com/tetris/template/cutcopy.php\" target=\"_blank\" rel=\"noopener\">shiwehi.com 千鳥格子</a> 同 <a href=\"https://harddrop.com/wiki/Cut_copy\" target=\"_blank\" rel=\"noopener\">harddrop Cut copy</a>。"
+}

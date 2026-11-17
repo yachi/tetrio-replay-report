@@ -5740,6 +5740,42 @@ to the position before its T, prints the scan sentence and the quarantine senten
 hit's hand words, drops a game, moves a hit's T, moves a hit link and reads a hit in the
 other hand. The board drawn per hit is not re-read by the audit; `bin/build-docs --check` byte-compares it with the renderer. These games say nothing about how often a person, or the bot under garbage, builds one.
 
+### 千鳥格子練習場
+
+`docs/practice-cutcopy.html` is a page to PRACTISE building a 千鳥格子. Each drill rewinds a board on which a Cut Copy
+was really built, and the player builds the shape with the pieces that follow. The page links back to `cutcopy.html`, and
+`cutcopy.html` links to it once, through the opt-in `practice_href` (`technique_page.TechniqueSiteProfile`; every other
+technique page is byte-identical). The drills are CONSTRUCTED practice boards. They are not corpus data and are in no
+count. The artefact says `report_eligible: false`, `constructed: true` and `practice: true`, and the page carries the
+quarantine sentences and no claim id or ✓.
+
+| piece | where |
+|---|---|
+| practice engine | `pipeline/cutcopy_practice_engine.js` (SRS+ kicks, 180, hold, the window fired by the corpus matcher's own `prepare()` output for `cutcopy` and `uncut`, passed in, never typed), inlined into the page |
+| drills | `pipeline/sim/cutcopy-drills.ts` (rules) + `emit-cutcopy-drills.ts` (argv and IO) → `analysis/cutcopy-drills.json`; sources are the QUALIFYING hits of `cutcopy-facts.json`, cold-clear's self-play games, our own design and the page's T-hole build, each hashed |
+| test | `pipeline/openers/cutcopy-drills.test.ts`: byte rebuild, the named `DRILLS` / `DROPPED` lists, a differential of the practice engine against the reference engine, and the engine's mutants |
+| page | `pipeline/cutcopy_practice_page.py` + `.js` + `.css` + `cutcopy_practice_prose.json`, rendered by `bin/build-docs` in its own block (not in `TECHNIQUE_SITES`, no index card); `--selftest` plants the corruptions |
+| manual runs | `tools/cutcopy-practice/` holds playwright scripts that solve every drill by touch on a phone profile. They are manual runs, NOT a gate; its README says how to run them |
+
+Selection is code, and every candidate it refuses is in `dropped` with its reason: a duplicate start, a start that can
+already fire, and **garbage luck**. Garbage luck means the drill builds only with the garbage hole in its original
+column, which is the engine's seeded hole, so nothing records it as the game's. Difficulty is the fewest pieces the
+practice engine needs, searched breadth first and exhaustively up to three, any piece (a T included), hold allowed.
+Past three it is the drill's own need when that is four, because the solution is a witness; otherwise it is unknown (極難).
+`windowCanStand` skips `findBuild` on a board where no window can stand at any offset. It is a necessary condition, so it
+changes the time and not the answer. One known limit is that the differential holds the practice engine's placements to
+be a SUBSET of the reference engine's. So a kick the practice engine drops is invisible to it, and only a drill that
+needs that kick catches it (the test's broken-kick mutant is chosen for that reason). How many drills there are, and
+of what, is the artefact's and the test's, never this file's.
+
+```bash
+bun pipeline/sim/emit-cutcopy-drills.ts --out analysis/cutcopy-drills.json   # or: bin/emit-corpus --only cutcopy-drills
+bun test pipeline/openers/cutcopy-drills.test.ts
+python3 -m pipeline.cutcopy_practice_page --selftest                         # --out-dir <dir> renders it
+```
+
+Emit it after `cutcopy-facts.json`, `cutcopy-selfplay.json` and `cutcopy-own.json`, which it hashes.
+
 ### 社畜トレイン（Shachiku Train）
 
 The same deliverable for `template/shachikutrain.php` (「2020-10-31更新」): `pipeline/openers/shachikutrain-technique.json` (held as a
