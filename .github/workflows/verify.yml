@@ -1796,6 +1796,15 @@ jobs:
           python3 -m pipeline.check_mutation_ladder --selftest
           python3 -m pipeline.check_mutation_ladder
 
+      # A proof-map status may only come from real `dafny verify` output. build_proof_map
+      # used to mark every row "verified" whenever no error landed inside a Claims.dfy lemma,
+      # so a Facts.dfy error, a crash or empty output produced an all-verified map. It now
+      # refuses unless the run's summary says 0 errors or every error is attributed; this
+      # runs it against fake `dafny` binaries (three failures and a control).
+      - name: build_proof_map refuses a failed verifier run
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.build_proof_map --selftest
+
       # The seven worked examples are described twice — as the machine-checked witnesses above and
       # as the drawn boards in example-boards.ts. The Dafny verifier never reads the TS, and the TS
       # test only compared the roof/floor separation, so the two could disagree on the verdict of a
