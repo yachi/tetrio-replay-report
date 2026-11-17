@@ -12,9 +12,9 @@
 #   4. generate Dafny from the same specs; `dafny verify` must report 0 errors
 #   5. (MUTATION=1) flipping a datum must break verification
 #   6. the simulator emitters -> sim/*.json (quarantined: no claim ids, no badges):
-#      the five that need only bun, then pc-miss (its Rust solver builds on first use),
-#      then cspin-miss ONLY when CC_COACH names a built cold-clear coach binary
-#      (tools/cc-coach); without it a loud !! line prints the commands to run by hand
+#      the five that need only bun and pc-miss (its Rust solver builds on first use), in
+#      parallel, and cspin-miss when a cold-clear coach binary exists: CC_COACH, or else the
+#      one bin/build-cc-coach caches; without either a loud !! line says how to build it
 #   7. emit a report skeleton — but only if the session has no report.html yet
 #
 # What it does NOT do is write the Cantonese prose — that is the part that needs
@@ -112,62 +112,89 @@ fi
 step "6/7 simulator artefacts"
 # Each emitter is deterministic — every committed sim/*.json rebuilds byte for byte — so
 # re-running over a session that has them is safe, and the line says whether one moved.
-# They read the replays from REPLAY_DIR, i.e. $DEST, where step 1 copied them.
+# They read the replays from REPLAY_DIR, i.e. $DEST, where step 1 copied them, and each
+# writes only its own file, so they run at once: the five that need only bun, pc-miss
+# once replay-facts.json is written (it reads it), and the cspin-miss chain (it reads only
+# the replays) beside all of them. The lines print in a fixed order whatever finishes first.
 if command -v bun >/dev/null; then
   mkdir -p "$DEST/sim"
-  for pair in forecast-facts:emit-forecast-facts opener-facts:emit-opener-facts \
-              attack-facts:emit-attack-facts finesse-facts:emit-finesse-facts \
-              replay-facts:emit-replay; do
-    out="$DEST/sim/${pair%%:*}.json"
-    before="$( [ -f "$out" ] && shasum "$out" || true )"
-    REPLAY_DIR="$DEST" bun "pipeline/sim/${pair##*:}.ts" --out "$out" >/dev/null \
-      || die "${pair##*:}.ts failed — see the error above"
+  LOGS="$(mktemp -d)"
+  trap 'rm -rf "$LOGS"' EXIT
+  sum_of() { if [ -f "$1" ]; then shasum "$1"; fi; }
+  # emit <name> <command...>: run it with REPLAY_DIR=$DEST, stdout dropped, stderr to <name>.err,
+  # after writing <name>.before (the old file's sum), so the state is judged against the old bytes
+  emit() {
+    local name="$1"; shift
+    sum_of "$DEST/sim/$name.json" > "$LOGS/$name.before"
+    REPLAY_DIR="$DEST" "$@" >/dev/null 2>"$LOGS/$name.err"
+  }
+  report() {   # report <name> <pid> <what failed>
+    local name="$1" out="$DEST/sim/$1.json" before state
+    if ! wait "$2"; then cat "$LOGS/$name.err" >&2; die "$3"; fi
+    before="$(cat "$LOGS/$name.before")"
     if [ -z "$before" ]; then state=new
-    elif [ "$before" = "$(shasum "$out")" ]; then state=unchanged
+    elif [ "$before" = "$(sum_of "$out")" ]; then state=unchanged
     else state=CHANGED; fi
     echo "  ok  $out ($state)"
-  done
-  # pc-miss reads sim/replay-facts.json, so it runs after the loop. Its PC solver is the
-  # Rust crate pipeline/sim/pc-solver-rs, which pc-solver-native.ts builds when stale, so
-  # cargo has to be on PATH the first time.
-  out="$DEST/sim/pc-miss-facts.json"
-  before="$( [ -f "$out" ] && shasum "$out" || true )"
-  # It prints one progress line per round to stderr; kept out of the way unless it fails.
-  log="$(mktemp)"
-  REPLAY_DIR="$DEST" bun pipeline/sim/pc-miss.ts --out "$out" >/dev/null 2>"$log" \
-    || { cat "$log" >&2; die "pc-miss.ts failed — see the error above (it needs cargo to build pc-solver-rs)"; }
-  rm -f "$log"
-  if [ -z "$before" ]; then state=new
-  elif [ "$before" = "$(shasum "$out")" ]; then state=unchanged
-  else state=CHANGED; fi
-  echo "  ok  $out ($state)"
+  }
 
   # cspin-miss needs cold-clear itself: the windows go through the coach binary and its
-  # placements come back into the artefact. The binary is not built by anything here, so
-  # it runs only when CC_COACH names it; otherwise say so loudly, because a session
+  # placements come back into the artefact. CC_COACH names the binary; unset, it defaults to
+  # the one bin/build-cc-coach caches (the pinned rev plus tools/cc-coach's patch, harness and
+  # lock) once that has been built. Without either it says so loudly, because a session
   # without the artefact gets no C-Spin 冇砌 section and nothing else would mention it.
-  out="$DEST/sim/cspin-miss-facts.json"
+  if [ -z "${CC_COACH:-}" ] && built="$(bin/build-cc-coach --path)"; then
+    CC_COACH="$built"
+    echo "  --  CC_COACH unset: using the bin/build-cc-coach cache, $CC_COACH"
+  fi
+  CSPIN=""
   if [ -n "${CC_COACH:-}" ]; then
     [ -x "$CC_COACH" ] || die "CC_COACH=$CC_COACH is not an executable"
     ccdir="$(mktemp -d)"
-    before="$( [ -f "$out" ] && shasum "$out" || true )"
-    REPLAY_DIR="$DEST" bun pipeline/sim/cspin-miss.ts --windows "$ccdir/in.jsonl" >/dev/null \
-      || die "cspin-miss.ts --windows failed"
-    CC_NODES=40000 COACH_MODE=rollout "$CC_COACH" < "$ccdir/in.jsonl" > "$ccdir/out.jsonl" \
-      || die "the cold-clear coach ($CC_COACH) failed"
-    REPLAY_DIR="$DEST" bun pipeline/sim/cspin-miss.ts --cc "$ccdir/out.jsonl" --out "$out" >/dev/null \
-      || die "cspin-miss.ts --cc failed"
+    cspin_chain() {
+      bun pipeline/sim/cspin-miss.ts --windows "$ccdir/in.jsonl" \
+        || { echo "cspin-miss.ts --windows failed" >&2; return 1; }
+      CC_NODES=40000 COACH_MODE=rollout "$CC_COACH" < "$ccdir/in.jsonl" > "$ccdir/out.jsonl" \
+        || { echo "the cold-clear coach ($CC_COACH) failed" >&2; return 1; }
+      bun pipeline/sim/cspin-miss.ts --cc "$ccdir/out.jsonl" --out "$DEST/sim/cspin-miss-facts.json" \
+        || { echo "cspin-miss.ts --cc failed" >&2; return 1; }
+    }
+    emit cspin-miss-facts cspin_chain &
+    CSPIN=$!
+  fi
+
+  declare -A PID
+  for pair in forecast-facts:emit-forecast-facts opener-facts:emit-opener-facts \
+              attack-facts:emit-attack-facts finesse-facts:emit-finesse-facts \
+              replay-facts:emit-replay; do
+    emit "${pair%%:*}" bun "pipeline/sim/${pair##*:}.ts" --out "$DEST/sim/${pair%%:*}.json" &
+    PID[${pair%%:*}]=$!
+  done
+  # pc-miss reads sim/replay-facts.json, so it starts once that is written. Its PC solver is
+  # the Rust crate pipeline/sim/pc-solver-rs, which pc-solver-native.ts builds when stale, so
+  # cargo has to be on PATH the first time. Its one progress line per round goes to stderr,
+  # kept out of the way unless it fails.
+  report replay-facts "${PID[replay-facts]}" "emit-replay.ts failed — see the error above"
+  emit pc-miss-facts bun pipeline/sim/pc-miss.ts --out "$DEST/sim/pc-miss-facts.json" &
+  PCMISS=$!
+  for pair in forecast-facts:emit-forecast-facts opener-facts:emit-opener-facts \
+              attack-facts:emit-attack-facts finesse-facts:emit-finesse-facts; do
+    report "${pair%%:*}" "${PID[${pair%%:*}]}" "${pair##*:}.ts failed — see the error above"
+  done
+  report pc-miss-facts "$PCMISS" "pc-miss.ts failed — see the error above (it needs cargo to build pc-solver-rs)"
+
+  out="$DEST/sim/cspin-miss-facts.json"
+  if [ -n "$CSPIN" ]; then
+    report cspin-miss-facts "$CSPIN" "the cspin-miss chain failed — see the error above"
     rm -rf "$ccdir"
-    if [ -z "$before" ]; then state=new
-    elif [ "$before" = "$(shasum "$out")" ]; then state=unchanged
-    else state=CHANGED; fi
-    echo "  ok  $out ($state)"
   elif [ -f "$out" ]; then
-    echo "  --  CC_COACH unset: $out left as it is (not re-derived)"
+    echo "  --  CC_COACH unset and bin/build-cc-coach not built: $out left as it is (not re-derived)"
   else
     echo "  !!  CC_COACH unset: NO $out, so the report gets no C-Spin 冇砌 section."
-    echo "  !!  Build tools/cc-coach (see tools/cc-coach/README.md), then either re-run with"
-    echo "  !!  CC_COACH=<path to the cc-coach binary>, or run by hand:"
+    echo "  !!  Build the coach once per machine (about a minute; needs cargo and network):"
+    echo "  !!    bin/build-cc-coach"
+    echo "  !!  and re-run this command, which then finds it; or set CC_COACH=<a cc-coach binary>;"
+    echo "  !!  or run by hand:"
     echo "  !!    REPLAY_DIR=$DEST bun pipeline/sim/cspin-miss.ts --windows /tmp/cc-in.jsonl"
     echo "  !!    CC_NODES=40000 COACH_MODE=rollout <cc-coach> < /tmp/cc-in.jsonl > /tmp/cc-out.jsonl"
     echo "  !!    REPLAY_DIR=$DEST bun pipeline/sim/cspin-miss.ts --cc /tmp/cc-out.jsonl --out $out"
@@ -195,6 +222,7 @@ else
   echo "  ok  $WORK/report.html built from the skeleton with TODO prose"
 fi
 
+DATE="$(basename "$DEST")"
 CLAIMS=$(jq length "$WORK/claims-generated.json")
 ROUNDS=$(jq '[.matches[].rounds | length] | add' "$WORK/facts.json")
 cat <<EOF
@@ -227,10 +255,16 @@ checked in a browser as it goes:
          $WORK/claims-generated.json $WORK/claims-narrative.json
        python3 -m pipeline.codegen_smt $WORK/facts.json --out $WORK/claims.smt2 \\
          --claims $WORK/claims-generated.json $WORK/claims-narrative.json
+     bin/fold-hand-claims $DATE runs that fold (one Dafny pass) and refreshes the
+     session's equiv-coverage figures, where the tool is on this branch.
   3. add the date to the session lists the sim tests pin — each one is asserted
      against disk, so a miss is a red test rather than a silent skip — and investigate
      any new anchor disagreement before naming it in an exception list:
        bun test pipeline/sim/ pipeline/openers/ pipeline/finesse-counters.test.ts
+     and re-emit the corpus artefacts the new session moves (about a minute: the route
+     and technique facts share two digests), then paste the figures the docs quote:
+       bin/emit-corpus
+       bin/paste-fragments
   4. rebuild the report after every prose edit (and after step 6 reports CHANGED on a
      session whose report.html already existed), then refresh the site:
        python3 -m pipeline.build_report $WORK
@@ -238,6 +272,8 @@ checked in a browser as it goes:
        python3 -m pipeline.check_prose_figures $WORK
        python3 -m pipeline.check_badge_links $WORK
        python3 bin/build-docs
+     bin/session-loop $DATE runs that loop (report, round table, report again, the
+     per-session gates CI runs, the TODO scan and a preview), where it is on this branch.
   5. list what the corpus-wide gates still need for this session (read-only, seconds):
        bin/session-todo $DEST
 EOF
