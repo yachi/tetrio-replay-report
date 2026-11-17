@@ -1,6 +1,7 @@
 """Gate: `equiv.py`'s hand-claim coverage, committed per session and gated in the prose.
 
     python3 -m pipeline.claims.check_equiv_coverage --write        # regenerate the artefacts
+    python3 -m pipeline.claims.check_equiv_coverage --write --session 2026-11-17  # just one
     python3 -m pipeline.claims.check_equiv_coverage --check        # re-measure + byte-compare + prose
     python3 -m pipeline.claims.check_equiv_coverage --check --modes single_value,two_site_match
     python3 -m pipeline.claims.check_equiv_coverage --check-prose  # prose only, no re-measurement
@@ -1095,6 +1096,11 @@ def main(argv=None):
                     help="worker processes for --write/--check (default: $EQUIV_JOBS, else "
                          "every CPU; 1 runs in this process). Changes the schedule, never a "
                          "byte of the result")
+    ap.add_argument("--session", default=None,
+                    help="with --write only: re-measure and write ONE session's artefact (a "
+                         "date, e.g. 2026-11-17). Every session's artefact is a function of "
+                         "that session's files alone, so the others are untouched; the full "
+                         "--check (CI's) still re-measures them all")
     ap.add_argument("--chunk", type=int, default=None,
                     help="moves per task when a two-site family is split across workers "
                          "(default: equiv.DEFAULT_CHUNK; 0 = one task per family)")
@@ -1118,10 +1124,24 @@ def main(argv=None):
             # the committed file, which is a deletion wearing a performance flag's clothes.
             ap.error("--modes narrows --check only; --write always measures every mode")
 
+    if args.session is not None and not (args.write and not args.check and not args.check_prose
+                                         and args.modes is None):
+        # One session is written, never CHECKED: a --check over one session would print the
+        # corpus-wide success line for a run that compared one artefact. And --modes is
+        # already refused with --write, so a narrowed one-session write cannot exist either.
+        ap.error("--session goes with --write alone (not --check, --modes or --check-prose)")
+
     if args.selftest:
         return _selftest(root)
 
     measurable, excluded = session_dirs(root)
+    if args.session is not None:
+        picked = [(s, d) for s, d in measurable if s == args.session]
+        if not picked:
+            names = [os.path.relpath(d, root) for d, _ in excluded]
+            ap.error(f"--session {args.session}: no measurable session of that name"
+                     + (f" (not measured: {', '.join(names)})" if names else ""))
+        measurable, excluded = picked, []
     for d, why in excluded:
         # Named, never silently skipped — pipeline/codegen.py:76-78.
         print(f"  --  {os.path.relpath(d, root)}: not measured ({why})")
