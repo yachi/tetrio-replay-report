@@ -115,6 +115,10 @@ class TechniqueSiteProfile:
     #: being played; 欄干 the same day, at yachi's request, where a few do. The artefact and its tests keep every
     #: hit; the index card counts the qualifying ones
     corpus_qualified_only: bool = False
+    #: opt-in: a page of constructed practice drills for this technique, linked once beside the demo page link,
+    #: its words `sections.practice_link` in the prose (千鳥格子: docs/practice-cutcopy.html, rendered by
+    #: `cutcopy_practice_page`). Empty: no link, and the page is byte for byte what it was
+    practice_href: str = ""
 
 
 def case_key(h):
@@ -655,7 +659,10 @@ class TechniqueSite:
         # the boards read off one match video, in a section of their own (pipeline/video_examples.py)
         out += VE.section(self.p.prefix)
         out += ['  <section class="scp-sec">', f'    <h2>{_esc(S["demos"])}</h2>',
-                f'    <p><a href="{_esc(self.DEMO_PAGE)}">{_esc(S["demos_link"])}</a></p>', '  </section>']
+                f'    <p><a href="{_esc(self.DEMO_PAGE)}">{_esc(S["demos_link"])}</a></p>']
+        if self.p.practice_href:
+            out.append(f'    <p><a href="{_esc(self.p.practice_href)}">{_esc(S["practice_link"])}</a></p>')
+        out.append('  </section>')
         out += RT._tail({"figures": fig})
         return "\n".join(out)
 
@@ -1185,6 +1192,8 @@ class TechniqueSite:
             bad.append("the headline is printed without the control sentence")
         if f'href="{self.DEMO_PAGE}"' not in page:
             bad.append("the overview does not link the demo page")
+        if self.p.practice_href and f'href="{self.p.practice_href}"' not in page:
+            bad.append("the overview does not link the practice page")
         if self.p.showcase:
             bad += self.audit_showcase(page, tr, art)
         return bad + self.audit_replay_links(page, tr, art)
@@ -1308,6 +1317,9 @@ class TechniqueSite:
             ("overview: a badge", "ov", ov.replace("</body>", '<span data-claim="G001">✓</span></body>')),
             ("overview: an innerHTML", "ov", ov.replace("</body>", "<script>x.innerHTML=1</script></body>")),
         ]
+        if self.p.practice_href:
+            cases.append(("overview: the practice link dropped", "ov",
+                          ov.replace(f'href="{_esc(self.p.practice_href)}"', 'href="#"')))
         if first_case:
             case_line = [l for l in ov.split("\n") if first_case.group(0) in l][0]
             at = re.search(r'@p(\d+)"', case_line)

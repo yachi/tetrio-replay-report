@@ -49,6 +49,8 @@ PROFILE = TechniqueSiteProfile(
     # games cold-clear played alone (cutcopy-selfplay.ts), played on the demo page after the own designs
     selfplay_rel=os.path.join("analysis", "cutcopy-selfplay.json"),
     corpus_qualified_only=True,
+    # the constructed practice drills (cutcopy_practice_page), linked once beside the demo page
+    practice_href="practice-cutcopy.html",
 )
 
 SITE = TechniqueSite(PROFILE)
