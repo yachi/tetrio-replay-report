@@ -7,7 +7,9 @@
 # The report dir is an argument so the CI matrix runs case 5 against ITS OWN session rather
 # than five times against one — the same wall clock, five different fact bases. An artefact
 # with no generated ledger (sessions/2026-07-24/proof) has nothing for check_rate_coverage
-# to perturb, so cases 5 and 6 skip there rather than failing.
+# to perturb, so cases 5 and 6 skip there rather than failing. With a report dir, case 6
+# checks the restore by bytes and leaves "the real module passes" to the verify job's step
+# before it; with none, it re-runs the gate too.
 #
 # deepcopy could not corrupt the original; make/unmake can. That is the whole risk of the
 # change, and it is a SILENT risk: a sweep that restores 4 439 of 4 440 sites still prints
@@ -90,8 +92,9 @@ if [ ! -f "$SESSION/claims-generated.json" ]; then
   skip=2
 else
 cp pipeline/perturb.py pipeline/perturb.py.testbak
+cp pipeline/perturb.py pipeline/perturb.py.orig
 restore_module() { mv -f pipeline/perturb.py.testbak pipeline/perturb.py 2>/dev/null || true; }
-trap restore_module EXIT
+trap 'restore_module; rm -f pipeline/perturb.py.orig' EXIT
 
 python3 - <<'PY'
 import re
@@ -109,6 +112,11 @@ PLANTED_RC=$?
 set -e
 restore_module
 trap - EXIT
+PLANT_GONE=no
+if [ ! -e pipeline/perturb.py.testbak ] && cmp -s pipeline/perturb.py.orig pipeline/perturb.py; then
+  PLANT_GONE=yes
+fi
+rm -f pipeline/perturb.py.orig
 
 if [ "$PLANTED_RC" -eq 0 ]; then
   bad "a disabled restore was NOT caught — the fingerprint assertion is decorative"
@@ -118,11 +126,22 @@ else
   bad "a disabled restore failed for the wrong reason: $(echo "$PLANTED_OUT" | tail -1)"
 fi
 
-# --- 6. and the real module still passes that same gate ------------------------
-if python3 -m pipeline.check_rate_coverage "$SESSION" >/dev/null 2>&1; then
-  ok "the unplanted module passes the gate (the plant was restored)"
+# --- 6. the plant is gone, and (standalone) the real module still passes ------
+# Byte equality with the copy taken before the plant proves "restored" more directly than
+# re-running the gate does. That the real module passes this gate on this session is the
+# verify job's step immediately before this one, so the ~18 s second sweep runs only when
+# the script is called with no report dir, where no such step precedes it.
+if [ "$PLANT_GONE" = yes ]; then
+  ok "perturb.py is byte-identical to before the plant, and the backup is gone"
 else
-  bad "the gate does not pass after restoring perturb.py"
+  bad "perturb.py was not restored byte for byte (or perturb.py.testbak was left behind)"
+fi
+if [ -z "$REPORT_ARG" ]; then
+  if python3 -m pipeline.check_rate_coverage "$SESSION" >/dev/null 2>&1; then
+    ok "the unplanted module passes the gate"
+  else
+    bad "the gate does not pass after restoring perturb.py"
+  fi
 fi
 fi
 

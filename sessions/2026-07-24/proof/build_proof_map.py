@@ -43,9 +43,8 @@ def main():
             st = "failed"
         elif n_err == 0:
             st = "verified"
-        elif failed:
-            st = "verified"
         else:
+            # Some error went unattributed, so no other row is licensed as verified.
             st = "unverified"
         proof_map.append({"id": e["id"], "lemma": e["lemma"], "file": e["file"], "status": st})
 

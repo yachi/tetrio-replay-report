@@ -257,7 +257,9 @@ Never let a report, README, or commit message blur those two things — every au
 in this project's history caught someone doing exactly that.
 
 Corollaries that are gates, not preferences:
-- a proof-map status may only come from real `dafny verify` output, never stamped by codegen
+- a proof-map status may only come from real `dafny verify` output, never stamped by codegen —
+  and `pipeline.build_proof_map` refuses to write a map unless that output's summary says
+  0 errors or every error is attributed to a lemma (`--selftest` plants fake `dafny` runs)
 - a proof-map entry must name a lemma that still exists. `codegen` builds lemma *names* from
   each claim's `english_gloss`, so editing a gloss renames the lemma and strands the badge's
   link while the verifier still reports 0 errors and the status gate still counts 54/54.
@@ -3088,6 +3090,15 @@ rejection it is printed under; the right direction at the wrong precision still 
 figure contradicting its own sentence, so the fragment is quoted at three. A CI quoted to show −0.5 lies outside it widens rather than
 narrows. And the two ratios below are quoted against each other, so the one the argument needs to
 be large floors and the one it needs to be small ceils.
+
+**The rule for every hand-typed figure, stated once (from 2026-11-17 on; earlier figures stay as
+measured).** A figure is rounded in the direction that weakens the sentence it sits in, at a
+precision where the rounded digit still supports that sentence: a p or ρ supporting 「rejected」 or
+「strong」 rounds toward the weak side (p ceils, ρ floors); a figure supporting 「flat」, 「small」 or
+「weak」 rounds the other way; a band floors its low end and ceils its high end. A figure with no
+claim riding on it (a series value, a shortfall cell, a percentage in a table) is round-half-up at
+the precision of its neighbours. Nothing gates this — `check_rounding` does not read prose — so it is
+a rule a reader applies, and the repair that would gate it is a renderer for the ρ/p tables.
 
 **Do not quote a number for that SD fall from here, and do not put one in the report either** —
 paste it. `records.r_stats()["sd_ratio"]` derives it through `fmt.ratio1`, which floors:
