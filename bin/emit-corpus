@@ -91,6 +91,10 @@ EXTRA = [
     # (--games <jsonl> --coach-seed <n>) needs the bot's JSONL, which is not committed, and is not done here
     dict(name='cutcopy-selfplay', out='cutcopy-selfplay.json', argv=['emit-cutcopy-selfplay.ts', '--rebuild'],
          reads=['cutcopy-selfplay.json']),
+    # 千鳥格子練習場's drills: the qualifying hits replayed off their sessions' timelines, the self-play games
+    # and our own design, rewound and re-placed in the practice engine (constructed, quarantined)
+    dict(name='cutcopy-drills', out='cutcopy-drills.json', argv=['emit-cutcopy-drills.ts'], sessions=True,
+         reads=['cutcopy-facts.json', 'cutcopy-selfplay.json', 'cutcopy-own.json']),
 ]
 
 REGISTRY_TS = r"""
