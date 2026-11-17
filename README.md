@@ -27,6 +27,12 @@ formal claim, and proved with [Dafny](https://dafny.org).
 | [2026-10-03](sessions/2026-10-03) | yachi 6 : 14 pinglamb | 146 over 20 matches | 135 |
 | [2026-10-09](sessions/2026-10-09) | yachi 5 : 7 pinglamb | 102 over 12 matches | 121 |
 | [2026-10-12](sessions/2026-10-12) | yachi 3 : 5 pinglamb | 55 over 8 matches | 107 |
+| [2026-10-20](sessions/2026-10-20) | yachi 2 : 2 pinglamb | 30 over 4 matches | 97 |
+| [2026-10-22](sessions/2026-10-22) | yachi 3 : 6 pinglamb | 63 over 9 matches | 111 |
+| [2026-10-29](sessions/2026-10-29) | yachi 3 : 6 pinglamb | 68 over 9 matches | 107 |
+| [2026-11-01](sessions/2026-11-01) | yachi 7 : 11 pinglamb | 130 over 18 matches | 129 |
+| [2026-11-05](sessions/2026-11-05) | yachi 2 : 6 pinglamb | 67 over 8 replayed matches | 109 |
+| [2026-11-17](sessions/2026-11-17) | yachi 0 : 3 pinglamb | 24 over 3 matches | 92 |
 
 **Two things about that last column.** It is `claims-proof-map.json`'s row count, i.e. what
 `dafny verify` actually certified for that session — not a target and not comparable across
@@ -36,7 +42,9 @@ session's number covers both ledgers. And the table stopped at 2026-08-01 for se
 during which 2026-07-28's and 2026-08-01's own figures went stale too (85 → 96 and 88 → 99 as
 their proof maps grew). It is re-derived from the committed maps rather than appended to — and
 it skipped 2026-09-18 for one session after that night landed, found on 2026-10-03's pass by
-counting rows against `sessions/*`.
+counting rows against `sessions/*`. It then stopped at 2026-10-12 for five more sessions (10-20 to 11-05), found
+on 2026-11-17's pass the same way; every row above is re-derived from `facts.json` and the committed
+maps, and 2026-11-05's counts are its eight replayed matches (its video-read ninth is in no count).
 
 2026-07-24 also carries a lighter "即場戰報" (`report-2026-07-24.html`) with its own
 independent 20-claim proof layer in [`sessions/2026-07-24/proof`](sessions/2026-07-24/proof).
@@ -226,6 +234,7 @@ unless it is:
 | 2026-10-29 | 16 of 19 testable — **84%** | 14 of 19 — **74%** | 14 of 19 — **74%** |
 | 2026-11-01 | 25 of 29 testable — **86%** | 24 of 29 — **83%** | 24 of 29 — **83%** |
 | 2026-11-05 | 15 of 18 testable — **83%** | 13 of 18 — **72%** | 13 of 18 — **72%** |
+| 2026-11-17 | 10 of 13 testable — **77%** | 8 of 13 — **62%** | 8 of 13 — **62%** |
 
 Every figure above is measured, and `pipeline/claims/check_equiv_coverage.py` re-derives
 them on push. **Until 2026-08-15 none of that was true**: three of the six sessions had
@@ -236,11 +245,11 @@ the denominator moving too. Enumerating every kind costs ~5× the wall clock and
 that session at 81%. A figure that moved with an argument nobody varied had been reading as
 a property of the data.
 
-The **≥85%** acceptance gate P4 declared is missed by <!--equiv:gate-count-->fifteen of the 22<!--/equiv:gate-count-->
-rows above (<!--equiv:gate-sessions-->2026-07-22, 08-09, 08-14, 08-19, 08-25, 09-03, 09-10, 09-11, 09-17, 10-09, 10-12, 10-20, 10-22, 10-29 and 11-05<!--/equiv:gate-sessions-->), and
+The **≥85%** acceptance gate P4 declared is missed by <!--equiv:gate-count-->sixteen of the 23<!--/equiv:gate-count-->
+rows above (<!--equiv:gate-sessions-->2026-07-22, 08-09, 08-14, 08-19, 08-25, 09-03, 09-10, 09-11, 09-17, 10-09, 10-12, 10-20, 10-22, 10-29, 11-05 and 11-17<!--/equiv:gate-sessions-->), and
 2026-07-22 — the session the gate was declared on — is one of them at 81%. That is reported rather than enforced: one hand claim is worth 10.0
 points on 2026-07-28, so no threshold exists that is both honest and stable, and a floor all
-twenty-two pass would sit at 60% and bless that session's artefact by definition. The gate compares
+twenty-three pass would sit at 60% and bless that session's artefact by definition. The gate compares
 **verdict sets**, not a percentage.
 
 (That 「a floor all N pass」 sentence is the one CLAUDE.md's 冇第二份 section names as having read
