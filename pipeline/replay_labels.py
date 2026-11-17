@@ -111,28 +111,38 @@ def load_sources(repo=REPO):
 
 class Round:
     """One round as the replay page decodes it: per player, per lock the piece, its cells (y-UP
-    indices), the board after it (a copy) and the lock's raw fields."""
+    indices), the board after it (a copy, decoded on demand: most rounds are never asked for one)
+    and the lock's raw fields."""
 
     def __init__(self, data, rr):
-        self.locks, self.boards, self.cells, self.pieces = {}, {}, {}, {}
+        self.locks, self.cells, self.pieces = {}, {}, {}
+        self._data, self._seq, self._snap = data, rr["seq"], {}
         b = data["board"]
         self.width, self.rows = b["width"], b["rows"]
         for p in rr["players"]:
             u = p["user"]
-            # decode_boards yields ONE live grid: copy it at each lock, before the next step moves it
-            dec = [(piece, [list(r) for r in board])
-                   for piece, _f, board in RS.decode_boards(data, rr["seq"], p["locks"], RS.NEXT_SHOWN)]
+            dec = RS.decode(data, rr["seq"], p["locks"], RS.NEXT_SHOWN)
             self.locks[u] = p["locks"]
-            self.pieces[u] = [piece for piece, _b in dec]
-            self.boards[u] = [board for _p, board in dec]
+            self.pieces[u] = [piece for piece, _n, _e in dec]
             self.cells[u] = [set(RS._place_cells(data["shapes"], self.width, self.rows, piece, lk[1]))
                              for lk, piece in zip(p["locks"], self.pieces[u])]
+
+    def _board(self, user, i):
+        key = (user, i)
+        if key not in self._snap:
+            for j, (_p, _f, board) in enumerate(RS.decode_boards(self._data, self._seq, self.locks[user], RS.NEXT_SHOWN)):
+                if j == i:
+                    self._snap[key] = [list(r) for r in board]
+                    break
+            else:
+                raise IndexError(f"{user} has no lock {i}")
+        return self._snap[key]
 
     def board_after(self, user, i):
         """The y-UP board after lock `i`; before lock 0 it is empty."""
         if i < 0:
             return [[None] * self.width for _ in range(self.rows)]
-        return self.boards[user][i]
+        return self._board(user, i)
 
 
 def _occ_rows(board):
@@ -184,7 +194,7 @@ def spin_matches(rnd, user, i, node, mirrored, lines):
 
 
 def pc_matches(rnd, user, i):
-    return rnd.locks[user][i][2] > 0 and all(v is None for row in rnd.boards[user][i] for v in row)
+    return rnd.locks[user][i][2] > 0 and all(v is None for row in rnd.board_after(user, i) for v in row)
 
 
 def technique_matches(rnd, user, i, tr, var, mirrored):

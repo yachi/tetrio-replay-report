@@ -338,8 +338,8 @@ class TechniqueSite:
                 t += lk[0]
                 fr.append(t)
             frames[p["user"]] = fr
-            dec = RS.decode_boards(data, pl["seq"], p["locks"], RS.NEXT_SHOWN)
-            locks[p["user"]] = [(piece, len(full), lk[3]) for lk, (piece, full, _b) in zip(p["locks"], dec)]
+            dec = RS.decode(data, pl["seq"], p["locks"], RS.NEXT_SHOWN)
+            locks[p["user"]] = [(piece, n, lk[3]) for lk, (piece, n, _e) in zip(p["locks"], dec)]
         rounds[key] = {"label": pl["label"], "order": pl["order"],
                        "users": [p["user"] for p in pl["players"]], "locks": locks,
                        "frames": frames}

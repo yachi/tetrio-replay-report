@@ -36,6 +36,7 @@ FIGURES. The match and round scores are counts of `winner` in facts.json; every 
 page prints is an integer count, or a rate computed in the browser and FLOORED (`fmt`'s rule).
 """
 import argparse
+import hashlib
 import html
 import json
 import os
@@ -373,7 +374,19 @@ def render(data, facts, report_href, labels=None):
 
 # ---------------------------------------------------------------- the audit
 
+_AQ_MEMO = {}
+
+
 def audit_quarantine(page, required, island_id):
+    """`_audit_quarantine`, memoised by the page's sha256 (selftests audit one page many times);
+    the caller gets a copy of the list."""
+    key = (hashlib.sha256(page.encode()).digest(), tuple(required), island_id)
+    if key not in _AQ_MEMO:
+        _AQ_MEMO[key] = _audit_quarantine(page, required, island_id)
+    return list(_AQ_MEMO[key])
+
+
+def _audit_quarantine(page, required, island_id):
     """The quarantine and single-file rules any simulator page obeys: no badge, every sentence in
     `required`, no markup sink, no external request, exactly one data island `island_id`."""
     bad = []
@@ -474,7 +487,17 @@ def _selftest():
     return 0 if ok else 1
 
 
+_LOAD_MEMO = RS.Memo("replay_page.load")
+
+
 def load(session_dir):
+    """`_load`, memoised per real path (the value is shared: never mutate it)."""
+    k = os.path.realpath(session_dir)
+    hit = _LOAD_MEMO.get(k)
+    return hit if hit is not None else _LOAD_MEMO.put(k, _load(session_dir))
+
+
+def _load(session_dir):
     """(replay facts or None, facts) for `session_dir` (sessions/<date>)."""
     report = os.path.join(session_dir, "report")
     with open(os.path.join(report, "facts.json"), encoding="utf-8") as fh:

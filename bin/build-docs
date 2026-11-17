@@ -4,6 +4,8 @@
     bin/build-docs                      render into docs/ (git-ignored; a local preview)
     bin/build-docs --out _site          render into _site/ (what CI deploys)
     bin/build-docs --check --out _site  re-render and byte-compare against _site/, write nothing
+    bin/build-docs --only 2026-11-17    render ONE night's report and replay page (a local preview:
+                                        nothing else is written or removed, and --check refuses it)
 
 Copies each session's self-contained report into the site under a clean name and
 regenerates index.html from facts.json + the proof maps — so the landing page can
@@ -372,6 +374,58 @@ def render_index(cards, totals, pooled_html=None, replays=(), openers=None, tech
     return "".join(parts)
 
 
+def report_page(session, src):
+    """(page, linked report or None, link stats) for one published report. A session's report is
+    published with every match and round it names linked to that night's replay page
+    (replay_links.py), which exists exactly when sim/replay-facts.json does; a subset re-numbers its
+    matches, so its report is copied byte for byte. Every published report, a subset's included,
+    then has each section's big title linked to its own section (section_anchors.py); report.html
+    itself is untouched."""
+    linked, lk = None, None
+    if _root(session) is SESSIONS and (SESSIONS / session / replay_section.FACTS_REL).exists():
+        facts = json.loads((src.parent / "facts.json").read_text(encoding="utf-8"))
+        linked, lk = replay_links.link_report(src.read_text(encoding="utf-8"), session,
+                                              replay_links.rounds_of(facts),
+                                              replay_links.files_of(facts),
+                                              video_links.for_session(session))
+    return section_anchors.anchor(linked if linked is not None else src.read_text(encoding="utf-8")), linked, lk
+
+
+def replay_page_of(d, report_of, label_sources):
+    """(data, facts, page) for the session directory `d`'s replay page."""
+    data, facts = replay_page.load(str(d))
+    return data, facts, replay_page.render(data, facts, report_of[d.name],
+                                           replay_labels.for_session(data, facts, label_sources))
+
+
+def only(session):
+    """`--only`: one night's report and replay page, written into the site directory. Nothing else is
+    rendered, written or removed, so it is a preview of those two pages and never a publish."""
+    rows = [a for a in ARTEFACTS if a[0] == session]
+    if not rows:
+        print(f"FAIL --only {session}: no published artefact has that date", file=sys.stderr)
+        return 1
+    DOCS.mkdir(exist_ok=True)
+    for _s, artefact, out_name, _label, _blurb in rows:
+        src = _root(session) / session / artefact / "report.html"
+        page, linked, lk = report_page(session, src)
+        (DOCS / out_name).write_text(page, encoding="utf-8")
+        how = (f"linked ({lk.linked} replay links, {len(lk.unresolved)} left plain)"
+               if linked is not None else "copied")
+        print(f"  {how} {src.relative_to(REPO)} -> {DOCS.name}/{out_name}")
+    d = SESSIONS / session
+    if (d / replay_section.FACTS_REL).exists():
+        _data, _facts, page = replay_page_of(d, {a[0]: a[2] for a in ARTEFACTS},
+                                             replay_labels.load_sources(str(REPO)))
+        name = replay_section.page_name(session)
+        (DOCS / name).write_text(page, encoding="utf-8")
+        print(f"  rendered {d.relative_to(REPO)} -> {DOCS.name}/{name} ({len(page.encode())} bytes)")
+    problems = replay_section.cache_problems() + replay_section.cache_control()
+    for p in problems:
+        print(f"FAIL {p}", file=sys.stderr)
+    return 1 if problems else 0
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--check", action="store_true",
@@ -379,11 +433,19 @@ def main(argv=None):
     ap.add_argument("--out", metavar="DIR",
                     help="render the site into DIR instead of docs/ (CI builds into _site and "
                          "deploys that directory; docs/ is no longer committed)")
+    ap.add_argument("--only", metavar="DATE",
+                    help="render only that night's report and replay page (a local preview; "
+                         "nothing else is written or removed, and --check refuses it)")
     args = ap.parse_args(argv)
     check = args.check
     if args.out:
         global DOCS
         DOCS = Path(args.out).resolve()
+    if args.only:
+        if check:
+            print("FAIL --only renders a partial site; --check compares a whole one", file=sys.stderr)
+            return 2
+        return only(args.only)
     drift = []
 
     DOCS.mkdir(exist_ok=True)
@@ -421,19 +483,8 @@ def main(argv=None):
             print(f"FAIL {session}/{artefact} has no facts*.json — its headline numbers "
                   f"cannot be derived, so it cannot be published", file=sys.stderr)
             return 1
-        # A session's report is published with every match and round it names linked to that
-        # night's replay page (replay_links.py), which exists exactly when sim/replay-facts.json
-        # does. A subset re-numbers its matches, so its report is copied byte for byte.
-        linked = None
-        if _root(session) is SESSIONS and (SESSIONS / session / replay_section.FACTS_REL).exists():
-            facts = json.loads((src.parent / "facts.json").read_text(encoding="utf-8"))
-            linked, lk = replay_links.link_report(src.read_text(encoding="utf-8"), session,
-                                                  replay_links.rounds_of(facts),
-                                                  replay_links.files_of(facts),
-                                                  video_links.for_session(session))
-        # Every published report, a subset's included, then has each section's big title linked to
-        # its own section (section_anchors.py); report.html itself is untouched.
-        page = section_anchors.anchor(linked if linked is not None else src.read_text(encoding="utf-8"))
+        # Linked to the night's replay page, or copied for a subset (see `report_page`).
+        page, linked, lk = report_page(session, src)
         if check:
             dst = DOCS / out_name
             if not dst.exists() or dst.read_text(encoding="utf-8") != page:
@@ -493,9 +544,7 @@ def main(argv=None):
     for d in sorted(SESSIONS.glob("*")):
         if not (d / replay_section.FACTS_REL).exists():
             continue
-        data, facts = replay_page.load(str(d))
-        page = replay_page.render(data, facts, report_of[d.name],
-                                  replay_labels.for_session(data, facts, label_sources))
+        data, facts, page = replay_page_of(d, report_of, label_sources)
         name = replay_section.page_name(data["session"])
         if name != replay_section.page_name(d.name):
             print(f"FAIL {d.name}/{replay_section.FACTS_REL} says session {data['session']!r}",
@@ -692,6 +741,16 @@ def main(argv=None):
     if problems:
         for p in problems:
             print(f"FAIL pooled forecast: {p}", file=sys.stderr)
+        return 1
+
+    # The replay decode, the per-round payloads and the loaded session data are memoised and SHARED
+    # with every page that asks (replay_section.Memo), so a renderer that mutated one would corrupt
+    # every later page silently. Each entry's value is re-digested against the digest taken when it
+    # was stored, and the guard's control plants a mutation in each memo and must see it caught.
+    problems = replay_section.cache_problems() + replay_section.cache_control()
+    if problems:
+        for p in problems:
+            print(f"FAIL {p}", file=sys.stderr)
         return 1
 
     index = render_index(cards, totals, pooled_html, replays, openers, techniques)
