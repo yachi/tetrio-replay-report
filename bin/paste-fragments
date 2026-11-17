@@ -1,0 +1,278 @@
+#!/usr/bin/env python3
+"""Paste every marked fragment the doc gates render into the documents, in place.
+
+    bin/paste-fragments                    run the renderers, paste, print each change
+    bin/paste-fragments --check            the same, writing nothing; exit 1 if anything moved
+    bin/paste-fragments --only don,dual    run only those namespaces' renderers
+    bin/paste-fragments --docs a.md b.md   paste into these files instead of the three docs
+    bin/paste-fragments --renders f1 f2    read saved --render outputs instead of running them
+    bin/paste-fragments --save-renders DIR keep each renderer's output in DIR
+    bin/paste-fragments --selftest         plant the refusals and require each one
+
+WHAT IT IS.  CLAUDE.md's rule is that a figure with a renderer is PASTED, never typed: each
+gate below prints its fragments with `--render` (`<!--ns:key-->value<!--/ns:key-->`) and
+byte-compares the documents against them.  This tool is the paste, nothing more.  It does
+not check anything the gates do not already check, and a green run here is not a gate: run
+the gates (bin/session-todo, bin/verify-repo) after it, as before.
+
+WHAT IT REFUSES, writing nothing at all if any one of them fires:
+  * a key that occurs more than once in one document (the exactly-one-pair rule: the gates
+    read the FIRST pair, so a second one is a shadow the eye takes as checked);
+  * a key a renderer printed that is in no document (a fragment the gate expects and the
+    paste would silently drop);
+  * a key in a document, in a namespace this run rendered, that no renderer printed (the
+    renderer stopped producing it, so the document carries a figure nothing checks);
+  * a key in a document whose namespace has no renderer here at all;
+  * two renderers, or two sections of one, printing different values for one key.
+
+Not pasted here: the leave-one-out annotations (`check_loo --render`), the intense-round
+CORPUS block (`check_intense_corpus --render`) and the equiv per-session tables — none of
+them is a marked fragment, and each gate has its own locator.  The run says so.
+"""
+import argparse
+import concurrent.futures as cf
+import os
+import re
+import subprocess
+import sys
+import tempfile
+import time
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parent.parent
+PY = sys.executable or "python3"
+DOCS = ("CLAUDE.md", "README.md", "ROADMAP.md")
+
+# namespace -> the module whose `--render` prints it.  A new marked-fragment family adds a row.
+RENDERERS = {
+    "app": "pipeline.check_app_decomposition",
+    "don": "pipeline.check_donation_bands",
+    "dual": "pipeline.check_dual_engine",
+    "equiv": "pipeline.claims.check_equiv_coverage",
+    "rate": "pipeline.check_rate_records",
+    "round": "pipeline.check_rounding",
+    "stat": "pipeline.check_stat_sources",
+}
+NOT_PASTED = ("check_loo --render (leave-one-out annotations)",
+              "check_intense_corpus --render (the CORPUS block in pipeline/intense_round.py)",
+              "check_equiv_coverage --render's per-session tables (README/ROADMAP/CLAUDE)")
+
+FR = re.compile(r"<!--([a-z0-9-]+):([a-z0-9-]+)-->(.*?)<!--/\1:\2-->", re.S)
+
+
+class Refused(Exception):
+    pass
+
+
+def parse(text):
+    """[(ns, key, value)] in document order."""
+    return [(m.group(1), m.group(2), m.group(3)) for m in FR.finditer(text)]
+
+
+def wanted(outputs):
+    """{(ns, key): value} from renderer outputs; a key printed twice must agree."""
+    want, errs = {}, []
+    for src, text in outputs:
+        for ns, key, val in parse(text):
+            k = (ns, key)
+            if k in want and want[k][0] != val:
+                errs.append(f"{ns}:{key}: {want[k][1]} prints {want[k][0]!r}, {src} prints {val!r}")
+                continue
+            want.setdefault(k, (val, src))
+    if errs:
+        raise Refused("\n".join(errs))
+    return {k: v for k, (v, _) in want.items()}
+
+
+def apply(docs, want, rendered_ns, known_ns):
+    """Pure: (new texts, changes, checked).  Raises Refused, and then nothing may be written."""
+    errs, changes, used, new, pasted = [], [], set(), {}, []
+    for name, text in docs.items():
+        keys = [(ns, key) for ns, key, _ in parse(text)]
+        for k in dict.fromkeys(keys):
+            ns, key = k
+            n = keys.count(k)
+            if n != 1:
+                errs.append(f"{name}: {ns}:{key} occurs {n} times (exactly one pair per document)")
+            if ns not in known_ns:
+                errs.append(f"{name}: {ns}:{key}: no renderer for namespace {ns!r}")
+            elif ns in rendered_ns and k not in want:
+                errs.append(f"{name}: {ns}:{key}: {RENDERERS.get(ns, ns)} --render no longer "
+                            f"prints it")
+
+        def sub(m, name=name):
+            k = (m.group(1), m.group(2))
+            if k not in want:
+                return m.group(0)
+            used.add(k)
+            pasted.append(k)
+            if m.group(3) != want[k]:
+                changes.append((name, f"{k[0]}:{k[1]}", m.group(3), want[k]))
+            return f"<!--{k[0]}:{k[1]}-->{want[k]}<!--/{k[0]}:{k[1]}-->"
+        new[name] = FR.sub(sub, text)
+    errs += [f"{ns}:{key}: rendered by {RENDERERS.get(ns, ns)} but in no document"
+             for ns, key in want if (ns, key) not in used]
+    if errs:
+        raise Refused("\n".join(errs))
+    return new, changes, len(pasted)
+
+
+def render(ns_list, save_dir=None, jobs=None):
+    def one(ns):
+        t0 = time.monotonic()
+        r = subprocess.run([PY, "-m", RENDERERS[ns], "--render"], cwd=REPO,
+                           capture_output=True, text=True)
+        return ns, r.returncode, r.stdout, r.stderr, time.monotonic() - t0
+    outs, errs = [], []
+    with cf.ThreadPoolExecutor(max_workers=jobs or len(ns_list)) as ex:
+        for ns, rc, out, err, secs in ex.map(one, ns_list):
+            print(f"  ..  {RENDERERS[ns]} --render  ({secs:.1f}s)", flush=True)
+            if rc != 0:
+                errs.append(f"{RENDERERS[ns]} --render exited {rc}:\n{(err or out)[-2000:]}")
+            if save_dir:
+                Path(save_dir, f"{ns}.txt").write_text(out, encoding="utf-8")
+            outs.append((f"{RENDERERS[ns]} --render", out))
+    if errs:
+        raise Refused("\n".join(errs))
+    return outs
+
+
+def write_atomic(path, text):
+    d = os.path.dirname(os.path.abspath(path))
+    fd, tmp = tempfile.mkstemp(dir=d, prefix=".paste-")
+    with os.fdopen(fd, "w", encoding="utf-8") as fh:
+        fh.write(text)
+    os.chmod(tmp, os.stat(path).st_mode & 0o7777)
+    os.replace(tmp, path)
+
+
+def run(doc_paths, outputs, rendered_ns, check, out=print):
+    docs = {p: Path(p).read_text(encoding="utf-8") for p in doc_paths}
+    new, changes, checked = apply(docs, wanted(outputs), set(rendered_ns), set(RENDERERS))
+    for p, k, a, b in changes:
+        rel = os.path.relpath(p, REPO)
+        out(f"  {p if rel.startswith('..') else rel}: {k}: {a!r} -> {b!r}")
+    if not check:
+        for p in doc_paths:
+            if new[p] != docs[p]:
+                write_atomic(p, new[p])
+    verb = "would change" if check else "changed"
+    out(f"{len(changes)} fragment(s) {verb}, {checked} pair(s) checked across {len(doc_paths)} document(s)")
+    return changes
+
+
+# ------------------------------------------------------------------- selftest
+
+def _selftest():
+    ok = True
+    sink = []
+
+    def expect(label, cond):
+        nonlocal ok
+        ok &= bool(cond)
+        print(f"  {'ok ' if cond else 'BAD'} {label}")
+
+    doc_a = ("x <!--don:a-->1<!--/don:a--> y <!--don:b-->2<!--/don:b-->\n"
+             "<!--rate:c-->3<!--/rate:c-->\n")
+    doc_b = "t <!--equiv:e-->9<!--/equiv:e-->\n"
+    rend = [("don", "<!--don:a-->10<!--/don:a-->\n<!--don:b-->2<!--/don:b-->\n"),
+            ("rate", "<!--rate:c-->3<!--/rate:c-->\n"),
+            ("equiv", "<!--equiv:e-->9<!--/equiv:e-->\n<!--equiv:e-->9<!--/equiv:e-->\n")]
+
+    with tempfile.TemporaryDirectory() as td:
+        def fresh(a=doc_a, b=doc_b):
+            pa, pb = os.path.join(td, "A.md"), os.path.join(td, "B.md")
+            Path(pa).write_text(a, encoding="utf-8")
+            Path(pb).write_text(b, encoding="utf-8")
+            return [pa, pb]
+
+        def attempt(paths, outputs, ns=("don", "rate", "equiv"), check=False):
+            before = [Path(p).read_bytes() for p in paths]
+            try:
+                ch = run(paths, outputs, ns, check, out=sink.append)
+                return ch, None, before
+            except Refused as e:
+                return None, str(e), before
+
+        paths = fresh()
+        ch, err, _ = attempt(paths, rend)
+        expect("a clean paste changes exactly the one moved fragment",
+               err is None and [c[1] for c in ch] == ["don:a"]
+               and "<!--don:a-->10<!--/don:a-->" in Path(paths[0]).read_text())
+        ch, err, before = attempt(paths, rend)
+        expect("a second run is a no-op: 0 changes, bytes untouched",
+               err is None and ch == [] and before == [Path(p).read_bytes() for p in paths])
+
+        paths = fresh()
+        ch, err, before = attempt(paths, rend, check=True)
+        expect("--check reports the change and writes nothing",
+               err is None and len(ch) == 1 and before == [Path(p).read_bytes() for p in paths])
+
+        planted = [
+            ("a key twice in one document is refused",
+             (doc_a + "<!--don:b-->2<!--/don:b-->\n",), rend, "occurs 2 times"),
+            ("a rendered key in no document is refused",
+             (), rend + [("rate", "<!--rate:z-->5<!--/rate:z-->")], "in no document"),
+            ("a document key its namespace's renderer stopped printing is refused",
+             (doc_a + "<!--rate:gone-->7<!--/rate:gone-->\n",), rend, "no longer prints"),
+            ("a document key with no renderer at all is refused",
+             (doc_a + "<!--zzz:k-->1<!--/zzz:k-->\n",), rend, "no renderer for namespace"),
+            ("two renders disagreeing on one key are refused",
+             (), rend + [("don", "<!--don:b-->3<!--/don:b-->")], "prints"),
+        ]
+        for label, texts, outputs, needle in planted:
+            paths = fresh(*texts)   # each plant gets its own fresh documents
+            ch, err, before = attempt(paths, outputs)
+            expect(label + ", and nothing is written",
+                   err is not None and needle in err
+                   and before == [Path(p).read_bytes() for p in paths])
+
+        # A namespace not rendered this run (--only) is left alone, not refused.
+        paths = fresh()
+        ch, err, _ = attempt(paths, rend[:1], ns=("don",))
+        expect("--only: an unrendered known namespace is carried over unread",
+               err is None and [c[1] for c in ch] == ["don:a"])
+    print("selftest: " + ("all planted refusals caught" if ok else "FAILED"))
+    return 0 if ok else 1
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap.add_argument("--check", action="store_true", help="write nothing; exit 1 if a paste would move")
+    ap.add_argument("--only", help="comma-separated namespaces (" + ",".join(RENDERERS) + ")")
+    ap.add_argument("--docs", nargs="+", help="documents to paste into (default: the three docs)")
+    ap.add_argument("--renders", nargs="+", help="saved --render outputs to read instead of running")
+    ap.add_argument("--save-renders", dest="save", help="write each renderer's output here")
+    ap.add_argument("--jobs", type=int, default=None, help="renderers run at once (default: all)")
+    ap.add_argument("--selftest", action="store_true")
+    a = ap.parse_args()
+    if a.selftest:
+        return _selftest()
+
+    ns_list = list(RENDERERS)
+    if a.only:
+        ns_list = [n.strip() for n in a.only.split(",") if n.strip()]
+        bad = [n for n in ns_list if n not in RENDERERS]
+        if bad or not ns_list:
+            ap.error(f"unknown namespace(s) {bad}; known: {', '.join(RENDERERS)}")
+    docs = [os.path.abspath(p) for p in (a.docs or [REPO / d for d in DOCS])]
+    t0 = time.monotonic()
+    try:
+        if a.renders:
+            outputs = [(p, Path(p).read_text(encoding="utf-8")) for p in a.renders]
+            ns_list = sorted({ns for _, t in outputs for ns, _, _ in parse(t)})
+        else:
+            if a.save:
+                os.makedirs(a.save, exist_ok=True)
+            outputs = render(ns_list, a.save, a.jobs)
+        changes = run(docs, outputs, ns_list, a.check)
+    except Refused as e:
+        print(f"REFUSED (nothing written):\n{e}", file=sys.stderr)
+        return 2
+    print(f"  --  not pasted by this tool: " + "; ".join(NOT_PASTED))
+    print(f"  ..  {time.monotonic() - t0:.1f}s; now run the gates (bin/session-todo)")
+    return 1 if (a.check and changes) else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

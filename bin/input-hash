@@ -1,0 +1,204 @@
+#!/usr/bin/env python3
+"""The input hash of a CI job, and the green store that lets an unchanged job skip.
+
+    bin/input-hash hash   <job> [<matrix-value>] [--list]   print the sha256 (--list: the files)
+    bin/input-hash gate   <job> [<matrix-value>]            CI: look the hash up in the store
+    bin/input-hash record <job> [<matrix-value>] [--dir D]  mark it green locally
+    bin/input-hash audit  <job> [<matrix-value>]            CI (daily): check the closure
+
+yachi's decision of 2026-11-17: a PR or main push may skip a job whose input closure
+(`pipeline/input_closure.py`) is unchanged since a green run of it; a daily schedule runs
+everything.  So `gate` never consults the store on `schedule` or `workflow_dispatch`, and
+refuses the jobs `bin/verify-repo`'s PLAN marks `never_skip` (workflow-plan among them).
+
+THE STORE is one tiny artifact per (job, matrix value, hash), named by
+`input_closure.artifact_name`, uploaded by the job's last step (`Record green inputs`) only
+after every other step passed.  `gate` asks the Actions API for an unexpired artifact of that
+name whose run's HEAD repository is this repository — a fork PR uploads into its own run with
+its own head repository, so it cannot forge a green mark for `main`.  Any API failure is a
+MISS: the job runs.  A hit writes `INPUTS_UNCHANGED=1` to `$GITHUB_ENV`, and every later step
+of the job carries `if: env.INPUTS_UNCHANGED != '1'`; the check stays green and says why.
+
+THE AUDIT.  On the daily schedule `gate` starts `inotifywait -m -r` on the workspace (after
+hashing, so its own reads are not logged); `audit`, the step before the record, reads that
+log and fails on a tracked file opened outside the closure.  That is the closure being
+checked against what the job did on the runner, which no static walk can promise.
+"""
+import importlib.machinery
+import importlib.util
+import json
+import os
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO))
+from pipeline import input_closure as ic  # noqa: E402
+
+AUDIT_LOG = "inputs-audit.log"
+
+
+def verify_repo():
+    loader = importlib.machinery.SourceFileLoader("verify_repo", str(REPO / "bin" / "verify-repo"))
+    spec = importlib.util.spec_from_loader("verify_repo", loader)
+    mod = importlib.util.module_from_spec(spec)
+    loader.exec_module(mod)
+    return mod
+
+
+def compute(job_name, matrix_val=None, tree=None):
+    vr = verify_repo()
+    _, jobs = vr.load()
+    by = {j.name: j for j in jobs}
+    if job_name not in by or job_name not in vr.PLAN:
+        raise SystemExit(f"input-hash: no job {job_name!r}")
+    job, entry = by[job_name], vr.PLAN[job_name]
+    if entry.never_skip:
+        raise SystemExit(f"input-hash: {job_name!r} is never skipped ({entry.never_skip}); "
+                         f"it has no input hash")
+    dim = next(iter(job.matrix), None) if job.matrix else None
+    if dim and matrix_val is None:
+        raise SystemExit(f"input-hash: {job_name!r} is a matrix job; name the {dim!r} value")
+    if dim and matrix_val not in job.matrix[dim]:
+        raise SystemExit(f"input-hash: {matrix_val!r} is not in {job_name}'s {dim!r} matrix")
+    tree = tree or ic.Tree()
+    cl = ic.closure(job, entry, vr.interpolate, dim, matrix_val, tree)
+    if cl.unresolved:
+        for s, tok, why in cl.unresolved:
+            print(f"input-hash: {job_name} / {s}: {tok!r} {why}", file=sys.stderr)
+        raise SystemExit(2)
+    return cl, cl.digest(tree), tree
+
+
+def env_append(name, text):
+    path = os.environ.get(name)
+    if path:
+        with open(path, "a") as fh:
+            fh.write(text)
+
+
+def lookup(artifact):
+    """True iff the store holds a usable green mark.  Every failure is False."""
+    repo, repo_id = os.environ.get("GITHUB_REPOSITORY"), os.environ.get("GITHUB_REPOSITORY_ID")
+    if not repo or not repo_id or not shutil.which("gh"):
+        print("input-hash: no GITHUB_REPOSITORY / gh — treating as a miss")
+        return False
+    r = subprocess.run(["gh", "api", f"repos/{repo}/actions/artifacts?name={artifact}&per_page=100"],
+                       capture_output=True, text=True)
+    if r.returncode:
+        print(f"input-hash: the artifact lookup failed — treating as a miss\n{r.stderr.strip()}")
+        return False
+    try:
+        arts = json.loads(r.stdout).get("artifacts", [])
+    except ValueError:
+        return False
+    for a in arts:
+        run = a.get("workflow_run") or {}
+        if a.get("name") == artifact and not a.get("expired") \
+                and str(run.get("head_repository_id")) == str(repo_id):
+            print(f"input-hash: green in run {run.get('id')} at {run.get('head_sha')}")
+            return True
+    return False
+
+
+def start_watch():
+    """Daily only: log every file the rest of the job opens."""
+    if not shutil.which("inotifywait"):
+        subprocess.run(["sudo", "apt-get", "install", "-y", "-qq", "inotify-tools"],
+                       check=True, stdout=subprocess.DEVNULL)
+    log = Path(os.environ["RUNNER_TEMP"]) / AUDIT_LOG
+    fh = open(log, "w")
+    subprocess.Popen(["inotifywait", "-m", "-r", "-q", "-e", "open", "--format", "%e %w%f",
+                      "--exclude", r"/\.git/", str(REPO)], stdout=fh,
+                     stderr=subprocess.DEVNULL, start_new_session=True)
+    print(f"input-hash: auditing opens into {log}")
+
+
+def cmd_gate(job, mv):
+    cl, digest, _ = compute(job, mv)
+    name = ic.artifact_name(job, mv, digest)
+    print(f"input hash {digest} over {len(cl.files)} files")
+    env_append("GITHUB_ENV", f"INPUTS_HASH={digest}\nINPUTS_ARTIFACT={name}\n")
+    temp = Path(os.environ.get("RUNNER_TEMP", "/tmp")) / "green-inputs"
+    temp.mkdir(parents=True, exist_ok=True)
+    (temp / "inputs.json").write_text(json.dumps(
+        {"job": job, "matrix": mv, "hash": digest, "sha": os.environ.get("GITHUB_SHA"),
+         "files": len(cl.files)}, indent=1) + "\n")
+    event = os.environ.get("GITHUB_EVENT_NAME", "")
+    if event in ("schedule", "workflow_dispatch"):
+        print(f"input-hash: {event} runs everything; the store is not consulted")
+        if event == "schedule":
+            start_watch()
+        return 0
+    if lookup(name):
+        print("::notice title=skipped: inputs unchanged::"
+              f"{job}{f' [{mv}]' if mv else ''}: input hash {digest[:12]} was green before; "
+              f"every step after this one is skipped")
+        env_append("GITHUB_ENV", "INPUTS_UNCHANGED=1\n")
+        env_append("GITHUB_STEP_SUMMARY",
+                   f"**skipped: inputs unchanged** — `{job}`{f' `{mv}`' if mv else ''}, "
+                   f"input hash `{digest[:12]}` already green\n")
+    else:
+        print("input-hash: not green before — the job runs")
+    return 0
+
+
+def cmd_audit(job, mv, log):
+    cl, _, tree = compute(job, mv)
+    log = Path(log or Path(os.environ.get("RUNNER_TEMP", "/tmp")) / AUDIT_LOG)
+    if not log.exists():
+        print(f"input-hash: no audit log at {log}", file=sys.stderr)
+        return 1
+    opened, listed = ic.parse_inotify(log.read_text().splitlines())
+    bad = ic.audit(cl, tree, opened, listed)
+    for b in bad:
+        print(f"::error title=input closure::{job}{f' [{mv}]' if mv else ''}: {b}")
+    print(f"input-hash audit: {len(opened)} files opened, {len(listed)} directories listed, "
+          f"{len(bad)} problems")
+    return 1 if bad else 0
+
+
+def main(argv):
+    if len(argv) < 2 or argv[0] not in ("hash", "gate", "record", "audit"):
+        print(__doc__, file=sys.stderr)
+        return 2
+    cmd, job, rest = argv[0], argv[1], argv[2:]
+    opts = {}
+    pos = []
+    i = 0
+    while i < len(rest):
+        if rest[i] in ("--dir", "--log"):
+            opts[rest[i]] = rest[i + 1]
+            i += 2
+        elif rest[i] == "--list":
+            opts["--list"] = True
+            i += 1
+        else:
+            pos.append(rest[i])
+            i += 1
+    mv = pos[0] if pos else None
+    if cmd == "hash":
+        cl, digest, _ = compute(job, mv)
+        if opts.get("--list"):
+            for label, _ in cl.texts:
+                print(f"text  {label}")
+            for f in sorted(cl.files):
+                print(f"file  {f}")
+        print(digest)
+        return 0
+    if cmd == "gate":
+        return cmd_gate(job, mv)
+    if cmd == "record":
+        _, digest, _ = compute(job, mv)
+        d = Path(opts.get("--dir") or ic.green_dir())
+        d.mkdir(parents=True, exist_ok=True)
+        (d / ic.artifact_name(job, mv, digest)).write_text(digest + "\n")
+        print(f"recorded green: {ic.artifact_name(job, mv, digest)}")
+        return 0
+    return cmd_audit(job, mv, opts.get("--log"))
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
