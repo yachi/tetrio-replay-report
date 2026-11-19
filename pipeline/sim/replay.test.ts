@@ -201,7 +201,10 @@ test('admission counts are pinned per session, and the exceptions are exactly th
  *  the verified prefix, the unobserved-garbage-hole tail of every other entry. No winner-class entry.
  *
  *  2026-11-05 adds NONE: in all 134 of its player-rounds (134 of 134 admit) the engine's knockout
- *  agrees with gameoverreason, so the list stays at 32. */
+ *  agrees with gameoverreason, so the list stays at 32.
+ *
+ *  2026-11-19 adds ONE (pinglamb, m2 r2, topout, engine survives): the same unobserved-garbage-hole
+ *  tail class as the others; the list is 33. */
 const KNOCKOUT_EXCEPTIONS = [
   { session: '2026-07-22', file: 'replay-2026-07-22-2.ttrm', round: 1, user: 'yachi', ending: 'topout', lock: null },
   { session: '2026-07-22', file: 'replay-2026-07-22-7.ttrm', round: 5, user: 'pinglamb', ending: 'topout', lock: null },
@@ -235,6 +238,7 @@ const KNOCKOUT_EXCEPTIONS = [
   { session: '2026-11-01', file: 'replay-2026-11-01-06.ttrm', round: 4, user: 'yachi', ending: 'topout', lock: null },
   { session: '2026-11-01', file: 'replay-2026-11-01-13.ttrm', round: 5, user: 'pinglamb', ending: 'topout', lock: null },
   { session: '2026-11-01', file: 'replay-2026-11-01-16.ttrm', round: 2, user: 'pinglamb', ending: 'topout', lock: null },
+  { session: '2026-11-19', file: 'replay-2026-11-19-02.ttrm', round: 1, user: 'pinglamb', ending: 'topout', lock: null },
 ];
 
 test('engine_knockout is consistent with its own definition, and its disagreements are exactly the named list', () => {

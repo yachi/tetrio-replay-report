@@ -1,27 +1,31 @@
 {
-  "eyebrow": "TODO · 關鍵時刻",
-  "title": "TODO — 呢一節嘅標題未寫",
+  "eyebrow": "關鍵時刻 · 三件事",
+  "title": "三件事：第四場、清得多打得少、同輸局",
   "cards": [
     {
+      "accent": "g",
+      "label": "頭三場 / 第四場",
+      "value": "12-11 / 6-15",
+      "body": "頭三場先贏五局，局數 yachi 12 比 11 仲多一局<span class=\"badge\" data-claim=\"C010\"></span>；第四場打十五局，pinglamb 頭五局連贏，6 比 15<span class=\"badge\" data-claim=\"C014\"></span>。<strong>成晚 18 比 26 嘅局數差距，全部喺第四場</strong><span class=\"badge\" data-claim=\"C010\"></span>。"
+    },
+    {
       "accent": "y",
-      "label": "TODO LABEL",
-      "value": "—",
-      "body": "TODO：呢張卡嘅文字未寫。"
+      "label": "清得多、打得少",
+      "value": "+115 行 / −115 條",
+      "body": "yachi 多疊 334 粒，即係多 8.78%<span class=\"badge\" data-claim=\"C005\"></span><span class=\"badge\" data-claim=\"C009\"></span>，清行仲多 115 行，2233 對 2118<span class=\"badge\" data-claim=\"C017\"></span>——<strong>但總攻擊少 115 條</strong>，即係 pinglamb 總攻擊嘅 4.52%<span class=\"badge\" data-claim=\"C005\"></span>。粒數最多填返 8.78 個百分點，對住 13.94% 個窿<span class=\"badge\" data-claim=\"C004\"></span><span class=\"badge\" data-claim=\"C009\"></span>。"
     },
     {
       "accent": "p",
-      "label": "TODO LABEL",
-      "value": "—",
-      "body": "TODO：呢張卡嘅文字未寫。"
-    },
-    {
-      "accent": "g",
-      "label": "TODO LABEL",
-      "value": "—",
-      "body": "TODO：呢張卡嘅文字未寫。"
+      "label": "輸局都重",
+      "value": "+6.80% / +9.15%",
+      "body": "拆開贏同輸嘅局：贏嗰啲局 pinglamb 每粒方塊嘅攻擊高 6.80%，<strong>輸嗰啲局反而高 9.15%</strong><span class=\"badge\" data-claim=\"C002\"></span>。即係佢輸局都輸得重過 yachi 輸局。"
     }
   ],
   "trivia": [
-    "TODO：呢條冷知識未寫。"
+    "最癲嗰局係 m4 第十三局，yachi 贏<span class=\"badge\" data-claim=\"G055\"></span>，攻擊量、落速、最大單波、行數每一條軸都領先<span class=\"badge\" data-claim=\"G075\"></span>；每粒方塊嘅攻擊約 0.775 對約 0.715<span class=\"badge\" data-claim=\"G076\"></span>。",
+    "All Clear yachi 7 個、pinglamb 5 個<span class=\"badge\" data-claim=\"G032\"></span>。淨係 yachi 做到全消嘅 7 局，佢輸咗 4 局<span class=\"badge\" data-claim=\"G070\"></span>。",
+    "44 局每一局都係 VS 高嗰個贏，零例外<span class=\"badge\" data-claim=\"G019\"></span>；yachi 嘅場均 PPS 四場都高過對手<span class=\"badge\" data-claim=\"G046\"></span>。",
+    "m4 第十七局 pinglamb APM 約113.8，但嗰局得 14 秒，唔計紀錄<span class=\"badge\" data-claim=\"G067\"></span>。",
+    "KPP 兩個人差唔多：yachi 3.562 下、pinglamb 3.604 下，pinglamb 高 1.17%<span class=\"badge\" data-claim=\"C008\"></span>。"
   ]
 }

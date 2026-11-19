@@ -50,6 +50,8 @@ const J_HOLD_BAG1: string[] = [
   "2026-11-01 m3r3 pinglamb",
   // 2026-11-05: two, both pinglamb's, unmirrored, a Z placed 7th (prefixes 26 and 56).
   "2026-11-05 m1r3 pinglamb", "2026-11-05 m6r4 pinglamb",
+  // 2026-11-19: two, both pinglamb's, both m4 (replay-2026-11-19-04.ttrm), mirrored, the Z placed 7th: m4r12 (prefix 24) and m4r13 (prefix 89), 6-lock match only.
+  "2026-11-19 m4r12 pinglamb", "2026-11-19 m4r13 pinglamb",
 ];
 /** The 6-lock field matched and the 7th piece WAS the bag-1 J (L when mirrored), placed off the page. */
 const J_PLACED_ELSEWHERE_BAG1: string[] = [
@@ -110,6 +112,9 @@ const TST_DONATE_CASES: string[] = [
   "2026-11-05 m5r5 pinglamb",
   // 2026-11-17: one, pinglamb's m3r1, mirrored, under 2.compromise (prefix 60, verified).
   "2026-11-17 m3r1 pinglamb",
+  // 2026-11-19: two, both pinglamb's, both mirrored, both reaching the TST-donate board at lock 19 (prefixes 88 and 97);
+  // m2r6 needed no garbage stripped, m4r14 seven rows (BAG2_GARBAGE_STRIPPED).
+  "2026-11-19 m2r6 pinglamb", "2026-11-19 m4r14 pinglamb",
 ];
 /** A bag-2 match that needed complete garbage rows stripped from under it (the count in brackets). */
 const BAG2_GARBAGE_STRIPPED: string[] = [
@@ -194,6 +199,9 @@ const BAG2_GARBAGE_STRIPPED: string[] = [
   "2026-11-05 m8r3 yachi (11)", "2026-11-05 m8r5 pinglamb (6)", "2026-11-05 m8r8 pinglamb (2)",
   // 2026-11-17: three, two of them pinglamb's, all mirrored.
   "2026-11-17 m3r1 pinglamb (4)", "2026-11-17 m3r2 pinglamb (4)", "2026-11-17 m3r5 yachi (6)",
+  // 2026-11-19: five (rows stripped in brackets).
+  "2026-11-19 m1r8 pinglamb (6)", "2026-11-19 m2r1 yachi (6)", "2026-11-19 m2r3 pinglamb (4)",
+  "2026-11-19 m3r8 pinglamb (9)", "2026-11-19 m4r14 pinglamb (7)",
 ];
 /** No bag-2 match: the board before the TST is a strict subset of a bag-2 board. MEASURED, not matched. */
 const BAG2_NONE_TST_BEFORE_COMPLETE: string[] = [
@@ -242,6 +250,9 @@ const BAG2_NONE_TST_BEFORE_COMPLETE: string[] = [
   "2026-11-05 m6r8 yachi under 2.ideal",
   // 2026-11-17: one, yachi's m3r7, mirrored, a 4-cell subset at lock 11 (prefix 23).
   "2026-11-17 m3r7 yachi under 2.ideal",
+  // 2026-11-19: four, the TST fired before bag 2 was complete: yachi m1r8, m2r5, m3r7 and pinglamb m2r1, all under 2.ideal.
+  "2026-11-19 m1r8 yachi under 2.ideal", "2026-11-19 m2r1 pinglamb under 2.ideal",
+  "2026-11-19 m2r5 yachi under 2.ideal", "2026-11-19 m3r7 yachi under 2.ideal",
 ];
 /** No bag-2 match: the board before the TST is a bag-2 board plus exactly four cells (their letters). MEASURED. */
 const BAG2_NONE_EXTRA_PIECE: string[] = [
@@ -311,6 +322,9 @@ const BAG2_NONE_MOVED_PIECE: string[] = [
   "2026-11-05 m6r3 pinglamb under 2.ideal, J moved", "2026-11-05 m8r6 pinglamb under 2.ideal, L moved",
   // 2026-11-17: one, pinglamb's m3r7, mirrored, at lock 12 (prefix 19) under 2.compromise with eleven garbage rows stripped.
   "2026-11-17 m3r7 pinglamb under 2.compromise, O moved",
+  // 2026-11-19: three, all pinglamb's, all under 2.ideal: one L moved (m1r5), two J moved (m4r1, m4r10).
+  "2026-11-19 m1r5 pinglamb under 2.ideal, L moved", "2026-11-19 m4r1 pinglamb under 2.ideal, J moved",
+  "2026-11-19 m4r10 pinglamb under 2.ideal, J moved",
 ];
 /** 8-line PCs that are on no drawn pattern, named with the node they stop under. The compromise ones are
  *  NOT filed under the page source's hidden compromise list (html_comment_boards): nothing classifies against it. */
@@ -330,6 +344,8 @@ const PC_OFF_PAGE: string[] = [
   // yachi's m6r4 (PC on lock 19 past a prefix verified to 18: `verified: false`).
   "2026-11-05 m4r8 pinglamb under bag1.j_right.other",
   "2026-11-05 m6r4 yachi under bag1.j_right.other",
+  // 2026-11-19: one, pinglamb's m2r5, a Perfect Clear on no drawn pattern under 2.compromise.
+  "2026-11-19 m2r5 pinglamb under 2.compromise.other",
 ];
 
 /** Measured empty. A first entry is a red build to investigate, never a number to absorb. */
@@ -340,12 +356,12 @@ const PC_GARBAGE_IN_WINDOW: string[] = [];
 const MULTI_COLOUR_RESOLVED_BY_GROUP: string[] = [];
 
 /** Both players mirror Honey Cup (unlike 迷走砲): pinned as a count per player, not a list. */
-const MIRRORED_BAG1 = { pinglamb: 366, yachi: 116 };
+const MIRRORED_BAG1 = { pinglamb: 380, yachi: 122 };
 
 /** Cases per measured node. The five 2.ideal forms share one occupancy, so these split by colour. */
 const NODE_CASES: Record<string, number> = {
-  'bag1.j_hold': 27, 'bag1.j_right': 773, 'bag1.j_placed_elsewhere': 32,
-  '2.ideal#1': 0, '2.ideal#2': 0, '2.ideal#3': 32, '2.ideal#4': 182, '2.ideal#5': 62, '2.compromise': 231,
+  'bag1.j_hold': 29, 'bag1.j_right': 796, 'bag1.j_placed_elsewhere': 32,
+  '2.ideal#1': 0, '2.ideal#2': 0, '2.ideal#3': 34, '2.ideal#4': 189, '2.ideal#5': 62, '2.compromise': 239,
   // 2026-10-12 adds three bag-3 PCs: two pc#1 (m7r2, pinglamb and yachi, both mirrored) and the
   // corpus's FIRST pc#9 — yachi's m5r1, mirrored, at lock 19 on a prefix verified only to 18, so
   // that case is `verified: false` and the node count carries it as the artefact does.
@@ -363,19 +379,19 @@ const NODE_CASES: Record<string, number> = {
   // (pinglamb's m8r3, `verified: false`, carried the same way).
   // 2026-11-17 adds three: two pc#1 (pinglamb's and yachi's m3r3, both at lock 19 on prefixes 17 and 13,
   // `verified: false`, carried the same way) and one pc#2 (pinglamb's m3r5, mirrored, verified).
-  '2.ideal.pc#1': 17, '2.ideal.pc#2': 10, '2.ideal.pc#3': 10, '2.ideal.pc#4': 13, '2.ideal.pc#5': 8,
+  '2.ideal.pc#1': 17, '2.ideal.pc#2': 10, '2.ideal.pc#3': 10, '2.ideal.pc#4': 13, '2.ideal.pc#5': 9,
   '2.ideal.pc#6': 3, '2.ideal.pc#7': 0, '2.ideal.pc#8': 2, '2.ideal.pc#9': 1, '2.ideal.pc#10': 0,
   '2.ideal.pc#11': 0, '2.ideal.pc#12': 0, '2.ideal.pc#13': 0, '2.ideal.pc#14': 0, '2.ideal.pc#15': 0,
-  '2.compromise.tst_donate': 75, '2.compromise.tst_donate.after': 0, '2.compromise.roof': 0,
+  '2.compromise.tst_donate': 77, '2.compromise.tst_donate.after': 0, '2.compromise.roof': 0,
   '2.compromise.roof.after': 0,
 };
 
 /** The compromise form's condition (the page's example, など) against the form actually built, in the
  *  handedness the page draws. It holds for a minority of the compromise rounds: never the reason. */
 const CONDITIONS = {
-  '2.compromise': { '(none)': 194, '2.compromise': 37 },
-  '2.ideal#3': { '(none)': 23, '2.compromise': 9 },
-  '2.ideal#4': { '(none)': 161, '2.compromise': 21 },
+  '2.compromise': { '(none)': 201, '2.compromise': 38 },
+  '2.ideal#3': { '(none)': 25, '2.compromise': 9 },
+  '2.ideal#4': { '(none)': 167, '2.compromise': 22 },
   '2.ideal#5': { '(none)': 47, '2.compromise': 15 },
 };
 

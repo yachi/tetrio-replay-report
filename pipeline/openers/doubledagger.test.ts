@@ -90,7 +90,7 @@ const GARBAGE_IN_WINDOW: string[] = [
 const DOUBLEDAGGER_IN_OPENER: string[] = [];
 const RECON_DROPPED_TSD: string[] = [];
 /** window_off_board, per player: a count with a property check, not a list (see the header). */
-const WINDOW_OFF_BOARD = { pinglamb: 1654, yachi: 1666 };
+const WINDOW_OFF_BOARD = { pinglamb: 1699, yachi: 1699 };
 
 /** The one SDPC Spin round that reached the second C-Spin build (`3.second`), measured over the bag harddrop
  *  draws the Double Dagger boards in. */
@@ -99,8 +99,8 @@ const SDPC_SECOND_ROUNDS: string[] = [
 ];
 
 /** Per player: the opportunity (scored full TSDs), split at the 0-based opener window. */
-const TSD_DENOM = { pinglamb: { all: 6723, in_opener: 1318, mid_game: 5405 },
-                    yachi: { all: 6121, in_opener: 1565, mid_game: 4556 } };
+const TSD_DENOM = { pinglamb: { all: 6894, in_opener: 1348, mid_game: 5546 },
+                    yachi: { all: 6249, in_opener: 1598, mid_game: 4651 } };
 /** Per player: hits, their split, the mirrored ones, the follow-ups that fired. */
 const HITS = { pinglamb: { all: 32, in_opener: 0, mid_game: 32, mirrored: 20, garbage_in_window: 7 },
                yachi: { all: 18, in_opener: 0, mid_game: 18, mirrored: 13, garbage_in_window: 4 } };
@@ -109,16 +109,16 @@ const FOLLOWUP_FIRED = { pinglamb: 28, yachi: 11 };
 const CONTROLS = {
   under: { TSS: { pinglamb: 3, yachi: 2 }, TST: { pinglamb: 0, yachi: 0 },
            mini_TSS: { pinglamb: 0, yachi: 0 }, mini_TSD: { pinglamb: 0, yachi: 0 } },
-  ablation: { no_must_empty: { pinglamb: 4061, yachi: 3534 }, no_roof: { pinglamb: 32, yachi: 18 },
-              t_overlap: { pinglamb: 43, yachi: 19 } },
-  orientation_baseline: { pinglamb: 64, yachi: 89 },
+  ablation: { no_must_empty: { pinglamb: 4165, yachi: 3598 }, no_roof: { pinglamb: 32, yachi: 18 },
+              t_overlap: { pinglamb: 44, yachi: 19 } },
+  orientation_baseline: { pinglamb: 65, yachi: 91 },
 };
 /** What discriminates, measured: full TSDs (not only hits) whose anchored T meets ONE part of the window —
  *  the two cleared rows, the overhang row above them, or the lower slot under them. The lower slot alone gives
  *  exactly the headline's hits; the cleared rows (entailed by the clear) and the overhang row (which a TSD slot
  *  nearly always has) admit almost every full TSD. The overhang still has work to do: it is what tells the two
  *  hands apart (the `noRoof` mutant makes a lock match both, and the matcher refuses it). */
-const PART_ONLY = { cleared: 12691, overhang: 12688, lower: 50 };
+const PART_ONLY = { cleared: 12987, overhang: 12984, lower: 50 };
 
 /** Measured byte-identical on this corpus, each for its reason; asserted to STAY identical. */
 const EQUIVALENT: Record<string, string> = {
@@ -177,7 +177,7 @@ test('quarantined: report_eligible false, no claim ids', () => {
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
   const n = checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT);
-  expect(n).toBe(18177);
+  expect(n).toBe(18623);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 
@@ -340,8 +340,8 @@ test('cross-check: the SDPC Spin round that reached the second C-Spin build, ove
 
 test('the follow-up row map is verified against the engine at every step it uses', () => {
   const c = art().check;
-  expect(c.rowmap_unverified).toBe(32);
-  expect(c.rowmap_steps).toBe(319424);
+  expect(c.rowmap_unverified).toBe(33);
+  expect(c.rowmap_steps).toBe(327362);
   expect(art().hits.every((h: any) => h.followup.reason !== 'rowmap_unverified')).toBe(true);
 });
 

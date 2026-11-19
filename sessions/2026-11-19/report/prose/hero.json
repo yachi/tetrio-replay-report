@@ -1,10 +1,10 @@
 {
-  "kicker": "",
-  "title": "TODO — 大標題未寫（<span class=\"hl-y\">yachi</span> vs <span class=\"hl-p\">pinglamb</span>）",
+  "kicker": "第二十四回合",
+  "title": "頭三場領先，\n<span class=\"hl-p\">輸喺打十五局嗰場</span>",
   "tags": {
-    "yachi": "TODO · TAGLINE",
-    "pinglamb": "TODO · TAGLINE"
+    "yachi": "快 · 清得多 · 頭三場 12 比 11",
+    "pinglamb": "每粒重 · 第四場 15 比 6 · EFFICIENCY"
   },
-  "lede": "TODO：呢一段導言未寫。要講今晚嘅主線，每句數得出嚟嘅嘢帶返 claim id。",
+  "lede": "四場、44 局，<strong>pinglamb 3 比 1</strong><span class=\"badge\" data-claim=\"G001\"></span><span class=\"badge\" data-claim=\"C001\"></span>，逐局 26 比 18<span class=\"badge\" data-claim=\"G002\"></span><span class=\"badge\" data-claim=\"C010\"></span>。但頭三場 yachi 局數仲多一局，12 比 11<span class=\"badge\" data-claim=\"C010\"></span>；<strong>成晚嘅局數差距全部喺第四場</strong>——打到十五局先贏，pinglamb 頭五局連贏，6 比 15 收<span class=\"badge\" data-claim=\"C014\"></span>，係成個 corpus 第一場唔係先贏五局嘅 match。pinglamb 每粒方塊嘅攻擊高 13.94%<span class=\"badge\" data-claim=\"C004\"></span>；yachi 多疊 334 粒、即係多 8.78%<span class=\"badge\" data-claim=\"C005\"></span><span class=\"badge\" data-claim=\"C009\"></span>，清行仲多 115 行<span class=\"badge\" data-claim=\"C017\"></span>，總攻擊照樣少 115 條<span class=\"badge\" data-claim=\"C005\"></span>。拆開贏輸：贏局 pinglamb 每粒高 6.80%，<strong>輸局高 9.15%</strong><span class=\"badge\" data-claim=\"C002\"></span>。四場都係總攻擊多嗰個贏<span class=\"badge\" data-claim=\"C016\"></span>。",
   "score_claim": "G001"
 }
