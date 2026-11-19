@@ -1,0 +1,27 @@
+{
+  "eyebrow": "TODO · 關鍵時刻",
+  "title": "TODO — 呢一節嘅標題未寫",
+  "cards": [
+    {
+      "accent": "y",
+      "label": "TODO LABEL",
+      "value": "—",
+      "body": "TODO：呢張卡嘅文字未寫。"
+    },
+    {
+      "accent": "p",
+      "label": "TODO LABEL",
+      "value": "—",
+      "body": "TODO：呢張卡嘅文字未寫。"
+    },
+    {
+      "accent": "g",
+      "label": "TODO LABEL",
+      "value": "—",
+      "body": "TODO：呢張卡嘅文字未寫。"
+    }
+  ],
+  "trivia": [
+    "TODO：呢條冷知識未寫。"
+  ]
+}

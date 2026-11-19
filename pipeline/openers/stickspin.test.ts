@@ -41,7 +41,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
    '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22',
-   '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17']);
+   '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19']);
 
 /** Bag 1 matched (six pieces, the page's board) and the 7th lock was NOT a full T-spin Single on a
  *  drawn U slot: the piece, the engine's spin and the lines it cleared. The one round is a T laid

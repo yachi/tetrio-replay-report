@@ -58,6 +58,7 @@ const SESSIONS = [
   { dir: '2026-11-01', rounds: 260, strict: 230, equal: 30, faults: 3847, perfect: 22515, pieces: 24718 },
   { dir: '2026-11-05', rounds: 134, strict: 122, equal: 12, faults: 2151, perfect: 12912, pieces: 14152 },
   { dir: '2026-11-17', rounds:  48, strict:  39, equal:  9, faults:  638, perfect:  4292, pieces:  4675 },
+  { dir: '2026-11-19', rounds:  88, strict:  0, equal:  0, faults:  0, perfect:  0, pieces:  0 },
 ];
 
 // At module scope, not inside a test: a membership check that lives in a test can be skipped

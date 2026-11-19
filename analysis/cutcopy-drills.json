@@ -19,7 +19,7 @@
  },
  "inputs": {
   "pipeline/openers/cutcopy-technique.json": "baa922715bf9150a0ab6775fe35fe71a",
-  "analysis/cutcopy-facts.json": "64f0fd8cc6e7020da383b2f91954aecb",
+  "analysis/cutcopy-facts.json": "1e340002a1474f1022cce2bf64593356",
   "analysis/cutcopy-selfplay.json": "7c2613ddc6d64d1623ec72b18ee62349",
   "analysis/cutcopy-own.json": "7a124866b74634dadf73486d29e68828",
   "sessions/2026-10-20/sim/replay-facts.json": "4505c50f34a94541c2c0ee0c30f6c9f4",

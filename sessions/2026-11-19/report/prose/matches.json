@@ -1,0 +1,30 @@
+{
+  "eyebrow": "TODO · 戰況直擊",
+  "title": "TODO — 4 場戰況",
+  "lede": "TODO：呢一段導言未寫。",
+  "closer": "TODO：呢句收結未寫。",
+  "hero_match": 4,
+  "score_claim": null,
+  "cards": {
+    "1": {
+      "title": "TODO — 第 1 場標題未寫",
+      "flag": null,
+      "body": "TODO：第 1 場嘅文字未寫。"
+    },
+    "2": {
+      "title": "TODO — 第 2 場標題未寫",
+      "flag": null,
+      "body": "TODO：第 2 場嘅文字未寫。"
+    },
+    "3": {
+      "title": "TODO — 第 3 場標題未寫",
+      "flag": null,
+      "body": "TODO：第 3 場嘅文字未寫。"
+    },
+    "4": {
+      "title": "TODO — 第 4 場標題未寫",
+      "flag": null,
+      "body": "TODO：第 4 場嘅文字未寫。"
+    }
+  }
+}
