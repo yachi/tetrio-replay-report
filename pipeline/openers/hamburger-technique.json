@@ -1,0 +1,614 @@
+{
+  "schema": "technique-shapes/1",
+  "technique": "hamburger",
+  "source": {
+    "url": "https://harddrop.com/wiki/Hamburger",
+    "edit_url": "https://harddrop.com/w/index.php?title=Hamburger&action=edit",
+    "title": "Hamburger",
+    "site": "harddrop.com (Hard Drop Tetris Wiki, MediaWiki)",
+    "author_note": "the page is harddrop's, edited by its wiki editors; it says the method was 「popularized by top Japanese player, Amemiyataiyou」",
+    "oldid": 40054,
+    "parentid": 37877,
+    "revision_sha1": "0d76bcfb514b59fa815a99b83cee6d45b31b2a38",
+    "revision_timestamp": "2024-07-24T13:11:30Z",
+    "updated": "2024-07-24",
+    "revision_note": "MediaWiki's own sha1 of revision 40054 (read from the API), equal to sha1 of the saved bytes: a second authority beside snapshot_sha256, which is ours; the page's latest revision when fetched",
+    "fetched": "2026-11-20",
+    "fetch_method": "the pinned revision's own bytes from the MediaWiki API (api.php?action=query&prop=revisions&titles=Hamburger&rvprop=ids|sha1|content|timestamp&rvslots=main&format=json&formatversion=2), with Python's urllib and a descriptive User-Agent (NOT curl). Boards are {{pfstart}} … {{pfend}} templates, read by route_transcription.wikitext_boards with `wikitext_readings`",
+    "snapshot_file": "Hamburger.wikitext",
+    "snapshot_sha256": "cdd891932856d563798d4cc521852a3c044de834e225c6be61924b6490ff37eb",
+    "snapshot_bytes": 7797,
+    "snapshot_note": "sha256 of the revision's bytes as the API serves them. The page is not committed; the weekly `wikitext-sources` job refetches the pinned revision, checks both hashes and re-runs --wikitext-dir, and fails when the page has a newer revision.",
+    "wikitext_readings": {
+      "SG": "c",
+      "SP": "U",
+      "ST": "t",
+      "SZ": "z",
+      "SI": "i",
+      "SJ": "j",
+      "SL": "l",
+      "SO": "o",
+      "SS": "s"
+    },
+    "wikitext_readings_note": "this page draws every cell with an S-prefixed code: SG grey (read c), SP the T placed (read U), ST a T drawn as a residue or as the soft-dropped T (read t), and SZ, SI, SJ, SL, SO, SS a piece of that letter",
+    "boards_not_transcribed": [
+      {
+        "boards": [
+          6,
+          26
+        ],
+        "heading": "Usages, Opening Setup, Mid Game Conversion",
+        "reason": "opener and conversion boards; recorded in cross_source.page (the window measured on each), not transcribed as nodes"
+      }
+    ],
+    "shiwehi": {
+      "checked": "2026-11-20",
+      "index": "https://shiwehi.com/tetris/template/ (its 中盤テンプレ・ドネイト list names no Hamburger)",
+      "note": "no shiwehi.com page draws this setup, so harddrop's page is the primary source"
+    }
+  },
+  "terms": {
+    "url": "https://harddrop.com/wiki/Hard_Drop_Tetris_Wiki:About",
+    "dated": "not stated: harddrop publishes no licence or terms page for wiki content",
+    "read": "2026-10-15, for SDPC Spin (sdpcspin-routes.json): the page footer and the About page it links (no body); not re-read for this page",
+    "allows": "not stated (no licence is published)",
+    "excludes": "not stated (no licence is published)",
+    "requests": "not stated; credited by link, as this repo credits every harddrop page it reads",
+    "how_met": "source link to the harddrop page in every page header; no ads on GitHub Pages"
+  },
+  "legend": {
+    "orientation": "rows top to bottom as drawn; 10 columns, column 0 the left wall",
+    "-": "empty",
+    "c": "a cell drawn grey (harddrop SG): placed before this diagram, any piece or garbage",
+    "U": "a cell of the T the spin places (harddrop SP)",
+    "t": "a cell drawn as a T (harddrop ST): the soft-dropped T on the second board, a TSS's residue on the repeat and Tetris boards (OUR READING)",
+    "z": "a cell of the Z (the cover on the page's Z build)",
+    "i": "a cell of the I (the Tetris)",
+    "muting": "harddrop never draws the row a spin clears muted, so the spin board is a named `:muting` discrepancy"
+  },
+  "empty_letters": "",
+  "quotes": [
+    {
+      "id": "intro",
+      "verbatim": "'''Hamburger''' is a form of sustainable [[T-Spin Single]] stacking"
+    },
+    {
+      "id": "basic",
+      "verbatim": "The basic idea of Hamburger is to create this basic shape:"
+    },
+    {
+      "id": "initial",
+      "verbatim": "Initial build"
+    },
+    {
+      "id": "softdrop",
+      "verbatim": "Soft Drop T"
+    },
+    {
+      "id": "rotate",
+      "verbatim": "Rotate T, for <br> T-Spin Single"
+    },
+    {
+      "id": "zpiece",
+      "verbatim": "The obvious way to make a Hamburger is to use a Z piece."
+    },
+    {
+      "id": "excess",
+      "verbatim": "After a few iterations, use an I piece to clear the excess."
+    },
+    {
+      "id": "repeat",
+      "verbatim": "Repeat"
+    },
+    {
+      "id": "tetris",
+      "verbatim": "Tetris"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "terrain",
+      "table": 0,
+      "board": 0,
+      "kind": "base",
+      "caption_quote": "initial",
+      "label": "the basic shape: a roof over the T's right end, a cover over a hole two columns left of the nub",
+      "rows": [
+        "----------",
+        "---cc-----",
+        "----c-----",
+        "cc-ccccccc",
+        "-ccccccccc"
+      ]
+    },
+    {
+      "id": "softdrop",
+      "table": 0,
+      "board": 1,
+      "kind": "illustration",
+      "caption_quote": "softdrop",
+      "label": "the T soft-dropped stood up into the slot, before it rotates",
+      "rows": [
+        "----------",
+        "--tcc-----",
+        "-tt-c-----",
+        "cctccccccc",
+        "-ccccccccc"
+      ]
+    },
+    {
+      "id": "spin",
+      "table": 0,
+      "board": 2,
+      "kind": "spin",
+      "caption_quote": "rotate",
+      "label": "the T rotated flat, nub down: a T-spin Single clearing the cover's row",
+      "rows": [
+        "----------",
+        "---cc-----",
+        "-UUUc-----",
+        "ccUccccccc",
+        "-ccccccccc"
+      ],
+      "spin_of": "terrain",
+      "spin_piece": "U",
+      "spin": "TSS",
+      "lines": 1
+    },
+    {
+      "id": "zbuild",
+      "table": 1,
+      "board": 0,
+      "kind": "base",
+      "caption_quote": "zpiece",
+      "label": "the same shape built with a Z: the Z is the cover and the row under it",
+      "rows": [
+        "----------",
+        "---cc-----",
+        "----c-----",
+        "zz-ccccccc",
+        "-zzccccccc"
+      ],
+      "same_occupancy_as": "terrain"
+    },
+    {
+      "id": "repeat",
+      "table": 2,
+      "board": 0,
+      "kind": "illustration",
+      "caption_quote": "repeat",
+      "label": "the shape again on top of the last cycle's residue: the well under it is deeper",
+      "rows": [
+        "----------",
+        "----------",
+        "---cc-----",
+        "----c-----",
+        "cc-ccccccc",
+        "-ccccccccc",
+        "-tttcccccc",
+        "-ccccccccc"
+      ]
+    },
+    {
+      "id": "tetris",
+      "table": 2,
+      "board": 1,
+      "kind": "illustration",
+      "caption_quote": "tetris",
+      "label": "a few cycles later: an I into the well clears the excess",
+      "rows": [
+        "----------",
+        "---cc-cccc",
+        "-tttcccccc",
+        "-ccccccccc",
+        "itttcccccc",
+        "iccccccccc",
+        "itttcccccc",
+        "iccccccccc"
+      ]
+    },
+    {
+      "id": "spin.after",
+      "kind": "derived",
+      "derived": true,
+      "caption_quote": "rotate",
+      "label": "what the TSS leaves (the page does not draw it): the well column open from the top to the floor",
+      "rows": [
+        "----------",
+        "----------",
+        "---cc-----",
+        "-tttc-----",
+        "-ccccccccc"
+      ],
+      "after_of": "spin"
+    }
+  ],
+  "page_order": [
+    "terrain",
+    "softdrop",
+    "spin",
+    "zbuild",
+    "repeat",
+    "tetris"
+  ],
+  "basic_form": [],
+  "variants": [
+    {
+      "id": "hamburger",
+      "board": "spin",
+      "spin": "TSS",
+      "lines": 1,
+      "window_basis": "agreement",
+      "window": {
+        "rows": [
+          1,
+          4
+        ],
+        "cols": [
+          0,
+          4
+        ]
+      },
+      "t_cells": [
+        [
+          2,
+          1
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          3,
+          2
+        ]
+      ],
+      "roof_cells": [
+        [
+          1,
+          3
+        ],
+        [
+          1,
+          4
+        ]
+      ],
+      "window_note": "in spin's frame, row 0 the top: the AGREEMENT BOX of the page's basic board, its two opener drawings with the T in (cross_source.page.drawings) and SDPC Spin's and stick spin's bag 1. Row 1 is the roof over the T's right end, open over the well; row 2 the T's row (the well cell left of it empty, the stack right of it filled); row 3 the row the TSS clears (the cover at the well and next to the nub, entailed by the clear at a full TSS, NaiveClauseForced); row 4 the hole under the cover at the well, filled beyond it. Occupancy only, never colour; garbage is filled, so a hole that is a garbage row's hole counts.",
+      "agreement": [
+        {
+          "board": "terrain",
+          "t_cells": [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "zbuild",
+          "t_cells": [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "repeat",
+          "t_cells": [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              4,
+              2
+            ]
+          ],
+          "mirrored": false
+        }
+      ],
+      "untested_drawn": {
+        "cells": [],
+        "reason": ""
+      },
+      "payoff": {
+        "kind": "well_quad",
+        "board": "spin.after",
+        "piece": "I",
+        "lines": 4,
+        "well_cell_pre_clear": [
+          4,
+          0
+        ],
+        "well_cell_after": [
+          4,
+          0
+        ],
+        "note": "a Tetris into the well, the step the page names (「After a few iterations, use an I piece to clear the excess.」) and draws (its Tetris board). A well that the next piece into its column fills without a Tetris is another cycle of the stacking (the page's Repeat board), not a failure; the matcher carries the well cell to the first later lock that puts a cell in its column and asks whether that lock is an I the engine credits with four lines"
+      },
+      "fires_on": [
+        "terrain",
+        "zbuild",
+        "repeat"
+      ],
+      "misses": [
+        "softdrop",
+        "tetris",
+        "spin.after"
+      ]
+    }
+  ],
+  "cross_source": {
+    "kind": "routes",
+    "label_pattern": "hamburger",
+    "note": "the window, by the gate's predicate (technique_transcription.window_fires), over every U-slot board of every committed *-routes.json, with the U cells as the T: it fires on SDPC Spin's two bag-1 TSS boards (harddrop's SDPC_Spin page, another page) and on stick spin's bag-1 TSS board mirrored (shiwehi.com, another site). Those three are also the window's external agreement drawings, beside the page's own two opener drawings (`page`).",
+    "fires": [
+      {
+        "file": "sdpcspin-routes.json",
+        "node": "bag1.lj",
+        "variant": "hamburger",
+        "mirrored": false,
+        "note": "SDPC Spin's bag-1 T-spin Single, the L under the J"
+      },
+      {
+        "file": "sdpcspin-routes.json",
+        "node": "bag1.jl",
+        "variant": "hamburger",
+        "mirrored": false,
+        "note": "SDPC Spin's bag-1 T-spin Single, the J under the L"
+      },
+      {
+        "file": "stickspin-routes.json",
+        "node": "bag1.pc",
+        "variant": "hamburger",
+        "mirrored": true,
+        "note": "stick spin's bag-1 T-spin Single laid flat (パフェ派生), mirrored"
+      }
+    ],
+    "also": [],
+    "labelled_not_fired": [],
+    "page": {
+      "note": "every board of the pinned revision after the six transcribed ones, read with `wikitext_readings`. A board whose drawn T (SP) the window fires on is a `drawing` (an agreement drawing); a board with a drawn T the window misses is in `drawn_t_not_fired` with how the T lies and why; a board with no T drawn on which a resting T placement fires is in `fires_without_slot`, one entry per hand. Complete both ways, measured by the gate on every --wikitext-dir run.",
+      "drawings": [
+        {
+          "board": 8,
+          "section": "Usages",
+          "rows": [
+            "----------",
+            "---ccccccc",
+            "---ccccccc",
+            "-UUUcccccc",
+            "zzUccccccc",
+            "-zzccccccc"
+          ],
+          "t_cells": [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              4,
+              2
+            ]
+          ],
+          "mirrored": false,
+          "note": "the Usages board drawn with the T in, on a Z cover and a full stack"
+        },
+        {
+          "board": 20,
+          "section": "Opening Setup",
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "---ll----i",
+            "-UUUloo--i",
+            "zzUjloossi",
+            "-zzjjjss-i"
+          ],
+          "t_cells": [
+            [
+              4,
+              1
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              5,
+              2
+            ]
+          ],
+          "mirrored": false,
+          "note": "the Sailboat opener's first T-spin, a Hamburger on its Z"
+        }
+      ],
+      "drawn_t_not_fired": [
+        {
+          "board": 6,
+          "section": "Usages",
+          "rows": [
+            "----------",
+            "---ccccccc",
+            "--Uccccccc",
+            "--UUcccccc",
+            "zzUccccccc",
+            "-zzccccccc"
+          ],
+          "lie": "stood up",
+          "reason": "not the window's T",
+          "note": "the T stood up into the slot, for a Tetris (「rotate the T piece once or twice」)"
+        },
+        {
+          "board": 22,
+          "section": "Opening Setup",
+          "rows": [
+            "----------",
+            "--i-z---ll",
+            "ooizz----l",
+            "ooizUUUssl",
+            "jjiccUss-c",
+            "jcccccc--c",
+            "jccccccc-c"
+          ],
+          "lie": "flat, nub down",
+          "reason": "disagrees",
+          "note": "the Sailboat example's T-spin Single on its right; the cell over the well side is filled"
+        },
+        {
+          "board": 24,
+          "section": "Opening Setup",
+          "rows": [
+            "----------",
+            "----------",
+            "--c-c---cc",
+            "ccccc----c",
+            "ccccccccUc",
+            "cccccccUUc",
+            "ccccccccUc"
+          ],
+          "lie": "stood up",
+          "reason": "not the window's T",
+          "note": "the T-spin Triple the Sailboat example ends with"
+        }
+      ],
+      "fires_without_slot": [
+        {
+          "board": 6,
+          "mirrored": false,
+          "note": "beside its drawn stood T, the flat T fires at the same slot"
+        },
+        {
+          "board": 11,
+          "mirrored": false,
+          "note": "Requires J before L"
+        },
+        {
+          "board": 12,
+          "mirrored": false,
+          "note": "Hamburger completed"
+        },
+        {
+          "board": 13,
+          "mirrored": true,
+          "note": "Mirrored version (L before J)"
+        },
+        {
+          "board": 15,
+          "mirrored": false,
+          "note": "Get creative"
+        },
+        {
+          "board": 16,
+          "mirrored": false,
+          "note": "ST Stacking start"
+        },
+        {
+          "board": 17,
+          "mirrored": false,
+          "note": "ST Stacking start"
+        },
+        {
+          "board": 18,
+          "mirrored": false,
+          "note": "ST Stacking start"
+        },
+        {
+          "board": 19,
+          "mirrored": false,
+          "note": "ST Stacking start"
+        },
+        {
+          "board": 25,
+          "mirrored": false,
+          "note": "Opener"
+        },
+        {
+          "board": 26,
+          "mirrored": false,
+          "note": "2nd Bag Conversion"
+        }
+      ]
+    },
+    "other_techniques": [
+      {
+        "file": "basicdonating-technique.json",
+        "node": "tonbo.burger",
+        "mirrored": true,
+        "note": "とんぼ's video's ハンバーガー積み template (another author), as 基本的なドネイト's file transcribes it, mirrored"
+      },
+      {
+        "file": "basicdonating-technique.json",
+        "node": "tonbo.burger_play",
+        "mirrored": true,
+        "note": "the same board with the T played"
+      }
+    ]
+  },
+  "known_discrepancies": [
+    {
+      "id": "spin:muting",
+      "note": "harddrop draws the row the TSS clears in the same letters as the rest (it never mutes a cleared row)"
+    },
+    {
+      "id": "repeat:colour",
+      "note": "the last cycle's T is three cells after its TSS (the fourth was in the cleared row): a piece cut by a line clear, not a whole T"
+    },
+    {
+      "id": "tetris:colour",
+      "note": "three cycles' T residues, three cells each, drawn as harddrop draws them (ST)"
+    }
+  ]
+}

@@ -5232,7 +5232,7 @@ fail. Their matchable children whose parent is never filed are named in `CLASSIF
 The shared edit moved every sibling's artefacts in their md5 lines only and none of their pages
 (no sibling profile names a `uFiresBefore` node, so `noUBefore` cannot reach them).
 
-## 中盤手法頁（STSD、STMB Cave、インペリアルクロス、ダブルダガー、BT砲、千鳥格子、社畜トレイン、欄干、階段のドネイト、途中DT砲、基本的なドネイト、King Crimson、Cave TSS 接 TST）— every mid-game technique page, quarantined like the route pages
+## 中盤手法頁（STSD、STMB Cave、インペリアルクロス、ダブルダガー、BT砲、千鳥格子、社畜トレイン、欄干、階段のドネイト、途中DT砲、基本的なドネイト、King Crimson、Cave TSS 接 TST、ハンバーガー）— every mid-game technique page, quarantined like the route pages
 
 shiwehi.com's 「中盤テンプレ・ドネイト」 pages draw a technique on a PARTIAL stack, at whatever lock it
 happens, which the route machinery cannot express: `route-facts.ts` compares whole boards (at most 8
@@ -5240,7 +5240,7 @@ rows, bottom-aligned) at fixed lock counts from an empty board, behind a bag-1 g
 pages are a SIBLING framework that imports the route code and edits none of it — no route artefact's
 hash line and no route page moved when it landed. STSD (`template/stsd.php`) is the first page,
 STMB Cave (`template/stmbcave.php`) the second, インペリアルクロス (`template/imperialcross.php`) the third and
-ダブルダガー (`template/doubledagger.php`) the fourth, BT砲 (`template/btcannon.php`) the fifth, 千鳥格子 (`template/cutcopy.php`) the sixth, 社畜トレイン (`template/shachikutrain.php`) the seventh, 欄干 (`template/parapet.php`) the eighth, 階段のドネイト (`template/kaidansetup.php`) the ninth, 途中DT砲 (`template/dtcannon.php`) the tenth, 基本的なドネイト (`template/basicdonating.php`) the eleventh, King Crimson (harddrop's `King_Crimson`, the first not from shiwehi.com) the twelfth and Cave TSS 接 TST (harddrop's T-Spin_Triple_Setups and a YouTube short) the thirteenth (each later one has a ### below); a later technique whose shape the window
+ダブルダガー (`template/doubledagger.php`) the fourth, BT砲 (`template/btcannon.php`) the fifth, 千鳥格子 (`template/cutcopy.php`) the sixth, 社畜トレイン (`template/shachikutrain.php`) the seventh, 欄干 (`template/parapet.php`) the eighth, 階段のドネイト (`template/kaidansetup.php`) the ninth, 途中DT砲 (`template/dtcannon.php`) the tenth, 基本的なドネイト (`template/basicdonating.php`) the eleventh, King Crimson (harddrop's `King_Crimson`, the first not from shiwehi.com) the twelfth Cave TSS 接 TST (harddrop's T-Spin_Triple_Setups and a YouTube short) the thirteenth and ハンバーガー (harddrop's `Hamburger`) the fourteenth (each later one has a ### below); a later technique whose shape the window
 predicate can express is a data addition (a transcription
 module + JSON, a facts profile, a demos profile, a page profile + prose, one registry line per side,
 two tests, three CI steps, one `TECHNIQUE_SITES` entry).
@@ -6174,9 +6174,45 @@ other technique's board fires it. No demo is built: the terrain and the board be
 planner limit), the board after it has covers only with a T (enumerated in the demos test), and the TST board is odd. The
 corpus has one hit, which qualifies; whether its follow-up fired, and the named lists and mutants, are the tests'.
 
+### ハンバーガー（Hamburger）
+
+The same deliverable for harddrop's `Hamburger` page (「a form of sustainable T-Spin Single stacking」), pinned by revision
+like King Crimson's (oldid, `revision_sha1`, sha256 and bytes, urllib through `api.php`), so `check_wikitext_sources`
+discovers it and re-reads it weekly: `pipeline/openers/hamburger-technique.json` (held as a literal in
+`extract_hamburger_shapes.py`), `technique-profile-hamburger.ts` → `analysis/hamburger-facts.json` (`hamburger.test.ts`),
+`technique-demos-hamburger.ts` → `analysis/hamburger-demos.json` (`hamburger-demos.test.ts`), and `docs/hamburger.html` +
+`docs/hamburger-demos.html` from `hamburger_page.py` + `hamburger_prose.json`, the fourteenth card under 中盤手法. Every
+figure is read off the artefacts and tests, never typed here.
+
+**A full TSS, the T flat and nub down, whose clear opens a well two columns from the nub.** A piece covers the hole and the
+cell between it and the nub (the row the TSS clears); the window is the agreement box of the page's three drawings of the
+shape and SDPC Spin's and stick spin's bag 1 (`cross_source.fires`, measured both ways; their bag-1 TSS IS this shape, so
+the opener hits are pinned by name in the test against both route artefacts and counted in the `in_opener` column, never
+dropped). Garbage is filled, so a garbage row's hole counts as the hole. The payoff is 欄干's `well_quad`: the page stacks
+the shape again over the well several times before the I (「After a few iterations, use an I piece to clear the
+excess.」), so the prose words `well_covered` / `well_filled_not_i` as 「再疊多層（重複）」, never as a miss. The payoff board
+is DERIVED (`spin.after`, the page draws no after board), which needed one opt-in in `technique_transcription.py`'s payoff
+rule; every other gate's output is byte-identical.
+
+**The cover is yachi's rule (「用S/Z 砌hamburger 先算，除非有其他完整piece 砌到」).** The two cover cells and the roof are
+`QUALIFY_OPTIONS.hamburger`'s key cells, so `fragment` / `garbage_in_shape` refuse a cover of garbage or a cut piece, and
+no single piece is required. `hamburger-cover.ts` adds a `cover` field to every hit (`one_sz`, `complete_pieces`,
+`not_complete`, or null when ownership is unverified), and the overview and the index card split the qualifying count by it
+through `technique_page.py`'s opt-in `split_field` (`qualify.split` and `index_card.split` in the prose; a qualifying value
+the prose does not name is a build error). `bin/build-docs` prints a card's optional `meta_note`; every other card is
+byte-identical. A coordinator probe scored only locks strictly inside the verified prefix; the hits on its last lock are
+named in the test (`AT_VERIFIED_EDGE`) and are the whole difference.
+
+**Overlaps, measured in the test:** 欄干's TSS (its T stood) and Cave TSS 接 TST (a mini) share no hit; 基本的なドネイト's TSS
+rule fires on many of the same T's, and since `hamburger` joined its `OTHER_PAGES` those are this page's, so
+基本的なドネイト's artefact moved in content and its tests were repinned. Adding `hamburger` to `technique-qualify.ts`
+moved every artefact hashing it in its hash lines only (checked with `git diff`). No demo is built: every board but the
+Tetris one has an odd cell count (a proof); the Tetris board is even but over the planner's limit. Named lists and their
+sizes live in the two tests.
+
 ### 用完整方塊砌出嚟先算 — the shared `qualify` hook of the other nine pages
 
-STSD, STMB Cave, インペリアルクロス, ダブルダガー, BT砲, 千鳥格子, 階段のドネイト, 途中DT砲, King Crimson and Cave TSS 接 TST carry the same build rules as 社畜トレイン
+STSD, STMB Cave, インペリアルクロス, ダブルダガー, BT砲, 千鳥格子, 階段のドネイト, 途中DT砲, King Crimson, Cave TSS 接 TST and ハンバーガー carry the same build rules as 社畜トレイン
 and 欄干 (yachi, 2026-10-23: 「睇埋其他中盤」), through ONE module, `pipeline/sim/technique-qualify.ts`
 (`techniqueQualifier`, `QUALIFY_OPTIONS`), gated by `pipeline/openers/technique-qualify.test.ts`. A hit qualifies iff each of
 its variant's KEY cells is a cell of a complete piece and never garbage (`fragment`, `garbage_in_shape`), a piece the page

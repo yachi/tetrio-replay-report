@@ -480,7 +480,9 @@ def payoff_problems(v: dict, byid: dict, rows: list[str], fr: set, spec: Techniq
     bad = []
     p = v['payoff']
     ab = byid.get(p['board'], {})
-    if ab.get('kind') != 'after' or ab.get('after_of') != v['board']:
+    # opt-in: a DERIVED after board (`derived: true` with `after_of`) when the page never draws what the spin leaves
+    # (ハンバーガー); the after rule then checks it exactly rather than as a measured slip
+    if not (ab.get('kind') == 'after' or (ab.get('derived') and 'after_of' in ab)) or ab.get('after_of') != v['board']:
         bad.append(f'window: {v["id"]}: the payoff board {p["board"]} is not the after board of {v["board"]}')
         return bad
     if p.get('kind') != 'well_quad' or p.get('piece') != 'I' or p.get('lines') != 4:
@@ -631,13 +633,18 @@ def verify(data: dict, spec: TechniqueSpec) -> list[str]:
 
     # after
     for n in nodes:
-        if n['kind'] != 'after':
+        derived_after = bool(n.get('derived')) and 'after_of' in n
+        if n['kind'] != 'after' and not derived_after:
             continue
         sp = byid[n['after_of']]
         got, _ = after_spin([''.join('t' if (r, c) in spin_cells(sp) else ('-' if is_empty(ch, spec) else 'c')
                                      for c, ch in enumerate(row)) for r, row in enumerate(sp['rows'])])
         if bottom(occ_of(got, spec), MAX_ROWS) != bottom(occ_of(n['rows'], spec), MAX_ROWS):
-            measured.add(f'{n["id"]}:after')
+            if derived_after:
+                # nobody drew it, so a difference is ours: refused, never a measured slip
+                bad.append(f'after: derived {n["id"]} is not what {n["after_of"]} leaves')
+            else:
+                measured.add(f'{n["id"]}:after')
 
     # build / derived
     for n in nodes:
@@ -659,7 +666,7 @@ def verify(data: dict, spec: TechniqueSpec) -> list[str]:
             k = n.get('extra_bottom_rows', 0)
             if bottom(occ_of(n['rows'][:len(n['rows']) - k], spec), MAX_ROWS) != bottom(occ_of(e, spec), MAX_ROWS):
                 bad.append(f'build: {n["id"]} less its bottom {k} row(s) is not {n["extends"]} by occupancy')
-        if n.get('derived') and not any(m.get('on') == n['id'] for m in nodes):
+        if n.get('derived') and 'after_of' not in n and not any(m.get('on') == n['id'] for m in nodes):
             bad.append(f'build: derived {n["id"]} is no board\'s `on`')
 
     # window
@@ -757,7 +764,7 @@ def verify(data: dict, spec: TechniqueSpec) -> list[str]:
 
     # colour
     for n in nodes:
-        if n['kind'] == 'after':
+        if n['kind'] == 'after' or (n.get('derived') and 'after_of' in n):
             continue   # its letters are pieces cut by the clear; the after rule checks it
         if piece_groups_ok(n['rows'], spec.upper_groups):
             measured.add(f'{n["id"]}:colour')

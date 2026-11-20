@@ -601,6 +601,8 @@ OTHER_WINDOWS = {
         {'file': 'shachikutrain-technique.json', 'variant': 'shachikutrain', 'board': 'harddrop #15', 'cells': [[2, 3], [2, 4], [2, 5], [3, 4]], 'mirrored': [False]},
         {'file': 'shachikutrain-technique.json', 'variant': 'shachikutrain', 'board': 'harddrop #14', 'cells': [[2, 3], [2, 4], [2, 5], [3, 4]], 'mirrored': [False]},
         {'file': 'stsd-technique.json', 'variant': 'stsd', 'board': 'harddrop_anchor_set #20', 'cells': [[3, 1], [4, 1], [4, 2], [5, 1]], 'mirrored': [True]},
+        {'file': 'hamburger-technique.json', 'variant': 'hamburger', 'board': 'harddrop #83', 'cells': [[3, 6], [3, 7], [3, 8], [4, 7]], 'mirrored': [True]},
+        {'file': 'hamburger-technique.json', 'variant': 'hamburger', 'board': 'harddrop #86', 'cells': [[3, 6], [3, 7], [3, 8], [4, 7]], 'mirrored': [True]},
     ],
     #: anchored on the same flat T, in the same hand: the cells both windows read (the T aside) and where they clash
     'shachikutrain_relation': {'as_drawn': {'shared': 16, 'clash': []}, 'mirrored': {'shared': 16, 'clash': []}},

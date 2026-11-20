@@ -29,7 +29,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
    '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19']);
 
-const KEYS = ['stsd', 'stmbcave', 'imperialcross', 'doubledagger', 'btcannon', 'cutcopy', 'kaidan', 'dtcannon', 'kingcrimson', 'cavetsstst'] as const;
+const KEYS = ['stsd', 'stmbcave', 'imperialcross', 'doubledagger', 'btcannon', 'cutcopy', 'kaidan', 'dtcannon', 'kingcrimson', 'cavetsstst', 'hamburger'] as const;
 
 const BY_PLAYER: Record<string, any> = {
   stsd: { pinglamb: { qualified: 26, not_qualified: {} }, yachi: { qualified: 62, not_qualified: { dpc: 1, fragment: 2, ownership_unverified: 1 } } },
@@ -42,9 +42,10 @@ const BY_PLAYER: Record<string, any> = {
   dtcannon: { pinglamb: { qualified: 0, not_qualified: {} }, yachi: { qualified: 33, not_qualified: { ownership_unverified: 1 } } },
   kingcrimson: { pinglamb: { qualified: 1, not_qualified: {} }, yachi: { qualified: 0, not_qualified: {} } },
   cavetsstst: { pinglamb: { qualified: 1, not_qualified: {} }, yachi: { qualified: 0, not_qualified: {} } },
+  hamburger: { pinglamb: { qualified: 8, not_qualified: { dpc: 1, fragment: 28, garbage_in_shape: 6 } }, yachi: { qualified: 101, not_qualified: { dpc: 1, fragment: 72, garbage_in_shape: 11, ownership_unverified: 2 } } },
 };
 
-/** every hit that does not qualify, with its reasons (階段のドネイト: the tally above only) */
+/** every hit that does not qualify, with its reasons (階段のドネイト and ハンバーガー: the tally above only) */
 const NOT_QUALIFIED: Record<string, string[]> = {
   stsd: [
     "2026-07-24 m2r1 yachi lock 32 (stsd): dpc",

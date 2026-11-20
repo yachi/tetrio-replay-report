@@ -329,7 +329,7 @@ def render_index(cards, totals, pooled_html=None, replays=(), openers=None, tech
                 f"<a class='card' href='{escape(o['href'])}'>"
                 f"<div class='date'>{escape(o['kicker'])}</div>"
                 f"<div class='title'>{escape(o['title'])}</div>"
-                f"<div class='meta'>{o['cases']} 個個案</div>"
+                f"<div class='meta'>{o['cases']} 個個案{escape(o.get('meta_note', ''))}</div>"
                 f"<p class='blurb'>{escape(o['blurb'])}</p>"
                 "<span class='pill'>模擬器 · 唔喺證明鏈入面</span></a>")
         parts.append("</div>")

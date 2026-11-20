@@ -1092,6 +1092,15 @@ jobs:
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_cavetsstst_shapes
 
+      # The fourteenth technique page, ハンバーガー (harddrop's Hamburger page): sustainable T-spin Single stacking, a flat
+      # nub-down T whose TSS clears the row covering a hole two columns from the nub, the well then open to the floor.
+      # Its window is the agreement box of the page's three drawings of the shape and SDPC Spin's and stick spin's bag 1;
+      # the corpus artefact and the demos are checked by pipeline/openers/hamburger.test.ts and hamburger-demos.test.ts
+      # in the typescript job.
+      - name: Check the Hamburger technique transcription
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_hamburger_shapes
+
       # The DPC page: what the first T-spin after each Perfect Clear was built on, against the setups
       # とんぼ's DPC video catalogues (read off its frames; nothing refetches it, a re-read needs the video
       # and --video). Its PC points are
@@ -1265,6 +1274,10 @@ jobs:
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_cavetsstst_shapes --selftest
 
+      - name: Check the Hamburger technique transcription gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_hamburger_shapes --selftest
+
       - name: Check the DPC setups transcription gate catches its mutants
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_dpc_setups --selftest
@@ -1431,6 +1444,10 @@ jobs:
       - name: Check the Cave TSS to TST technique page audit catches its corruptions
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.cavetsstst_page --selftest
+
+      - name: Check the Hamburger technique page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.hamburger_page --selftest
 
       - name: Check the DPC page audit catches its corruptions
         if: env.INPUTS_UNCHANGED != '1'
