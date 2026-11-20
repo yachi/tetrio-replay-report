@@ -512,6 +512,8 @@ OTHER_WINDOWS = {
         {'file': 'kaidan-technique.json', 'variant': 'kaidan', 'board': 'tonbo.kaidan', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [False]},
         {'file': 'kaidan-technique.json', 'variant': 'kaidan', 'board': 'tonbo.kaidan_play', 'cells': [[3, 6], [3, 7], [3, 8], [4, 7]], 'mirrored': [False]},
         {'file': 'kaidan-technique.json', 'variant': 'kaidan', 'board': 'yuukun.kaidan_play', 'cells': [[3, 1], [3, 2], [3, 3], [4, 2]], 'mirrored': [True]},
+        {'file': 'hamburger-technique.json', 'variant': 'hamburger', 'board': 'tonbo.burger', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [True]},
+        {'file': 'hamburger-technique.json', 'variant': 'hamburger', 'board': 'tonbo.burger_play', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [True]},
         {'file': 'parapet-technique.json', 'variant': 'parapet', 'board': 'one.l_a', 'cells': [[2, 1], [2, 2], [2, 3], [3, 2]], 'mirrored': [False]},
         {'file': 'parapet-technique.json', 'variant': 'parapet_tss', 'board': 'one.l_a', 'cells': [[1, 2], [2, 2], [2, 3], [3, 2]], 'mirrored': [False]},
         {'file': 'shachikutrain-technique.json', 'variant': 'shachikutrain', 'board': 'q1.1.answer', 'cells': [[4, 3], [4, 4], [4, 5], [5, 4]], 'mirrored': [False]},
@@ -650,6 +652,7 @@ NAMED_FORMS = [
     ('one.s', 'kaidan-technique.json', 'kaidan'),           # %Sドネイト(=階段のドネイト)
     ('one.l_a', 'parapet-technique.json', 'parapet'),       # %LドネイトA(=欄干)
     ('two.sz_a', 'stmbcave-technique.json', 'stmbcave'),    # %S%ZドネイトA(=STMB Cave)
+    ('tonbo.burger', 'hamburger-technique.json', 'hamburger'),  # とんぼ's ハンバーガー積み (harddrop's Hamburger)
 ]
 
 

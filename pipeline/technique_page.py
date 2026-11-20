@@ -119,6 +119,11 @@ class TechniqueSiteProfile:
     #: its words `sections.practice_link` in the prose (千鳥格子: docs/practice-cutcopy.html, rendered by
     #: `cutcopy_practice_page`). Empty: no link, and the page is byte for byte what it was
     practice_href: str = ""
+    #: opt-in, with `corpus_qualified_only`: a field every hit carries, by whose values the qualifying hits are split
+    #: on the overview and on the index card (ハンバーガー: `cover`, one S/Z against other whole pieces). The values, in
+    #: order, and their words are the prose's `qualify.split`; a qualifying hit with a value the prose does not name is
+    #: a build error. Empty: no split, and every page is byte for byte what it was
+    split_field: str = ""
 
 
 def case_key(h):
@@ -209,8 +214,25 @@ class TechniqueSite:
 
     # ------------------------------------------------------------ figures
 
+    def split_counts(self, art):
+        """Opt-in (`split_field`): the qualifying hits of every variant, counted by that field's value, in the prose's
+        order. A value the prose does not name is a build error, never a dropped hit."""
+        vids = {vid for vid, _opp in self.VARIANTS}
+        order = [v for v, _w in self.PROSE["qualify"]["split"]["values"]]
+        counts = dict.fromkeys(order, 0)
+        for h in art["hits"]:
+            if h["variant"] in vids and h["qualifies"]:
+                v = str(h[self.p.split_field])
+                if v not in counts:
+                    raise SystemExit(f"{self.p.module}: a qualifying hit has {self.p.split_field} {v!r}, which "
+                                     "qualify.split does not name")
+                counts[v] += 1
+        return counts
+
     def _qualified_only(self, art, n, showcase=None):
         out = {"qualified": str(n)}
+        if self.p.split_field:
+            out.update({f"split.{v}": str(k) for v, k in self.split_counts(art).items()})
         if self.p.showcase:
             # the showcase under `corpus_qualified_only` ranges over the qualifying hits of the primary variant
             out["showcase"] = _nn(len(self.showcase_hits(art)) if showcase is None else showcase,
@@ -673,10 +695,14 @@ class TechniqueSite:
     def _qualified_only_section(self, fig):
         """Opt-in (`corpus_qualified_only`): the rules and how many hits pass them, and nothing else of the corpus."""
         Q = self.PROSE["qualify"]
-        return ['  <section class="scp-sec">', f'    <h2>{_esc(Q["title"])}</h2>', f'    <p>{_esc(Q["note"])}</p>',
+        return (['  <section class="scp-sec">', f'    <h2>{_esc(Q["title"])}</h2>', f'    <p>{_esc(Q["note"])}</p>',
                 f'    <p class="scp-count">{_esc(Q["summary_lead"])}<span data-figure="qualified">'
-                f'{_esc(fig["qualified"])}</span>{_esc(Q["summary_unit"])}</p>',
-                f'    <p>{_esc(Q["summary_note"])}</p>', "  </section>"]
+                f'{_esc(fig["qualified"])}</span>{_esc(Q["summary_unit"])}</p>']
+                + ([f'    <p>{_esc(Q["split"]["lead"])}' + _esc(Q["split"]["join"]).join(
+                    f'{_esc(w)}<span data-figure="split.{_esc(v)}">{_esc(fig["split." + v])}</span>'
+                    f'{_esc(Q["summary_unit"])}' for v, w in Q["split"]["values"]) + '</p>']
+                   if self.p.split_field else [])
+                + [f'    <p>{_esc(Q["summary_note"])}</p>', "  </section>"])
 
     def _qualify_section(self, art, fig, users):
         """Opt-in (社畜トレイン, the artefact's `qualify`): of the hits, which were BUILT as the technique, and
@@ -1474,6 +1500,9 @@ class TechniqueSite:
                 if to:
                     by["qualified"] += 1
                     h["qualifies"], h["not_qualified"] = True, []
+                    if self.p.split_field:
+                        # (a hit turned qualifying needs a value the split names, as a real one has)
+                        h[self.p.split_field] = self.PROSE["qualify"]["split"]["values"][0][0]
                 else:
                     by["qualified"] -= 1
                     by["not_qualified"]["fragment"] = by["not_qualified"].get("fragment", 0) + 1
@@ -1534,5 +1563,9 @@ def site_card(site, art):
     if site.p.corpus_qualified_only:
         # the page lists no hit, so the card counts what the page reports: the hits that pass `qualify`
         hits = [h for h in hits if h["qualifies"]]
-    return {"href": site.OVERVIEW, "cases": len(hits),
-            "kicker": card["kicker"], "title": site.PROSE["overview_title"], "blurb": card["blurb"]}
+    out = {"href": site.OVERVIEW, "cases": len(hits),
+           "kicker": card["kicker"], "title": site.PROSE["overview_title"], "blurb": card["blurb"]}
+    if site.p.split_field:
+        # opt-in: the qualifying count split by the profile's field, words from the prose's index_card.split
+        out["meta_note"] = card["split"].format(**site.split_counts(art))
+    return out

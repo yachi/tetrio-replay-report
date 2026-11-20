@@ -4854,6 +4854,58 @@
           "mirrored": [
             true
           ]
+        },
+        {
+          "file": "hamburger-technique.json",
+          "variant": "hamburger",
+          "board": "harddrop #83",
+          "cells": [
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              7
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "hamburger-technique.json",
+          "variant": "hamburger",
+          "board": "harddrop #86",
+          "cells": [
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              7
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
         }
       ],
       "shachikutrain_relation": {

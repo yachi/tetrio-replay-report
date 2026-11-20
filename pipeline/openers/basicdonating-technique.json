@@ -3696,6 +3696,58 @@
           ]
         },
         {
+          "file": "hamburger-technique.json",
+          "variant": "hamburger",
+          "board": "tonbo.burger",
+          "cells": [
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              7
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "hamburger-technique.json",
+          "variant": "hamburger",
+          "board": "tonbo.burger_play",
+          "cells": [
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              7
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
           "file": "parapet-technique.json",
           "variant": "parapet",
           "board": "one.l_a",

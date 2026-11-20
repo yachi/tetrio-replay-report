@@ -1,0 +1,453 @@
+{
+ "schema": "technique-demos/1",
+ "report_eligible": false,
+ "constructed": true,
+ "technique": "hamburger",
+ "means": "One constructed replay per Hamburger build board the planner can build: from an empty board, the terrain built out of pieces WE chose, then the page's own pieces, then the flat T into the TSS that opens the well. Run through the vendored Triangle engine. A board no demo stands on is published unbuilt with its reason.",
+ "not_eligible_because": "constructed, not played: the queue, the hold and the key inputs are ours, and the terrain's pieces are ours too (harddrop draws it grey). No claim id, no badge, no figure in any count.",
+ "caveat": "a demo stands only on what the planner can build from an empty board without clearing a line; harddrop draws this technique on a terrain whose cell count is odd, which no such build reaches.",
+ "rules": [
+  "a demo starts from an empty board, as every decoder does; the terrain is an exact cover of its grey cells by pieces the planner chose, every one reachable from spawn by the engine's own moves, no line cleared",
+  "the page's own pieces are the build board's lower-case letters, one whole piece per letter",
+  "the flat T is the one T placement at which the corpus window (technique-facts.ts windowMatch, as drawn) matches the build board, and must be credited a full T-spin clearing the variant's lines",
+  "a variant with a payoff in place of a follow-up ends the demo on the stood T",
+  "the engine is the arbiter: every lock must land where the plan put it, with its spin, lines and hold flag"
+ ],
+ "engine": {
+  "options": {
+   "g": 0,
+   "gincrease": 0,
+   "gmargin": 0,
+   "seed": 0,
+   "handling": {
+    "das": 8,
+    "arr": 2,
+    "sdf": 20,
+    "dcd": 0,
+    "safelock": false,
+    "cancel": false,
+    "irs": "off",
+    "ihs": "off",
+    "may20g": false
+   }
+  },
+  "kickset": "SRS+",
+  "allow180": true,
+  "date": "2026-11-20T00:00:00.000Z",
+  "frames_per_input": 4
+ },
+ "inputs": {
+  "transcription_md5": "5f8b1b9b9b46e2e6783250437b7a7f4d",
+  "planner_md5": "97e4608854e9255ef0668af543b4bae3",
+  "emit_replay_md5": "2acf99b059380595cc3fa14df268e8bb",
+  "classifier_md5": "629505faca6158721ce714e7aefccae3"
+ },
+ "board": {
+  "width": 10,
+  "rows": 40,
+  "visible_rows": 20,
+  "coords": "y-UP: row 0 is the bottom row",
+  "cell": "yUp * width + x"
+ },
+ "lock_fields": [
+  "dframe",
+  "place",
+  "lines",
+  "spin",
+  "garbage",
+  "held",
+  "attack",
+  "sent"
+ ],
+ "shapes": {
+  "I": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     3,
+     0
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     0,
+     3
+    ]
+   ]
+  ],
+  "O": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ]
+   ]
+  ],
+  "T": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     1,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ],
+  "S": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ]
+  ],
+  "Z": [
+   [
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ],
+  "J": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     0,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     1,
+     2
+    ]
+   ],
+   [
+    [
+     2,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ],
+  "L": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ]
+ },
+ "unbuilt": [
+  {
+   "node": "repeat",
+   "reason": "重複疊多層嘅示意圖有 39 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "softdrop",
+   "reason": "T 軟降到一半嘅示意圖有 25 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "spin",
+   "reason": "T 擺入去嘅 TSS 盤面有 25 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "spin.after",
+   "reason": "TSS 打完嘅盤面有 15 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "terrain",
+   "reason": "基本形嘅地形有 21 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "tetris",
+   "reason": "最後用 I 打 Tetris 嘅示意圖有 64 格，係 4 嘅倍數，但要先打過幾次 TSS（消過行）先去到，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）"
+  },
+  {
+   "node": "zbuild",
+   "reason": "用 Z 蓋住個窿嘅砌法同地形一樣有 21 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  }
+ ],
+ "demos": [
+
+ ]
+}

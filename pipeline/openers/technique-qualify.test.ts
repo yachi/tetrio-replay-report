@@ -29,7 +29,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
    '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19']);
 
-const KEYS = ['stsd', 'stmbcave', 'imperialcross', 'doubledagger', 'btcannon', 'cutcopy', 'kaidan', 'dtcannon', 'kingcrimson', 'cavetsstst'] as const;
+const KEYS = ['stsd', 'stmbcave', 'imperialcross', 'doubledagger', 'btcannon', 'cutcopy', 'kaidan', 'dtcannon', 'kingcrimson', 'cavetsstst', 'hamburger'] as const;
 
 const BY_PLAYER: Record<string, any> = {
   stsd: { pinglamb: { qualified: 26, not_qualified: {} }, yachi: { qualified: 62, not_qualified: { dpc: 1, fragment: 2, ownership_unverified: 1 } } },
@@ -42,9 +42,10 @@ const BY_PLAYER: Record<string, any> = {
   dtcannon: { pinglamb: { qualified: 0, not_qualified: {} }, yachi: { qualified: 33, not_qualified: { ownership_unverified: 1 } } },
   kingcrimson: { pinglamb: { qualified: 1, not_qualified: {} }, yachi: { qualified: 0, not_qualified: {} } },
   cavetsstst: { pinglamb: { qualified: 1, not_qualified: {} }, yachi: { qualified: 0, not_qualified: {} } },
+  hamburger: { pinglamb: { qualified: 3, not_qualified: { dpc: 1, fragment: 28, garbage_in_shape: 6, in_opener: 5 } }, yachi: { qualified: 5, not_qualified: { dpc: 1, fragment: 72, garbage_in_shape: 11, in_opener: 101, ownership_unverified: 2 } } },
 };
 
-/** every hit that does not qualify, with its reasons (階段のドネイト: the tally above only) */
+/** every hit that does not qualify, with its reasons (階段のドネイト and ハンバーガー: the tally above only) */
 const NOT_QUALIFIED: Record<string, string[]> = {
   stsd: [
     "2026-07-24 m2r1 yachi lock 32 (stsd): dpc",
@@ -205,9 +206,15 @@ test('qualify: every committed verdict is the hook\'s, and each rule turned off 
      ['fragment', 'garbage_in_shape', 'z_not_one_piece', 'dpc', 'not_whole_shape']],
   ];
   const live = new Set<string>();
+  // ハンバーガー's `in_opener` is its own wrapper (hamburger-cover.ts's withMidGameOnly), outside this module's rules:
+  // read every verdict without it, and hamburger.test.ts checks the wrapper
+  const generic = (h: any) => {
+    const nq = h.not_qualified.filter((x: string) => x !== 'in_opener');
+    return { ...h, qualifies: nq.length === 0, not_qualified: nq };
+  };
   for (const k of KEYS) {
     const P = TECHNIQUES[k]!;
-    const a = art(k);
+    const a = { ...art(k), hits: art(k).hits.map(generic) };
     const opts = QUALIFY_OPTIONS[k];
     const base = withWholeShape(P.transcriptionPath, techniqueQualifier(P.transcriptionPath, opts));
     for (const h of a.hits) expect(base(h, digestOf(h)), qName(h)).toEqual({ qualifies: h.qualifies, not_qualified: h.not_qualified });

@@ -8,7 +8,7 @@
  *   fires at the same T (any of its variants, either hand); a TSD window can fire on a TSS whose far side is open,
  *   and that T is no TSD of that page's. Many of
  *   them are donations — the page names its %Sドネイト as 階段のドネイト, its %LドネイトA as 欄干 and its %S%ZドネイトA
- *   as STMB Cave, and the Shachiku Train's first TSD is a donation one column past the arm — so a T another page
+ *   as STMB Cave, とんぼ's ハンバーガー積み is harddrop's Hamburger (a TSS donation), and the Shachiku Train's first TSD is a donation one column past the arm — so a T another page
  *   claims is that page's, counted once.
  *
  *   `opener_route` (yachi, 2026-10-27, on 10-22 m8r1 pinglamb lock 24, 迷走砲's 「STMB cave の形」 TSD): the round is a
@@ -30,7 +30,7 @@ import { loadTranscription, prepare, windowMatch } from './technique-facts.ts';
 
 /** The other technique pages whose windows `other_page` reads, by transcription file name. */
 export const OTHER_PAGES = ['stsd', 'stmbcave', 'imperialcross', 'doubledagger', 'btcannon', 'cutcopy', 'shachikutrain',
-                            'parapet', 'kaidan', 'dtcannon'];
+                            'parapet', 'kaidan', 'dtcannon', 'hamburger'];
 
 /** The opener route artefacts `opener_route` reads, under `analysis/`. */
 export const ROUTE_ARTEFACTS = ['stray-cannon', 'honey-cup', 'mountainous2', 'stickspin', 'gamushiro', 'sdpcspin'];
