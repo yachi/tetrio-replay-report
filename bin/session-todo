@@ -50,6 +50,12 @@ GATES = [
      "only, seconds), then `bin/paste-fragments --only equiv`; the per-session table lines in "
      "`python3 -m pipeline.claims.check_equiv_coverage --render` are not fragments and are pasted "
      "by hand"),
+    ("test session lists", [PY, "bin/add-session-dates", "{d}", "--check"],
+     "`bin/add-session-dates {d}`, then run the test files it prints and measure the literals "
+     "they pin for {d}"),
+    ("docs index row", [PY, "bin/session-todo", "--docs-row", "{d}"],
+     "add (\"{d}\", \"report\", \"{d}.html\", \"完整戰報\", \"<one-line blurb>\") to ARTEFACTS in "
+     "bin/build-docs, after the previous night (the index lists newest first)"),
     ("rate records", [PY, "-m", "pipeline.check_rate_records"],
      "`Rscript analysis/rate_records.R --json analysis/rate-records.json`, then "
      "`bin/paste-fragments --only rate`"),
@@ -64,21 +70,40 @@ GATES = [
 ]
 CORPUS_GATE = ("corpus artefacts", [PY, "bin/emit-corpus", "--check", "--jobs", "2"],
                "`python3 bin/emit-corpus --jobs 2` re-emits every analysis/*.json the sessions feed")
+# tools/triangle-oracle/dual-backed.json runs every replay through both engines (minutes) and has
+# its own weekly workflow, so it was found stale only after a push; it is --corpus's too.
+MANIFEST_GATE = ("dual-backed manifest", ["bun", "cross-extract.mjs", "--check"],
+                 "`(cd tools/triangle-oracle && bun cross-extract.mjs --write)`, then make README.md's "
+                 "three percentages match what --check prints")
 
 TIMEOUT = 900
 _RED = re.compile(r"^\s*(FAIL|BAD|DRIFT|!!)|\bstale\b|does not|not classified|no longer", re.I)
 
 
-def run(argv):
+def run(argv, cwd=REPO):
     t0 = time.monotonic()
     try:
-        r = subprocess.run(argv, cwd=REPO, capture_output=True, text=True, timeout=TIMEOUT)
+        r = subprocess.run(argv, cwd=cwd, capture_output=True, text=True, timeout=TIMEOUT)
         rc, out = r.returncode, r.stdout + r.stderr
     except subprocess.TimeoutExpired:
         rc, out = 124, f"timed out after {TIMEOUT}s"
     except OSError as e:
         rc, out = 127, str(e)
     return rc, out, time.monotonic() - t0
+
+
+def docs_row(date):
+    """Exit status of the "docs index row" gate: does bin/build-docs' ARTEFACTS name the date?
+
+    bin/build-docs refuses a session on disk with no row, but only after it has rendered
+    everything else; the row holds an editorial blurb, so it is typed, and this says so in a
+    second rather than at the end of a full site render.
+    """
+    text = (REPO / "bin" / "build-docs").read_text(encoding="utf-8")
+    if re.search(r'\(\s*"' + re.escape(date) + r'",\s*"report"', text):
+        return 0
+    print(f"bin/build-docs: ARTEFACTS has no row for {date}")
+    return 1
 
 
 def evidence(out, date, n=4):
@@ -92,6 +117,8 @@ def evidence(out, date, n=4):
 
 
 def main():
+    if len(sys.argv) == 3 and sys.argv[1] == "--docs-row":
+        return docs_row(sys.argv[2])
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("session", help="the session directory, sessions/<date>")
     ap.add_argument("--corpus", action="store_true",
@@ -106,7 +133,7 @@ def main():
               file=sys.stderr)
         return 2
 
-    tasks = {name: argv for name, argv, _ in GATES}
+    tasks = {name: [a.format(d=date) for a in argv] for name, argv, _ in GATES}
     fixes = {name: fix for name, _, fix in GATES}
     if args.corpus:
         if (REPO / "bin" / "emit-corpus").exists():
@@ -114,27 +141,42 @@ def main():
             fixes[CORPUS_GATE[0]] = CORPUS_GATE[2]
         else:
             print("  --  --corpus: bin/emit-corpus does not exist here; not run")
+        if (REPO / "tools" / "triangle-oracle" / "node_modules").is_dir():
+            tasks[MANIFEST_GATE[0]] = MANIFEST_GATE[1]
+            fixes[MANIFEST_GATE[0]] = MANIFEST_GATE[2]
+        else:
+            print("  --  --corpus: tools/triangle-oracle has no node_modules (`bun install "
+                  "--frozen-lockfile` there); dual-backed manifest not run")
     # Every report's corpus-wide sections move when a session lands, so build_report --check
     # runs over EVERY session, not just the new one.
     reports = sorted(p.parent for p in (REPO / "sessions").glob("*/report/report.html"))
     for r in reports:
         tasks[f"build_report {r.parent.name}"] = [PY, "-m", "pipeline.build_report",
                                                   str(r.relative_to(REPO)), "--check"]
+        # a re-emit moves the routes-techniques cells, and a tagged 建議 item citing a figure the
+        # region no longer prints is red in CI; it is a second per-report gate for that reason
+        tasks[f"routes_techniques {r.parent.name}"] = [PY, "-m", "pipeline.check_routes_techniques",
+                                                       str(r.relative_to(REPO))]
 
     t0 = time.monotonic()
     with cf.ThreadPoolExecutor(max_workers=max(1, args.jobs)) as ex:
-        futs = {name: ex.submit(run, argv) for name, argv in tasks.items()}
+        futs = {name: ex.submit(run, argv, REPO / "tools" / "triangle-oracle"
+                                if name == MANIFEST_GATE[0] else REPO)
+                for name, argv in tasks.items()}
         res = {name: f.result() for name, f in futs.items()}
     wall = time.monotonic() - t0
 
     red_gates = [n for n, _, _ in GATES if n in res and res[n][0] != 0]
-    if CORPUS_GATE[0] in res and res[CORPUS_GATE[0]][0] != 0:
-        red_gates.append(CORPUS_GATE[0])
+    for g in (CORPUS_GATE, MANIFEST_GATE):
+        if g[0] in res and res[g[0]][0] != 0:
+            red_gates.append(g[0])
     red_reports = [r for r in reports if res[f"build_report {r.parent.name}"][0] != 0]
+    red_routes = [r for r in reports if res[f"routes_techniques {r.parent.name}"][0] != 0]
 
     print(f"session-todo {date}: {len(tasks)} checks in {wall:.1f}s, "
-          f"{len(red_gates) + len(red_reports)} red\n")
-    for name in [n for n in tasks if not n.startswith("build_report ")]:
+          f"{len(red_gates) + len(red_reports) + len(red_routes)} red\n")
+    per_report = ("build_report ", "routes_techniques ")
+    for name in [n for n in tasks if not n.startswith(per_report)]:
         rc, out, secs = res[name]
         if rc == 0:
             print(f"  ok   {name}  ({secs:.1f}s)")
@@ -155,12 +197,23 @@ def main():
               "python3 -m pipeline.build_report sessions/$d/report; done")
     else:
         print(f"  ok   build_report --check, all {len(reports)} reports")
+    if red_routes:
+        print(f"  RED  check_routes_techniques: {len(red_routes)} of {len(reports)} reports")
+        for r in red_routes:
+            lines, _ = evidence(res[f"routes_techniques {r.parent.name}"][1], r.parent.name, n=2)
+            for l in lines:
+                print(f"         | {l.strip()}")
+        print("       fix: rebuild the report first (build_report above); a tagged 建議 item in "
+              "prose/coaching.json whose figure the region no longer prints is rewritten against the "
+              "cell it talks about, or deleted")
+    else:
+        print(f"  ok   check_routes_techniques, all {len(reports)} reports")
     if not args.corpus:
-        print("  --   not run: bin/emit-corpus --check (re-runs every corpus emitter, minutes); "
-              "pass --corpus")
+        print("  --   not run: bin/emit-corpus --check and the dual-backed manifest (each re-runs "
+              "emitters, minutes); pass --corpus")
     print("  --   cheap halves only: re-measurements (check_loo --check, check_equiv_coverage "
           "--check, check_rate_records --rerun) are bin/verify-repo's")
-    return 1 if (red_gates or red_reports) else 0
+    return 1 if (red_gates or red_reports or red_routes) else 0
 
 
 if __name__ == "__main__":

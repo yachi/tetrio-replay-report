@@ -231,6 +231,13 @@ def main() -> int:
         if bad:
             sys.exit(f'emit-corpus: --only: unknown {bad}; known: {", ".join(sorted(nodes))}')
         chosen = {o: nodes[o] for o in a.only}
+        # --only runs what it names and nothing upstream: say which committed inputs it will read,
+        # since a stale one is reproduced exactly and every byte-identity gate agrees with it
+        for o in a.only:
+            up = sorted(by_out[d].name for d in nodes[o].data if d in by_out and by_out[d].name not in chosen)
+            if up and not a.list:
+                print(f'emit-corpus: --only {o} reads {", ".join(up)} as committed; '
+                      f'if any of them is stale, add --only for it too (it runs first)', file=sys.stderr)
     else:
         chosen = {k: n for k, n in nodes.items() if a.all or n.tier == 'corpus'}
 

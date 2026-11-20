@@ -113,7 +113,11 @@ def check(root: pathlib.Path) -> list[str]:
         files = closure(root, r['estimand_entry'])
         rc, out = git(root, 'diff', '--name-only', r['pinned_commit'], '--', *files)
         if rc != 0:
-            problems.append(f'{name}: cannot diff against pinned commit {r["pinned_commit"][:12]}: {out}')
+            hint = ''
+            if git(root, 'rev-parse', '--is-shallow-repository')[1] == 'true':
+                hint = (' This clone is shallow, so the pinned commit is not in it: run '
+                        '`git fetch --unshallow` (CI checks out with fetch-depth: 0 for this reason).')
+            problems.append(f'{name}: cannot diff against pinned commit {r["pinned_commit"][:12]}: {out}{hint}')
         elif out:
             moved = out.splitlines()
             problems.append(
