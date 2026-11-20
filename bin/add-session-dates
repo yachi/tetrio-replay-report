@@ -1,0 +1,171 @@
+#!/usr/bin/env python3
+"""Append a new session's date to every hand-written FULL-corpus session list in the tests.
+
+    bin/add-session-dates 2026-11-19            write the lists
+    bin/add-session-dates 2026-11-19 --check    list what would change, write nothing; exit 1 if any
+    bin/add-session-dates --selftest            plant the cases below in a temp tree
+
+WHY THIS EXISTS.  About thirty test files pin the corpus as a typed list of dates, checked against
+disk in both directions by `pipeline/corpus-membership.ts`, so a new session fails every one of them
+at module scope until its date is typed in.  `corpus-membership.ts` says why the list survives
+rather than a glob: the files pin per-session literals that only exist once somebody has measured
+them.  This script does the typing and NOT the measuring.  After it runs, the membership check
+passes and the failure moves to the literals themselves (named lists, per-session counts), which is
+where it belongs.  It prints the files it touched so their tests can be run.
+
+WHAT COUNTS AS A FULL-CORPUS LIST.  A bracketed literal holding nothing but quoted dates, which
+are exactly every session on disk before the new one, in ascending order.  An array of records that
+carry a date (`{ dir: '2026-11-17', rounds: 48, ... }`) is not a date list and is never touched: its
+new row is a measurement.  A list naming SOME sessions (an exception list, a
+per-session window) never matches, so it is never edited; a list that spans the corpus end to end but
+skips one or two sessions inside it is printed as a near miss and left alone, because a list that skipped a session is a
+finding to read, not a gap to fill.  The quote character is copied from the list itself.
+"""
+from __future__ import annotations
+
+import argparse
+import re
+import sys
+import tempfile
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parent.parent
+SCAN = ('pipeline', 'tools', 'bin', 'analysis', 'spec', 'lean')
+SUFFIXES = {'.ts', '.mjs', '.js', '.py', '.R'}
+DATE = re.compile(r"""(['"])(\d{4}-\d{2}-\d{2})\1""")
+LIST = re.compile(r"\[([^\[\]]*)\]")
+
+
+def sessions_on_disk(root: Path) -> list[str]:
+    """Same predicate as corpus-membership.ts: a directory holding replays is a session."""
+    d = root / 'sessions'
+    return sorted(p.name for p in d.iterdir() if p.is_dir() and any(p.glob('*.ttrm'))) if d.is_dir() else []
+
+
+def files(root: Path):
+    for top in SCAN:
+        base = root / top
+        if not base.is_dir():
+            continue
+        for p in sorted(base.rglob('*')):
+            if p.suffix in SUFFIXES and p.is_file() and 'node_modules' not in p.parts:
+                yield p
+
+
+def plan(root: Path, new: str):
+    """(edits {path: new text}, near misses [(path, line, missing)])."""
+    on_disk = sessions_on_disk(root)
+    if new not in on_disk:
+        raise SystemExit(f'add-session-dates: sessions/{new} holds no replays on disk')
+    prev = [s for s in on_disk if s < new]
+    if not prev:
+        raise SystemExit('add-session-dates: no earlier session to extend a list from')
+    if any(s > new for s in on_disk):
+        raise SystemExit(f'add-session-dates: {new} is not the newest session; the lists are in date '
+                         'order, so insert it by hand')
+    edits, near = {}, []
+    for p in files(root):
+        text = p.read_text(encoding='utf-8')
+        if prev[-1] not in text:
+            continue
+        out, last, changed = [], 0, False
+        for m in LIST.finditer(text):
+            dates = DATE.findall(m.group(1))
+            got = [d for _, d in dates]
+            if not got or new in got or DATE.sub('', m.group(1)).strip(' \t\r\n,'):
+                continue      # a list of anything but bare dates (records keyed by date) is not edited
+            if got == prev:
+                tail = list(DATE.finditer(m.group(1)))[-1]
+                at = m.start(1) + tail.end()
+                q = tail.group(1)
+                out.append(text[last:at] + f', {q}{new}{q}')
+                last, changed = at, True
+            elif got == sorted(got) and got[0] == prev[0] and got[-1] == prev[-1] \
+                    and len(prev) - 2 <= len(got) < len(prev) and set(got) <= set(prev):
+                line = text.count('\n', 0, m.start()) + 1
+                near.append((p, line, sorted(set(prev) - set(got))))
+        if changed:
+            out.append(text[last:])
+            edits[p] = ''.join(out)
+    return edits, near
+
+
+def selftest() -> int:
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        for s in ('2026-01-01', '2026-01-02', '2026-01-03', '2026-01-04'):
+            (root / 'sessions' / s).mkdir(parents=True)
+            (root / 'sessions' / s / 'a.ttrm').write_text('{}')
+        (root / 'sessions' / '2026-01-05').mkdir()          # no replays: not a session
+        t = root / 'pipeline' / 'a.test.ts'
+        t.parent.mkdir()
+        t.write_text("const S = f(R,\n  ['2026-01-01', '2026-01-02',\n   '2026-01-03']);\n"   # bumped
+                     "const X = ['2026-01-02', '2026-01-03'];\n"                                   # named: kept
+                     "const N = ['2026-01-01', '2026-01-03'];\n")                                  # near miss
+        py = root / 'tools' / 'b.py'
+        py.parent.mkdir()
+        py.write_text('R = [{"d": "2026-01-01"}, {"d": "2026-01-02"}, {"d": "2026-01-03"}]\n'        # records: kept
+                      'S = ["2026-01-01", "2026-01-02", "2026-01-03"]\n'                            # bumped
+                      'D = ["2026-01-01", "2026-01-02", "2026-01-03", "2026-01-04"]\n')            # holds it
+        edits, near = plan(root, '2026-01-04')
+        want_ts = ("const S = f(R,\n  ['2026-01-01', '2026-01-02',\n   '2026-01-03', '2026-01-04']);\n"
+                   "const X = ['2026-01-02', '2026-01-03'];\n"
+                   "const N = ['2026-01-01', '2026-01-03'];\n")
+        want_py = ('R = [{"d": "2026-01-01"}, {"d": "2026-01-02"}, {"d": "2026-01-03"}]\n'
+                   'S = ["2026-01-01", "2026-01-02", "2026-01-03", "2026-01-04"]\n'
+                   'D = ["2026-01-01", "2026-01-02", "2026-01-03", "2026-01-04"]\n')
+        fails = []
+        if edits.get(t) != want_ts:
+            fails.append(f'ts list: got {edits.get(t)!r}')
+        if edits.get(py) != want_py:
+            fails.append(f'py list: got {edits.get(py)!r}')
+        if [(p.name, n) for p, n, _ in near] != [('a.test.ts', 5)]:
+            fails.append(f'near misses: got {near}')
+        # a second run over the edited tree changes nothing
+        for p, txt in edits.items():
+            p.write_text(txt)
+        if plan(root, '2026-01-04')[0]:
+            fails.append('not idempotent')
+        try:
+            plan(root, '2026-01-05')
+            fails.append('a directory without replays was accepted as the session')
+        except SystemExit:
+            pass
+    for f in fails:
+        print(f'SELFTEST FAIL: {f}', file=sys.stderr)
+    if not fails:
+        print('selftest ok: a full list is extended in either quote style, a named list, an array of dated records and one that '
+              'already holds the date are kept, a near miss is reported, a second run is a no-op, and a '
+              'date without replays is refused')
+    return 1 if fails else 0
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
+    ap.add_argument('date', nargs='?')
+    ap.add_argument('--check', action='store_true')
+    ap.add_argument('--selftest', action='store_true')
+    a = ap.parse_args()
+    if a.selftest:
+        return selftest()
+    if not a.date or not re.fullmatch(r'\d{4}-\d{2}-\d{2}', a.date):
+        ap.error('want a session date, YYYY-MM-DD')
+    edits, near = plan(REPO, a.date)
+    for p, line, missing in near:
+        print(f'  near miss (left alone): {p.relative_to(REPO)}:{line} lacks {", ".join(missing)}')
+    if not edits:
+        print(f'add-session-dates {a.date}: every full-corpus list already names it')
+        return 0
+    verb = 'would add' if a.check else 'added'
+    for p, txt in sorted(edits.items()):
+        if not a.check:
+            p.write_text(txt, encoding='utf-8')
+        print(f'  {verb} {a.date}: {p.relative_to(REPO)}')
+    print(f'add-session-dates {a.date}: {len(edits)} file(s). The lists only say the session exists; '
+          'the per-session literals beside them are still unmeasured. Run their tests, e.g.')
+    print('  bun test ' + ' '.join(str(p.relative_to(REPO)) for p in sorted(edits) if p.name.endswith('.test.ts')))
+    return 1 if a.check else 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

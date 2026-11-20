@@ -258,8 +258,11 @@ checked in a browser as it goes:
      bin/fold-hand-claims $DATE runs that fold (one Dafny pass) and refreshes the
      session's equiv-coverage figures, where the tool is on this branch.
   3. add the date to the session lists the sim tests pin — each one is asserted
-     against disk, so a miss is a red test rather than a silent skip — and investigate
-     any new anchor disagreement before naming it in an exception list:
+     against disk, so a miss is a red test rather than a silent skip. The typing is
+     mechanical and bin/add-session-dates does it (every bare full-corpus date list,
+     nothing else); the per-session literals beside them are measurements and are not:
+       bin/add-session-dates $DATE
+     then investigate any new anchor disagreement before naming it in an exception list:
        bun test pipeline/sim/ pipeline/openers/ pipeline/finesse-counters.test.ts
      and re-emit the corpus artefacts the new session moves (about a minute: the route
      and technique facts share two digests), then paste the figures the docs quote:
@@ -272,6 +275,8 @@ checked in a browser as it goes:
        python3 -m pipeline.check_prose_figures $WORK
        python3 -m pipeline.check_badge_links $WORK
        python3 bin/build-docs
+     (bin/build-docs refuses a session with no row in its ARTEFACTS table: add one, with the
+     index card's one-line Cantonese blurb, newest last — the index lists it first)
      bin/session-loop $DATE runs that loop (report, round table, report again, the
      per-session gates CI runs, the TODO scan and a preview), where it is on this branch.
   5. list what the corpus-wide gates still need for this session (read-only, seconds):

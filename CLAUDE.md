@@ -328,6 +328,7 @@ bin/verify-session sessions/<date>/report      # re-run all gates (MUTATION=1 ad
 bin/build-docs [--out <dir>]                   # render the Pages site (default docs/, git-ignored; CI deploys it)
 CC_COACH=<cc-coach binary> bin/new-session …   # also builds sim/cspin-miss-facts.json (without it: no C-Spin 冇砌 section, said loudly)
 bin/session-todo sessions/<date> [--jobs N] [--corpus]  # read-only: what the corpus-wide gates still need after a session lands (--corpus adds emit-corpus --check)
+bin/add-session-dates <date> [--check]          # append a new session's date to every full-corpus test list (the per-session literals beside them are still measured by hand)
 bin/emit-corpus [--check] [--only <name>] [--jobs N] [--list]  # re-emit every analysis/*.json in dependency order (--all adds the constructed ones; --check writes nothing)
 bin/verify-repo --session <date>               # the repo-wide gates plus both matrices for that session only
 bin/verify-repo --only verify --only pipeline --session <date>  # just the two per-session matrices for it
