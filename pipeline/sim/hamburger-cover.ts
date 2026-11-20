@@ -41,3 +41,12 @@ export function hamburgerCover(h: Hit, d: TechDigest): CoverKind {
 export function withHamburgerCover(check: (h: any, d: any) => { qualifies: boolean; not_qualified: string[] }) {
   return (h: any, d: any) => ({ ...check(h, d), cover: hamburgerCover(h, d) });
 }
+
+/** a qualify check that also fails every hit inside the opener window (`in_opener`): a mid-game page counts no opener hit */
+export function withMidGameOnly(check: (h: any, d: any) => { qualifies: boolean; not_qualified: string[] }) {
+  return (h: any, d: any) => {
+    const r = check(h, d);
+    if (!h.in_opener) return r;
+    return { ...r, qualifies: false, not_qualified: [...r.not_qualified, 'in_opener'] };
+  };
+}

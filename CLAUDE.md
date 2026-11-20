@@ -6187,8 +6187,10 @@ figure is read off the artefacts and tests, never typed here.
 **A full TSS, the T flat and nub down, whose clear opens a well two columns from the nub.** A piece covers the hole and the
 cell between it and the nub (the row the TSS clears); the window is the agreement box of the page's three drawings of the
 shape and SDPC Spin's and stick spin's bag 1 (`cross_source.fires`, measured both ways; their bag-1 TSS IS this shape, so
-the opener hits are pinned by name in the test against both route artefacts and counted in the `in_opener` column, never
-dropped). Garbage is filled, so a garbage row's hole counts as the hole. The payoff is 欄干's `well_quad`: the page stacks
+the opener hits are pinned by name in the test against both route artefacts and counted in the `in_opener` column). **They
+never qualify** (yachi: 「開局唔洗計啦，叫得中盤」): `hamburger-cover.ts`'s `withMidGameOnly` adds the qualify reason
+`in_opener` to every hit inside the opener window, outside `technique-qualify.ts`'s rules, so `technique-qualify.test.ts`
+reads verdicts without it and `hamburger.test.ts` checks the wrapper. Garbage is filled, so a garbage row's hole counts as the hole. The payoff is 欄干's `well_quad`: the page stacks
 the shape again over the well several times before the I (「After a few iterations, use an I piece to clear the
 excess.」), so the prose words `well_covered` / `well_filled_not_i` as 「再疊多層（重複）」, never as a miss. The payoff board
 is DERIVED (`spin.after`, the page draws no after board), which needed one opt-in in `technique_transcription.py`'s payoff

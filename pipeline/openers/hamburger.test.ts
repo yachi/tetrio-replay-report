@@ -25,7 +25,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { build, serialise, digestCorpus, prepare, windowMatch, type Mutants, type TechDigest, type Cell }
   from '../sim/technique-facts.ts';
 import { HAMBURGER } from '../sim/technique-profile-hamburger.ts';
-import { hamburgerCover } from '../sim/hamburger-cover.ts';
+import { hamburgerCover, withMidGameOnly } from '../sim/hamburger-cover.ts';
 import { TECHNIQUES } from '../sim/techniques.ts';
 import { assertCorpusIsEverySessionOnDisk } from '../corpus-membership.ts';
 import { checkNamedList, checkScoredAgainstOpenerFacts, checkHitPositions } from './technique-facts-checks.ts';
@@ -193,12 +193,12 @@ const HITS = { pinglamb: { all: 42, in_opener: 5, mid_game: 37, mirrored: 13, ga
 /** the payoff: `well_covered` / `well_filled_not_i` are another layer of the stacking (the page's Repeat) */
 const PAYOFF = { pinglamb: { fired: 23, not_fired: { i_in_well_not_quad: 5, well_covered: 3, well_filled_not_i: 11 } },
                  yachi: { fired: 35, not_fired: { i_in_well_not_quad: 15, past_verified: 7, round_ended: 1, well_covered: 17, well_filled_not_i: 112 } } };
-const QUALIFY = { pinglamb: { qualified: 8, not_qualified: { dpc: 1, fragment: 28, garbage_in_shape: 6 } },
-                  yachi: { qualified: 101, not_qualified: { dpc: 1, fragment: 72, garbage_in_shape: 11, ownership_unverified: 2 } } };
+const QUALIFY = { pinglamb: { qualified: 3, not_qualified: { dpc: 1, fragment: 28, garbage_in_shape: 6, in_opener: 5 } },
+                  yachi: { qualified: 5, not_qualified: { dpc: 1, fragment: 72, garbage_in_shape: 11, in_opener: 101, ownership_unverified: 2 } } };
 /** cover kind per player, over every hit and over the qualifying ones */
 const COVER: Record<string, any> = {
-  pinglamb: { all: { complete_pieces: 2, not_complete: 33, one_sz: 7 }, qualified: { complete_pieces: 2, one_sz: 6 } },
-  yachi: { all: { complete_pieces: 1, not_complete: 83, null: 2, one_sz: 101 }, qualified: { complete_pieces: 1, one_sz: 100 } },
+  pinglamb: { all: { complete_pieces: 2, not_complete: 33, one_sz: 7 }, qualified: { complete_pieces: 2, one_sz: 1 } },
+  yachi: { all: { complete_pieces: 1, not_complete: 83, null: 2, one_sz: 101 }, qualified: { complete_pieces: 1, one_sz: 4 } },
 };
 const CONTROLS = {under: {TSD: {pinglamb: 0, yachi: 0}, TST: {pinglamb: 0, yachi: 0}, mini_TSS: {pinglamb: 0, yachi: 0}, mini_TSD: {pinglamb: 0, yachi: 0}}, ablation: {no_must_empty: {pinglamb: 344, yachi: 499}, no_roof: {pinglamb: 42, yachi: 188}, t_overlap: {pinglamb: 46, yachi: 191}}, orientation_baseline: {pinglamb: 178, yachi: 520}};
 /** full TSSs whose anchored T meets ONE row of the window: `above` the row over the arms, `arms` the T's arm row,
@@ -322,6 +322,17 @@ test('the opener: every SDPC Spin / stick spin bag-1 TSS case is a hit at its sp
   expect(a.hits.filter((h: any) => route.has(hk(h))).every((h: any) => h.in_opener)).toBe(true);
   expect(a.hits.filter((h: any) => h.in_opener && !route.has(hk(h))).map(qName)).toEqual(OPENER_OTHER_HITS);
   expect(a.lists.hamburger_in_opener.length).toBe(OPENER_ROUTE_HITS.length + OPENER_OTHER_HITS.length);
+});
+
+test('mid-game only: every opener hit fails in_opener and nothing else fails it; the wrapper adds exactly that', () => {
+  const a = art();
+  for (const h of a.hits) expect(h.not_qualified.includes('in_opener'), qName(h)).toBe(h.in_opener);
+  expect(a.hits.some((h: any) => h.qualifies && h.in_opener)).toBe(false);
+  const inner = (h: any) => ({ qualifies: false, not_qualified: ['x'] });
+  const ok = (h: any) => ({ qualifies: true, not_qualified: [] });
+  expect(withMidGameOnly(ok)({ in_opener: true }, null)).toEqual({ qualifies: false, not_qualified: ['in_opener'] });
+  expect(withMidGameOnly(ok)({ in_opener: false }, null)).toEqual({ qualifies: true, not_qualified: [] });
+  expect(withMidGameOnly(inner)({ in_opener: true }, null)).toEqual({ qualifies: false, not_qualified: ['x', 'in_opener'] });
 });
 
 test('the cover: re-derived from every digest; whole pieces on every qualifying hit; the split pinned', () => {
