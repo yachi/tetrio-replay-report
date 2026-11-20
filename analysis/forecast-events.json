@@ -423,6 +423,21 @@
    "separation": 4,
    "mechanism": "line-clear",
    "mechanism_step": 82
+  },
+  {
+   "session": "2026-11-19",
+   "file": "replay-2026-11-19-02.ttrm",
+   "round_index0": 1,
+   "match": 2,
+   "round": 2,
+   "player": "pinglamb",
+   "lock": 31,
+   "roof_lock": 23,
+   "lines": 2,
+   "kind": "forecast_lineclear",
+   "separation": 8,
+   "mechanism": "line-clear",
+   "mechanism_step": 26
   }
  ]
 }
