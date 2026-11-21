@@ -9,7 +9,9 @@
  *   (b) a PINNED-BY-NAME cheap set of shapes and two bag-4 lines are re-run through the built crate and
  *       must equal the artefact's records (the rest is not re-derived here: that is a known limit);
  *   (c) invariants written here, in TS, that do not reuse the crate, hold over EVERY tiling;
- *   (d) each invariant has a mutant that must trip it.
+ *   (d) each invariant has a mutant that must trip it;
+ *   (e) the same pinned shapes re-run in the counter's fixed-bag-1 mode (FIXED=1) must equal the
+ *       artefact's `fixed` block (every bag-1 board's cum, and the board picked as best).
  *
  * Run: bun test pipeline/openers/tst-openers.test.ts   (the first run builds the crate)
  */
@@ -206,6 +208,25 @@ test('(b) pinned cheap shapes and bag-4 lines re-run through the crate equal the
     const p = Bun.spawnSync([pc4], { stdin: Buffer.from(l + '\n'), stderr: 'pipe' });
     expect(p.exitCode).toBe(0);
     expect(JSON.parse(p.stdout.toString().trim())).toEqual(ART.pc4.find((x: any) => x.line === l));
+  }
+}, 120_000);
+
+test('(e) the fixed-bag-1 counts of the pinned cheap shapes re-run through the crate equal the artefact', () => {
+  const bin = crateBin('tst2bag');
+  if (!bin) { console.warn('SKIPPED (e): cargo is unavailable or the crate failed to build; the fixed counts are NOT re-checked'); return; }
+  const recs = PINNED_SHAPES.map((n) => ART.shapes.find((s: any) => `s${s.id}` === n)).filter((o: any) => o.fixed);
+  expect(recs.length).toBeGreaterThan(0);
+  const lines = recs.map((o: any) => `${inputLine(SHAPES.find((s) => s.id === o.id))}|${o.fixed.classes.map((c: string) => c || '-').join(';')}`);
+  const r = Bun.spawnSync([bin], { stdin: Buffer.from(lines.join('\n') + '\n'), stderr: 'pipe', env: { ...process.env, JOBS: '2', FIXED: '1' } });
+  expect(r.exitCode).toBe(0);
+  const got = r.stdout.toString().trim().split('\n').map((l) => JSON.parse(l));
+  for (const o of recs) {
+    const g = got.find((x: any) => x.name === `s${o.id}`);
+    expect(g.classes).toEqual(o.fixed.classes);
+    expect(g.b1.length).toBe(o.fixed.nb1);
+    if (!o.fixed.nb1) continue;
+    expect(g.b1.map((b: any) => b.cum)).toEqual(o.fixed.cums);
+    expect(g.b1[o.fixed.best].pieces).toEqual(o.fixed.b1);
   }
 }, 120_000);
 

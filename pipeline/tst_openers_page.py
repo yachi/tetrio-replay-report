@@ -11,7 +11,12 @@ quarantined: nobody played these boards, no claim id, no badge. The audit reuses
 `replay_page.audit_quarantine` and adds:
 
 * every ranked shape has exactly one card, in rank order, and every card's four figures are RECOMPUTED from the
-  artefact (a second, independent computation: best tiling by direct search, exact fractions);
+  artefact (a second, independent computation, exact fractions). The headline figures are the FIXED-bag-1 ones
+  (the artefact's `fixed` block: bag 1 laid one way, bag 2 random, PC over the tilings holding that bag 1); the
+  audit re-picks the best bag-1 board from its `cums` by rate x PC and checks the drawn tiling holds it. The
+  see-both-bags figure (best single tiling) is printed beside it and re-derived too. It is NOT a strict upper
+  bound: a fixed bag 1 may finish on any of several tilings holding it, so the page counts the shapes where the
+  fixed rate exceeds it instead of calling it one;
 * the inlined data island equals what the renderer builds from the artefact;
 * `未計` where the two-bag count is zero (never a `0%` PC), `≈` on every sampled bag-4 figure;
 * no simplified glyph, no external request, no markup sink.
@@ -21,6 +26,7 @@ a ranking must not read higher than the exact value. Computation is exact (`frac
 never an artefact of float noise; the JS only draws strings this module has already floored.
 """
 import argparse
+import copy
 import html
 import json
 import math
@@ -50,6 +56,7 @@ N2 = BAG * BAG
 LEFT_NOTE_MIN = 3                 # a leftover of this many pieces or more makes the PC count approximate
 WALL = 2                          # a TST this close to a side wall (cells) counts as 近牆
 HID_SHOWN = 6                     # how many hidden wall ranks the filter note names
+PC3_SHOWN = 15                    # rows of the 「兩巡易砌又 3 巡 PC 高」 table
 COL = dict(I="#2fb8c9", O="#e3b425", T="#9a46d6", S="#4cb648", Z="#d9433d", J="#3b61d6", L="#e5792a")
 
 # the seven tetrominoes as sets of (x, y) offsets, every rotation, normalised to min x = min y = 0
@@ -75,7 +82,9 @@ SHAPE = {k: _rots(v) for k, v in _BASE.items()}
 _PCX = re.compile(r'<details class="pcx" data-line="([^"]*)">(.*?)</details>', re.S)
 _PCX_FIG = re.compile(r'<figure data-deal="([A-Z]*)" data-h="(\d+)">(.*?)</figure>', re.S)
 _PCX_STEP = re.compile(r'<li data-p="([A-Z])" data-c="([\d,]+)" data-h="([01])">')
-_CARD = re.compile(r'<article class="card[^"]*" data-pos="[^"]*" data-card="(\d+)" data-rk="([^"]*)">(.*?)</article>', re.S)
+_CARD = re.compile(r'<article class="card[^"]*" data-pos="[^"]*" data-card="(\d+)" data-rk="([^"]*)"[^>]*>(.*?)</article>', re.S)
+_P3ROW = re.compile(r'<tr data-p3="(\d+)">(.*?)</tr>', re.S)
+_P3FIG = re.compile(r'data-g="(\w+)">(.*?)</td>', re.S)
 _FIG = re.compile(r'data-f="(\w+)">(.*?)</b>', re.S)
 _ISLAND = re.compile(r'<script id="data" type="application/json">(.*?)</script>', re.S)
 
@@ -175,6 +184,69 @@ def fig_strings(t, p4, n4):
     return two, pc3, pc4, pct(score(t, p4) / N2)
 
 
+def class_figs(o, idx):
+    """leftover -> (PC Fraction used for ranking, p5, p4 or None, draws behind p4) over the two-bag tilings; a
+    leftover's PC does not depend on the tiling (the residue rows are the shape's), which is asserted."""
+    out = {}
+    for t in o["til"]:
+        if t["B"] == 0:
+            continue
+        p4, n4 = tiling_p4(o, t, idx)
+        v = (p4 if p4 is not None else Fraction(t["p5"], BAG), t["p5"], p4, n4)
+        _need(out.setdefault(t["left"], v) == v, f"shape {o['id']}: leftover {t['left']!r} has two PC figures")
+    return out
+
+
+def fixed_figs(o, idx):
+    """The fixed-bag-1 figures of shape `o` (None when it has no `fixed` block): the bag-1 board is the one the
+    artefact picked, bag 2 is random, the player then ends on the best leftover class the deal allows.
+    Returns dict(cum, rate, pc3n, pc3d, pc3, pc4, n4, joint, same) with exact fractions; `pc4` is None when a
+    contributing class has no bag-4 record (the joint then uses its bag-3 figure, a lower bound)."""
+    f = o.get("fixed")
+    if not f:
+        return None
+    if not f["nb1"]:
+        return dict(cum=0, rate=Fraction(0), pc3n=0, pc3d=0, pc3=None, pc4=None, n4=0, joint=Fraction(0), same=True)
+    cf = class_figs(o, idx)
+    cum = f["cums"][f["best"]]
+    joint = Fraction(0)
+    pc3n = 0
+    n4 = 0
+    missing = False
+    prev = 0
+    used = set()
+    for k, c in enumerate(f["classes"]):
+        d = cum[k] - prev
+        prev = cum[k]
+        if not d:
+            continue
+        pc, p5, p4, nn = cf[c]
+        used.add(pc)
+        joint += d * pc
+        pc3n += d * p5
+        n4 = max(n4, nn)
+        missing |= p4 is None
+    tot = cum[-1]
+    if not tot:
+        return dict(cum=0, rate=Fraction(0), pc3n=0, pc3d=0, pc3=None, pc4=None, n4=0, joint=Fraction(0), same=True)
+    return dict(cum=tot, rate=Fraction(tot, N2), pc3n=pc3n, pc3d=tot * BAG, pc3=Fraction(pc3n, tot * BAG),
+                pc4=None if missing else joint / tot, n4=n4, joint=joint / N2, same=len(set(v[0] for v in cf.values())) == 1)
+
+
+def fixed_strings(fx):
+    """(rate, bag-3 PC, bag-4 PC, joint) display strings of `fixed_figs`; 未計 where the fixed rate is zero."""
+    if fx["cum"] == 0:
+        return pct(0), "未計", "未計", pct(0)
+    pc4 = "–" if fx["pc4"] is None else (("≈" if fx["n4"] else "") + pct(fx["pc4"]))
+    return pct(fx["rate"]), pct(fx["pc3"]), pc4, pct(fx["joint"])
+
+
+def shown_tiling(e):
+    """The tiling a card draws: the fixed run's (the best tiling holding the fixed bag-1 board), else the best."""
+    f = e["o"].get("fixed")
+    return e["o"]["til"][f["til"]] if f and f["nb1"] and e["fx"]["cum"] else e["best"]
+
+
 def grid(t):
     g = {}
     for k, cs in t["pieces"]:
@@ -194,8 +266,8 @@ def mirror_key(s):
 
 
 def entries(art, shp):
-    """The ranked list: one entry per shape up to left-right mirroring, best tiling picked, sorted by
-    (-joint, -two); a shape with no tiling at all is not ranked."""
+    """The ranked list: one entry per shape up to left-right mirroring, sorted by `rank_key` (the fixed-bag-1
+    joint first); `best` is the best single tiling (the see-both-bags figure); a shape with no tiling is not ranked."""
     shapes = {s["id"]: s for s in shp["shapes"]}
     idx = p4_index(art)
     rows = {}
@@ -206,20 +278,68 @@ def entries(art, shp):
         scored = [(t, *tiling_p4(o, t, idx)) for t in o["til"]]
         best = max(scored, key=lambda x: (score(x[0], x[1]), x[0]["B"]))
         t, p4, n4 = best
-        e = dict(s=s, o=o, best=t, p4=p4, n4=n4, joint=score(t, p4) / N2, two=Fraction(t["B"], N2), scored=scored)
+        fx = fixed_figs(o, idx)
+        e = dict(s=s, o=o, best=t, p4=p4, n4=n4, joint=score(t, p4) / N2, two=Fraction(t["B"], N2), scored=scored, fx=fx,
+                 fjoint=fx["joint"] if fx else Fraction(0))
         k = mirror_key(s)
         if k in rows:
             p = rows[k]
             names = sorted(set(p["names"]) | set(s["names"]))
             p["names"] = names
             p["mirror"] = True
-            if (e["joint"], e["two"]) > (p["joint"], p["two"]):
+            if rank_key(e) < rank_key(p):
                 e["names"], e["mirror"] = names, True
                 rows[k] = e
         else:
             e["names"], e["mirror"] = list(s["names"]), False
             rows[k] = e
-    return sorted(rows.values(), key=lambda e: (-e["joint"], -e["two"]))
+    return sorted(rows.values(), key=rank_key)
+
+
+def pc3_rank(F):
+    """The 「兩巡易砌又 3 巡 PC 高」 table: full shapes with a fixed figure, ranked by the probability that the
+    fixed bag 1 builds the shape AND bag 3 clears (fixed rate × bag-3 PC = pc3n / (N2·BAG)), then by the main
+    rank; each row is (main rank, entry, that joint). The figures are the drawn board's (`fixed_figs`)."""
+    rows = [(i + 1, e, Fraction(e["fx"]["pc3n"], N2 * BAG)) for i, e in enumerate(F) if e["fx"] and e["fx"]["cum"]]
+    rows.sort(key=lambda r: (-r[2], r[0]))
+    return rows[:PC3_SHOWN]
+
+
+def pc3_cells(rk, e, j3):
+    """The display strings of one pc3 table row: main rank, fixed rate, bag-3 PC, joint."""
+    return [f"#{rk}", pct(e["fx"]["rate"]), pct(e["fx"]["pc3"]), pct(j3)]
+
+
+def pc3_table(F, PR, full):
+    T = PR["pc3_table"]
+    head = "".join(f"<th>{_esc(h)}</th>" for h in T["cols"])
+    body = []
+    for n, (rk, e, j3) in enumerate(pc3_rank(F), 1):
+        mk, r, p3, j = pc3_cells(rk, e, j3)
+        names = ", ".join(_esc(x) for x in e["names"][:2]) + (PR["names_more"].format(c=len(e["names"])) if len(e["names"]) > 2 else "")
+        body.append(f'<tr data-p3="{e["s"]["id"]}"><td class="num">{n}</td><td><a href="#c{e["s"]["id"]}">{names}</a></td>'
+                    f'<td class="num" data-g="rate">{r}</td><td class="num" data-g="pc3">{p3}</td>'
+                    f'<td class="num j3" data-g="j3">{j}</td><td class="num" data-g="main">{mk}</td></tr>')
+    return [f'<h2>{_esc(T["h2"])}</h2>', f'<p class="muted">{T["note"].format(shown=PC3_SHOWN, full=full)}</p>',
+            f'<div class="p3w"><table class="p3"><thead><tr>{head}</tr></thead><tbody>', *body, "</tbody></table></div>"]
+
+
+def audit_pc3(page, F):
+    bad = []
+    got = [(int(sid), {k: re.sub(r"<[^>]+>", "", v) for k, v in _P3FIG.findall(b)}) for sid, b in _P3ROW.findall(page)]
+    want = pc3_rank(F)
+    if [g[0] for g in got] != [e["s"]["id"] for _, e, _ in want]:
+        bad.append("the 3巡 PC table is not the recomputed ranking")
+        return bad
+    for (sid, figs), (rk, e, j3) in zip(got, want):
+        if [figs.get(k) for k in ("main", "rate", "pc3", "j3")] != pc3_cells(rk, e, j3):
+            bad.append(f"3巡 PC table row for shape {sid}: figures are not the recomputed ones")
+    return bad
+
+
+def rank_key(e):
+    """Rank by the fixed-bag-1 joint figure, then the see-both-bags joint, then the two-bag count."""
+    return (-e["fjoint"], -e["joint"], -e["two"])
 
 
 def dist(s):
@@ -372,13 +492,19 @@ def pcx(e, b, ex, C):
             f'<p class="muted sm">{_esc(C["pcx_note"])}</p><div class="pcxb">{"".join(parts)}</div></details>')
 
 
+def _cells(pieces):
+    out = {}
+    for k, cs in pieces:
+        for c in cs:
+            out[(c % 10, c // 10)] = k
+    return out
+
+
 def card(rk, e, PR, badge="", pcxd=None):
     C = PR["card"]
-    s, b = e["s"], e["best"]
-    cells = {}
-    for k, cs in b["pieces"]:
-        for c in cs:
-            cells[(c % 10, c // 10)] = k
+    s, fx = e["s"], e["fx"]
+    b = shown_tiling(e)
+    cells = _cells(b["pieces"])
     H = max(y for x, y in cells) + 1
     tst = [tuple(t) for t in s["tst"]]
     for t in tst:
@@ -394,10 +520,25 @@ def card(rk, e, PR, badge="", pcxd=None):
     d = dist(s)
     pos = PR["pos_centre"] if d >= WALL else PR["pos_wall"]
     left = b["left"] or C["no_left"]
-    two, pc3, pc4, joint = fig_strings(b, e["p4"], e["n4"])
-    pc4_html = f'<span title="{_esc(C["sample_title"].format(n=e["n4"]))}">{_esc(pc4)}</span>' if pc4.startswith("≈") else _esc(pc4)
+    up_two, _, _, up_joint = fig_strings(e["best"], e["p4"], e["n4"])
+    b1 = ""
+    if fx is None or fx["cum"] == 0:
+        rate, pc3, pc4, joint = pct(0), "未計", "未計", pct(0)
+        counts = C["fixed_none"] if fx is None or not e["o"]["fixed"]["nb1"] else C["fixed_zero"]
+    else:
+        rate, pc3, pc4, joint = fixed_strings(fx)
+        bc = _cells(e["o"]["fixed"]["b1"])
+        b1 = (f'<div class="small"><div class="lab">{_esc(C["b1_title"])}</div>'
+              f'{svg(bc, max(4, max(y for x, y in bc) + 1), 9)}</div>')
+        counts = C["counts"].format(cum=f'{fx["cum"]:,}', n2=f"{N2:,}", p3n=f'{fx["pc3n"]:,}', p3d=f'{fx["pc3d"]:,}')
+        if fx["n4"]:
+            counts += C["counts_sample"].format(n=fx["n4"])
+        if fx["same"]:
+            counts += C["same_pc"]
+    pc4_html = (f'<span title="{_esc(C["sample_title"].format(n=fx["n4"]))}">{_esc(pc4)}</span>'
+                if pc4.startswith("≈") else _esc(pc4))
     note = ""
-    if b["B"] == 0:
+    if fx is None or fx["cum"] == 0:
         note = C["uncounted_note"]
     elif len(b["left"]) >= LEFT_NOTE_MIN:
         note = C["left_note"].format(c=len(b["left"]))
@@ -405,14 +546,17 @@ def card(rk, e, PR, badge="", pcxd=None):
     cls = " me" if PR["me_name"] in names else ""
     line = C["pos_line"].format(pos=pos, d=d, cells=len(s["cells"]), nt=e["o"]["ntil"], left=left,
                                 mirror=C["mirror"] if e["mirror"] else "")
-    return (f'<article class="card{cls}" data-pos="{pos}" data-card="{s["id"]}" data-rk="{_esc(rk)}">'
+    upper = (f'<div class="muted sm up">{_esc(C["upper"])} <b class="num" data-f="up_two">{up_two}</b> · '
+             f'{_esc(C["joint"])} <b class="num" data-f="up_joint">{up_joint}</b></div>')
+    return (f'<article class="card{cls}" data-pos="{pos}" data-card="{s["id"]}" data-rk="{_esc(rk)}" id="c{s["id"]}">'
             f'<div class="rk num">{_esc(rk)}</div>{badge}\n'
-            f'<div class="bd">{svg(cells, max(H, 8), 15, tst)}<div class="small"><div class="lab">{_esc(C["left_title"])}</div>{svg(res, rh, 9)}</div></div>\n'
+            f'<div class="bd">{svg(cells, max(H, 8), 15, tst)}<div class="smalls">{b1}<div class="small"><div class="lab">{_esc(C["left_title"])}</div>{svg(res, rh, 9)}</div></div></div>\n'
             f'<div class="meta"><div class="src">{shown}</div>\n'
-            f'<div class="stats"><span>{C["two"]} <b class="num" data-f="two">{two}</b></span>'
+            f'<div class="stats"><span>{C["two"]} <b class="num" data-f="two">{rate}</b></span>'
             f'<span>{C["pc3"]} <b class="num" data-f="pc3">{_esc(pc3)}</b></span>'
             f'<span>{C["pc4"]} <b class="num" data-f="pc4">{pc4_html}</b></span>'
-            f'<span class="j">{C["joint"]} <b class="num" data-f="joint">{joint}</b></span></div>{note}\n'
+            f'<span class="j">{C["joint"]} <b class="num" data-f="joint">{joint}</b></span></div>\n'
+            f'<div class="muted sm cnt">{_esc(counts)}</div>{upper}{note}\n'
             f'<div class="muted sm">{_esc(line)}</div>\n'
             f'{pcx(e, b, pcxd[line_of(e["o"], b)], C) if pcxd is not None and b["B"] > 0 else ""}'
             f'<details data-s="s{s["id"]}"><summary>{_esc(C["details"].format(nt=e["o"]["ntil"]))}</summary><div class="tl"></div></details></div></article>')
@@ -427,7 +571,8 @@ def render(art, shp, PR, pcxd):
     jb = "、".join(k.replace("johnbeak Gamushiro ", "") for k in shp["sources"]["johnbeak"]["fumens"])
     fmt = dict(n=len(ents), n_hd=len(shp["sources"]["harddrop"]["titles"]), jb=jb, sample=sample, full=full, pieces=full // 4,
                nf=len(F), np=len(P), me=me, me_cells=me_cells, nc=len(cent), left_min=LEFT_NOTE_MIN, wall=WALL,
-               hid="、".join(f"#{i}" for i in hid[:HID_SHOWN]))
+               hid="、".join(f"#{i}" for i in hid[:HID_SHOWN]),
+               n_over=sum(1 for e in ents if e["fx"] and e["fx"]["rate"] > Fraction(e["best"]["B"], N2)))
     me_sentence = PR["me_sentence"].format(**fmt) if me else ""
     cards = "\n".join(card(f"#{i + 1}", e, PR, pcxd=pcxd) for i, e in enumerate(F))
     pc = []
@@ -457,6 +602,7 @@ def render(art, shp, PR, pcxd):
             f'<div class="bar"><button aria-pressed="true" data-f="{PR["pos_centre"]}">{_esc(PR["filter_centre"].format(**fmt))}</button>'
             f'<button aria-pressed="false" data-f="all">{_esc(PR["filter_all"])}</button></div>',
             f'<p class="muted sm">{_esc(PR["filter_note"].format(**fmt))}</p>',
+            *pc3_table(F, PR, full),
             f'<h2>{_esc(PR["h2_full"].format(**fmt))}</h2>', '<div class="grid" id="g">', cards, "</div>",
             f'<h2>{_esc(PR["h2_partial"].format(**fmt))}</h2>',
             f'<p class="muted">{_esc(PR["partial_note"].format(me_top=PR["me_top"].format(**fmt) if me else "", **fmt))}</p>']
@@ -467,26 +613,67 @@ def render(art, shp, PR, pcxd):
 
 # ------------------------------------------------------------------ audit
 
-def expected_card(art, sid, idx):
-    """The four figures of shape `sid`, computed from the artefact alone and by a different route from
-    `entries()`: a direct scan for the best tiling, exact fractions throughout."""
-    o = art["shapes"][sid]
+def expected_upper(o, idx):
+    """The see-both-bags figures (two-bag, joint) of shape `o`, by a direct scan for the best tiling."""
     best = None
     for t in o["til"]:
         if t["p5"] >= BAG:
-            p4, n4 = Fraction(1), 0
+            p4 = Fraction(1)
         else:
             r = idx.get(",".join(str(x) for x in o["rows"]) + "|" + t["left"])
-            p4, n4 = (None, 0) if r is None else (Fraction(t["p5"]) / BAG + (1 - Fraction(t["p5"]) / BAG) * Fraction(r["ok"], r["n"]), r["n"])
+            p4 = None if r is None else Fraction(t["p5"]) / BAG + (1 - Fraction(t["p5"]) / BAG) * Fraction(r["ok"], r["n"])
         sc = t["B"] * (p4 if p4 is not None else Fraction(t["p5"], BAG))
         if best is None or (sc, t["B"]) > (best[0], best[1]["B"]):
-            best = (sc, t, p4, n4)
-    sc, t, p4, n4 = best
-    two = pct(Fraction(t["B"], N2))
-    if t["B"] == 0:
-        return [two, "未計", "未計", pct(sc / N2)]
-    pc4 = "–" if p4 is None else (("≈" if n4 else "") + pct(p4))
-    return [two, pct(Fraction(t["p5"], BAG)), pc4, pct(sc / N2)]
+            best = (sc, t)
+    return [pct(Fraction(best[1]["B"], N2)), pct(best[0] / N2)]
+
+
+def expected_card(art, sid, idx):
+    """A card's figures computed from the artefact alone and by a different route from `fixed_figs`: the best
+    bag-1 board re-picked from every board's class counts, each class's PC read straight off a tiling ending
+    on it, exact fractions throughout. Returns (fixed four, upper two, problems)."""
+    o = art["shapes"][sid]
+    bad = []
+    f = o.get("fixed")
+    up = expected_upper(o, idx)
+    if not f or not f["nb1"]:
+        return [pct(0), "未計", "未計", pct(0)], up, bad
+    pcs = {}
+    for t in o["til"]:
+        if t["B"] and t["left"] not in pcs:
+            if t["p5"] >= BAG:
+                pcs[t["left"]] = (Fraction(1), t["p5"], 0, True)
+            else:
+                r = idx.get(",".join(str(x) for x in o["rows"]) + "|" + t["left"])
+                if r is None:
+                    pcs[t["left"]] = (Fraction(t["p5"], BAG), t["p5"], 0, False)
+                else:
+                    pcs[t["left"]] = (Fraction(t["p5"]) / BAG + (1 - Fraction(t["p5"]) / BAG) * Fraction(r["ok"], r["n"]),
+                                      t["p5"], r["n"], True)
+    def joint_of(cum):
+        return sum((cum[k] - (cum[k - 1] if k else 0)) * pcs[c][0] for k, c in enumerate(f["classes"]))
+    pick = max(range(len(f["cums"])), key=lambda i: (joint_of(f["cums"][i]), f["cums"][i][-1], -i))
+    if pick != f["best"]:
+        bad.append(f"shape {sid}: the artefact's best bag-1 board is {f['best']}, re-picked {pick}")
+    if [pcs[c][0] for c in f["classes"]] != sorted((pcs[c][0] for c in f["classes"]), reverse=True):
+        bad.append(f"shape {sid}: the leftover classes are not ordered by PC")
+    t = o["til"][f["til"]]
+    if not {(k, tuple(sorted(c))) for k, c in f["b1"]} <= {(k, tuple(sorted(c))) for k, c in t["pieces"]}:
+        bad.append(f"shape {sid}: the drawn tiling does not hold the fixed bag-1 board")
+    cum = f["cums"][f["best"]]
+    tot = cum[-1]
+    if not tot:
+        return [pct(0), "未計", "未計", pct(0)], up, bad
+    j, p3, n4, ok4 = Fraction(0), Fraction(0), 0, True
+    for k, c in enumerate(f["classes"]):
+        d = cum[k] - (cum[k - 1] if k else 0)
+        if d:
+            j += d * pcs[c][0]
+            p3 += Fraction(d * pcs[c][1], BAG)
+            n4 = max(n4, pcs[c][2])
+            ok4 &= pcs[c][3]
+    pc4 = (("≈" if n4 else "") + pct(j / tot)) if ok4 else "–"
+    return [pct(Fraction(tot, N2)), pct(p3 / tot), pc4, pct(j / N2)], up, bad
 
 
 def audit_pcx(cards, ents, pcxd):
@@ -496,7 +683,7 @@ def audit_pcx(cards, ents, pcxd):
     by = {e["s"]["id"]: e for e in ents}
     for sid, rk, body in cards:
         e = by[int(sid)]
-        b = e["best"]
+        b = shown_tiling(e)
         secs = _PCX.findall(body)
         if b["B"] == 0:
             if secs:
@@ -539,16 +726,20 @@ def audit(page, art, shp, PR, pcxd=None):
         bad.append(f"the cards are not one per ranked shape in rank order (page {len(got)}, artefact {len(want)})")
     for sid, rk, body in cards:
         figs = {k: re.sub(r"<[^>]+>", "", html.unescape(v)) for k, v in _FIG.findall(body)}
-        exp = expected_card(art, int(sid), idx)
+        exp, eup, why = expected_card(art, int(sid), idx)
+        bad += [f"card {rk}: {w}" for w in why]
         pr = [figs.get(k) for k in ("two", "pc3", "pc4", "joint")]
         if pr != exp:
             bad.append(f"card {rk}: printed figures {pr} are not the recomputed {exp}")
+        if [figs.get("up_two"), figs.get("up_joint")] != eup:
+            bad.append(f"card {rk}: the see-both-bags figures are not the recomputed {eup}")
         if "未計" in exp and ("0%" in pr[1:3]):
             bad.append(f"card {rk}: a 0% PC where 未計 is required")
         if ("≈" in exp[2]) != ("≈" in (pr[2] or "")):
             bad.append(f"card {rk}: the ≈ of a sampled figure is missing or spurious")
     if pcxd is not None:
         bad += audit_pcx(cards, ents, pcxd)
+    bad += audit_pc3(page, F)
     m = _ISLAND.search(page)
     if not m:
         bad.append("no data island")
@@ -613,6 +804,21 @@ def selftest(repo=REPO):
     expect("a worked-PC deal letter swapped", sub(r'<figure data-deal="([A-Z]{2})', lambda d: d[::-1] if d[0] != d[1] else "IO"), True)
     expect("a worked-PC cell moved", sub(r'<li data-p="[A-Z]" data-c="(\d+)', lambda c: str((int(c) + 1) % 60)), True)
     expect("a worked-PC hold flag flipped", sub(r'<li data-p="[A-Z]" data-c="[\d,]+" data-h="([01])"', lambda h: "1" if h == "0" else "0"), True)
+    expect("a card's see-both-bags figure edited", sub(r'data-f="up_two">(\d)', lambda d: str((int(d) + 1) % 10)), True)
+    expect("the fixed figures dropped for the see-both-bags ones",
+           page.replace('data-f="two">', 'data-f="two_x">', 1).replace('data-f="up_two">', 'data-f="two">', 1), True)
+
+    worse = copy.deepcopy(art)
+    o = next(o for o in worse["shapes"] if o.get("fixed") and o["fixed"]["nb1"] > 1
+             and len({c[-1] for c in o["fixed"]["cums"]}) > 1)
+    f = o["fixed"]
+    f["best"] = next(i for i, c in enumerate(f["cums"]) if c[-1] != f["cums"][f["best"]][-1])
+    expect("a worse bag-1 board picked", render(worse, shp, PR, pcxd), True)
+    expect("a 3巡 PC table figure edited", sub(r'data-g="j3">(\d)', lambda d: str((int(d) + 1) % 10)), True)
+    rows = _P3ROW.findall(page)
+    expect("two 3巡 PC table rows swapped",
+           page.replace(f'data-p3="{rows[0][0]}"', "data-p3=\"X\"", 1).replace(f'data-p3="{rows[1][0]}"', f'data-p3="{rows[0][0]}"', 1)
+           .replace('data-p3="X"', f'data-p3="{rows[1][0]}"', 1), True)
     expect("an external request planted", page.replace("<style>", '<link rel="stylesheet" href="https://x.example/a.css"><style>', 1), True)
     print(f"selftest: {killed} killed, {survived} survived")
     return 1 if survived else 0

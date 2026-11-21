@@ -6489,6 +6489,19 @@ its input line), so `bin/emit-corpus` names the artefact and skips it always, ev
 harddrop wikitext the harddrop shapes were read from carries no revision pin, and the johnbeak fumens and the one hand-drawn board are recorded
 rows only. A shape from one of those is as good as its transcription and no better; ROADMAP.md lists them.
 
+**The ranking is by a FIXED bag 1 (since 2026-11-21, yachi, on Fable's advice).** The first version ranked by the best
+single tiling with both bags seen, which assumes the player adapts bag 1 to bag 2 and read far higher than any learnt opener. The
+counter's `FIXED=1` mode (input `name|cells|tst|classes`, classes the shape's leftovers ordered by PC, highest first) takes every
+bag-1 board (one placement each of IJLOSZ, T held) and counts, per board, the 5040² two-bag deals that end on a tiling holding
+that board, cumulative by leftover class (`cum[k]`). `emit-tst-openers.py --fixed-input` prints those lines, `--merge-fixed <out>`
+merges the counter's output into each shape's `fixed` block (`classes`, `nb1`, `best`, `b1`, `ntil`, `til`, `cums`; schema
+`tst-openers/2`). The best board is the one with the largest rate × PC (the class increments times their PC), the card draws it and
+`fixed.til`, and the page ranks by that joint figure. PC is over the deals the fixed board builds. The old figure stays on each card
+as 「睇晒兩包（揀一種砌法）」 and is NOT a strict upper bound: a fixed bag 1 may finish on several tilings, so the page counts the
+shapes where the fixed rate exceeds it (computed at render, never typed). The audit re-picks the best board from `cums`, checks the
+drawn tiling holds it and re-derives both figure sets; test (e) re-runs the pinned cheap shapes in `FIXED=1`. The fixed run is part
+of the full recount and is not re-run in CI. The worked PCs follow the drawn tiling (`tst_openers_page.shown_tiling`).
+
 ## 影片實戰例子 — boards read off one match video, drawn beside the source drawings
 
 `pipeline/openers/video-examples.json` (schema `video-examples/2`) holds boards read off YouTube videos, listed in

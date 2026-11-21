@@ -185,10 +185,149 @@ fn main() {
     for _ in 0..nt { let (ps, lines, next, tx) = (ps.clone(), lines.clone(), next.clone(), tx.clone()); std::thread::spawn(move || {
         let mut pcm = HashMap::new();
         loop { let i = next.fetch_add(1, std::sync::atomic::Ordering::SeqCst); if i >= lines.len() { break; }
-            let t0 = std::time::Instant::now(); let s = run(&lines[i], &ps, &mut pcm);
+            let t0 = std::time::Instant::now(); let s = if std::env::var("FIXED").is_ok() { run_fixed(&lines[i]) } else { run(&lines[i], &ps, &mut pcm) };
             eprintln!("{} done in {:?}", lines[i].split('|').next().unwrap(), t0.elapsed()); tx.send(s).unwrap(); }
     }); }
     drop(tx);
     let so = std::io::stdout(); let mut so = so.lock();
     for s in rx { writeln!(so, "{}", s).unwrap(); so.flush().unwrap(); }
+}
+
+// ---- fixed bag 1 (FIXED=1) --------------------------------------------------------------------
+// Input line: name|cells|tst|classes, classes = ';'-joined `left` strings ('-' for empty) in the
+// order the caller ranks them. The player learns ONE bag-1 board (one placement of each of IJLOSZ,
+// T held) and adapts bag 2 freely among every tiling of the shape that contains that board.
+// For each such board and each k, `cum[k]` counts the 5040² dealt orders of bags 1+2 that end on
+// a tiling whose `left` is among the first k+1 classes, with a T held and the TST slot reachable.
+struct UState { set: Vec<usize>, occ: u128, tils: Vec<usize> }
+struct Union { pl: Vec<Pl>, kind: Vec<u8>, til_sets: Vec<Vec<usize>>, nodes: Vec<UState>, index: HashMap<Vec<usize>, u32>, edges: HashMap<u32, Vec<(usize, u32)>>, tst_ok: bool, n: usize }
+impl Union {
+    fn node(&mut self, set: Vec<usize>, tils: Vec<usize>) -> u32 {
+        if let Some(&i) = self.index.get(&set) { return i; }
+        let occ = set.iter().fold(0u128, |a, &p| a | bits(&self.pl[p].1));
+        let i = self.nodes.len() as u32; self.index.insert(set.clone(), i); self.nodes.push(UState { set, occ, tils }); i
+    }
+    fn edges_of(&mut self, id: u32, rc: &mut Reach) -> Vec<(usize, u32)> {
+        if let Some(e) = self.edges.get(&id) { return e.clone(); }
+        let (set, occ, tils) = { let s = &self.nodes[id as usize]; (s.set.clone(), s.occ, s.tils.clone()) };
+        let mut cand: Vec<usize> = tils.iter().flat_map(|&t| self.til_sets[t].iter().cloned()).filter(|p| !set.contains(p)).collect();
+        cand.sort(); cand.dedup();
+        let mut out = vec![];
+        for p in cand {
+            let want: [u16;4] = [self.pl[p].1[0], self.pl[p].1[1], self.pl[p].1[2], self.pl[p].1[3]];
+            if !rc.get(occ, sym_of(self.pl[p].0)).iter().any(|f| f.0 == want) { continue; }
+            let mut s2 = set.clone(); s2.push(p); s2.sort();
+            let t2: Vec<usize> = tils.iter().cloned().filter(|&t| self.til_sets[t].binary_search(&p).is_ok()).collect();
+            let c = self.node(s2, t2); out.push((p, c));
+        }
+        self.edges.insert(id, out.clone()); out
+    }
+    fn full_til(&self, id: u32) -> Option<usize> { let s = &self.nodes[id as usize]; if s.set.len() == self.n { s.tils.first().cloned() } else { None } }
+}
+struct FCounter<'a> { u: &'a mut Union, rc: &'a mut Reach, b1: Vec<usize>, b1_id: u32, allowed: Vec<bool>, memo: HashMap<Vec<u32>, u64> }
+fn fenc(id: u32, h: u32, f: u32) -> u32 { f << 31 | h << 28 | id }
+impl<'a> FCounter<'a> {
+    fn ok_full(&self, id: u32) -> bool { self.u.full_til(id).map_or(false, |t| self.allowed[t]) && self.u.tst_ok }
+    fn place(&mut self, id: u32, c: u8, ph: u32, out: &mut Vec<u32>) -> bool {
+        if self.u.full_til(id).is_some() { return ph == 1 && c == T && self.ok_full(id); }
+        for (p, ch) in self.u.edges_of(id, self.rc) {
+            if self.u.kind[p] != c { continue; }
+            if ph == 0 && !self.b1.contains(&p) { continue; }
+            out.push(ch);
+        }
+        false
+    }
+    fn step(&mut self, st: &[u32], c: u8, ph: u32) -> Step {
+        let mut res = vec![]; let mut tmp = vec![];
+        for &s in st {
+            let f = s >> 31; let h = s >> 28 & 7; let id = s & 0x0fff_ffff;
+            tmp.clear(); if self.place(id, c, ph, &mut tmp) { return Step::Win; }
+            for &m2 in &tmp { res.push(fenc(m2, h, 0)); }
+            if f == 1 { continue; }
+            if h == 0 { res.push(fenc(id, c as u32, 1)); }
+            else { tmp.clear(); if self.place(id, h as u8, ph, &mut tmp) { return Step::Win; } for &m2 in &tmp { res.push(fenc(m2, c as u32, 0)); } }
+        }
+        res.sort_unstable(); res.dedup(); Step::S(res)
+    }
+    fn rec(&mut self, st: Vec<u32>, r: u32, ph: u32) -> u64 {
+        if r == 0 {
+            if ph == 0 {
+                let mut v: Vec<u32> = st.iter().filter(|&&s| s & 0x0fff_ffff == self.b1_id).map(|&s| s & !(1 << 31)).collect();
+                v.sort_unstable(); v.dedup();
+                if v.is_empty() { return 0; }
+                if std::env::var("B1ONLY").is_ok() { return 5040; }
+                return self.rec(v, 127, 1);
+            }
+            return st.iter().any(|&s| { let h = s >> 28 & 7; let id = s & 0x0fff_ffff; h == T as u32 && self.ok_full(id) }) as u64;
+        }
+        let mut key = st.clone(); key.push(ph << 8 | r);
+        if let Some(&v) = self.memo.get(&key) { return v; }
+        let rem = r.count_ones() as usize; let mut tot = 0;
+        for i in 0..7 { if r >> i & 1 == 1 {
+            match self.step(&st, i as u8 + 1, ph) {
+                Step::Win => tot += FACT[rem-1],
+                Step::S(v) => if !v.is_empty() { tot += self.rec(v, r & !(1 << i), ph); }
+            }
+        }}
+        self.memo.insert(key, tot); tot
+    }
+}
+fn left_of(t: &[Pl]) -> String {
+    let mut left = String::new();
+    for &k in b"IJLOSTZ" { let used = t.iter().filter(|p| p.0 == k).count() as i32 + if k == b'T' { 1 } else { 0 }; for _ in used..2 { left.push(k as char); } }
+    left
+}
+fn run_fixed(line: &str) -> String {
+    let mut parts = line.split('|');
+    let name = parts.next().unwrap();
+    let parse = |s: &str| -> Vec<(i32,i32)> { s.split(';').map(|p| { let mut q = p.split(','); (q.next().unwrap().parse().unwrap(), q.next().unwrap().parse().unwrap()) }).collect() };
+    let cells = parse(parts.next().unwrap()); let tstv = parse(parts.next().unwrap());
+    let classes: Vec<String> = parts.next().unwrap().split(';').map(|s| if s == "-" { String::new() } else { s.to_string() }).collect();
+    let mut tst = [0u16;4]; for i in 0..4 { tst[i] = (tstv[i].1*10+tstv[i].0) as u16; } tst.sort();
+    let lim: HashMap<u8,u32> = b"IJLOSZ".iter().map(|&k| (k,2)).chain([(b'T',1)]).collect();
+    let tils = tile(&cells, &lim);
+    let mut rc = Reach { cache: HashMap::new() };
+    // union placement list, each tiling as a sorted id list
+    let mut pl: Vec<Pl> = tils.iter().flat_map(|t| t.iter().cloned()).collect(); pl.sort(); pl.dedup();
+    let til_sets: Vec<Vec<usize>> = tils.iter().map(|t| { let mut v: Vec<usize> = t.iter().map(|p| pl.binary_search(p).unwrap()).collect(); v.sort(); v }).collect();
+    let n = tils.first().map_or(0, |t| t.len());
+    assert!(tils.iter().all(|t| t.len() == n), "tilings of one shape differ in piece count");
+    let shape_occ: u128 = cells.iter().fold(0u128, |a, p| a | 1u128 << (p.1*10+p.0));
+    let tst_ok = !tils.is_empty() && rc.get(shape_occ, sym_of(b'T')).iter().any(|f| f.0 == tst && f.1 == 2);
+    let kind: Vec<u8> = pl.iter().map(|p| K.iter().position(|&c| c == p.0).unwrap() as u8 + 1).collect();
+    let til_left: Vec<String> = tils.iter().map(|t| left_of(t)).collect();
+    let mut u = Union { pl: pl.clone(), kind, til_sets: til_sets.clone(), nodes: vec![], index: HashMap::new(), edges: HashMap::new(), tst_ok, n };
+    let root = u.node(vec![], (0..tils.len()).collect());
+    // bag-1 boards: one placement of each of IJLOSZ from one tiling, buildable from empty using only themselves
+    let mut boards: Vec<Vec<usize>> = vec![];
+    for ts in &til_sets {
+        let mut by: Vec<Vec<usize>> = vec![vec![]; 6];
+        for &p in ts { if let Some(k) = b"IJLOSZ".iter().position(|&c| c == pl[p].0) { by[k].push(p); } }
+        if by.iter().any(|v| v.is_empty()) { continue; }
+        let mut combos: Vec<Vec<usize>> = vec![vec![]];
+        for v in &by { combos = combos.into_iter().flat_map(|c| v.iter().map(move |&p| { let mut d = c.clone(); d.push(p); d })).collect(); }
+        for mut c in combos { c.sort(); boards.push(c); }
+    }
+    boards.sort(); boards.dedup();
+    let mut out = vec![];
+    for b1 in boards {
+        // buildable: BFS over subsets of b1 from root
+        let mut seen = std::collections::HashSet::new(); seen.insert(root); let mut q = vec![root]; let mut b1_id = None;
+        while let Some(id) = q.pop() {
+            if u.nodes[id as usize].set == b1 { b1_id = Some(id); }
+            for (p, ch) in u.edges_of(id, &mut rc) { if b1.contains(&p) && seen.insert(ch) { q.push(ch); } }
+        }
+        let Some(b1_id) = b1_id else { continue; };
+        let mut cum = vec![];
+        for k in 0..classes.len() {
+            let allowed: Vec<bool> = til_left.iter().map(|l| classes[..=k].contains(l)).collect();
+            if k > 0 && allowed == til_left.iter().map(|l| classes[..k].contains(l)).collect::<Vec<_>>() { let last = *cum.last().unwrap(); cum.push(last); continue; }
+            let mut c = FCounter { u: &mut u, rc: &mut rc, b1: b1.clone(), b1_id, allowed, memo: HashMap::new() };
+            cum.push(c.rec(vec![fenc(root, 0, 0)], 127, 0));
+        }
+        let pieces: Vec<String> = b1.iter().map(|&p| format!("[\"{}\",[{}]]", pl[p].0 as char, pl[p].1.iter().map(|c| c.to_string()).collect::<Vec<_>>().join(","))).collect();
+        let ntil = u.nodes[b1_id as usize].tils.len();
+        out.push(format!("{{\"pieces\":[{}],\"ntil\":{},\"cum\":[{}]}}", pieces.join(","), ntil, cum.iter().map(|c| c.to_string()).collect::<Vec<_>>().join(",")));
+    }
+    format!("{{\"name\":\"{}\",\"classes\":[{}],\"b1\":[{}]}}", name, classes.iter().map(|c| format!("\"{}\"", c)).collect::<Vec<_>>().join(","), out.join(","))
 }
