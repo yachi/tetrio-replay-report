@@ -37,7 +37,7 @@ def crate_md5():
 
 def lines(repo=ROOT):
     art, shp = P.load_inputs(str(repo))
-    return [P.line_of(e["o"], e["best"]) for e in P.entries(art, shp) if e["best"]["B"] > 0]
+    return [P.line_of(e["o"], P.shown_tiling(e)) for e in P.entries(art, shp) if P.shown_tiling(e)["B"] > 0]
 
 
 def build(jobs=4):
