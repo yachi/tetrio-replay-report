@@ -7,8 +7,10 @@
  * 露天嘅TST位。再加多一粒就即食tst」) is one variant, `tst`, `window_basis: spin_rule`, so the profile's `detect`
  * decides, and it reads the round's locks from the previous T-spin to the TST: the TST's cells were covered before that
  * T-spin, its clear opens at least one of the slot's columns to the sky, pieces placed after it roof that column, and
- * the next T fires the TST. (A stricter reading, the whole slot roofless and one piece over the nub, failed the video's
- * own pair, so the rule is this relaxed one.) The video's own TSD is the T-spin
+ * the next T fires the TST. The slot itself (the T rows and the row under them, the T's columns and one each side) must
+ * already be complete right after that clear: only the roof is added (yachi, 2026-11-21: 「影片食完tst ,擺完頂就食得，
+ * 唔洗點砌，啲examples 要砌好多，唔算」). (A stricter reading, the whole slot roofless and one piece over the nub, failed
+ * the video's own pair.) The video's own TSD is the T-spin
  * before its TST. What makes a hit accidental is also the qualify hook (`accidental-qualify.ts`): mid-game, no other
  * page's window, no opener route. No payoff and no follow-up: the hit is the spin itself (`no_followup`).
  */
@@ -26,8 +28,9 @@ const H = 40, W = 10;
 
 /** each ablation drops one clause of the rule, at the opportunity (a full TST): `no_next_t` lets a T lock between the
  *  two spins, `no_exposed` drops "covered before i's clear", `no_access` drops "a T column opened to the sky by
- *  i's clear", `no_new_roof` drops "that column roofed by a piece placed after i" */
-export const ACCIDENTAL_ABLATIONS = ['no_next_t', 'no_exposed', 'no_access', 'no_new_roof'];
+ *  i's clear", `no_new_roof` drops "that column roofed by a piece placed after i", `no_slot_built` drops "the slot
+ *  box already complete right after i's clear" */
+export const ACCIDENTAL_ABLATIONS = ['no_next_t', 'no_exposed', 'no_access', 'no_new_roof', 'no_slot_built'];
 
 /** row r of the board before a lock that clears `cleared`: the row it was before the clear (-1: a row the clear
  *  brought in empty at the top) */
@@ -51,7 +54,9 @@ const openToSky = (b: string[][], cells: C[]) => cells.every(c => {
  *  (none is a new row) and empty right after it, and were covered before it (exposed: a filled cell over them, or a
  *  row i cleared, or a cell i's own T filled); ACCESS: the top T cell of at least one of j's columns is open to the sky
  *  right after i's clear; ROOF: over at least one such column, the lowest filled cell above the T before j was placed
- *  by a piece after i (any number of roof pieces). Every lock from i to j-1 must
+ *  by a piece after i (any number of roof pieces); SLOT BUILT: every filled cell before j in the slot box (the T rows and
+ *  the row under them, the T's columns and one each side) stood there right after i's clear, so nothing between i and j
+ *  built the slot, only the roof above it. Every lock from i to j-1 must
  *  pass its row-map check. The box (full width, two rows above the T to one under it) is display only. */
 export function accidentalDetect(d: TechDigest, jx: number, _withT: unknown, T: C[], rows: number[], abl?: string,
                                  variant?: string) {
@@ -123,6 +128,17 @@ export function accidentalDetect(d: TechDigest, jx: number, _withT: unknown, T: 
   if (abl !== 'no_new_roof' && roofs.size === 0) return null;
   const rs = T.map(c => c.row);
   const r0 = Math.min(...rs), r1 = Math.max(...rs);
+  // SLOT BUILT (yachi: 「擺完頂就食得，唔洗點砌」): the slot box, the T rows and the row under them, the T's columns
+  // and one each side, was already complete right after i's clear: every filled cell of it before j stood there then
+  if (abl !== 'no_slot_built') {
+    const cs = T.map(c => c.col);
+    const c0 = Math.max(0, Math.min(...cs) - 1), c1 = Math.min(W - 1, Math.max(...cs) + 1);
+    for (let r = r0; r <= Math.min(H - 1, r1 + 1); r++) for (let c = c0; c <= c1; c++) {
+      if (bj[r]![c] === '.' || T.some(t => t.row === r && t.col === c)) continue;
+      const mr = back(r);
+      if (mr < 0 || kept[mr]![c] === '.') return null;
+    }
+  }
   return { columns: [], box: { rows: [Math.max(0, r0 - 2), Math.min(H - 1, r1 + 1)] as [number, number],
                                cols: [0, W - 1] as [number, number] },
            rule: { prev_spin_lock: i, roof_locks: [...roofs].sort((a, b) => a - b) } };
@@ -156,7 +172,7 @@ export const ACCIDENTAL: TechniqueProfile = {
     schema: 'technique-facts/1',
     means: 'For every scored T-spin in the corpus (a T with an engine spin credit that cleared lines, inside '
       + 'the verified prefix, passing the reconstruction check), whether it was a full T-spin Triple whose slot the '
-      + 'previous T-spin\'s clear opened to the sky in at least one column, pieces placed after it then roofing that column (variant tst), and, through qualify, whether '
+      + 'previous T-spin\'s clear left complete and opened to the sky in at least one column, pieces placed after it only roofing it (variant tst), and, through qualify, whether '
       + 'no technique page and no opener route owns it: an accidental T-spin (意外 T-spin, yachi\'s 「accidental tsd tst」).',
     notEligible: 'simulator output: which T-spin a lock was is read off the vendored Triangle '
       + 'engine\'s boards, and nothing on the corpus side has a second implementation of it. No claim id, '
@@ -176,10 +192,12 @@ export const ACCIDENTAL: TechniqueProfile = {
       + 'garbage insertion, land on rows that stood after i\'s clear, and are empty there '
       + 'and covered before it (a filled cell over them, a row i cleared, or i\'s own T); the top T cell of at least one of '
       + 'j\'s columns is open to the sky right after i\'s clear (access), and over at least one such column the lowest '
-      + 'filled cell before j was placed after i (the roof; any number of pieces). No gap cap. The box is display only',
+      + 'filled cell before j was placed after i (the roof; any number of pieces); every filled cell before j in the slot box '
+      + '(the T rows and the row under them, the T\'s columns and one each side) stood there right after i\'s clear, so '
+      + 'only the roof is built between the two spins (slot built). No gap cap. The box is display only',
     'no follow-up and no payoff: the hit is the spin itself (no_followup)',
-    'controls: the same rule at the profile\'s other scored spins; ablations no_next_t, no_exposed, no_access and '
-      + 'no_new_roof each drop one clause, at the opportunity; orientation_baseline = opportunities whose T is stood up',
+    'controls: the same rule at the profile\'s other scored spins; ablations no_next_t, no_exposed, no_access, '
+      + 'no_new_roof and no_slot_built each drop one clause, at the opportunity; orientation_baseline = opportunities whose T is stood up',
   ],
   qualify: {
     rules: [

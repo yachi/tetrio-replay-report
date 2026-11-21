@@ -9,7 +9,12 @@
  * the round cleared lines; no T locks between them; j's four T cells were covered before i's clear and empty right
  * after it, on rows that stood then. Relaxed 2026-11-21 (yachi's video failed the earlier overhang reading): at least
  * one T column's top cell is open to the sky right after i's clear (ACCESS), and over every such column the lowest
- * filled cell above the T before j belongs to a piece placed after i (ROOF; any number of roof pieces).
+ * filled cell above the T before j belongs to a piece placed after i (ROOF; any number of roof pieces). Tightened
+ * the same day (yachi: 「影片食完tst ,擺完頂就食得，唔洗點砌，啲examples 要砌好多，唔算」; chose 「收緊版(0 個)」): the
+ * slot box (the T rows and the row under them, the T's columns and one each side) must be complete right after i's
+ * clear, so only the roof is built between the two spins (SLOT BUILT). The corpus then holds NO hit; the twelve the
+ * relaxed rule found all had slot walls built after i, and are pinned here as `SLOT_BUILT_AFTER`, re-derived under the
+ * `no_slot_built` ablation and run through the qualify hook as the LOOSE profile, so the rules stay exercised.
  *
  *   1. byte identity: the committed artefact is what `build()` produces now.
  *   2. THE THIRD COPY OF THE T-SPIN LOOP, held to `emit-opener-facts.ts`'s own count.
@@ -27,7 +32,7 @@
  */import { test, expect } from 'bun:test';
 import { readFileSync } from 'node:fs';
 import { build, serialise, digestCorpus, type Mutants, type TechDigest } from '../sim/technique-facts.ts';
-import { ACCIDENTAL } from '../sim/technique-profile-accidental.ts';
+import { ACCIDENTAL, accidentalDetect } from '../sim/technique-profile-accidental.ts';
 import { accidentalQualifier, OTHER_PAGES, type AccidentalQualifyMutants } from '../sim/accidental-qualify.ts';
 import { TECHNIQUES } from '../sim/techniques.ts';
 import { assertCorpusIsEverySessionOnDisk } from '../corpus-membership.ts';
@@ -45,8 +50,11 @@ const TR = JSON.parse(readFileSync(ACCIDENTAL.transcriptionPath, 'utf8'));
 const H = 40;
 const USERS = ['pinglamb', 'yachi'] as const;
 
-/** Every hit, by name, in artefact order. */
-const HIT_NAMES: string[] = [
+/** Every hit, by name, in artefact order: none, since the slot-built clause. */
+const HIT_NAMES: string[] = [];
+/** The hits of the rule without its slot-built clause (the `no_slot_built` ablation, and the LOOSE profile below), in
+ *  artefact order: every one had a wall cell of its slot placed between the two spins. */
+const SLOT_BUILT_AFTER: string[] = [
   '2026-07-22 m7r8 yachi lock 65 tst',
   '2026-09-17 m5r6 yachi lock 160 tst',
   '2026-09-19 m8r5 yachi lock 78 tst',
@@ -60,10 +68,11 @@ const HIT_NAMES: string[] = [
   '2026-11-17 m2r6 pinglamb lock 29 tst',
   '2026-11-17 m3r2 pinglamb lock 308 tst',
 ];
-/** The hits that are not some opener route's own continuation (the other two are, `opener_route`). */
-const NOT_QUALIFIED = ['2026-10-09 m4r4 pinglamb lock 24 tst', '2026-10-12 m1r2 pinglamb lock 24 tst'];
-const QUALIFIED = HIT_NAMES.filter(n => !NOT_QUALIFIED.includes(n));
-/** each hit's previous T-spin and roof pieces, by lock */
+/** Of the LOOSE hits, the two that are some opener route's own continuation (`opener_route`). */
+const LOOSE_NOT_QUALIFIED = ['2026-10-09 m4r4 pinglamb lock 24 tst', '2026-10-12 m1r2 pinglamb lock 24 tst'];
+const LOOSE_QUALIFIED = SLOT_BUILT_AFTER.filter(n => !LOOSE_NOT_QUALIFIED.includes(n));
+const QUALIFIED: string[] = [];
+/** each LOOSE hit's previous T-spin and roof pieces, by lock */
 const RULE: Record<string, [number, number[]]> = {
   '2026-07-22 m7r8 yachi lock 65 tst': [50, [56, 60]],
   '2026-09-17 m5r6 yachi lock 160 tst': [147, [150, 159]],
@@ -83,13 +92,14 @@ const DENOM = {
   pinglamb: { TST: { all: 1773, in_opener: 1730, mid_game: 43 } },
   yachi: { TST: { all: 1083, in_opener: 1022, mid_game: 61 } },
 };
-const HITS = { pinglamb: { all: 5, in_opener: 0, mid_game: 5, garbage_in_window: 4 },
-               yachi: { all: 7, in_opener: 0, mid_game: 7, garbage_in_window: 7 } };
-const QUALIFY = { pinglamb: { qualified: 3, not_qualified: { opener_route: 2 } }, yachi: { qualified: 7, not_qualified: {} } };
-/** each clause dropped, at the opportunity; no_access and no_new_roof both equal the headline on this corpus
- *  (measured equivalents: every candidate passing the other clauses already has an open T column with a new roof) */
-const ABLATION = { no_next_t: { pinglamb: 7, yachi: 8 }, no_exposed: { pinglamb: 235, yachi: 94 },
-                   no_access: { pinglamb: 5, yachi: 7 }, no_new_roof: { pinglamb: 5, yachi: 7 } };
+const HITS = { pinglamb: { all: 0, in_opener: 0, mid_game: 0, garbage_in_window: 0 },
+               yachi: { all: 0, in_opener: 0, mid_game: 0, garbage_in_window: 0 } };
+const QUALIFY = { pinglamb: { qualified: 0, not_qualified: {} }, yachi: { qualified: 0, not_qualified: {} } };
+/** each clause dropped, at the opportunity. Only no_slot_built admits anything (the twelve SLOT_BUILT_AFTER); the
+ *  others equal the headline, 0, on this corpus, because every candidate they admit still fails slot-built */
+const ABLATION = { no_next_t: { pinglamb: 0, yachi: 0 }, no_exposed: { pinglamb: 0, yachi: 0 },
+                   no_access: { pinglamb: 0, yachi: 0 }, no_new_roof: { pinglamb: 0, yachi: 0 },
+                   no_slot_built: { pinglamb: 5, yachi: 7 } };
 type Abl = '' | keyof typeof ABLATION;
 
 let DIGESTS: TechDigest[] | null = null;
@@ -97,6 +107,13 @@ const digests = () => (DIGESTS ??= digestCorpus(SESSIONS));
 let ART: any = null;
 const art = () => (ART ??= JSON.parse(readFileSync(ART_PATH, 'utf8')));
 const run = (m: Mutants) => build(ACCIDENTAL, m, digests());
+/** the rule without its slot-built clause: the headline reads it as the `no_slot_built` ablation, every ablation as
+ *  itself plus that one */
+const LOOSE = { ...ACCIDENTAL, detect: { ...ACCIDENTAL.detect,
+  match: ((d: any, jx: number, w: unknown, T: any, rows: number[], abl?: string, v?: string) =>
+    accidentalDetect(d, jx, w, T, rows, abl ?? 'no_slot_built', v)) as any } };
+let LOOSE_ART: any = null;
+const looseArt = () => (LOOSE_ART ??= JSON.parse(serialise(build(LOOSE as any, {}, digests()))));
 const hk = (h: any) => `${h.session}|${h.file}|${h.round_index0}|${h.player}|${h.lock}`;
 const keyOf = (d: TechDigest, lock: number) => `${d.session}|${d.file}|${d.round}|${d.user}|${lock}`;
 const qName = (h: any) => `${h.session} m${h.match}r${h.round} ${h.player} lock ${h.lock} ${h.variant}`;
@@ -183,6 +200,16 @@ function forward(d: TechDigest, j: number, abl: Abl): { i: number; roofs: number
     }
   }
   if (abl !== 'no_new_roof' && roofs.size === 0) return null;
+  // SLOT BUILT: every filled non-T cell of the slot box before j stood there before i (tag o:)
+  if (abl !== 'no_slot_built') {
+    const rs = lj.cells.map(c => c.row), cs = lj.cells.map(c => c.col);
+    const r1 = Math.max(...rs), c0 = Math.max(0, Math.min(...cs) - 1), c1 = Math.min(W - 1, Math.max(...cs) + 1);
+    for (let r = Math.min(...rs); r <= Math.min(H - 1, r1 + 1); r++) for (let c = c0; c <= c1; c++) {
+      const x = grid[r]![c]!;
+      if (!x.occ || lj.cells.some(t => t.row === r && t.col === c)) continue;
+      if (!x.tag.startsWith('o:')) return null;
+    }
+  }
   return { i, roofs: [...roofs].sort((x, y) => x - y) };
 }
 
@@ -216,11 +243,16 @@ test('the detector, re-derived forward: the hits, their previous spin and roof, 
       const m = forward(d, s.i, abl);
       if (!m) continue;
       by[d.user]!++;
-      if (!abl) want.set(keyOf(d, s.i), [m.i, m.roofs]);
+      if (!abl || abl === 'no_slot_built') want.set(keyOf(d, s.i), [m.i, m.roofs]);
     }
     if (abl) {
       expect(by, abl).toEqual(ABLATION[abl]);
       expect(a.variants.tst.controls.ablation[abl], abl).toEqual(ABLATION[abl]);
+      if (abl === 'no_slot_built') {
+        const lg = new Map<string, [number, number[]]>(looseArt().hits.map((h: any) =>
+          [hk(h), [h.rule.prev_spin_lock, h.rule.roof_locks]]));
+        expect([...lg.entries()].sort()).toEqual([...want.entries()].sort());
+      }
       continue;
     }
     const got = new Map<string, [number, number[]]>(a.hits.map((h: any) =>
@@ -230,9 +262,10 @@ test('the detector, re-derived forward: the hits, their previous spin and roof, 
   }
 }, 1_200_000);
 
-test('each hit: its previous T-spin cleared lines, no T between, roof pieces placed after it, a box over the T', () => {
+test('each LOOSE hit: its previous T-spin cleared lines, no T between, roof pieces after it, a slot wall built after it', () => {
   const byKey = new Map(digests().map(d => [`${d.file}|${d.round}|${d.user}`, d]));
-  for (const h of art().hits) {
+  expect(looseArt().lists.accidental_hits).toEqual(SLOT_BUILT_AFTER);
+  for (const h of looseArt().hits) {
     const d = byKey.get(`${h.file}|${h.round_index0}|${h.player}`)!;
     const [i, roofs] = RULE[qName(h)]!;
     expect([h.rule.prev_spin_lock, h.rule.roof_locks], qName(h)).toEqual([i, roofs]);
@@ -244,35 +277,41 @@ test('each hit: its previous T-spin cleared lines, no T between, roof pieces pla
     for (const k of roofs) expect(k > i && k < h.lock, qName(h)).toBe(true);
     expect(h.rule.t_cells.length, qName(h)).toBe(4);
     expect(h.rule.box.cols, qName(h)).toEqual([0, 9]);
+    // the clause the headline adds is what refuses it
+    const lk = d.locks[h.lock]!;
+    expect(accidentalDetect(d, h.lock, null, lk.cells, lk.clearedRows, undefined, 'tst'), qName(h)).toBeNull();
+    expect(accidentalDetect(d, h.lock, null, lk.cells, lk.clearedRows, 'no_slot_built', 'tst'), qName(h)).not.toBeNull();
   }
 }, 600_000);
 
-test('the qualify verdicts, re-derived; two hits are an opener route\'s own, and only that rule turned off adds them', () => {
+test('the qualify verdicts on the LOOSE hits, re-derived; two are an opener route\'s own, and only that rule turned off adds them', () => {
   const byKey = new Map(digests().map(d => [`${d.file}|${d.round}|${d.user}`, d]));
+  const L = looseArt().hits;
   const verdicts = (m: AccidentalQualifyMutants) => {
     const q = accidentalQualifier(OPENERS, ANALYSIS, m);
-    return art().hits.map((h: any) => q(h, byKey.get(`${h.file}|${h.round_index0}|${h.player}`)!));
+    return L.map((h: any) => q(h, byKey.get(`${h.file}|${h.round_index0}|${h.player}`)!));
   };
   const base = verdicts({});
-  art().hits.forEach((h: any, k: number) => {
+  L.forEach((h: any, k: number) => {
     expect(base[k].qualifies, qName(h)).toBe(h.qualifies);
     expect(base[k].not_qualified, qName(h)).toEqual(h.not_qualified);
   });
-  const nq = art().hits.filter((h: any) => !h.qualifies);
-  expect(nq.map(qName)).toEqual(NOT_QUALIFIED);
+  const nq = L.filter((h: any) => !h.qualifies);
+  expect(nq.map(qName)).toEqual(LOOSE_NOT_QUALIFIED);
+  expect(L.filter((h: any) => h.qualifies).map(qName)).toEqual(LOOSE_QUALIFIED);
   for (const h of nq) expect(h.not_qualified, qName(h)).toEqual(['opener_route']);
   for (const m of ['noOpener', 'noOtherPage', 'noOpenerRoute', 'noOpenerSpin'] as (keyof AccidentalQualifyMutants)[])
     expect(verdicts({ [m]: true }).filter(x => x.qualifies).length, m)
-      .toBe(m === 'noOpenerRoute' ? art().hits.length : QUALIFIED.length);
+      .toBe(m === 'noOpenerRoute' ? L.length : LOOSE_QUALIFIED.length);
 }, 600_000);
 
 test('mid-game only: in_opener is exactly the opener window', () => {
-  for (const h of art().hits) expect(h.not_qualified.includes('in_opener'), qName(h)).toBe(h.in_opener);
+  for (const h of [...art().hits, ...looseArt().hits]) expect(h.not_qualified.includes('in_opener'), qName(h)).toBe(h.in_opener);
   expect(qualified().every((h: any) => !h.in_opener)).toBe(true);
 });
 
 test('other_page against the other artefacts: no hit is another page\'s, keyed by round', () => {
-  const mine = new Map<string, any>(art().hits.map((h: any) => [hk(h), h]));
+  const mine = new Map<string, any>(looseArt().hits.map((h: any) => [hk(h), h]));
   for (const k of OTHER_PAGES) {
     const P = (TECHNIQUES as any)[k];
     for (const x of JSON.parse(readFileSync(P.artefactPath, 'utf8')).hits)

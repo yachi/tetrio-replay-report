@@ -15,7 +15,9 @@ yachi on 2026-11-20 (「係TSpin 完意外地有個tst 形，再加個屋頂就�
 counts when the previous T-spin i of the round cleared lines, no T locks between them, j's four T cells (mapped back
 through every clear and garbage row between) were covered before i's clear and empty right after it, at least one
 column's top T cell was open to the sky right after it (access), and over such a column the lowest filled cell above
-the T before j belongs to a piece placed after i (the roof; any number of roof pieces) —
+the T before j belongs to a piece placed after i (the roof; any number of roof pieces), and the slot box (the T rows
+and the row under them, the T's columns and one each side) was already complete right after i's clear, so only the
+roof is built between them (slot built; yachi 2026-11-21: 「擺完頂就食得，唔洗點砌，啲examples 要砌好多，唔算」) —
 `technique-profile-accidental.ts`. It must also be mid-game and owned by no other technique page or opener route (the
 qualify hook, `accidental-qualify.ts`). An earlier, stricter reading (the whole slot roofless after i, one piece
 filling the cell over j's nub) was dropped because yachi's own video fails it: the cell over the nub was filled before
@@ -128,7 +130,9 @@ VARIANTS = [
      'rule_note': 'a full T-spin Triple at lock j whose slot the previous T-spin i opened: i cleared lines, no T '
                   'locks between them, j\'s four T cells (mapped back through every clear and garbage row between) '
                   'were covered before i\'s clear and empty right after it, at least one column\'s top T cell was '
-                  'open to the sky right after it, and over such a column pieces placed after i roof the slot; '
+                  'open to the sky right after it, over such a column pieces placed after i roof the slot, and the slot '
+                  'box (the T rows and the row under them, the T\'s columns and one each side) was already complete '
+                  'right after i\'s clear, so only the roof is built between them; '
                   'mid-game (lock > 21), at a T no other technique page and no opener route owns '
                   '(accidental-qualify.ts). The window is the T\'s own box: the rule reads the round\'s locks, not '
                   'a drawn shape.',
@@ -195,8 +199,10 @@ def _open(rows, cells):
 def video_pair(prev_rows, tst_rows):
     """The rule's clauses on a drawn pair (the two boards bottom-aligned): the TST's T cells were covered before the
     previous spin's clear and empty right after it; the clear opened at least one T column to the sky (its top T cell);
-    and over such a column the lowest filled cell above the T on the TST board was empty right after the clear, i.e.
-    placed after the previous spin (the roof)."""
+    over such a column the lowest filled cell above the T on the TST board was empty right after the clear, i.e.
+    placed after the previous spin (the roof); and every filled cell of the slot box on the TST board (the T rows and
+    the row under them, the T's columns and one each side) was filled right after the clear (slot built: only the
+    roof is added)."""
     filled = [''.join('c' if ch != '-' else '-' for ch in r) for r in prev_rows]
     keep = [i for i, r in enumerate(filled) if '-' in r]
     after = _clear(prev_rows)
@@ -215,14 +221,24 @@ def video_pair(prev_rows, tst_rows):
     access = [(r, c) for r, c in tops if _open(after, {(r - off, c)})]
     if not access:
         return 'no_access'
+    roofed = False
     for r, c in access:
         for rr in range(r - 1, -1, -1):
             if tst_rows[rr][c] in '-U':
                 continue
             if rr - off < 0 or after[rr - off][c] == '-':
-                return 'ok'
+                roofed = True
             break
-    return 'not_roofed'
+    if not roofed:
+        return 'not_roofed'
+    rs, cs = [r for r, _ in t], [c for _, c in t]
+    for r in range(min(rs), min(len(tst_rows) - 1, max(rs) + 1) + 1):
+        for c in range(max(0, min(cs) - 1), min(9, max(cs) + 1) + 1):
+            if tst_rows[r][c] in '-U':
+                continue
+            if r - off < 0 or after[r - off][c] == '-':
+                return 'slot_built'
+    return 'ok'
 
 
 def extra_checks(data: dict):
@@ -304,6 +320,8 @@ MUTANTS = [
      'the TST\'s roof taken away', 'discrepancy:'),
     (lambda d: [_set(node(d, k)['rows'], 1, 5, 'c') for k in ('video.tsd', 'video.tsd.spin')],
      'the column over the TST\'s stem left covered after the TSD', 'discrepancy:'),
+    (lambda d: [_set(node(d, k)['rows'], 6, 4, '-') for k in ('video.tsd', 'video.tsd.spin')],
+     'a slot wall of the TST missing right after the TSD (built between the spins)', 'discrepancy:'),
     (lambda d: node(d, 'video.tst.spin').__setitem__('caption_quote', 'nope'), 'a caption naming no quote', 'quote:'),
     (lambda d: d['cross_source']['video'].__setitem__('sha256', '0' * 64), 'the video record disagreeing', 'video:'),
     (lambda d: node(d, 'video.tsd.spin').pop('time_s'), 'a video board with no time', 'video:'),

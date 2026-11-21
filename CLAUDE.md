@@ -6234,8 +6234,14 @@ our frame read the cell over the TST's nub was filled before the TSD). Now ACCES
 is open to the sky right after i's clear; and ROOF: over every such column, the lowest filled cell above the T on the
 board before j belongs to a piece placed after i, any number of roof pieces. No gap cap. Each hit's `rule` records
 `prev_spin_lock`, `roof_locks` (sorted), the box (full width, display and `garbage_in_window` only) and `t_cells`.
-The ablations drop one clause each (`no_next_t`, `no_exposed`, `no_access`, `no_new_roof`); `no_access` and
-`no_new_roof` each equal the headline on this corpus, measured equivalents. (`technique-facts.ts` and
+**Then TIGHTENED the same day** (yachi on the relaxed hits: 「影片食完tst ,擺完頂就食得，唔洗點砌，啲examples 要砌好多，
+唔算」; he chose the tight version on a decision card knowing it leaves the corpus with no hit): SLOT BUILT, every
+filled non-T cell of the slot box (the T's rows and the row under them, its columns and one each side) on the board
+before j maps back to a filled cell of the board right after i's clear, so between the two spins only roof is added.
+The ablations drop one clause each (`no_next_t`, `no_exposed`, `no_access`, `no_new_roof`, `no_slot_built`); only
+`no_slot_built` moves off zero, and its hits are the relaxed rule's, which `accidental.test.ts` names
+(`SLOT_BUILT_AFTER`) and keeps exercised through a LOOSE profile (the detect with `no_slot_built`) so the qualify and
+`other_page` tests still run on real hits. The page states that the corpus count is zero and the video is the example. (`technique-facts.ts` and
 `technique-profile.ts`, hashed, still type the field `roof_lock`; nothing compiles them with tsc.)
 `accidental.test.ts` re-derives the hits, their locks and every ablation count with a second implementation that
 plays the board FORWARD from i with tagged cells (the profile maps backward through the row maps); the two disagreed

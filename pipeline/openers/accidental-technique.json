@@ -153,7 +153,7 @@
         ]
       ],
       "roof_cells": [],
-      "rule_note": "a full T-spin Triple at lock j whose slot the previous T-spin i opened: i cleared lines, no T locks between them, j's four T cells (mapped back through every clear and garbage row between) were covered before i's clear and empty right after it, at least one column's top T cell was open to the sky right after it, and over such a column pieces placed after i roof the slot; mid-game (lock > 21), at a T no other technique page and no opener route owns (accidental-qualify.ts). The window is the T's own box: the rule reads the round's locks, not a drawn shape.",
+      "rule_note": "a full T-spin Triple at lock j whose slot the previous T-spin i opened: i cleared lines, no T locks between them, j's four T cells (mapped back through every clear and garbage row between) were covered before i's clear and empty right after it, at least one column's top T cell was open to the sky right after it, over such a column pieces placed after i roof the slot, and the slot box (the T rows and the row under them, the T's columns and one each side) was already complete right after i's clear, so only the roof is built between them; mid-game (lock > 21), at a T no other technique page and no opener route owns (accidental-qualify.ts). The window is the T's own box: the rule reads the round's locks, not a drawn shape.",
       "fires_on": [],
       "misses": []
     }
