@@ -21,7 +21,9 @@ of the job carries `if: env.INPUTS_UNCHANGED != '1'`; the check stays green and 
 
 THE AUDIT.  On the daily schedule `gate` starts `inotifywait -m -r` on the workspace (after
 hashing, so its own reads are not logged); `audit`, the step before the record, reads that
-log and fails on a tracked file opened outside the closure.  That is the closure being
+log and fails on a tracked file opened outside the closure.  It stops the watcher before it
+computes the closure, because that computation runs `git status` and reads the workflows, and
+until 2026-11-21 those reads were logged and reported as the job's.  That is the closure being
 checked against what the job did on the runner, which no static walk can promise.
 """
 import importlib.machinery
@@ -29,8 +31,10 @@ import importlib.util
 import json
 import os
 import shutil
+import signal
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
@@ -109,11 +113,37 @@ def start_watch():
         subprocess.run(["sudo", "apt-get", "install", "-y", "-qq", "inotify-tools"],
                        check=True, stdout=subprocess.DEVNULL)
     log = Path(os.environ["RUNNER_TEMP"]) / AUDIT_LOG
-    fh = open(log, "w")
-    subprocess.Popen(["inotifywait", "-m", "-r", "-q", "-e", "open", "--format", "%e %w%f",
-                      "--exclude", r"/\.git/", str(REPO)], stdout=fh,
-                     stderr=subprocess.DEVNULL, start_new_session=True)
+    err = log.with_suffix(".err")
+    proc = subprocess.Popen(["inotifywait", "-m", "-r", "-e", "open", "--format", "%e %w%f",
+                             "--exclude", r"/\.git/", str(REPO)], stdout=open(log, "w"),
+                            stderr=open(err, "w"), start_new_session=True)
+    log.with_suffix(".pid").write_text(f"{proc.pid}\n")
+    # -r sets its watches up in the background; a step that starts before they are all in
+    # place is not watched, so wait for inotifywait to say they are.
+    for _ in range(600):
+        if "Watches established" in err.read_text() or proc.poll() is not None:
+            break
+        time.sleep(0.1)
+    else:
+        raise SystemExit("input-hash: inotifywait did not establish its watches in 60 s")
+    if proc.poll() is not None:
+        raise SystemExit(f"input-hash: inotifywait exited: {err.read_text().strip()}")
     print(f"input-hash: auditing opens into {log}")
+
+
+def stop_watch(log):
+    """Stop the watcher and return its log.  The audit computes the closure itself, and that
+    runs `git status` (which lists every directory and opens every file whose stat looks
+    changed) and reads the workflow files: with the watcher still running, those reads land
+    in the log the audit is checking, and every daily run reported them as the job's."""
+    pid = log.with_suffix(".pid")
+    if pid.exists():
+        try:
+            os.kill(int(pid.read_text()), signal.SIGTERM)
+        except ProcessLookupError:
+            pass
+        time.sleep(0.5)
+    return log.read_text().splitlines()
 
 
 def cmd_gate(job, mv):
@@ -146,12 +176,13 @@ def cmd_gate(job, mv):
 
 
 def cmd_audit(job, mv, log):
-    cl, _, tree = compute(job, mv)
     log = Path(log or Path(os.environ.get("RUNNER_TEMP", "/tmp")) / AUDIT_LOG)
     if not log.exists():
         print(f"input-hash: no audit log at {log}", file=sys.stderr)
         return 1
-    opened, listed = ic.parse_inotify(log.read_text().splitlines())
+    # stop the watcher BEFORE computing the closure: see stop_watch
+    opened, listed = ic.parse_inotify(stop_watch(log))
+    cl, _, tree = compute(job, mv)
     bad = ic.audit(cl, tree, opened, listed)
     for b in bad:
         print(f"::error title=input closure::{job}{f' [{mv}]' if mv else ''}: {b}")
