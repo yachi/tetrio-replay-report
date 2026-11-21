@@ -56,6 +56,7 @@ N2 = BAG * BAG
 LEFT_NOTE_MIN = 3                 # a leftover of this many pieces or more makes the PC count approximate
 WALL = 2                          # a TST this close to a side wall (cells) counts as 近牆
 HID_SHOWN = 6                     # how many hidden wall ranks the filter note names
+PC3_SHOWN = 15                    # rows of the 「兩巡易砌又 3 巡 PC 高」 table
 COL = dict(I="#2fb8c9", O="#e3b425", T="#9a46d6", S="#4cb648", Z="#d9433d", J="#3b61d6", L="#e5792a")
 
 # the seven tetrominoes as sets of (x, y) offsets, every rotation, normalised to min x = min y = 0
@@ -81,7 +82,9 @@ SHAPE = {k: _rots(v) for k, v in _BASE.items()}
 _PCX = re.compile(r'<details class="pcx" data-line="([^"]*)">(.*?)</details>', re.S)
 _PCX_FIG = re.compile(r'<figure data-deal="([A-Z]*)" data-h="(\d+)">(.*?)</figure>', re.S)
 _PCX_STEP = re.compile(r'<li data-p="([A-Z])" data-c="([\d,]+)" data-h="([01])">')
-_CARD = re.compile(r'<article class="card[^"]*" data-pos="[^"]*" data-card="(\d+)" data-rk="([^"]*)">(.*?)</article>', re.S)
+_CARD = re.compile(r'<article class="card[^"]*" data-pos="[^"]*" data-card="(\d+)" data-rk="([^"]*)"[^>]*>(.*?)</article>', re.S)
+_P3ROW = re.compile(r'<tr data-p3="(\d+)">(.*?)</tr>', re.S)
+_P3FIG = re.compile(r'data-g="(\w+)">(.*?)</td>', re.S)
 _FIG = re.compile(r'data-f="(\w+)">(.*?)</b>', re.S)
 _ISLAND = re.compile(r'<script id="data" type="application/json">(.*?)</script>', re.S)
 
@@ -291,6 +294,47 @@ def entries(art, shp):
             e["names"], e["mirror"] = list(s["names"]), False
             rows[k] = e
     return sorted(rows.values(), key=rank_key)
+
+
+def pc3_rank(F):
+    """The 「兩巡易砌又 3 巡 PC 高」 table: full shapes with a fixed figure, ranked by the probability that the
+    fixed bag 1 builds the shape AND bag 3 clears (fixed rate × bag-3 PC = pc3n / (N2·BAG)), then by the main
+    rank; each row is (main rank, entry, that joint). The figures are the drawn board's (`fixed_figs`)."""
+    rows = [(i + 1, e, Fraction(e["fx"]["pc3n"], N2 * BAG)) for i, e in enumerate(F) if e["fx"] and e["fx"]["cum"]]
+    rows.sort(key=lambda r: (-r[2], r[0]))
+    return rows[:PC3_SHOWN]
+
+
+def pc3_cells(rk, e, j3):
+    """The display strings of one pc3 table row: main rank, fixed rate, bag-3 PC, joint."""
+    return [f"#{rk}", pct(e["fx"]["rate"]), pct(e["fx"]["pc3"]), pct(j3)]
+
+
+def pc3_table(F, PR, full):
+    T = PR["pc3_table"]
+    head = "".join(f"<th>{_esc(h)}</th>" for h in T["cols"])
+    body = []
+    for n, (rk, e, j3) in enumerate(pc3_rank(F), 1):
+        mk, r, p3, j = pc3_cells(rk, e, j3)
+        names = ", ".join(_esc(x) for x in e["names"][:2]) + (PR["names_more"].format(c=len(e["names"])) if len(e["names"]) > 2 else "")
+        body.append(f'<tr data-p3="{e["s"]["id"]}"><td class="num">{n}</td><td><a href="#c{e["s"]["id"]}">{names}</a></td>'
+                    f'<td class="num" data-g="rate">{r}</td><td class="num" data-g="pc3">{p3}</td>'
+                    f'<td class="num j3" data-g="j3">{j}</td><td class="num" data-g="main">{mk}</td></tr>')
+    return [f'<h2>{_esc(T["h2"])}</h2>', f'<p class="muted">{T["note"].format(shown=PC3_SHOWN, full=full)}</p>',
+            f'<div class="p3w"><table class="p3"><thead><tr>{head}</tr></thead><tbody>', *body, "</tbody></table></div>"]
+
+
+def audit_pc3(page, F):
+    bad = []
+    got = [(int(sid), {k: re.sub(r"<[^>]+>", "", v) for k, v in _P3FIG.findall(b)}) for sid, b in _P3ROW.findall(page)]
+    want = pc3_rank(F)
+    if [g[0] for g in got] != [e["s"]["id"] for _, e, _ in want]:
+        bad.append("the 3巡 PC table is not the recomputed ranking")
+        return bad
+    for (sid, figs), (rk, e, j3) in zip(got, want):
+        if [figs.get(k) for k in ("main", "rate", "pc3", "j3")] != pc3_cells(rk, e, j3):
+            bad.append(f"3巡 PC table row for shape {sid}: figures are not the recomputed ones")
+    return bad
 
 
 def rank_key(e):
@@ -504,7 +548,7 @@ def card(rk, e, PR, badge="", pcxd=None):
                                 mirror=C["mirror"] if e["mirror"] else "")
     upper = (f'<div class="muted sm up">{_esc(C["upper"])} <b class="num" data-f="up_two">{up_two}</b> · '
              f'{_esc(C["joint"])} <b class="num" data-f="up_joint">{up_joint}</b></div>')
-    return (f'<article class="card{cls}" data-pos="{pos}" data-card="{s["id"]}" data-rk="{_esc(rk)}">'
+    return (f'<article class="card{cls}" data-pos="{pos}" data-card="{s["id"]}" data-rk="{_esc(rk)}" id="c{s["id"]}">'
             f'<div class="rk num">{_esc(rk)}</div>{badge}\n'
             f'<div class="bd">{svg(cells, max(H, 8), 15, tst)}<div class="smalls">{b1}<div class="small"><div class="lab">{_esc(C["left_title"])}</div>{svg(res, rh, 9)}</div></div></div>\n'
             f'<div class="meta"><div class="src">{shown}</div>\n'
@@ -558,6 +602,7 @@ def render(art, shp, PR, pcxd):
             f'<div class="bar"><button aria-pressed="true" data-f="{PR["pos_centre"]}">{_esc(PR["filter_centre"].format(**fmt))}</button>'
             f'<button aria-pressed="false" data-f="all">{_esc(PR["filter_all"])}</button></div>',
             f'<p class="muted sm">{_esc(PR["filter_note"].format(**fmt))}</p>',
+            *pc3_table(F, PR, full),
             f'<h2>{_esc(PR["h2_full"].format(**fmt))}</h2>', '<div class="grid" id="g">', cards, "</div>",
             f'<h2>{_esc(PR["h2_partial"].format(**fmt))}</h2>',
             f'<p class="muted">{_esc(PR["partial_note"].format(me_top=PR["me_top"].format(**fmt) if me else "", **fmt))}</p>']
@@ -694,6 +739,7 @@ def audit(page, art, shp, PR, pcxd=None):
             bad.append(f"card {rk}: the ≈ of a sampled figure is missing or spurious")
     if pcxd is not None:
         bad += audit_pcx(cards, ents, pcxd)
+    bad += audit_pc3(page, F)
     m = _ISLAND.search(page)
     if not m:
         bad.append("no data island")
@@ -768,6 +814,11 @@ def selftest(repo=REPO):
     f = o["fixed"]
     f["best"] = next(i for i, c in enumerate(f["cums"]) if c[-1] != f["cums"][f["best"]][-1])
     expect("a worse bag-1 board picked", render(worse, shp, PR, pcxd), True)
+    expect("a 3巡 PC table figure edited", sub(r'data-g="j3">(\d)', lambda d: str((int(d) + 1) % 10)), True)
+    rows = _P3ROW.findall(page)
+    expect("two 3巡 PC table rows swapped",
+           page.replace(f'data-p3="{rows[0][0]}"', "data-p3=\"X\"", 1).replace(f'data-p3="{rows[1][0]}"', f'data-p3="{rows[0][0]}"', 1)
+           .replace('data-p3="X"', f'data-p3="{rows[1][0]}"', 1), True)
     expect("an external request planted", page.replace("<style>", '<link rel="stylesheet" href="https://x.example/a.css"><style>', 1), True)
     print(f"selftest: {killed} killed, {survived} survived")
     return 1 if survived else 0
