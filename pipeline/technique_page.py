@@ -552,6 +552,13 @@ class TechniqueSite:
         return ['  <nav class="scp-top" aria-label="返去"><a href="index.html">← 全部戰報</a>'
                 f'<a href="{_esc(other_href)}">{_esc(other_words)}</a></nav>']
 
+    def _source_line(self, tr):
+        """The source credit line. Opt-in prose `source_line` replaces it whole for a source that is no web page
+        (意外 T-spin: yachi's own recording, with no URL to link); default the shared route-page line, as before."""
+        if "source_line" in self.PROSE:
+            return f'  <p class="scp-src-line">{_esc(self.PROSE["source_line"])}</p>'
+        return RT._source_line(tr, self.PROSE.get("source_credit"))
+
     def _window_rows(self, tr, v, mirrored):
         rows = [n for n in tr["nodes"] if n["id"] == v["board"]][0]["rows"]
         empties = tr.get("empty_letters", "")
@@ -569,10 +576,12 @@ class TechniqueSite:
     def _thumb(self, tr, v, h):
         """A hit's window before the T, its letters as the artefact records them, the T's cells as the
         dashed slot (mirrored with the window)."""
-        if v.get("window_basis") == "rule":
-            # a rule hit's thumbnail is its own box, and its T is the hit's own (`donation.t_cells`), not the drawing's
-            (r0, _r1), (c0, _c1) = h["donation"]["box"]["rows"], h["donation"]["box"]["cols"]
-            tcells = {(r - r0, c - c0) for r, c in h["donation"]["t_cells"]}
+        if v.get("window_basis") in ("rule", "spin_rule"):
+            # a rule hit's thumbnail is its own box, and its T is the hit's own (`donation.t_cells`, or `rule.t_cells`
+            # for a spin rule, 意外 T-spin), not the drawing's
+            own = h.get("donation") or h["rule"]
+            (r0, _r1), (c0, _c1) = own["box"]["rows"], own["box"]["cols"]
+            tcells = {(r - r0, c - c0) for r, c in own["t_cells"]}
         else:
             (r0, _r1), (c0, c1) = v["window"]["rows"], v["window"]["cols"]
             w = c1 - c0
@@ -605,7 +614,7 @@ class TechniqueSite:
                 f'    <div class="eyebrow">{RS.EYEBROW}</div>',
                 f'    <h1 class="section-title">{_esc(title)}</h1>',
                 f'    <p>{_esc(PR["lede"])}</p>',
-                RT._source_line(tr, PR.get("source_credit")),
+                self._source_line(tr),
                 '  </header>',
                 '  <div class="method-note">',
                 '    <p><strong>呢版唔屬於信任鏈。</strong>每個盤面都係<strong>一個 replay 模擬器</strong>'
@@ -1122,7 +1131,7 @@ class TechniqueSite:
                 f'    <div class="eyebrow">{RS.EYEBROW}</div>',
                 f'    <h1 class="section-title">{_esc(title)}</h1>',
                 f'    <p>{_esc(DP["lede"])}</p>',
-                RT._source_line(tr, self.PROSE.get("source_credit")),
+                self._source_line(tr),
                 '  </header>',
                 '  <div class="method-note">',
                 f'    <p><strong>呢版唔屬於信任鏈，亦唔係對局。</strong>所以呢版<strong>{RS.NO_CLAIM}</strong>。</p>']

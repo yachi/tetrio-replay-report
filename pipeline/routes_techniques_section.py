@@ -188,7 +188,10 @@ def compute(facts, data):
         hs = [h for h in t.art["hits"] if h["session"] == S]
         for vid, var in t.variants.items():
             row = {"name": _variant_name(t, vid, var), "short": t.name, "href": t.href,
-                   "spin": ("mini " if var.get("credit") == "mini" else "") + var["spin"], "payoff": bool(var.get("payoff")), "cells": {}}
+                   "spin": ("mini " if var.get("credit") == "mini" else "") + var["spin"], "payoff": bool(var.get("payoff")),
+                   # a `spin_rule` variant (意外 T-spin) has nothing after the spin, and every scored spin of its kind
+                   # that is not the page's is no near miss, so neither a follow-up nor a shape-only count is printed
+                   "after": not (var.get("window_basis") == "spin_rule"), "cells": {}}
             for p in players:
                 mine = [h for h in hs if h["variant"] == vid and h["player"] == p]
                 den = data["tsd"][p] if var["spin"] == "TSD" else None
@@ -196,7 +199,7 @@ def compute(facts, data):
                 # its build rules; the rest are the shape alone, printed beside the cell and never as hits.
                 shape_only = None
                 if t.art.get("qualify"):
-                    shape_only = sum(1 for h in mine if not h["qualifies"])
+                    shape_only = sum(1 for h in mine if not h["qualifies"]) if row["after"] else None
                     mine = [h for h in mine if h["qualifies"]]
                 if not mine:
                     row["cells"][p] = {"hits": 0, "den": den, "shape_only": shape_only}
@@ -204,7 +207,7 @@ def compute(facts, data):
                 reasons = {}
                 for h in mine:
                     fu = h.get("followup") or {}
-                    if not fu.get("fired"):
+                    if not fu.get("fired") and row["after"]:
                         rs = fu.get("reason")
                         _need(rs in REASON, f"{t.rel}: follow-up reason {rs!r} has no wording")
                         reasons[rs] = reasons.get(rs, 0) + 1
@@ -250,7 +253,7 @@ def _route_cell(c, nrounds, session):
             f'<a class="rs-sub" href="{href}">睇第一局（{c["first"]}）</a>{c.get("video", "")}</td>')
 
 
-def _tech_cell(c, spin, payoff):
+def _tech_cell(c, spin, payoff, after=True):
     den = (f" / {c['den']} 個 TSD" if c["den"] is not None
            else f"（{spin}，今晚冇可核 {spin} 總數）")
     shape = (f"<br><span class=\"rs-sub\">另外 {c['shape_only']} 次形似但唔算</span>"
@@ -258,7 +261,7 @@ def _tech_cell(c, spin, payoff):
     if not c["hits"]:
         return f'<td class="mono rs-zero">0{den}{shape}</td>'
     follow = "Tetris" if payoff else "第二個 T-spin"
-    sub = f"接到 {follow} {c['fired']} 次 · 開局 {c['opener']} · 中盤 {c['mid']}"
+    sub = (f"接到 {follow} {c['fired']} 次 · " if after else "") + f"開局 {c['opener']} · 中盤 {c['mid']}"
     miss = ""
     if c["reasons"]:
         miss = ("<br><span class=\"rs-sub\">冇接到：" + " · ".join(
@@ -283,7 +286,7 @@ def section(d):
         for r in routes)
     tech_rows = "".join(
         f'<tr><td><a href="{e(t["href"])}">{e(t["name"])}</a></td>'
-        + "".join(_tech_cell(t["cells"][p], t["spin"], t["payoff"]) for p in pl) + "</tr>"
+        + "".join(_tech_cell(t["cells"][p], t["spin"], t["payoff"], t["after"]) for p in pl) + "</tr>"
         for t in techs)
 
     def zero(rows, all_rows, what):

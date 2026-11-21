@@ -321,6 +321,10 @@ export interface Hit {
   /** a `rule` variant's hit only: every column the detector found, and the box its `window_letters` cover */
   donation?: { columns: { col: number; hole_row: number; depth: number; cover: string }[];
                box: { rows: [number, number]; cols: [number, number] }; t_cells: number[][] };
+  /** a `rule` variant with no payoff only (意外 T-spin): what the detector recorded (the previous T-spin's lock and
+   *  the roof piece's lock), the box its `window_letters` cover, and the T's cells */
+  rule?: { prev_spin_lock?: number; roof_lock?: number | null;
+           box: { rows: [number, number]; cols: [number, number] }; t_cells: number[][] };
 }
 
 const sameSet = (a: Cell[], b: { r: number; c: number }[]) =>
@@ -415,13 +419,19 @@ export interface Classified {
 export const caseName = (h: { session: string; match: number; round: number; player: string }) =>
   `${h.session} m${h.match}r${h.round} ${h.player}`;
 
+/** `rule`: the profile's `detect` decides (基本的なドネイト's donation rule). `spin_rule`: the same, for a variant the
+ *  transcription's gate fires on no drawing, because the rule is an exclusion over the corpus (意外 T-spin) */
+export const isRuleVariant = (v: { window_basis?: string }) => v.window_basis === 'rule' || v.window_basis === 'spin_rule';
+
 export function classify(P: TechniqueProfile, tr: any, digests: TechDigest[], mut: Mutants = {}): Classified {
   const variants: Variant[] = tr.variants;
   // a `rule` variant has no window: the profile's `detect` stands in for the predicate
-  const preps = variants.map(v => v.window_basis === 'rule' ? [] : prepare(tr, v));
-  for (const v of variants) if (v.window_basis === 'rule') {
+  const preps = variants.map(v => isRuleVariant(v) ? [] : prepare(tr, v));
+  for (const v of variants) if (isRuleVariant(v)) {
     if (!P.detect) throw new Error(`${P.tag}: variant ${v.id} is a rule variant and the profile has no detect`);
-    if (v.followup || v.payoff?.kind !== 'well_quad') throw new Error(`${P.tag}: rule variant ${v.id} must carry a well_quad payoff`);
+    // a rule variant carries a well_quad payoff (基本的なドネイト, ハンバーガー) or nothing after the spin (意外 T-spin)
+    if (v.followup || (v.payoff && v.payoff.kind !== 'well_quad'))
+      throw new Error(`${P.tag}: rule variant ${v.id} must carry a well_quad payoff or none`);
   }
   const users = [...new Set(digests.map(d => d.user))].sort();
   const per = <T>(f: () => T) => Object.fromEntries(users.map(u => [u, f()])) as Record<string, T>;
@@ -449,7 +459,7 @@ export function classify(P: TechniqueProfile, tr: any, digests: TechDigest[], mu
     hits: per(() => ({ all: 0, in_opener: 0, mid_game: 0, mirrored: 0, garbage_in_window: 0 })),
     followup: per(() => ({ fired: 0, not_fired: {} as Record<string, number> })),
     under: Object.fromEntries(unders[vi]!.map(c => [c.name, per(() => 0)])),
-    ablation: v.window_basis === 'rule'
+    ablation: isRuleVariant(v)
       ? Object.fromEntries(P.detect!.ablations.map(a => [a, per(() => 0)]))
       : { no_must_empty: per(() => 0), no_roof: per(() => 0), t_overlap: per(() => 0) },
     orientation_baseline: per(() => 0),
@@ -503,11 +513,11 @@ export function classify(P: TechniqueProfile, tr: any, digests: TechDigest[], mu
       const lk = d.locks[t.i]!;
       for (let vi = 0; vi < variants.length; vi++) {
         const v = variants[vi]!, Ps = preps[vi]!, rec = pv[v.id]!, vOpp = vOpps[vi]!, under = unders[vi]!;
-        if (v.window_basis === 'rule') {
+        if (isRuleVariant(v)) {
           const withT = withTs.get(t.i)!, det = P.detect!;
-          const m = det.match(d, t.i, withT, lk.cells, lk.clearedRows);
+          const m = det.match(d, t.i, withT, lk.cells, lk.clearedRows, undefined, v.id);
           if (s.kind === vOpp) {
-            for (const a of det.ablations) if (det.match(d, t.i, withT, lk.cells, lk.clearedRows, a)) rec.ablation[a][d.user]++;
+            for (const a of det.ablations) if (det.match(d, t.i, withT, lk.cells, lk.clearedRows, a, v.id)) rec.ablation[a][d.user]++;
             if (isStood(lk.cells)) rec.orientation_baseline[d.user]++;
           }
           if (!m) continue;
@@ -524,13 +534,22 @@ export function classify(P: TechniqueProfile, tr: any, digests: TechDigest[], mu
           const g = letters.some(x => x.includes('G'));
           const Pp: Prepared = { id: v.id, mirrored: false, cells, T: [], roofTop: R0, followup: [], followupKind: '',
                                  well: m.well };
-          const fu = mut.tOverlap ? { lock: null, fired: false, reason: 'not_anchored' }
-            : wellPayoff(d, t.i, Pp, { dr: 0, dc: 0 }, mut);
-          const ownCol = m.columns.find(x => x.col === m.well.c)!;
-          const h: Hit = { session: d.session, file: d.file, round_index0: d.round, match: d.match, round: d.round + 1,
+          const tCells = lk.cells.map(q => [q.row, q.col]);
+          const base = { session: d.session, file: d.file, round_index0: d.round, match: d.match, round: d.round + 1,
             player: d.user, variant: v.id, lock: t.i, in_opener: inOpener(t.i), mirrored: false,
-            garbage_in_window: g, window_letters: letters, verified_to: d.v, followup: fu, well_depth: ownCol.depth,
-            donation: { columns: m.columns, box: m.box, t_cells: lk.cells.map(q => [q.row, q.col]) } };
+            garbage_in_window: g, window_letters: letters, verified_to: d.v };
+          let h: Hit;
+          if (v.payoff) {
+            const fu = mut.tOverlap ? { lock: null, fired: false, reason: 'not_anchored' }
+              : wellPayoff(d, t.i, Pp, { dr: 0, dc: 0 }, mut);
+            const ownCol = m.columns.find(x => x.col === m.well!.c)!;
+            h = { ...base, followup: fu, well_depth: ownCol.depth,
+                  donation: { columns: m.columns, box: m.box, t_cells: tCells } };
+          } else {
+            // nothing after the spin to follow: the hit is the spin itself
+            h = { ...base, followup: { lock: null, fired: false, reason: 'no_followup' }, rule: { ...(m.rule ?? {}), box: m.box, t_cells: tCells } };
+          }
+          const fu = h.followup;
           hits.push(h);
           const hb = rec.hits[d.user]!;
           hb.all++; hb[h.in_opener ? 'in_opener' : 'mid_game']++;

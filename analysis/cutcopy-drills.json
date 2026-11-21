@@ -19,9 +19,9 @@
  },
  "inputs": {
   "pipeline/openers/cutcopy-technique.json": "baa922715bf9150a0ab6775fe35fe71a",
-  "analysis/cutcopy-facts.json": "45b1d6f4a664751fc1a808d594c89542",
-  "analysis/cutcopy-selfplay.json": "c74f5402a6d8c6c68bf3deb0ac6ab7c0",
-  "analysis/cutcopy-own.json": "90ea0dd54126be3a0026ccb7970f42c2",
+  "analysis/cutcopy-facts.json": "37c7b2292a93b369a671d1d3f761bea7",
+  "analysis/cutcopy-selfplay.json": "e2558990acfe4da7c9a9e6798dc1173a",
+  "analysis/cutcopy-own.json": "f58c1d13299d31e485cd430e2658422e",
   "sessions/2026-10-20/sim/replay-facts.json": "4505c50f34a94541c2c0ee0c30f6c9f4",
   "sessions/2026-11-01/sim/replay-facts.json": "2957aa454c78787ee02e47ba557c71b7"
  },
@@ -29,7 +29,7 @@
   "pipeline/sim/cutcopy-drills.ts": "18b743eccc116a92c80377e64366742a",
   "pipeline/sim/emit-cutcopy-drills.ts": "2098ccb241d6ce4fa36fdfbe90c9ce0b",
   "pipeline/cutcopy_practice_engine.js": "193f0a99162b65ab948e392af368e1a9",
-  "pipeline/sim/technique-facts.ts": "4a15d5cdb191f56204d71aa6881cda4c",
+  "pipeline/sim/technique-facts.ts": "2e80fa0e35e7f8ba51d8148d62ef65c8",
   "pipeline/sim/emit-replay.ts": "2acf99b059380595cc3fa14df268e8bb"
  },
  "sessions": [

@@ -1,0 +1,177 @@
+{
+  "schema": "technique-shapes/1",
+  "technique": "accidental",
+  "source": {
+    "url": "upload: PXL_20261120_153445271.mp4 (yachi's own phone recording of a TETR.IO game, sent in the project thread on 2026-11-20; no public URL)",
+    "title": "意外 T-spin (accidental TSD / TST): yachi's recording",
+    "site": "none: yachi's own upload",
+    "author_note": "the recording and the request are yachi's; no site draws a page for this technique",
+    "request": "Add 中盤，accidental tsd tst",
+    "fetched": "2026-11-20",
+    "fetch_method": "the file as uploaded to the thread; probed with ffprobe (1920x1080, 30000/1001 fps, 11.13 s) and read by eye off single frames extracted with ffmpeg",
+    "snapshot_file": "PXL_20261120_153445271.mp4",
+    "snapshot_sha256": "c7a1d16ab3347e76c6ed2ef52a80ebccc315f7bac9eb26b50300bdc6ff4b1510",
+    "snapshot_bytes": 12908032,
+    "snapshot_note": "sha256 and size of the uploaded file, ours alone (no second authority). The video is NOT committed and nothing refetches it; `--html-dir <dir>` holding the file re-checks both."
+  },
+  "terms": {
+    "url": "none: yachi's own recording, sent to this project; not republished (no frame is committed or shown)",
+    "allows": "use inside this project, at yachi's request",
+    "how_met": "the boards are read off it by hand; the file stays out of the repository and the site"
+  },
+  "legend": {
+    "orientation": "rows top to bottom as drawn; 10 columns, column 0 the left wall",
+    "-": "empty",
+    "c": "a filled cell (any piece or garbage; the video is read by occupancy only)",
+    "C": "a filled cell in a row the spin clears (muted)",
+    "U": "a cell of the T the spin places"
+  },
+  "empty_letters": "",
+  "quotes": [
+    {
+      "id": "request",
+      "verbatim": "Add 中盤，accidental tsd tst"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "video.tsd",
+      "kind": "derived",
+      "derived": true,
+      "label": "the video at about 4.0 s, before the T: a flat slot, nub down",
+      "rows": [
+        "--------cc",
+        "-cccc---cc",
+        "CCCC---CCC",
+        "CCCCC-CCCC",
+        "ccccc-cccc",
+        "ccccc--ccc",
+        "ccccc-cccc"
+      ]
+    },
+    {
+      "id": "video.tsd.spin",
+      "kind": "spin",
+      "caption_quote": "request",
+      "label": "the video's first T-spin (about 4.0 s): a TSD, the T flat, nub down; the T-spin before the TST",
+      "rows": [
+        "--------cc",
+        "-cccc---cc",
+        "CCCCUUUCCC",
+        "CCCCCUCCCC",
+        "ccccc-cccc",
+        "ccccc--ccc",
+        "ccccc-cccc"
+      ],
+      "on": "video.tsd",
+      "adds": "U",
+      "spin_of": "video.tsd",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "time_s": 4.0,
+      "prev_spin_of": "video.tst.spin"
+    },
+    {
+      "id": "video.tst",
+      "kind": "derived",
+      "derived": true,
+      "label": "the video at about 9.0 s, before the T: a slot one column wide, three deep, open to one side",
+      "rows": [
+        "----cc----",
+        "c--ccc----",
+        "cccccc----",
+        "cccccc--cc",
+        "ccccc---cc",
+        "CCCCC-CCCC",
+        "CCCCC--CCC",
+        "CCCCC-CCCC"
+      ]
+    },
+    {
+      "id": "video.tst.spin",
+      "kind": "spin",
+      "caption_quote": "request",
+      "label": "the video's second T-spin (about 9.0 s): a TST, the T stood up, nub right",
+      "rows": [
+        "----cc----",
+        "c--ccc----",
+        "cccccc----",
+        "cccccc--cc",
+        "ccccc---cc",
+        "CCCCCUCCCC",
+        "CCCCCUUCCC",
+        "CCCCCUCCCC"
+      ],
+      "on": "video.tst",
+      "adds": "U",
+      "spin_of": "video.tst",
+      "spin_piece": "U",
+      "spin": "TST",
+      "lines": 3,
+      "time_s": 9.0
+    }
+  ],
+  "page_order": [
+    "video.tsd.spin",
+    "video.tst.spin"
+  ],
+  "basic_form": [],
+  "variants": [
+    {
+      "id": "tst",
+      "board": "video.tst.spin",
+      "spin": "TST",
+      "lines": 3,
+      "window_basis": "spin_rule",
+      "window": {
+        "rows": [
+          5,
+          7
+        ],
+        "cols": [
+          5,
+          6
+        ]
+      },
+      "t_cells": [
+        [
+          5,
+          5
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          6,
+          6
+        ],
+        [
+          7,
+          5
+        ]
+      ],
+      "roof_cells": [],
+      "rule_note": "a full T-spin Triple at lock j whose slot the previous T-spin i opened: i cleared lines, no T locks between them, j's four T cells (mapped back through every clear and garbage row between) were covered before i's clear and empty right after it, at least one column's top T cell was open to the sky right after it, and over such a column pieces placed after i roof the slot; mid-game (lock > 21), at a T no other technique page and no opener route owns (accidental-qualify.ts). The window is the T's own box: the rule reads the round's locks, not a drawn shape.",
+      "fires_on": [],
+      "misses": []
+    }
+  ],
+  "cross_source": {
+    "kind": "rule",
+    "note": "the variants are rules over the corpus (window_basis spin_rule): no drawing fires them by construction, so there is no window for a routes board or another site's drawing to check. The exclusions are measured instead, in accidental.test.ts: every qualifying hit has no other technique page's hit at the same T and no opener route owns it.",
+    "routes_fire_none": "a spin_rule variant fires on no board (technique_transcription.window_fires returns False for it), so no routes board is recorded",
+    "video": {
+      "file": "PXL_20261120_153445271.mp4",
+      "sha256": "c7a1d16ab3347e76c6ed2ef52a80ebccc315f7bac9eb26b50300bdc6ff4b1510",
+      "bytes": 12908032,
+      "probe": "1920x1080, 30000/1001 fps, 11.13 s (ffprobe); a phone filming a monitor",
+      "reading": "two boards read by eye off single frames (about 4.0 s and 9.0 s), occupancy only, rows only as deep as the slot needs; the T's cells are where it locked"
+    },
+    "fires": [],
+    "also": [],
+    "labelled_not_fired": []
+  },
+  "known_discrepancies": []
+}

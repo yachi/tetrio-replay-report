@@ -1101,6 +1101,14 @@ jobs:
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_hamburger_shapes
 
+      # The fifteenth technique page, 意外 T-spin (yachi's request, his own phone recording, not committed): a page
+      # defined by exclusion, a full TST or a full TSD whose T stands up, mid-game, that no other page's window and no
+      # opener route owns. Both variants are `window_basis: spin_rule` (no window); the corpus artefact and the demos are
+      # checked by pipeline/openers/accidental.test.ts and accidental-demos.test.ts in the typescript job.
+      - name: Check the accidental T-spin technique transcription
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_accidental_shapes
+
       # The DPC page: what the first T-spin after each Perfect Clear was built on, against the setups
       # とんぼ's DPC video catalogues (read off its frames; nothing refetches it, a re-read needs the video
       # and --video). Its PC points are
@@ -1278,6 +1286,10 @@ jobs:
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_hamburger_shapes --selftest
 
+      - name: Check the accidental T-spin technique transcription gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_accidental_shapes --selftest
+
       - name: Check the DPC setups transcription gate catches its mutants
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_dpc_setups --selftest
@@ -1448,6 +1460,10 @@ jobs:
       - name: Check the Hamburger technique page audit catches its corruptions
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.hamburger_page --selftest
+
+      - name: Check the accidental T-spin technique page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.accidental_page --selftest
 
       - name: Check the DPC page audit catches its corruptions
         if: env.INPUTS_UNCHANGED != '1'
