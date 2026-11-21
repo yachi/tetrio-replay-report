@@ -1,0 +1,57 @@
+{
+ "title": "C-Spin 開局（TST 先），兩巡理想形排名",
+ "overview_title": "C-Spin 開局排名：兩巡理想形",
+ "desc": "由 harddrop、shiwehi 同 johnbeak 嘅定式頁抽出嚟嘅 TST 兩巡形，窮舉砌法同派牌，計兩巡砌到嘅機會同之後 Perfect Clear 嘅機會。全部係模擬，唔屬於信任鏈。",
+ "index_card": {
+  "kicker": "定式路線 · 構造",
+  "blurb": "由幾個來源頁抽出嚟嘅 TST 兩巡形，窮舉砌法同派牌，排名兩巡砌到加之後做到 PC 嘅機會。模擬推導，唔係 corpus。"
+ },
+ "quarantine": "<strong>呢版係模擬推導，唔係 corpus</strong>：每個盤面都係由來源圖構造出嚟，再用模擬器同 solver 窮舉或者抽樣，冇人打過，唔入任何計數，冇 claim 編號、冇 ✓ 標記。",
+ "intro": [
+  "由 harddrop 嘅 Triple Double 開局頁（{n_hd} 頁）、shiwehi 嘅定式頁，同 johnbeak 嘅 Gamushiro 頁（{jb}），抽晒「T 企住入、清三行」嘅兩巡形出嚟，去重之後有 {n} 個（左右反轉當同一個）。每個形都窮舉晒點樣用兩包方塊（每款最多兩粒，T 一粒）砌，再逐種派牌次序計（有 hold、有 180）。",
+  "<b>兩巡砌到</b>：兩包隨機派牌，砌得出呢個形而且 T 入得到 TST 位嘅機會。<b>第 3 巡 PC</b>：TST 之後用剩低嘅方塊加第三包做到 Perfect Clear 嘅機會（窮舉晒 7! 種派牌）。<b>第 4 巡前 PC</b>：第三包做唔到嘅話，再加第四包，總共做到 PC 嘅機會（第三包做唔到嗰啲派牌，每組抽 {sample} 個第三、四包派牌計，所以係估算）。<b>合計</b>＝兩巡砌到 × 第 4 巡前 PC，用嚟排名。每張卡顯示嗰個形最好嗰種砌法；撳「睇晒砌法」就見到嗰個形全部砌法同各自嘅數；紫色虛線係 T 嘅位。{me_sentence}",
+  "<b>點睇大細：</b>來源圖有啲只畫咗部分方塊（少過 {full} 格）。呢啲形有幾粒方塊用唔着，未砌完之前早到就要擺入 hold，hold 得一格，所以佢哋嘅兩巡成功率會被計低；之後計 PC 又多咗幾粒剩低嘅方塊用。兩樣都令佢哋同 {full} 格嘅形唔可以直接比，所以分開兩個表：上面係 {nf} 個 {full} 格嘅形，一齊排名；下面係 {np} 個唔完整嘅圖，按格數分組，淨係同組入面排。"
+ ],
+ "me_sentence": "yachi 畫嘅形（{me_cells} 格）喺佢嗰組入面係第 {me} 名，有紫框。",
+ "note_names": "名就係個圖喺來源頁嘅標題；同一個形可能出現喺幾個開局頁。",
+ "reading_summary": "呢啲數點樣讀先唔會讀錯",
+ "reading": [
+  "<b>假設咗玩家睇得晒兩包、手冇失誤</b>：所以「兩巡砌到」會偏高，尤其係高嗰啲。另一邊，每個形只計佢固定嗰幾種砌法，真人可以臨場改形，呢樣會令個數偏低。低嗰啲邊個方向大啲，未知。",
+  "<b>第 3 巡 PC</b> 係 7! 種派牌窮舉，但每種有搜尋上限，夠鐘都搵唔到就當失敗，所以係下限。",
+  "<b>第 4 巡前 PC</b> 寫「≈」嘅係抽樣估算：第 3 巡做唔到嗰啲派牌，抽 {sample} 個第 3、4 包派牌計。冇「≈」嘅係第 3 巡已經 100%。有啲形冇抽樣紀錄，就寫「–」，排名嗰陣用第 3 巡嘅數代替（下限）。",
+  "<b>兩巡砌唔到</b>嘅形冇計 PC，卡上寫「未計」，唔係 PC 0%。",
+  "<b>剩 {left_min} 粒或以上</b>嘅砌法，計 PC 時剩低嗰幾粒嘅次序係固定咗，所以 PC 數係近似，偏高定偏低未知；卡上有寫。",
+  "<b>百分比一律向下去尾</b>（同戰報入面「約」嘅規則一樣）：低過 0.1% 嘅寫兩個小數位，所以冇一個數會讀得高過真值；去尾之後仲係 0 嘅寫「&lt;0.01%」。",
+  "<b>點樣核對過</b>：呢版嘅數字喺 <code>analysis/tst-openers.json</code> 重新計一次（<code>python3 -m pipeline.tst_openers_page --selftest</code> 會改卡上嘅數、拎走卡、拎走「≈」同「未計」，一定要被審計搵到）；來源圖嘅格仔由 <code>pipeline/openers/extract_tst_opener_shapes.py</code> 核對；砌法嘅合法性同幾個細嘅形由 <code>pipeline/openers/tst-openers.test.ts</code> 重跑。冇被呢三樣覆蓋嘅，就唔算核對過：尤其係全部形嘅完整重數，同 harddrop、johnbeak 嘅來源頁（冇釘住版本）。"
+ ],
+ "filter_all": "全部",
+ "filter_centre": "淨係 TST 喺中間（{full} 格有 {nc} 個）",
+ "filter_note": "名次係全部一齊排嘅。揀「淨係中間」會收埋近牆嘅形，但佢哋嘅名次照計，所以名次會跳（例如 {hid} 係近牆，收埋咗）。「近牆」即係 TST 位離牆少過 {wall} 格。",
+ "pos_centre": "中間",
+ "pos_wall": "近牆",
+ "h2_full": "{full} 格（兩巡用晒 {pieces} 粒）· {nf} 個",
+ "h2_partial": "唔完整嘅圖（少過 {full} 格）· {np} 個",
+ "partial_note": "來源圖少畫咗方塊，多出嚟嗰幾粒會塞住 hold，所以兩巡成功率偏低，PC 就有多啲剩低方塊用。唔好同上面 {full} 格嗰個表比，淨係同一組入面比。{me_top}",
+ "me_top": "yachi 畫嘅形（{me_cells} 格）放喺最頂。",
+ "group_head": "{n} 格（少 {k} 粒）· {c} 個",
+ "group_badge": "{n} 格／少 {k} 粒",
+ "me_name": "yachi 畫嘅形",
+ "names_more": " 等 {c} 個圖",
+ "labels": ["兩巡", "3巡PC", "4巡PC", "合計", "· 剩 "],
+ "card": {
+  "left_title": "TST 之後剩低",
+  "two": "兩巡砌到",
+  "pc3": "第 3 巡 PC",
+  "pc4": "第 4 巡前 PC",
+  "joint": "合計",
+  "uncounted": "未計",
+  "uncounted_note": "兩巡砌唔到，所以冇計 PC",
+  "sample_title": "抽 {n} 個派牌估",
+  "left_note": "剩 {c} 粒，PC 數係近似（偏高定偏低未知）",
+  "pos_line": "TST 喺{pos}（離牆 {d} 格）· {cells} 格 · {nt} 種砌法，圖係最好嗰種 · 剩低未用：{left}{mirror}",
+  "no_left": "冇",
+  "mirror": " · 左右反轉都計埋",
+  "details": "睇晒 {nt} 種砌法"
+ },
+ "back": "← 全部戰報"
+}

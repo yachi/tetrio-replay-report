@@ -4528,3 +4528,19 @@ C002、C003、C008 三條喺三個 granularity 都係 uncovered，同 single-val
 implementation 夾過)，但依然冇 committed artefact re-derive 佢。今次 COMBO 由 corrected
 0.0081 行到 **0.022** —— 仲係 survivor，但已經唔算舒服，再多一個 sub-50 session 就過返界。
 **一個會郁到 verdict 邊緣嘅 table，冇 gate 守住，係而家個 repo 最大嗰個 冇第二份 exposure。**
+
+## TST 開局排名頁 (2026-11-21)
+
+Added `docs/tst-openers.html`: every two-bag TST shape from harddrop's Triple Double openers category, the committed route pages, johnbeak's
+Gamushiro bag-2 fumens and one hand-drawn board, counted by the Rust crate `pipeline/sim/tst2bag-rs` and ranked (see CLAUDE.md, 「TST 開局排名頁」).
+Constructed and quarantined; the artefact is `analysis/tst-openers.json`.
+
+Open items:
+
+- [ ] The shape sources other than harddrop and the committed routes files are recorded rows only: johnbeak's fumens (decoded once, outside the repo)
+      and the one user-drawn board. Nothing re-reads them; pin and transcribe them like a `*-routes.json` source, or say on the page they are unchecked.
+- [ ] harddrop's wikitext for the category pages was fetched without saving revision ids, so `check_wikitext_sources` cannot discover it. Re-fetch,
+      record each page's oldid and `revision_sha1` in the shapes file, and the weekly job will re-read them.
+- [ ] The full recount (counter and bag-4 sampler, hours of CPU) is not re-run by any job; only a pinned cheap subset is, byte for byte. A weekly or
+      manual job on a larger runner would close it. `bin/emit-corpus` skips the node on purpose.
+- [ ] The bag-4 sampler (`pc4`) has no line for some tilings; their bag-4 PC column reads – (no sample), never zero. Run the missing lines.

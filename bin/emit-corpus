@@ -74,7 +74,8 @@ EXCLUDED = {
 }
 
 #: emitters the registries do not describe.  `reads`: analysis/ artefacts they read (data edges);
-#: `sessions`: whether they read sessions/* themselves; `needs`: an executable that must exist, else skip
+#: `sessions`: whether they read sessions/* themselves; `needs`: an executable that must exist, else skip;
+#: `always_skip`: never re-run here, `skip_why` says why
 EXTRA = [
     dict(name='dpc-facts', out='dpc-facts.json', argv=['emit-dpc-facts.ts'], sessions=True),
     dict(name='secondpc-facts', out='secondpc-facts.json', argv=['emit-secondpc-facts.ts'], sessions=True),
@@ -87,6 +88,15 @@ EXTRA = [
          needs='cc-oracle',
          skip_why='needs the cold-clear `cc-oracle` binary (result/bin/cc-oracle, built by the flake for '
                   'aarch64 only); CI re-queries it in the oracle-image job'),
+    # the TST opener ranking: shapes.json + the Rust counter's output + the pc4 sampler's, merged by a Python
+    # emitter whose raw inputs (the counter's and the sampler's stdout, ~14000 CPU-s) are not committed.
+    # Constructed, never re-emitted here (`always_skip`); pipeline/openers/tst-openers.test.ts re-runs a
+    # pinned cheap subset and checks every tiling, and pins the artefact's md5s.
+    dict(name='tst-openers', out='tst-openers.json', argv=['emit-tst-openers.py'],
+         always_skip=True,
+         skip_why='its raw inputs (the Rust counter\'s and pc4 sampler\'s output, about four hours of CPU) are '
+                  'not committed; run pipeline/sim/emit-tst-openers.py by hand (see its docstring); CI re-checks '
+                  'it in pipeline/openers/tst-openers.test.ts'),
     # the self-play artefact rebuilds from the placements committed INSIDE it; re-running cold-clear
     # (--games <jsonl> --coach-seed <n>) needs the bot's JSONL, which is not committed, and is not done here
     dict(name='cutcopy-selfplay', out='cutcopy-selfplay.json', argv=['emit-cutcopy-selfplay.ts', '--rebuild'],
@@ -164,7 +174,9 @@ def plan() -> dict[str, Node]:
     for e in EXTRA:
         n = Node(e['name'], e['out'], list(e['argv']), sessions=e.get('sessions', False),
                  data=set(e.get('reads', [])) - {e['out']})
-        if e.get('needs') and not (shutil.which(e['needs']) or (REPO / 'result' / 'bin' / e['needs']).exists()):
+        if e.get('always_skip'):
+            n.skip_why = e['skip_why']
+        elif e.get('needs') and not (shutil.which(e['needs']) or (REPO / 'result' / 'bin' / e['needs']).exists()):
             n.skip_why = e['skip_why']
         nodes.append(n)
 

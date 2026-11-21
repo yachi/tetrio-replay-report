@@ -563,6 +563,10 @@ bun test pipeline/openers/video-examples.test.ts           #   key cells and who
 python3 -m pipeline.openers.check_sdpc_loop            # CI gate: the SDPC loop video read (JayKob)
 python3 -m pipeline.openers.check_sdpc_loop --selftest #   its mutants; --video <mp4> re-reads every frame
 python3 -m pipeline.sdpc_loop_page --selftest          # the docs/sdpc-loop.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_tst_opener_shapes            # CI gate: the TST-opener shapes (--wikitext-dir <dir> re-reads harddrop)
+python3 -m pipeline.openers.extract_tst_opener_shapes --selftest #   its mutants
+bun test pipeline/openers/tst-openers.test.ts                  #   artefact md5s, a pinned cheap re-run through tst2bag-rs, every tiling checked
+python3 -m pipeline.tst_openers_page --selftest                # the docs/tst-openers.html audit's mutants (--out-dir <dir> renders)
 bun pipeline/sim/emit-sdpc-loop-demos.ts \
   --out analysis/sdpc-loop-demos.json                           # every SD Perfect Clear × DPC that closes the loop, engine-built (constructed, quarantined)
 bun test pipeline/openers/sdpc-loop-demos.test.ts              #   byte rebuild, engine re-run, independent decode, completeness + mutants
@@ -6459,6 +6463,30 @@ both mutation suites on the schedule; `lean` installs Lean by sha256 (GitHub's a
 authority) and runs `lean/check.sh`, with `lean/mutate.sh` on the schedule. A bare `lake build` fails
 on a clean checkout because `RouteOrders/Generated/` is gitignored — always `bash lean/check.sh`.
 Run Dafny and Lean one at a time: the Dafny mutants' limits are wall-clock.
+
+## TST 開局排名頁 — every two-bag TST shape, counted and ranked (since 2026-11-21)
+
+`docs/tst-openers.html` (a 定式路線 card after the SDPC loop's) ranks the two-bag boards on which a stood T clears three rows: for each,
+how many ways the first two bags can build it and how many dealt orders allow it, and then how often a bag-4 Perfect Clear follows. It is
+CONSTRUCTED and quarantined like the route demos: nobody played these boards, `report_eligible: false`, no claim id, no ✓, in no count, and every
+shape count on the page is the artefact's, never typed here or in the prose.
+
+| piece | where |
+|---|---|
+| shape transcription | `pipeline/openers/tst-openers-shapes.json`, checked by `extract_tst_opener_shapes.py` (default run, `--selftest`, `--wikitext-dir <dir>`) |
+| counter + sampler | `pipeline/sim/tst2bag-rs` (binaries `tst2bag` and `pc4`; path dependencies on `oracle-rs` and `pc-solver-rs`; `Cargo.lock` committed, `target/` ignored) |
+| merge emitter, artefact | `pipeline/sim/emit-tst-openers.py` → `analysis/tst-openers.json` |
+| test | `pipeline/openers/tst-openers.test.ts` (bun; builds the crate on first use, skips its re-run half loudly without cargo) |
+| page | `pipeline/tst_openers_page.py` + `tst_openers_prose.json` + `.css` + `.js` → `docs/tst-openers.html`, rendered by `bin/build-docs` (audit inside `render_all`; `--selftest`) |
+
+What re-derives what. The shape gate re-reads every shape from its recorded drawing (cells, slot, three rows cleared, uniqueness) and the
+committed routes files; its selftest plants a moved cell, a T that clears fewer rows and a duplicate. The test pins the artefact's md5s (crate
+sources, both dependency crates, the shapes file), re-runs a cheap set of shapes and two bag-4 lines named in it through the built crate, and
+checks every tiling of every shape with its own TypeScript invariants, each with a mutant. The page audit recomputes each card's figures from
+the artefact. **What nothing re-runs in CI is the full recount** (hours of CPU for the counter and the sampler; the sampler is deterministic from
+its input line), so `bin/emit-corpus` names the artefact and skips it always, even with `--all`. **Nor are the unpinned sources re-read**: the
+harddrop wikitext the harddrop shapes were read from carries no revision pin, and the johnbeak fumens and the one hand-drawn board are recorded
+rows only. A shape from one of those is as good as its transcription and no better; ROADMAP.md lists them.
 
 ## 影片實戰例子 — boards read off one match video, drawn beside the source drawings
 

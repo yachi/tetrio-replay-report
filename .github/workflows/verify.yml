@@ -1126,6 +1126,14 @@ jobs:
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_secondpc_setups
 
+      # The TST opener ranking page: every two-bag TST shape harddrop and johnbeak draw, re-derived from the
+      # recorded drawings (cells, slot, the three rows cleared). The Rust recount behind
+      # analysis/tst-openers.json is not re-run here; pipeline/openers/tst-openers.test.ts in the
+      # typescript job re-runs a pinned cheap subset and checks every tiling independently.
+      - name: Check the TST opener shapes transcription
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_tst_opener_shapes
+
       # The SDPC loop page: JayKob's SDPC loop video, read against stick spin's SDパフェ and the
       # くるまDPC setup. The video is not committed; --video <mp4> re-reads every frame by hand.
       # Its selftest also covers sdpc-loop-demos.html, every constructed loop of
@@ -1301,6 +1309,10 @@ jobs:
       - name: Check the SDPC loop gate catches its mutants
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.check_sdpc_loop --selftest
+
+      - name: Check the TST opener shapes gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_tst_opener_shapes --selftest
 
       - name: Check the video examples gate catches its mutants
         if: env.INPUTS_UNCHANGED != '1'
@@ -1484,6 +1496,10 @@ jobs:
       - name: Check the SDPC loop page audit catches its corruptions
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.sdpc_loop_page --selftest
+
+      - name: Check the TST opener page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.tst_openers_page --selftest
 
       - name: Check the pc-miss page audit catches its corruptions
         if: env.INPUTS_UNCHANGED != '1'
@@ -1718,6 +1734,16 @@ jobs:
         run: |
           set -euo pipefail
           cargo build --release --locked --manifest-path pipeline/sim/forecast-rs/Cargo.toml
+
+      # The TST opener counter (pipeline/sim/tst2bag-rs, binaries tst2bag and pc4; path dependencies on
+      # oracle-rs and pc-solver-rs) is built by pipeline/openers/tst-openers.test.ts on first use when
+      # stale. Built here once so the two shards do not each wait on cargo's lock; the test itself runs in
+      # the whole-suite bun test below, and skips its re-run half loudly where cargo is missing.
+      - name: Build the TST opener counter
+        if: env.INPUTS_UNCHANGED != '1'
+        run: |
+          set -euo pipefail
+          cargo build --release --locked --manifest-path pipeline/sim/tst2bag-rs/Cargo.toml
 
       - name: Warm the oracle cache
         if: env.INPUTS_UNCHANGED != '1'
