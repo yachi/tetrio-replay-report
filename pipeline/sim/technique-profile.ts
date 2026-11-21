@@ -45,13 +45,16 @@ export interface TechniqueProfile {
   anchor: 'spin_t_cells';
   /** required by a `rule` variant: whether the shape stood at one scored lock (the board before it with the lock's
    *  cells added, the lock's cells, the rows it clears), its thumbnail box and its payoff well; `abl` relaxes one
-   *  clause for the controls, named in `ablations` */
+   *  clause for the controls, named in `ablations`; `variant` names the variant asked about */
   detect?: {
     ablations: string[];
     match(d: TechDigest, i: number, withT: boolean[][], cells: { row: number; col: number }[], rows: number[],
-          abl?: string): { columns: { col: number; hole_row: number; depth: number; cover: string }[];
-                           well: { r: number; c: number };
-                           box: { rows: [number, number]; cols: [number, number] } } | null;
+          abl?: string, variant?: string): { columns: { col: number; hole_row: number; depth: number; cover: string }[];
+                           /** the payoff's well cell; a variant with no payoff (意外 T-spin) has none */
+                           well?: { r: number; c: number };
+                           box: { rows: [number, number]; cols: [number, number] };
+                           /** a variant with no payoff only (意外 T-spin): what the hit's `rule` field records */
+                           rule?: { prev_spin_lock: number; roof_lock: number | null } } | null;
   };
   /** how a garbage cell reads inside the window. Only `filled` exists */
   garbage: 'filled';

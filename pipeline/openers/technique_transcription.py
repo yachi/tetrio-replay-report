@@ -141,6 +141,10 @@ class TechniqueSpec:
     #: HTML (King Crimson: harddrop's own King_Crimson wikitext, which `route_transcription.check_snapshot` reads by
     #: its `.wikitext` suffix); default None rebuilds the raw-HTML page from `page_order`, as before
     synthetic_snapshot: Callable | None = None
+    #: opt-in: fn(data, dir) -> problems, the `--html-dir` re-check of a primary source that is no page at all (意外
+    #: T-spin: a video file, whose hash and size are all there is to re-read); replaces `route_transcription.
+    #: check_snapshot`, and the selftest plants a missing file and wrong bytes against it. Default None: unchanged
+    snapshot_check: Callable | None = None
 
 
 # ── geometry ─────────────────────────────────────────────────────────────────────────────────────
@@ -203,6 +207,10 @@ def window_fires(data: dict, var: dict, spec: TechniqueSpec, board: list[str], l
     A `rule` variant (基本的なドネイト) has no window: `rule_columns` decides, in one hand only (the rule is
     symmetric, so a mirrored call is always False and a hit is recorded once), and only where the T makes exactly
     the variant's `lines` rows full (the matcher scores TSDs)."""
+    if var.get('window_basis') == 'spin_rule':
+        # opt-in (意外 T-spin): the rule is an exclusion over the corpus (no other page's hit, no opener), so it
+        # fires on no drawing and no other page's window reads it
+        return False
     if var.get('window_basis') == 'rule':
         if mirrored:
             return False
@@ -404,6 +412,27 @@ def rule_window(data: dict, v: dict, spec: TechniqueSpec, sp: dict, tc: set) -> 
     return bad
 
 
+def spin_rule_window(v: dict, spec: TechniqueSpec, sp: dict, tc: set) -> list[str]:
+    """The window rule for a `spin_rule` variant (意外 T-spin, since 2026-11-20): no window and no follow-up; the
+    profile's `detect` reads the spin and the round's locks before it (the previous T-spin and what came between),
+    which no single drawing holds, and the qualify hook excludes every T another page or an opener owns. What a
+    drawing can check is checked:
+      (s1) the board is a spin board whose drawn T is the variant's `t_cells`, `window` is exactly its box, no roof;
+      (s2) the drawn spin clears the variant's `lines`, by the board's own occupancy."""
+    bad = []
+    if sp['kind'] != 'spin':
+        return [f'window: {v["id"]}: a spin_rule variant stands on a spin board, not {sp["kind"]}']
+    box = [[min(r for r, _ in tc), max(r for r, _ in tc)], [min(c for _, c in tc), max(c for _, c in tc)]]
+    if [v['window']['rows'], v['window']['cols']] != box:
+        bad.append(f'window: {v["id"]}\'s window {v["window"]} is not its T\'s box {box}')
+    if v.get('roof_cells'):
+        bad.append(f'window: {v["id"]}: a spin_rule variant has no roof cells')
+    fr = full_rows(occ_of(sp['rows'], spec))
+    if len(fr) != v['lines'] or sp.get('lines') != v['lines']:
+        bad.append(f'window: {v["id"]}: {v["board"]} makes {len(fr)} rows full, not {v["lines"]}')
+    return bad
+
+
 def rule_accounting(data: dict, spec: TechniqueSpec) -> list[str]:
     """Every drawing on the page, held to the rule BOTH WAYS, so the rule never chooses its own evidence: on a spin
     board at its drawn T (taken out); on a base board (a form or a question, drawn without its T) at every resting
@@ -584,7 +613,10 @@ def verify(data: dict, spec: TechniqueSpec) -> list[str]:
     if data.get('page_order') != drawn:
         bad.append(f'grammar: page_order {data.get("page_order")} is not the drawn boards in order {drawn}')
     for v in data.get('variants', []):
-        if ('followup' in v) == ('payoff' in v):
+        if v.get('window_basis') == 'spin_rule':
+            if 'followup' in v:
+                bad.append(f'grammar: variant {v["id"]} is a spin_rule variant and carries a followup')
+        elif ('followup' in v) == ('payoff' in v):
             bad.append(f'grammar: variant {v["id"]} carries {"both" if "followup" in v else "neither"} of followup and payoff')
         for ref in [v['board'], *(f['board'] for f in (v.get('followup'), v.get('payoff')) if f),
                     *v.get('fires_on', []), *v.get('misses', [])]:
@@ -681,6 +713,9 @@ def verify(data: dict, spec: TechniqueSpec) -> list[str]:
             bad.append(f'window: {v["id"]}.t_cells {sorted(tc)} are not {v["board"]}\'s T cells {sorted(sc)}')
         if not tc <= inwin:
             bad.append(f'window: {v["id"]}\'s window does not hold every T cell')
+        if v.get('window_basis') == 'spin_rule':
+            bad += spin_rule_window(v, spec, sp, tc)
+            continue
         top = min((r for r, _ in sc), default=None)
         fu = ({tuple(x) for x in v['followup']['t_cells_pre_clear']} if 'followup' in v
               else {tuple(v['payoff']['well_cell_pre_clear'])})
@@ -817,6 +852,10 @@ def check_cross_routes(data: dict, spec: TechniqueSpec) -> list[str]:
         # agreement set's external drawings instead, which rule (g) fires the window on one by one
         alt = (xs.get('routes_fire_none') and spec.external_drawings and spec.external_drawings()
                and data.get('variants') and all(v.get('window_basis') == 'agreement' for v in data['variants']))
+        # opt-in (意外 T-spin): every variant is a spin_rule, which fires on no drawing by definition, so there is
+        # no window for an independent drawing to check; `routes_fire_none` must still say so
+        alt = alt or (xs.get('routes_fire_none') and data.get('variants')
+                      and all(v.get('window_basis') == 'spin_rule' for v in data['variants']))
         if not alt:
             return ['cross: the transcription records no routes board the technique fires on — '
                     'a technique gate needs an independent drawing to check its window against']
@@ -879,6 +918,19 @@ def run_selftest(spec: TechniqueSpec, mutants: list, snapshot_edits: dict, spec_
     d = copy.deepcopy(base)
     node(d, base['page_order'][0])['label'] = 'edited by hand'
     expect(drift(d, spec), 'a hand edit to the committed JSON', 'drift:')
+    if spec.snapshot_check is not None:
+        # opt-in: the primary source is no page (a video): a missing file and wrong bytes must each be refused
+        with tempfile.TemporaryDirectory() as td:
+            missing = spec.snapshot_check(base, Path(td))
+            (Path(td) / base['source']['snapshot_file']).write_bytes(b'not the recorded file')
+            wrong = spec.snapshot_check(base, Path(td))
+        if not any(x.startswith('snapshot:') for x in missing) or not any(x.startswith('snapshot:') for x in wrong):
+            print(f'selftest FAILED: snapshot re-check (missing={missing[:1]}, wrong={wrong[:1]})', file=sys.stderr)
+            ok = False
+        else:
+            print('  killed: the source file missing / its bytes not the recorded ones  [snapshot:]')
+        print('selftest: all mutants killed' if ok else 'selftest: FAILED')
+        return 0 if ok else 1
     # the snapshot locator, unchanged from the route gate: a raw-HTML page rebuilt from the boards
     # an indented page (`snapshot_indented`) is rebuilt with a tab before every board row, as it draws them
     if spec.synthetic_snapshot is not None:
@@ -923,7 +975,10 @@ def main(spec: TechniqueSpec, selftest: Callable[[], int], doc: str | None) -> i
     data = spec.build()
     problems = verify(data, spec)
     if args.html_dir:
-        problems += RT.check_snapshot(data, args.html_dir, indented=spec.snapshot_indented)
+        if spec.snapshot_check is not None:
+            problems += spec.snapshot_check(data, args.html_dir)
+        else:
+            problems += RT.check_snapshot(data, args.html_dir, indented=spec.snapshot_indented)
         if spec.html_checks:
             problems += spec.html_checks(data, args.html_dir)
     if args.wikitext_dir:

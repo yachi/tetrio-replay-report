@@ -18,6 +18,7 @@ import { BASICDONATING } from './technique-profile-basicdonating.ts';
 import { KINGCRIMSON } from './technique-profile-kingcrimson.ts';
 import { CAVETSSTST } from './technique-profile-cavetsstst.ts';
 import { HAMBURGER } from './technique-profile-hamburger.ts';
+import { ACCIDENTAL } from './technique-profile-accidental.ts';
 import type { TechniqueDemoProfile } from './technique-demo-profile.ts';
 import { STSD_DEMOS } from './technique-demos-stsd.ts';
 import { STMBCAVE_DEMOS } from './technique-demos-stmbcave.ts';
@@ -33,6 +34,7 @@ import { BASICDONATING_DEMOS } from './technique-demos-basicdonating.ts';
 import { KINGCRIMSON_DEMOS } from './technique-demos-kingcrimson.ts';
 import { CAVETSSTST_DEMOS } from './technique-demos-cavetsstst.ts';
 import { HAMBURGER_DEMOS } from './technique-demos-hamburger.ts';
+import { ACCIDENTAL_DEMOS } from './technique-demos-accidental.ts';
 import type { OwnProfile } from './technique-own.ts';
 import { CUTCOPY_OWN } from './technique-own-cutcopy.ts';
 
@@ -40,7 +42,7 @@ export const TECHNIQUES: Record<string, TechniqueProfile & { crossRoute?: CrossR
   stsd: STSD, stmbcave: STMBCAVE, imperialcross: IMPERIALCROSS, doubledagger: DOUBLEDAGGER, btcannon: BTCANNON,
   cutcopy: CUTCOPY, shachikutrain: SHACHIKUTRAIN, parapet: PARAPET, kaidan: KAIDAN,
   dtcannon: DTCANNON, basicdonating: BASICDONATING, kingcrimson: KINGCRIMSON, cavetsstst: CAVETSSTST,
-  hamburger: HAMBURGER,
+  hamburger: HAMBURGER, accidental: ACCIDENTAL,
 };
 /** each technique's constructed-demo half, by the same key */
 export const TECHNIQUE_DEMOS: Record<string, TechniqueDemoProfile> = {
@@ -48,7 +50,7 @@ export const TECHNIQUE_DEMOS: Record<string, TechniqueDemoProfile> = {
   doubledagger: DOUBLEDAGGER_DEMOS, btcannon: BTCANNON_DEMOS, cutcopy: CUTCOPY_DEMOS,
   shachikutrain: SHACHIKUTRAIN_DEMOS, parapet: PARAPET_DEMOS, kaidan: KAIDAN_DEMOS,
   dtcannon: DTCANNON_DEMOS, basicdonating: BASICDONATING_DEMOS, kingcrimson: KINGCRIMSON_DEMOS,
-  cavetsstst: CAVETSSTST_DEMOS, hamburger: HAMBURGER_DEMOS,
+  cavetsstst: CAVETSSTST_DEMOS, hamburger: HAMBURGER_DEMOS, accidental: ACCIDENTAL_DEMOS,
 };
 /** the techniques with an own-design search (`technique-own.ts`), by the same key */
 export const TECHNIQUE_OWN: Record<string, OwnProfile> = { cutcopy: CUTCOPY_OWN };

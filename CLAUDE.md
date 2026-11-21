@@ -5232,7 +5232,7 @@ fail. Their matchable children whose parent is never filed are named in `CLASSIF
 The shared edit moved every sibling's artefacts in their md5 lines only and none of their pages
 (no sibling profile names a `uFiresBefore` node, so `noUBefore` cannot reach them).
 
-## 中盤手法頁（STSD、STMB Cave、インペリアルクロス、ダブルダガー、BT砲、千鳥格子、社畜トレイン、欄干、階段のドネイト、途中DT砲、基本的なドネイト、King Crimson、Cave TSS 接 TST、ハンバーガー）— every mid-game technique page, quarantined like the route pages
+## 中盤手法頁（STSD、STMB Cave、インペリアルクロス、ダブルダガー、BT砲、千鳥格子、社畜トレイン、欄干、階段のドネイト、途中DT砲、基本的なドネイト、King Crimson、Cave TSS 接 TST、ハンバーガー、意外 T-spin）— every mid-game technique page, quarantined like the route pages
 
 shiwehi.com's 「中盤テンプレ・ドネイト」 pages draw a technique on a PARTIAL stack, at whatever lock it
 happens, which the route machinery cannot express: `route-facts.ts` compares whole boards (at most 8
@@ -6211,6 +6211,57 @@ rule fires on many of the same T's, and since `hamburger` joined its `OTHER_PAGE
 moved every artefact hashing it in its hash lines only (checked with `git diff`). No demo is built: every board but the
 Tetris one has an odd cell count (a proof); the Tetris board is even but over the planner's limit. Named lists and their
 sizes live in the two tests.
+
+### 意外 T-spin（accidental TST）
+
+A page with no source site (yachi, 2026-11-20: 「Add 中盤，accidental tsd tst」, with a phone recording of a TSD
+then a TST): `pipeline/openers/accidental-technique.json` (held as a literal in `extract_accidental_shapes.py`, gated
+by the shared `technique_transcription.py`), `technique-profile-accidental.ts` → `analysis/accidental-facts.json`
+(`accidental.test.ts`), `technique-demos-accidental.ts` → `analysis/accidental-demos.json` (`accidental-demos.test.ts`),
+and `docs/accidental.html` + `docs/accidental-demos.html` from `accidental_page.py` + `accidental_prose.json`, the
+fifteenth card under 中盤手法. Every figure is read off the artefacts and tests, never typed here.
+
+**The rule is yachi's, and the first reading was wrong.** The first version matched any mid-game TST (and any
+stood-up TSD) that no other page names; yachi corrected it: 「係TSpin 完意外地有個tst 形，再加個屋頂就食得」, then
+「打完一個T-spin,佢清行之前 TST 嗰四格係被蓋住嘅。清完之後,嗰四格啱啱變成一個露天嘅TST位。再加多一粒就即食tst」. So
+there is ONE variant, `tst`, `window_basis: spin_rule` (no window): a full TST at lock j, inside the verified prefix;
+the previous T-spin i of the round cleared at least one line; no T locks between them; j's four T cells, carried back
+through every clear and garbage insertion between, sit on rows that stood right after i's clear (none is a new row),
+were COVERED before it (a filled cell over them, a row i cleared, or i's own T) and empty right after it. That much
+is yachi's statement; the rest was RELAXED on 2026-11-21, because yachi's own video pair failed the first reading
+(every TST column open to the sky after i's clear, and the cell over the nub roofed by one piece placed after i: by
+our frame read the cell over the TST's nub was filled before the TSD). Now ACCESS: at least one T column's top cell
+is open to the sky right after i's clear; and ROOF: over every such column, the lowest filled cell above the T on the
+board before j belongs to a piece placed after i, any number of roof pieces. No gap cap. Each hit's `rule` records
+`prev_spin_lock`, `roof_locks` (sorted), the box (full width, display and `garbage_in_window` only) and `t_cells`.
+**Then TIGHTENED the same day** (yachi on the relaxed hits: 「影片食完tst ,擺完頂就食得，唔洗點砌，啲examples 要砌好多，
+唔算」; he chose the tight version on a decision card knowing it leaves the corpus with no hit): SLOT BUILT, every
+filled non-T cell of the slot box (the T's rows and the row under them, its columns and one each side) on the board
+before j maps back to a filled cell of the board right after i's clear, so between the two spins only roof is added.
+The ablations drop one clause each (`no_next_t`, `no_exposed`, `no_access`, `no_new_roof`, `no_slot_built`); only
+`no_slot_built` moves off zero, and its hits are the relaxed rule's, which `accidental.test.ts` names
+(`SLOT_BUILT_AFTER`) and keeps exercised through a LOOSE profile (the detect with `no_slot_built`) so the qualify and
+`other_page` tests still run on real hits. The page states that the corpus count is zero and the video is the example. (`technique-facts.ts` and
+`technique-profile.ts`, hashed, still type the field `roof_lock`; nothing compiles them with tsc.)
+`accidental.test.ts` re-derives the hits, their locks and every ablation count with a second implementation that
+plays the board FORWARD from i with tagged cells (the profile maps backward through the row maps); the two disagreed
+once, on a row i's own clear brought in, and the profile was fixed. Then `accidental-qualify.ts` excludes `in_opener`,
+`other_page` (another technique page's window fires at the T), `opener_route` and `opener_spin`; the page is
+`corpus_qualified_only`. No follow-up and no payoff: every hit's `followup` is `no_followup`.
+
+**The recording is not committed.** The transcription records its sha256 and size; `snapshot_check` (an opt-in of the
+shared gate) re-checks a local copy with `--html-dir` and is the only re-read. Its TSD (`video.tsd.spin`,
+`prev_spin_of` the TST) and TST (`video.tst.spin`) are drawn as the pair the rule reads, and the gate checks the pair passes it. The recording is 1920×1080
+landscape.
+
+**Shared files it changed, each default-preserving for the others.** `technique-facts.ts` (`isRuleVariant`; a rule
+variant may carry no payoff; `detect.match` gets the variant id and may return a `rule` record) and
+`technique-profile.ts` are hashed, so every technique artefact (and `dpc-facts.json` / `secondpc-facts.json`'s
+`emitter_md5`, `cutcopy-drills.json`'s input md5s) moved in its hash lines only. Also changed:
+`technique_transcription.py` (`spin_rule` fires on no drawing, its window rule `spin_rule_window`, the grammar branch
+and `snapshot_check`), `technique_page.py` (the thumbnail for a `spin_rule` hit, and an opt-in prose `source_line`
+replacing the web-page credit), and `replay_labels.technique_matches` (a `spin_rule` label checks the spin and its
+lines; the rest of the rule is the artefact's). Counts and named lists live in the two tests.
 
 ### 用完整方塊砌出嚟先算 — the shared `qualify` hook of the other nine pages
 

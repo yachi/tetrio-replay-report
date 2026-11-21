@@ -206,8 +206,12 @@ def technique_matches(rnd, user, i, tr, var, mirrored):
     want = 1 if var.get("credit") == "mini" else 2
     if rnd.pieces[user][i] != "T" or lk[3] != want or lk[2] != var["lines"]:
         return False
-    before = rnd.board_after(user, i - 1)
     H, W = rnd.rows, rnd.width
+    if var.get("window_basis") == "spin_rule":
+        # 意外 T-spin: no window; the spin and its lines are the whole check here (the rest of the rule reads
+        # the round's earlier locks, which the artefact's detector did)
+        return True
+    before = rnd.board_after(user, i - 1)
     rows = ["".join("-" if before[y][x] is None else "#" for x in range(W)) for y in range(H - 1, -1, -1)]
     lock = {(H - 1 - c // W, c % W) for c in rnd.cells[user][i]}
     spec = SimpleNamespace(empty_letters="")
