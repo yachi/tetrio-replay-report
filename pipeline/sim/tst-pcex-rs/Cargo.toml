@@ -1,0 +1,9 @@
+[package]
+name = "tst-pcex"
+version = "0.1.0"
+edition = "2021"
+publish = false
+[dependencies]
+pc-solver-rs = { path = "../pc-solver-rs" }
+[profile.release]
+opt-level = 3

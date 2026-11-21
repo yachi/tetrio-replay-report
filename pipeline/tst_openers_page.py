@@ -39,6 +39,7 @@ OVERVIEW = "tst-openers.html"
 PREFIX = "tst-openers"
 ART_PATH = os.path.join(REPO, "analysis", "tst-openers.json")
 SHAPES_PATH = os.path.join(REPO, "pipeline", "openers", "tst-openers-shapes.json")
+PCX_PATH = os.path.join(REPO, "analysis", "tst-openers-pc-examples.json")
 PROSE_PATH = os.path.join(HERE, "tst_openers_prose.json")
 CSS_PATH = os.path.join(HERE, "tst_openers_page.css")
 JS_PATH = os.path.join(HERE, "tst_openers_page.js")
@@ -51,6 +52,29 @@ WALL = 2                          # a TST this close to a side wall (cells) coun
 HID_SHOWN = 6                     # how many hidden wall ranks the filter note names
 COL = dict(I="#2fb8c9", O="#e3b425", T="#9a46d6", S="#4cb648", Z="#d9433d", J="#3b61d6", L="#e5792a")
 
+# the seven tetrominoes as sets of (x, y) offsets, every rotation, normalised to min x = min y = 0
+_BASE = dict(I=[(0, 0), (1, 0), (2, 0), (3, 0)], O=[(0, 0), (1, 0), (0, 1), (1, 1)], T=[(0, 0), (1, 0), (2, 0), (1, 1)],
+             S=[(0, 0), (1, 0), (1, 1), (2, 1)], Z=[(1, 0), (2, 0), (0, 1), (1, 1)], J=[(0, 0), (1, 0), (2, 0), (0, 1)],
+             L=[(0, 0), (1, 0), (2, 0), (2, 1)])
+
+
+def _norm(cs):
+    mx, my = min(x for x, y in cs), min(y for x, y in cs)
+    return frozenset((x - mx, y - my) for x, y in cs)
+
+
+def _rots(cs):
+    out, cur = set(), list(cs)
+    for _ in range(4):
+        out.add(_norm(cur))
+        cur = [(y, -x) for x, y in cur]
+    return out
+
+
+SHAPE = {k: _rots(v) for k, v in _BASE.items()}
+_PCX = re.compile(r'<details class="pcx" data-line="([^"]*)">(.*?)</details>', re.S)
+_PCX_FIG = re.compile(r'<figure data-deal="([A-Z]*)" data-h="(\d+)">(.*?)</figure>', re.S)
+_PCX_STEP = re.compile(r'<li data-p="([A-Z])" data-c="([\d,]+)" data-h="([01])">')
 _CARD = re.compile(r'<article class="card[^"]*" data-pos="[^"]*" data-card="(\d+)" data-rk="([^"]*)">(.*?)</article>', re.S)
 _FIG = re.compile(r'data-f="(\w+)">(.*?)</b>', re.S)
 _ISLAND = re.compile(r'<script id="data" type="application/json">(.*?)</script>', re.S)
@@ -91,6 +115,22 @@ def load_inputs(repo=REPO):
     by = {s["id"]: s for s in shp["shapes"]}
     _need(set(by) == {s["id"] for s in art["shapes"]}, "the shapes file and the artefact name different shapes")
     return art, shp
+
+
+def load_pcx(repo=REPO, art_bytes=None):
+    """The worked-PC examples (`pipeline/sim/emit-tst-pc-examples.py`), keyed by `rows|left` line. Refuses an
+    artefact built from another `tst-openers.json` than the one on disk."""
+    import hashlib
+    with open(os.path.join(repo, "analysis", "tst-openers-pc-examples.json"), encoding="utf-8") as f:
+        ex = json.load(f)
+    _need(ex.get("report_eligible") is False and ex.get("constructed") is True,
+          "the PC examples artefact is not marked report_eligible: false / constructed: true")
+    if art_bytes is None:
+        with open(os.path.join(repo, "analysis", "tst-openers.json"), "rb") as f:
+            art_bytes = f.read()
+    _need(ex["md5"]["tst_openers"] == hashlib.md5(art_bytes).hexdigest(),
+          "the PC examples artefact was built from another analysis/tst-openers.json: re-run emit-tst-pc-examples.py")
+    return {e["line"]: e for e in ex["examples"]}
 
 
 def load_prose(path=PROSE_PATH):
@@ -234,7 +274,105 @@ def svg(cells, H, cs=14, tst=()):
     return "".join(r)
 
 
-def card(rk, e, PR, badge=""):
+def start(left, deal):
+    """pc4's start state (tst-pcex-rs `start`): (current, hold, queue). '' is an empty hold."""
+    left = list(left)
+    if not left:
+        return deal[0], "", list(deal[1:])
+    if len(left) == 1:
+        return left[0], "", list(deal)
+    return left[0], left[1], left[2:] + list(deal)
+
+
+def replay(rows, left, deal, h, plan):
+    """Replay one solver plan from scratch. Returns ({(x, y) in the ORIGINAL frame: (piece, step)}, problems).
+    Checks: the piece order follows the queue and hold rule of `start`, each placement is four empty cells of
+    that piece's shape on the board as it stands, full rows clear, and the board ends empty."""
+    bad = []
+    cur, hold, q = start(left, deal)
+    qi = 0
+    board = [r for r in rows] + [0] * max(0, h - len(rows))
+    if len(rows) > h:
+        bad.append(f"the residue is {len(rows)} rows, taller than the plan's {h}")
+    ids = list(range(len(board)))
+    out = {}
+    for n, (p, cells, held) in enumerate(plan, 1):
+        nq = q[qi] if qi < len(q) else ""
+        if not held:
+            want, cur, qi = cur, nq, qi + 1
+        elif not hold:
+            want, hold, cur, qi = nq, cur, (q[qi + 1] if qi + 1 < len(q) else ""), qi + 2
+        else:
+            want, hold, cur, qi = hold, cur, nq, qi + 1
+        if p != want:
+            bad.append(f"step {n}: placed {p}, the queue and hold give {want or 'nothing'}")
+        xy = [(c % 10, c // 10) for c in cells]
+        if any(y >= len(board) for x, y in xy) or len(set(xy)) != 4:
+            bad.append(f"step {n}: cells {cells} are outside the board or repeat")
+            return out, bad
+        if _norm(xy) not in SHAPE.get(p, ()):
+            bad.append(f"step {n}: cells {cells} are not a {p}")
+        for x, y in xy:
+            if board[y] >> x & 1:
+                bad.append(f"step {n}: cell ({x},{y}) is already filled")
+            board[y] |= 1 << x
+            out[(x, ids[y])] = (p, n)
+        keep = [i for i, r in enumerate(board) if r != 1023]
+        board, ids = [board[i] for i in keep], [ids[i] for i in keep]
+    if any(board):
+        bad.append("the board is not empty at the end")
+    return out, bad
+
+
+def pcx_svg(rows, h, placed, cs=16):
+    W = 10
+    r = [f'<svg class="board" width="{W * cs}" height="{h * cs}" viewBox="0 0 {W * cs} {h * cs}" role="img">',
+         f'<rect width="{W * cs}" height="{h * cs}" fill="var(--well)"/>']
+    for y in range(h):
+        for x in range(W):
+            filled = y < len(rows) and rows[y] >> x & 1
+            k, n = ("G", 0) if filled else placed.get((x, y), (None, 0))
+            fill = "var(--grid)" if k is None else COL.get(k, "#8a8f9c")
+            Y = (h - 1 - y) * cs
+            r.append(f'<rect x="{x * cs + .5}" y="{Y + .5}" width="{cs - 1}" height="{cs - 1}" fill="{fill}"/>')
+            if n:
+                r.append(f'<text x="{x * cs + cs / 2}" y="{Y + cs * .72}" text-anchor="middle" font-size="{cs * .6:.1f}" '
+                         f'fill="#fff" font-weight="700">{n}</text>')
+    r.append("</svg>")
+    return "".join(r)
+
+
+def pcx_block(rows, left, deal, ex, title, deal_line, C):
+    placed, bad = replay(rows, left, deal, ex["h"], ex["plan"])
+    _need(not bad, f"PC example {title}: {'; '.join(bad[:3])}")
+    steps = "".join(f'<li data-p="{p}" data-c="{",".join(map(str, c))}" data-h="{int(hd)}">'
+                    f'<b style="color:{COL[p]}">{p}</b>{_esc(C["pcx_hold"]) if hd else ""}</li>' for p, c, hd in ex["plan"])
+    return (f'<figure data-deal="{deal}" data-h="{ex["h"]}"><figcaption><b>{_esc(title)}</b> · {_esc(deal_line)}</figcaption>'
+            f'{pcx_svg(rows, ex["h"], placed)}<ol class="steps">{steps}</ol></figure>')
+
+
+def pcx(e, b, ex, C):
+    """The folded worked-PC section of one card (`ex` is its examples-artefact entry)."""
+    rows, left = e["o"]["rows"], b["left"]
+    lf = C["pcx_left"].format(left=left) if left else ""
+    parts = []
+    if ex["b3"] is None:
+        parts.append(f'<p class="muted sm">{_esc(C["pcx_none3"])}</p>')
+    else:
+        d = ex["b3"]["deal"]
+        parts.append(pcx_block(rows, left, d, ex["b3"], C["pcx_b3"], lf + C["pcx_deal3"].format(d=d), C))
+    if b["p5"] >= BAG:
+        parts.append(f'<p class="muted sm">{_esc(C["pcx_always3"])}</p>')
+    elif ex["b4"] is None:
+        parts.append(f'<p class="muted sm">{_esc(C["pcx_none4"])}</p>')
+    else:
+        d3, d4 = ex["b4"]["deal3"], ex["b4"]["deal4"]
+        parts.append(pcx_block(rows, left, d3 + d4, ex["b4"], C["pcx_b4"], lf + C["pcx_deal34"].format(d3=d3, d4=d4), C))
+    return (f'<details class="pcx" data-line="{_esc(ex["line"])}"><summary>{_esc(C["pcx"])}</summary>'
+            f'<p class="muted sm">{_esc(C["pcx_note"])}</p><div class="pcxb">{"".join(parts)}</div></details>')
+
+
+def card(rk, e, PR, badge="", pcxd=None):
     C = PR["card"]
     s, b = e["s"], e["best"]
     cells = {}
@@ -276,10 +414,11 @@ def card(rk, e, PR, badge=""):
             f'<span>{C["pc4"]} <b class="num" data-f="pc4">{pc4_html}</b></span>'
             f'<span class="j">{C["joint"]} <b class="num" data-f="joint">{joint}</b></span></div>{note}\n'
             f'<div class="muted sm">{_esc(line)}</div>\n'
+            f'{pcx(e, b, pcxd[line_of(e["o"], b)], C) if pcxd is not None and b["B"] > 0 else ""}'
             f'<details data-s="s{s["id"]}"><summary>{_esc(C["details"].format(nt=e["o"]["ntil"]))}</summary><div class="tl"></div></details></div></article>')
 
 
-def render(art, shp, PR):
+def render(art, shp, PR, pcxd):
     ents = entries(art, shp)
     full, F, P, groups, order, me_cells, me = structure(ents)
     cent = [i + 1 for i, e in enumerate(F) if dist(e["s"]) >= WALL]
@@ -290,13 +429,13 @@ def render(art, shp, PR):
                nf=len(F), np=len(P), me=me, me_cells=me_cells, nc=len(cent), left_min=LEFT_NOTE_MIN, wall=WALL,
                hid="、".join(f"#{i}" for i in hid[:HID_SHOWN]))
     me_sentence = PR["me_sentence"].format(**fmt) if me else ""
-    cards = "\n".join(card(f"#{i + 1}", e, PR) for i, e in enumerate(F))
+    cards = "\n".join(card(f"#{i + 1}", e, PR, pcxd=pcxd) for i, e in enumerate(F))
     pc = []
     for n in order:
         g = groups[n]
         k = (full - n) // 4
         pc.append(f'<h3 class="gh">{_esc(PR["group_head"].format(n=n, k=k, c=len(g)))}</h3><div class="grid">')
-        pc += [card(f"{n}格 #{i + 1}", e, PR, f'<div class="badge">{_esc(PR["group_badge"].format(n=n, k=k))}</div>') for i, e in enumerate(g)]
+        pc += [card(f"{n}格 #{i + 1}", e, PR, f'<div class="badge">{_esc(PR["group_badge"].format(n=n, k=k))}</div>', pcxd) for i, e in enumerate(g)]
         pc.append("</div>")
     title = PR["title"] + RS.TITLE_MARK
     data = json.dumps(build_data(ents, PR), separators=(",", ":"), ensure_ascii=False).replace("</", "<\\/")
@@ -350,7 +489,43 @@ def expected_card(art, sid, idx):
     return [two, pct(Fraction(t["p5"], BAG)), pc4, pct(sc / N2)]
 
 
-def audit(page, art, shp, PR):
+def audit_pcx(cards, ents, pcxd):
+    """Every card whose shape is two-bag buildable carries exactly one worked-PC section for its displayed tiling,
+    its figures are the examples artefact's (deal, rows, plan), and every plan replays from the card's residue."""
+    bad = []
+    by = {e["s"]["id"]: e for e in ents}
+    for sid, rk, body in cards:
+        e = by[int(sid)]
+        b = e["best"]
+        secs = _PCX.findall(body)
+        if b["B"] == 0:
+            if secs:
+                bad.append(f"card {rk}: a worked PC on a shape two bags cannot build")
+            continue
+        line = line_of(e["o"], b)
+        if len(secs) != 1 or html.unescape(secs[0][0]) != line:
+            bad.append(f"card {rk}: {len(secs)} worked-PC sections, or not for its displayed tiling")
+            continue
+        ex = pcxd[line]
+        want = []
+        if ex["b3"] is not None:
+            want.append((ex["b3"]["deal"], ex["b3"]["h"], ex["b3"]["plan"]))
+        if b["p5"] < BAG and ex["b4"] is not None:
+            want.append((ex["b4"]["deal3"] + ex["b4"]["deal4"], ex["b4"]["h"], ex["b4"]["plan"]))
+        got = []
+        for deal, h, fb in _PCX_FIG.findall(secs[0][1]):
+            plan = [[p, [int(x) for x in c.split(",")], bool(int(hd))] for p, c, hd in _PCX_STEP.findall(fb)]
+            got.append((deal, int(h), plan))
+            _, why = replay(e["o"]["rows"], b["left"], deal, int(h), plan)
+            if why:
+                bad.append(f"card {rk}: a worked PC does not replay ({why[0]})")
+        norm = lambda w: [(d, h, [[p, list(c), bool(x)] for p, c, x in pl]) for d, h, pl in w]
+        if norm(got) != norm(want):
+            bad.append(f"card {rk}: the worked PCs are not the examples artefact's")
+    return bad
+
+
+def audit(page, art, shp, PR, pcxd=None):
     bad = RP.audit_quarantine(page, [RS.EYEBROW, RS.NO_CLAIM, PR["quarantine"]], DATA_ID)
     if set(page) & SIMPLIFIED:
         bad.append(f"the page carries simplified glyph(s) {sorted(set(page) & SIMPLIFIED)}")
@@ -372,6 +547,8 @@ def audit(page, art, shp, PR):
             bad.append(f"card {rk}: a 0% PC where 未計 is required")
         if ("≈" in exp[2]) != ("≈" in (pr[2] or "")):
             bad.append(f"card {rk}: the ≈ of a sampled figure is missing or spurious")
+    if pcxd is not None:
+        bad += audit_pcx(cards, ents, pcxd)
     m = _ISLAND.search(page)
     if not m:
         bad.append("no data island")
@@ -390,8 +567,9 @@ def audit(page, art, shp, PR):
 def render_all(repo=REPO, inputs=None, prose=None):
     art, shp = inputs or load_inputs(repo)
     PR = prose or load_prose()
-    page = render(art, shp, PR)
-    bad = audit(page, art, shp, PR)
+    pcxd = load_pcx(repo)
+    page = render(art, shp, PR, pcxd)
+    bad = audit(page, art, shp, PR, pcxd)
     _need(not bad, "; ".join(bad[:5]))
     return {OVERVIEW: page}
 
@@ -399,12 +577,13 @@ def render_all(repo=REPO, inputs=None, prose=None):
 def selftest(repo=REPO):
     art, shp = load_inputs(repo)
     PR = load_prose()
-    page = render(art, shp, PR)
+    pcxd = load_pcx(repo)
+    page = render(art, shp, PR, pcxd)
     killed = survived = 0
 
     def expect(label, mutated, want):
         nonlocal killed, survived
-        bad = audit(mutated, art, shp, PR)
+        bad = audit(mutated, art, shp, PR, pcxd)
         if bool(bad) == want:
             killed += want
             print(f'  {"killed" if want else "passed"}: {label}')
@@ -429,6 +608,11 @@ def selftest(repo=REPO):
     _need("未計" in page, "selftest: no 未計 card to plant 0% at")
     expect("0% shown where 未計 is required", sub(r'data-f="pc3">(未計)', lambda _: "0%"), True)
     expect("an island figure edited", sub(r'"t":\[\["[A-Z.]+","[^"]*","[^"]*","[^"]*","(\d)', lambda d: str((int(d) + 1) % 10)), True)
+    m = _PCX.search(page)
+    expect("a worked-PC section dropped", page.replace(m.group(0), "", 1), True)
+    expect("a worked-PC deal letter swapped", sub(r'<figure data-deal="([A-Z]{2})', lambda d: d[::-1] if d[0] != d[1] else "IO"), True)
+    expect("a worked-PC cell moved", sub(r'<li data-p="[A-Z]" data-c="(\d+)', lambda c: str((int(c) + 1) % 60)), True)
+    expect("a worked-PC hold flag flipped", sub(r'<li data-p="[A-Z]" data-c="[\d,]+" data-h="([01])"', lambda h: "1" if h == "0" else "0"), True)
     expect("an external request planted", page.replace("<style>", '<link rel="stylesheet" href="https://x.example/a.css"><style>', 1), True)
     print(f"selftest: {killed} killed, {survived} survived")
     return 1 if survived else 0

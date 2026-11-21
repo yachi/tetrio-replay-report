@@ -71,6 +71,9 @@ SIM = REPO / 'pipeline' / 'sim'
 EXCLUDED = {
     'rate-records.json': 'written by `Rscript analysis/rate_records.R --json` (R, not a bun emitter); '
                          'gated by pipeline/check_rate_records.py',
+    'tst-openers-pc-examples.json': 'written by `python3 pipeline/sim/emit-tst-pc-examples.py` (Python over the '
+                                    'tst-pcex-rs binary, not a bun emitter); re-run and byte-compared by its own '
+                                    '--check in verify.yml\'s typescript job',
 }
 
 #: emitters the registries do not describe.  `reads`: analysis/ artefacts they read (data edges);

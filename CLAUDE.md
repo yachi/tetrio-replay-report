@@ -6478,6 +6478,7 @@ shape count on the page is the artefact's, never typed here or in the prose.
 | merge emitter, artefact | `pipeline/sim/emit-tst-openers.py` → `analysis/tst-openers.json` |
 | test | `pipeline/openers/tst-openers.test.ts` (bun; builds the crate on first use, skips its re-run half loudly without cargo) |
 | page | `pipeline/tst_openers_page.py` + `tst_openers_prose.json` + `.css` + `.js` → `docs/tst-openers.html`, rendered by `bin/build-docs` (audit inside `render_all`; `--selftest`) |
+| worked PCs | `pipeline/sim/tst-pcex-rs` (binary `tst-pcex`, path dependency on `pc-solver-rs`) run by `pipeline/sim/emit-tst-pc-examples.py` → `analysis/tst-openers-pc-examples.json`: per card's displayed tiling, the first bag-3 deal the solver clears and the first proved-impossible bag-3 deal with a bag-4 deal that clears, each with the solver's plan. Drawn folded on each card, step-numbered; the page audit replays every plan from the card's residue (hold rule, shapes, clears, empty at the end). Examples, not figures. `--check` re-runs it in seconds (typescript job) and refuses an artefact built from another `tst-openers.json` |
 
 What re-derives what. The shape gate re-reads every shape from its recorded drawing (cells, slot, three rows cleared, uniqueness) and the
 committed routes files; its selftest plants a moved cell, a T that clears fewer rows and a duplicate. The test pins the artefact's md5s (crate
