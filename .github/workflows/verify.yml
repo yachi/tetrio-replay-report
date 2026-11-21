@@ -1745,6 +1745,13 @@ jobs:
           set -euo pipefail
           cargo build --release --locked --manifest-path pipeline/sim/tst2bag-rs/Cargo.toml
 
+      # The worked PCs on docs/tst-openers.html (pipeline/sim/tst-pcex-rs, path dependency on pc-solver-rs):
+      # re-run in full (seconds) and byte-compared with analysis/tst-openers-pc-examples.json, which also
+      # checks that artefact names the current analysis/tst-openers.json.
+      - name: Re-run the TST opener worked PCs
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 pipeline/sim/emit-tst-pc-examples.py --check
+
       - name: Warm the oracle cache
         if: env.INPUTS_UNCHANGED != '1'
         run: bun pipeline/sim/oracle-cache.ts --warm --jobs 4

@@ -37,7 +37,13 @@
  "group_badge": "{n} 格／少 {k} 粒",
  "me_name": "yachi 畫嘅形",
  "names_more": " 等 {c} 個圖",
- "labels": ["兩巡", "3巡PC", "4巡PC", "合計", "· 剩 "],
+ "labels": [
+  "兩巡",
+  "3巡PC",
+  "4巡PC",
+  "合計",
+  "· 剩 "
+ ],
  "card": {
   "left_title": "TST 之後剩低",
   "two": "兩巡砌到",
@@ -51,7 +57,18 @@
   "pos_line": "TST 喺{pos}（離牆 {d} 格）· {cells} 格 · {nt} 種砌法，圖係最好嗰種 · 剩低未用：{left}{mirror}",
   "no_left": "冇",
   "mirror": " · 左右反轉都計埋",
-  "details": "睇晒 {nt} 種砌法"
+  "details": "睇晒 {nt} 種砌法",
+  "pcx": "睇 3 巡、4 巡 PC 點砌",
+  "pcx_note": "每個都係一個例子：solver 搵到嘅第一個派牌同砌法，數字係擺嘅次序；灰色係 TST 之後剩低嘅格。百分比要睇上面嘅數，唔係呢度。",
+  "pcx_b3": "3 巡 PC",
+  "pcx_b4": "4 巡 PC（3 巡做唔到嗰陣）",
+  "pcx_left": "手上剩 {left} · ",
+  "pcx_deal3": "第 3 包派：{d}",
+  "pcx_deal34": "第 3 包派：{d3}，第 4 包派：{d4}",
+  "pcx_hold": "（hold）",
+  "pcx_none3": "搵唔到 3 巡做到 PC 嘅派牌例子。",
+  "pcx_none4": "搵唔到 3 巡做唔到、4 巡做到嘅例子。",
+  "pcx_always3": "呢個形每種第 3 包派牌都做到 PC，所以冇 4 巡例子。"
  },
  "back": "← 全部戰報"
 }
