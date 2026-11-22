@@ -83,7 +83,7 @@ function board(H, cells, cs) {
 }
 function showBuild(panel, c, j) {
   panel.replaceChildren();
-  if (!c.b[j]) { panel.append(el('p', 'muted sm', D.cl.bo_none)); return; }
+  if (!c.b[j]) { panel.append(el('p', 'muted sm', D.cl.bo_nobuild)); return; }
   const [order, sd] = c.b[j], [tst, line, a3] = c.x[j], n1 = c.n1, m = order.length + 1;
   let H = 1; for (const [, cs] of order) for (const q of cs) H = Math.max(H, Math.floor(q / 10) + 1);
   for (const q of tst) H = Math.max(H, Math.floor(q / 10) + 1);
@@ -97,7 +97,7 @@ function showBuild(panel, c, j) {
     order.forEach(([k, cs], i) => { if (i < s) for (const q of cs) cells.set(q, { fill: COL[k], n: i + 1, cur: i === s - 1, op: i < n1 ? null : .85 }); });
     for (const q of tst) cells.set(q, s === m ? { fill: COL.T, n: m, cur: true } : { dash: true });
     pic.replaceChildren(board(H, cells, 18));
-    cap.textContent = D.cl.bo_step.replace('{n}', s).replace('{m}', m) + (s === 0 ? '' : ' · ' + (s === m ? D.cl.bo_tst : order[s - 1][0] + (order[s - 1][2] ? ' ' + D.cl.bo_sd + order[s - 1][2] : '')));
+    cap.textContent = D.cl.bo_step.replace('{n}', s).replace('{m}', m) + (s === 0 ? '' : ' · ' + (s === m ? D.cl.bo_tst : order[s - 1][0] + (order[s - 1][2] ? ' ' + D.cl.bo_sd : '')));
     lis.forEach((li, i) => li.classList.toggle('on', i === s - 1));
   };
   for (const [lab, f] of [[D.cl.bo_first, () => 0], [D.cl.bo_prev, () => Math.max(0, s - 1)], [D.cl.bo_next, () => Math.min(m, s + 1)], [D.cl.bo_last, () => m]]) {
@@ -109,7 +109,7 @@ function showBuild(panel, c, j) {
     b.onclick = () => { s = i + 1; draw(); }; li.append(b); lis.push(li); return li;
   };
   list.append(el('li', 'bo-g', D.cl.bo_b1));
-  order.forEach(([k, , d], i) => { if (i === n1) list.append(el('li', 'bo-g', D.cl.bo_rest)); list.append(item(i, k, COL[k], d ? D.cl.bo_sd + d : '')); });
+  order.forEach(([k, , d], i) => { if (i === n1) list.append(el('li', 'bo-g', D.cl.bo_rest)); list.append(item(i, k, COL[k], d ? D.cl.bo_sd : '')); });
   list.append(el('li', 'bo-g', D.cl.bo_tst)); list.append(item(order.length, 'T', COL.T, ''));
   side.append(nav, cap, list); wrap.append(pic, side); panel.append(wrap);
   draw();

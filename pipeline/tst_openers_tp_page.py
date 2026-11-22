@@ -165,6 +165,9 @@ def load_builds(repo=REPO):
     with open(os.path.join(repo, "analysis", "tst-openers-tp.json"), "rb") as f:
         _need(bd["md5"]["tst_openers_tp"] == hashlib.md5(f.read()).hexdigest(),
               "the builds artefact was built from another analysis/tst-openers-tp.json: re-run emit-tst-builds.py")
+    for key, v in bd["builds"].items():
+        _need(v.get("order") is not None, f"build {key}: the engine found no placement order")
+        _need(v.get("tst") is True, f"build {key}: the engine did not confirm the T reaches the TST slot with a full spin")
     return bd["builds"]
 
 
@@ -488,7 +491,7 @@ def counts_line(b, k, C):
 
 CL_KEYS = ("pcx_b3", "pcx_b4", "pcx_left", "pcx_deal3", "pcx_deal34", "pcx_hold", "pcx_none3", "pcx_none4", "pcx_always3",
            "cl_hint", "bo_title", "bo_note", "bo_b1", "bo_rest", "bo_tst", "bo_sd", "bo_step", "bo_first", "bo_prev", "bo_next",
-           "bo_last", "bo_pc", "bo_pc_note", "bo_none")
+           "bo_last", "bo_pc", "bo_pc_note", "bo_none", "bo_nobuild")
 
 
 def tst_cells(s):
@@ -883,6 +886,14 @@ def audit_builds(island, R, cat, pcxd):
                 bad.append(f"{tag}: the build is not the class's drawn tiling")
             if sd != sum(x for _, _, x in order):
                 bad.append(f"{tag}: the soft-drop total is not its steps' sum")
+            occ = set()
+            for k, cs, x in order:
+                if not any(q < 10 or (q - 10 in occ and q - 10 not in cs) for q in cs):
+                    bad.append(f"{tag}: a {k} step rests on nothing")
+                over = any(q2 in occ for q in cs for q2 in range(q + 10, 120, 10) if q2 not in cs)
+                if x != int(over):
+                    bad.append(f"{tag}: a {k} step's soft-drop flag is not whether a filled cell stands over it")
+                occ |= set(cs)
             tc, ln, a3 = c["x"][j]
             s = cat[r["shapes"][si]]
             if tc != tst_cells(s) or set(tc) & set(built) or OP._norm([(q % 10, q // 10) for q in tc]) not in OP.SHAPE["T"]:
@@ -1268,6 +1279,19 @@ def selftest(repo=REPO):
     bd[k0]["order"][0][2] += 1
     expect("a soft-drop count edited", render(art, cat, PR, pcxd, bd), True, bd=bd)
     bd = copy.deepcopy(builds)
+    rests = lambda cs, occ: any(q < 10 or (q - 10 in occ and q - 10 not in cs) for q in cs)
+    o, sw = next((v["order"], i) for v in bd.values() for i in range(len(v["order"]) - 1)
+                 if not rests(v["order"][i + 1][1], {q for _, cs, _ in v["order"][:i] for q in cs}))
+    o[sw], o[sw + 1] = o[sw + 1], o[sw]
+    expect("two build steps swapped so one floats", render(art, cat, PR, pcxd, bd), True, bd=bd)
+    bd = copy.deepcopy(builds)
+    kk, o = next((k, v["order"]) for k, v in bd.items()
+                 if any(x for _, _, x in v["order"]) and not all(x for _, _, x in v["order"]))
+    a = next(i for i, st in enumerate(o) if st[2])
+    z = next(i for i, st in enumerate(o) if not st[2])
+    o[a][2], o[z][2] = 0, 1
+    expect("a soft drop moved to another step, total unchanged", render(art, cat, PR, pcxd, bd), True, bd=bd)
+    bd = copy.deepcopy(builds)
     del bd[k0]
     expect("a build missing", render(art, cat, PR, pcxd, bd), True, bd=bd)
     px = copy.deepcopy(pcxd)
@@ -1297,6 +1321,21 @@ def selftest(repo=REPO):
     except Exception:
         killed += 1
         print("  killed: a stale builds artefact")
+    for label, edit in (("a build the engine did not confirm reaches the TST", lambda v: v.update(tst=False)),
+                        ("a build with no placement order", lambda v: v.update(order=None))):
+        try:
+            bad_b = json.load(open(bdj))
+            edit(next(iter(bad_b["builds"].values())))
+            tmp = os.path.join(tempfile.mkdtemp(), "analysis")
+            os.makedirs(tmp)
+            json.dump(bad_b, open(os.path.join(tmp, "tst-openers-tp-builds.json"), "w"))
+            shutil.copy(os.path.join(repo, "analysis", "tst-openers-tp.json"), tmp)
+            load_builds(os.path.dirname(tmp))
+            survived += 1
+            print(f"  SURVIVED: {label}", file=sys.stderr)
+        except Exception:
+            killed += 1
+            print(f"  killed: {label}")
     print(f"selftest: {killed} killed, {survived} survived")
     return 1 if survived else 0
 
