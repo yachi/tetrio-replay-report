@@ -6466,7 +6466,7 @@ Run Dafny and Lean one at a time: the Dafny mutants' limits are wall-clock.
 
 ## TST 開局排名頁 — every two-bag TST shape, counted and ranked (since 2026-11-21)
 
-`docs/tst-openers.html` (a 定式路線 card after the SDPC loop's) ranks the two-bag boards on which a stood T clears three rows: for each,
+`docs/tst-openers-held.html` (the reference page; its card is replaced by the T-placed page's, see below) ranks the two-bag boards on which a stood T clears three rows: for each,
 how many ways the first two bags can build it and how many dealt orders allow it, and then how often a bag-4 Perfect Clear follows. It is
 CONSTRUCTED and quarantined like the route demos: nobody played these boards, `report_eligible: false`, no claim id, no ✓, in no count, and every
 shape count on the page is the artefact's, never typed here or in the prose.
@@ -6489,18 +6489,50 @@ its input line), so `bin/emit-corpus` names the artefact and skips it always, ev
 harddrop wikitext the harddrop shapes were read from carries no revision pin, and the johnbeak fumens and the one hand-drawn board are recorded
 rows only. A shape from one of those is as good as its transcription and no better; ROADMAP.md lists them.
 
-**The ranking is by a FIXED bag 1 (since 2026-11-21, yachi, on Fable's advice).** The first version ranked by the best
-single tiling with both bags seen, which assumes the player adapts bag 1 to bag 2 and read far higher than any learnt opener. The
-counter's `FIXED=1` mode (input `name|cells|tst|classes`, classes the shape's leftovers ordered by PC, highest first) takes every
-bag-1 board (one placement each of IJLOSZ, T held) and counts, per board, the 5040² two-bag deals that end on a tiling holding
-that board, cumulative by leftover class (`cum[k]`). `emit-tst-openers.py --fixed-input` prints those lines, `--merge-fixed <out>`
-merges the counter's output into each shape's `fixed` block (`classes`, `nb1`, `best`, `b1`, `ntil`, `til`, `cums`; schema
-`tst-openers/2`). The best board is the one with the largest rate × PC (the class increments times their PC), the card draws it and
-`fixed.til`, and the page ranks by that joint figure. PC is over the deals the fixed board builds. The old figure stays on each card
-as 「睇晒兩包（揀一種砌法）」 and is NOT a strict upper bound: a fixed bag 1 may finish on several tilings, so the page counts the
-shapes where the fixed rate exceeds it (computed at render, never typed). The audit re-picks the best board from `cums`, checks the
-drawn tiling holds it and re-derives both figure sets; test (e) re-runs the pinned cheap shapes in `FIXED=1`. The fixed run is part
-of the full recount and is not re-run in CI. The worked PCs follow the drawn tiling (`tst_openers_page.shown_tiling`).
+**Two pages, and the first is kept as the reference (since 2026-11-22, yachi: 「Replace the page, but keep the page as reference」).**
+`docs/tst-openers.html` is now the T-placed ranking, below. The previous page (ranked by a FIXED bag 1: the counter's `FIXED=1` mode
+takes every bag-1 board, one placement each of IJLOSZ with the T held, and counts the 5040² two-bag deals that end on a tiling holding
+it, cumulative by leftover class; the card draws the board with the largest rate x PC) is `docs/tst-openers-held.html`, rendered by the
+unchanged `tst_openers_page.py` (`OVERVIEW = "tst-openers-held.html"`) from `analysis/tst-openers.json`, with a `ref` note and a link to
+the new page. Its figures, crate, emitter, test and worked PCs (`analysis/tst-openers-pc-examples.json`) are exactly as in the table above.
+
+**The T-placed ranking (the new `docs/tst-openers.html`).** Same shapes, a different question: the board before the stood T is six pieces
+(the T already placed), the two bags are dealt, and the page counts the deals that build a tiling holding that board, per leftover class,
+at four soft-drop budgets (0 / 1 / 2 / inf extra inputs, `cum` keys `"0"`, `"1"`, `"2"`, `"inf"`, cumulative over the classes ordered by
+p5). Per board: built = `cum[-1]/N2`, pc3 given built = `pc3n/(cum[-1]*BAG)`, joint = `pc3n/(N2*BAG)` (BAG = 5040, N2 = BAG²); all
+figures are exact fractions re-derived by the page audit, floored for print.
+
+| piece | where |
+|---|---|
+| counter + sampler | `pipeline/sim/tst2bag-tp-rs` (path dependencies as `tst2bag-rs`; `Cargo.lock` committed) |
+| emitter, artefact | `pipeline/sim/emit-tst-openers-tp.py` → `analysis/tst-openers-tp.json` (schema `tst-openers-tp/1`) |
+| test | `pipeline/openers/tst-openers-tp.test.ts` |
+| page | `pipeline/tst_openers_tp_page.py` + `tst_openers_tp_prose.json` + `.css` + `.js` → `docs/tst-openers.html`; reuses `tst_openers_page`'s card, tiling and PC-replay functions; `--selftest` plants the corruptions |
+| worked PCs | `emit-tst-pc-examples.py --tp` → `analysis/tst-openers-tp-pc-examples.json`, lines from `tst_openers_tp_page.pcx_lines()`; `--tp --check` re-runs it in CI |
+
+Rules the page depends on, each of which a simplification would break:
+
+* **One card per mirror pair.** A board and its mirror are one card; the representative is the board with fewer shapes of id 1000+ (the
+  mirror shapes), then the higher joint at `inf`, then the name. The card says whether the partner differs.
+* **Ranks are printed only above 36% joint (9/25).** The counter prunes boards whose upper bound is at or under the threshold
+  (`prune.threshold` [9, 25]; the artefact records how many of the boards it kept), so a rank is complete only above it; below it the
+  card is in a folded, unranked table. Ranks are competition ranks (1 + the number of strictly larger joints at that budget), so ties
+  share one, and the order changes with the soft-drop budget the filter bar selects.
+* **`classes` lists every leftover class of the listed shapes, not only the live ones.** A class is live only if some budget gives a
+  positive increment; only live classes have a tiling holding the board. A reader or audit that indexes tilings by class must filter
+  to live classes first (that was the first bug of this page).
+* **Mirror state is a flag.** `mirror.assumed: true` marks the fallback artefact, where the mirror half was assumed equal rather than
+  counted; the page says so in its own sentence (`mirror_assumed`), and the sentence changes when the counted artefact lands.
+* **A pair whose partner exceeds the threshold while its representative does not is left out of the ranking**, and its count is not
+  yet measured; the page does not print one.
+* **Page size is about 4 MB** (every card's tilings and the per-class rows ride in one island); the plan's cap was about 6 MB.
+
+What re-derives what: the page audit recomputes every figure, every rank and every class row from the artefact and the shapes, checks
+each class against the shape's tilings, replays every worked PC from the card's residue and requires the island to equal `build_data`
+(`--selftest`: 33 mutants, all killed). **What nothing re-runs in CI is the full recount** (hours of CPU), for the same reason as the
+first page; `bin/emit-corpus` skips it. The detail rows' figures drawn on open have no dashed T marker (the row shape differs per class
+and the island row format is audited), so the T is read from the caption. The hand-typed OPEN opener labels on the cards are not
+re-checked by anything.
 
 ## 影片實戰例子 — boards read off one match video, drawn beside the source drawings
 
