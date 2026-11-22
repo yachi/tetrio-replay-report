@@ -1,0 +1,6 @@
+.bar span.muted{margin-right:2px}
+.mir{border-top:1px dashed var(--line);padding-top:4px}
+.sdl b{color:var(--fg)}
+details.inc{margin-top:10px}
+.tl figure figcaption+figcaption{margin-top:2px}
+.fam{margin:.4em 0}.fam summary{cursor:pointer;font-size:.9em}.famm{margin:.3em 0}

@@ -2,6 +2,9 @@
 Perfect Clear: `docs/tst-openers.html`.
 
     python3 -m pipeline.tst_openers_page --out-dir /tmp/tst   # render it somewhere other than docs/
+
+This is the REFERENCE page since the T-placed bag-1 ranking took `docs/tst-openers.html`: it is rendered from the
+unchanged `analysis/tst-openers.json` (T held in bag 1), carries a `ref_note` saying so and links to the new page.
     python3 -m pipeline.tst_openers_page --selftest           # the audit's mutants
 
 Inputs, both committed and nothing else: `analysis/tst-openers.json` (the merged enumeration: per shape its
@@ -41,7 +44,8 @@ from pipeline.claims.build_claims import SIMPLIFIED
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
-OVERVIEW = "tst-openers.html"
+OVERVIEW = "tst-openers-held.html"
+NEW_PAGE = "tst-openers.html"      # the T-placed bag-1 ranking (`tst_openers_tp_page`), which replaced this page at that URL
 PREFIX = "tst-openers"
 ART_PATH = os.path.join(REPO, "analysis", "tst-openers.json")
 SHAPES_PATH = os.path.join(REPO, "pipeline", "openers", "tst-openers-shapes.json")
@@ -620,7 +624,8 @@ def render(art, shp, PR, pcxd):
            "<style>", css, "</style></head><body><main>",
            f'<nav class="sm"><a href="index.html">{_esc(PR["back"])}</a></nav>',
            f'<div class="eyebrow">{RS.EYEBROW}</div>', f"<h1>{_esc(title)}</h1>",
-           f'<p class="quar">{PR["quarantine"]}</p>']
+           f'<p class="quar">{PR["quarantine"]}</p>',
+           f'<p class="ref">{PR["ref_note"]} <a href="{NEW_PAGE}">{PR["to_new"]}</a></p>']
     out += [f"<p>{t.format(me_sentence=me_sentence, **fmt)}</p>" for t in PR["intro"]]
     out += [f'<p class="muted sm">{_esc(PR["note_names"])}</p>',
             f'<details class="sm"><summary><b>{_esc(PR["reading_summary"])}</b></summary>\n<ul>']
@@ -770,6 +775,8 @@ def audit_rows(island, art, ents, cards):
 
 def audit(page, art, shp, PR, pcxd=None):
     bad = RP.audit_quarantine(page, [RS.EYEBROW, RS.NO_CLAIM, PR["quarantine"]], DATA_ID)
+    if PR["ref_note"] not in page or f'<a href="{NEW_PAGE}">' not in page:
+        bad.append("the reference note or its link to the new page is missing")
     if set(page) & SIMPLIFIED:
         bad.append(f"the page carries simplified glyph(s) {sorted(set(page) & SIMPLIFIED)}")
     ents = entries(art, shp)
@@ -846,6 +853,8 @@ def selftest(repo=REPO):
 
     expect("the rendered page (control)", page, False)
     expect("the quarantine sentence deleted", page.replace(PR["quarantine"], "", 1), True)
+    expect("the reference note deleted", page.replace(PR["ref_note"], "", 1), True)
+    expect("the link to the new page deleted", page.replace(f'<a href="{NEW_PAGE}">', "<a>", 1), True)
     expect("a claim badge planted", page.replace("</h1>", '<span data-claim="C001">✓</span></h1>', 1), True)
     expect("a card's joint figure edited", sub(r'data-f="joint">(\d)', lambda d: str((int(d) + 1) % 10)), True)
     expect("a card's two-bag figure edited", sub(r'data-f="two">(\d)', lambda d: str((int(d) + 1) % 10)), True)
@@ -890,13 +899,6 @@ def selftest(repo=REPO):
     expect("an external request planted", page.replace("<style>", '<link rel="stylesheet" href="https://x.example/a.css"><style>', 1), True)
     print(f"selftest: {killed} killed, {survived} survived")
     return 1 if survived else 0
-
-
-def site_card(inputs=None, prose=None):
-    art, shp = inputs or load_inputs()
-    PR = prose or load_prose()
-    return {"href": OVERVIEW, "cases": len(entries(art, shp)), "unit": "個形", "kicker": PR["index_card"]["kicker"],
-            "title": PR["overview_title"], "blurb": PR["index_card"]["blurb"]}
 
 
 def main(argv=None):

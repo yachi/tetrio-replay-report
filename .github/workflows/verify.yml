@@ -1501,6 +1501,10 @@ jobs:
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.tst_openers_page --selftest
 
+      - name: Check the TST opener T-placed page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.tst_openers_tp_page --selftest
+
       - name: Check the pc-miss page audit catches its corruptions
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.pc_miss_page --selftest
@@ -1751,6 +1755,17 @@ jobs:
       - name: Re-run the TST opener worked PCs
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 pipeline/sim/emit-tst-pc-examples.py --check
+
+      # The T-placed ranking's counter (pipeline/sim/tst2bag-tp-rs) and its worked PCs, the same way.
+      - name: Build the TST opener T-placed counter
+        if: env.INPUTS_UNCHANGED != '1'
+        run: |
+          set -euo pipefail
+          cargo build --release --locked --manifest-path pipeline/sim/tst2bag-tp-rs/Cargo.toml
+
+      - name: Re-run the TST opener T-placed worked PCs
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 pipeline/sim/emit-tst-pc-examples.py --tp --check
 
       - name: Warm the oracle cache
         if: env.INPUTS_UNCHANGED != '1'

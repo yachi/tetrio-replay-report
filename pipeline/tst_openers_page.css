@@ -34,3 +34,4 @@ ol.steps{margin:0;padding-left:1.6em;font-size:.72rem;columns:2;column-gap:14px}
 .smalls{display:flex;flex-direction:column;gap:6px}
 .cnt{margin-top:2px}.up{margin-top:2px}
 .p3w{overflow-x:auto}table.p3{border-collapse:collapse;font-size:.85rem;min-width:520px}table.p3 th,table.p3 td{padding:4px 8px;border-bottom:1px solid var(--line);text-align:left}table.p3 td.num{text-align:right}table.p3 td.j3{color:var(--accent);font-weight:700}table.p3 a{color:var(--fg)}
+.ref{border-left:3px solid var(--muted);padding-left:10px}

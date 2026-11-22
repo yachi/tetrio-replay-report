@@ -2,10 +2,6 @@
  "title": "C-Spin 開局（TST 先），兩巡理想形排名",
  "overview_title": "C-Spin 開局排名：兩巡理想形",
  "desc": "由 harddrop、shiwehi 同 johnbeak 嘅定式頁抽出嚟嘅 TST 兩巡形，窮舉砌法同派牌，計兩巡砌到嘅機會同之後 Perfect Clear 嘅機會。全部係模擬，唔屬於信任鏈。",
- "index_card": {
-  "kicker": "定式路線 · 構造",
-  "blurb": "由幾個來源頁抽出嚟嘅 TST 兩巡形，窮舉砌法同派牌，排名兩巡砌到加之後做到 PC 嘅機會。模擬推導，唔係 corpus。"
- },
  "quarantine": "<strong>呢版係模擬推導，唔係 corpus</strong>：每個盤面都係由來源圖構造出嚟，再用模擬器同 solver 窮舉或者抽樣，冇人打過，唔入任何計數，冇 claim 編號、冇 ✓ 標記。",
  "intro": [
   "由 harddrop 嘅 Triple Double 開局頁（{n_hd} 頁）、shiwehi 嘅定式頁，同 johnbeak 嘅 Gamushiro 頁（{jb}），抽晒「T 企住入、清三行」嘅兩巡形出嚟，去重之後有 {n} 個（左右反轉當同一個）。每個形都窮舉晒點樣用兩包方塊（每款最多兩粒，T 一粒）砌，再逐種派牌次序計（有 hold、有 180）。",
@@ -89,5 +85,7 @@
   "fixed_zero": "固定咗第一包之後，冇一種第二包砌得成",
   "upper": "睇晒兩包（揀一種砌法）"
  },
- "back": "← 全部戰報"
+ "back": "← 全部戰報",
+ "ref_note": "呢頁係舊版排名，留低做參考：第一包 T 留喺 hold 入面（第二包先落），數字同舊嘅 TST 兩巡形目錄一一對應。新版排名改成第一包就連 T 一齊落，睇 3 巡 PC 最易嘅開局板。",
+ "to_new": "去新版排名 →"
 }

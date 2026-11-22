@@ -1,0 +1,318 @@
+/**
+ * The T-placed bag-1 ranking (`analysis/tst-openers-tp.json`, merged by `pipeline/sim/emit-tst-openers-tp.py` from the
+ * Rust counter `pipeline/sim/tst2bag-tp-rs`). CONSTRUCTED and quarantined: nobody played these boards,
+ * `report_eligible: false`, no claim id, no badge.
+ *
+ * The full recount takes about an hour and a half on four cores, so it is never re-run here. What is checked:
+ *   (a) the artefact's three md5s (crate sources, the old artefact's bytes, the shapes) are current;
+ *   (b) invariants written here in TypeScript, with this file's own mirror function, over every board;
+ *   (c) a mutant per invariant, each of which must trip it;
+ *   (d) a PINNED set of boards re-run as MULTI lines at soft-drop budgets 0, 1, 2 and unlimited equal `cum`;
+ *   (e) two cheap original shapes re-run with TPL+LASTONLY equal `built1` on every board listing them;
+ *   (f) the symmetry probe: the mirrors of five cheap shapes re-run in default mode equal `mirror_shapes[].til`.
+ * (d)-(f) build the crate on first use and skip loudly without cargo. Run: bun test pipeline/openers/tst-openers-tp.test.ts
+ */
+import { test, expect } from 'bun:test';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { join } from 'node:path';
+
+const ROOT = join(import.meta.dir, '..', '..');
+const SIM = join(ROOT, 'pipeline', 'sim');
+const ART = JSON.parse(readFileSync(join(ROOT, 'analysis', 'tst-openers-tp.json'), 'utf8'));
+const OLD_PATH = join(ROOT, 'analysis', 'tst-openers.json');
+const OLD = JSON.parse(readFileSync(OLD_PATH, 'utf8'));
+const SHAPES: any[] = JSON.parse(readFileSync(join(ROOT, 'pipeline', 'openers', 'tst-openers-shapes.json'), 'utf8')).shapes;
+const md5 = (b: string | Buffer) => createHash('md5').update(b).digest('hex');
+const B = 5040, N2 = B * B;
+const ORDER = 'IJLOSTZ';
+const clone = <T>(x: T): T => JSON.parse(JSON.stringify(x));
+
+/** Boards re-run in (d), pinned by their pieces (names are regenerated on every emit). Cheap: one or two shapes each. */
+const PINNED_BOARDS = [
+  'I:9,19,29,39/J:0,1,2,10/L:7,8,17,27/O:35,36,45,46/T:6,15,16,26/Z:4,5,13,14',
+  'I:9,19,29,39/J:0,1,2,10/O:48,49,58,59/S:11,20,21,30/T:8,17,18,28/Z:6,7,15,16',
+  'I:7,17,27,37/J:0,1,2,10/L:8,9,18,28/O:35,36,45,46/T:6,15,16,26/Z:4,5,13,14',
+  'I:9,19,29,39/J:0,1,2,10/L:3,4,13,23/O:48,49,58,59/S:11,20,21,30/T:8,17,18,28',
+  'I:0,10,20,30/J:5,6,16,26/L:7,8,9,19/O:40,41,50,51/S:2,3,13,14/T:1,11,12,21',
+  'I:0,10,20,30/J:5,6,16,26/L:7,8,9,19/S:2,3,13,14/T:1,11,12,21/Z:18,28,29,39',
+];
+/** Original shapes re-run in (e) and whose mirrors are re-run in (f). */
+const PINNED_E = [98, 81];
+const PINNED_F = [98, 81, 46, 47, 119];
+
+// ---- helpers (this file's own mirror and tiling arithmetic) ----------------------------------------------------------
+const SW: Record<string, string> = { J: 'L', L: 'J', S: 'Z', Z: 'S' };
+const mk = (k: string) => SW[k] ?? k;
+const mc = (c: number) => Math.floor(c / 10) * 10 + 9 - (c % 10);
+type Pc = [string, number[]];
+const sortPcs = (ps: Pc[]): Pc[] => ps.map(([k, cs]) => [k, [...cs].sort((a, b) => a - b)] as Pc).sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : a[1].join() < b[1].join() ? -1 : a[1].join() > b[1].join() ? 1 : 0));
+const mirrorPcs = (ps: Pc[]): Pc[] => sortPcs(ps.map(([k, cs]) => [mk(k), cs.map(mc)] as Pc));
+const keyOf = (ps: Pc[]) => sortPcs(ps).map(([k, cs]) => `${k}:${cs.join(',')}`).join('/');
+const pieceKeys = (ps: Pc[]) => new Set(ps.map(([k, cs]) => `${k}:${[...cs].sort((a, b) => a - b).join(',')}`));
+const sortLeft = (l: string) => [...l].sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b)).join('');
+const leftOf = (ps: Pc[]) => [...ORDER].map((k) => k.repeat(Math.max(0, 2 - ps.filter((p) => p[0] === k).length - (k === 'T' ? 1 : 0)))).join('');
+const pts = (ps: number[][]) => ps.map((p) => p.join(',')).join(';');
+const idxs = (ps: number[][]) => ps.map(([x, y]) => y * 10 + x).sort((a, b) => a - b);
+const shapeKey = (s: { cells: number[][]; tst: number[][] }) => JSON.stringify([idxs(s.cells), idxs(s.tst)]);
+
+interface Til { pieces: Pc[]; left: string; A: number; B: number; p5: number }
+interface Cat { id: number; cells: number[][]; tst: number[][]; til: Til[]; classes: Map<string, number> }
+
+/** The 234-shape catalogue: the 121 transcribed shapes (tilings from the old artefact) and the mirrors of those whose mirror is absent. */
+function catalogue(art: any): Map<number, Cat> {
+  const by = new Map<number, Cat>();
+  const add = (id: number, cells: number[][], tst: number[][], til: Til[]) => {
+    const classes = new Map<string, number>();
+    for (const t of til) if (t.B > 0) classes.set(t.left, t.p5);
+    by.set(id, { id, cells, tst, til, classes });
+  };
+  const oldBy = new Map<number, any>(OLD.shapes.map((o: any) => [o.id, o]));
+  for (const s of SHAPES) add(s.id, s.cells, s.tst, oldBy.get(s.id).til.map((t: any) => ({ pieces: t.pieces, left: t.left, A: t.A, B: t.B, p5: t.p5 })));
+  const have = new Set(SHAPES.map(shapeKey));
+  for (const ms of art.mirror_shapes) {
+    const s = SHAPES.find((x) => x.id === ms.mirror_of)!;
+    const cells = s.cells.map(([x, y]: number[]) => [9 - x, y]).sort((a: number[], b: number[]) => a[0] - b[0] || a[1] - b[1]);
+    const tst = s.tst.map(([x, y]: number[]) => [9 - x, y]).sort((a: number[], b: number[]) => a[0] - b[0] || a[1] - b[1]);
+    const o = oldBy.get(ms.mirror_of);
+    add(ms.id, cells, tst, o.til.map((t: any, i: number) => ({ pieces: mirrorPcs(t.pieces), left: sortLeft([...t.left].map(mk).join('')), A: ms.til[i][0], B: ms.til[i][1], p5: ms.til[i][2] })));
+    have.add(shapeKey({ cells, tst }));
+  }
+  return by;
+}
+const holds = (t: Til, board: Pc[]) => { const ks = pieceKeys(t.pieces); return board.every(([k, cs]) => ks.has(`${k}:${[...cs].sort((a, b) => a - b).join(',')}`)); };
+const classesOf = (ids: number[], cat: Map<number, Cat>): [number, string, number][] => {
+  const out: [number, string, number][] = [];
+  ids.forEach((sid, si) => cat.get(sid)!.classes.forEach((p5, l) => out.push([si, l, p5])));
+  return out.sort((a, b) => b[2] - a[2] || a[0] - b[0] || (a[1] < b[1] ? -1 : a[1] > b[1] ? 1 : 0));
+};
+/** ub > 9/25, exactly: min(min(N2, sum b) * maxP, sum b_i * maxp5_i) / (N2 * 5040). */
+function ubExceeds(ids: number[], built1: number[], cat: Map<number, Cat>): boolean {
+  const mp = ids.map((id) => Math.max(0, ...cat.get(id)!.classes.values()));
+  const sum = built1.reduce((a, b) => a + b, 0);
+  const maxP = Math.max(...mp);
+  const a = BigInt(Math.min(N2, sum)) * BigInt(maxP);
+  const b = built1.reduce((s, x, i) => s + BigInt(x) * BigInt(mp[i]!), 0n);
+  const num = a < b ? a : b;
+  return num * 25n > 9n * BigInt(N2) * BigInt(B);
+}
+
+// ---- (a) hashes --------------------------------------------------------------------------------------------------
+function canon(x: any): string {
+  if (Array.isArray(x)) return '[' + x.map(canon).join(',') + ']';
+  if (x && typeof x === 'object') return '{' + Object.keys(x).sort().map((k) => JSON.stringify(k) + ':' + canon(x[k])).join(',') + '}';
+  return JSON.stringify(x);
+}
+function crateMd5(): string {
+  const files = ['tst2bag-tp-rs/Cargo.toml'];
+  for (const c of ['tst2bag-tp-rs', 'oracle-rs', 'pc-solver-rs'])
+    for (const f of readdirSync(join(SIM, c, 'src'), { recursive: true }) as string[]) if (f.endsWith('.rs')) files.push(`${c}/src/${f}`);
+  files.sort();
+  const h = createHash('md5');
+  for (const f of files) h.update(`${f}\0${md5(readFileSync(join(SIM, f)))}\n`);
+  return h.digest('hex');
+}
+test('(a) the three md5s are current and the artefact is quarantined', () => {
+  expect(ART.md5.crate).toBe(crateMd5());
+  expect(ART.md5.tst_openers).toBe(md5(readFileSync(OLD_PATH)));
+  expect(ART.md5.shapes).toBe(md5(canon(SHAPES)));
+  expect(ART.report_eligible).toBe(false);
+  expect(ART.constructed).toBe(true);
+  expect(ART.schema).toBe('tst-openers-tp/1');
+});
+
+// ---- (b) invariants ----------------------------------------------------------------------------------------------
+const KINDS = 'IJLOSZ';
+function problems(art: any, only?: number[]): string[] {
+  const bad: string[] = [];
+  const cat = catalogue(art);
+  // mirror_shapes cover exactly the shapes whose mirror is absent
+  const have = new Set(SHAPES.map(shapeKey));
+  const want = new Map<number, number>();
+  const seenMirror = new Set<string>();
+  for (const s of SHAPES) {
+    const m = { cells: s.cells.map(([x, y]: number[]) => [9 - x, y]), tst: s.tst.map(([x, y]: number[]) => [9 - x, y]) };
+    const k = shapeKey(m);
+    if (have.has(k) || seenMirror.has(k)) continue;
+    seenMirror.add(k);
+    want.set(1000 + s.id, s.id);
+  }
+  const got = new Map<number, number>(art.mirror_shapes.map((m: any) => [m.id, m.mirror_of]));
+  if (JSON.stringify([...want].sort()) !== JSON.stringify([...got].sort()) || got.size !== art.mirror_shapes.length) bad.push('mirror_shapes');
+  if (art.mirror_shapes.some((m: any) => !Array.isArray(m.til) || m.til.length !== OLD.shapes.find((o: any) => o.id === m.mirror_of)?.til.length)) bad.push('mirror_shapes til');
+  if (art.prune.kept !== art.boards.length) bad.push('prune kept');
+  const keys = new Map<string, any>();
+  art.boards.forEach((b: any, i: number) => {
+    keys.set(keyOf(b.pieces), b);
+    if (only && !only.includes(i)) return;
+    const tag = (t: string) => bad.push(`${t} ${b.name}`);
+    if (b.name !== `t${i}`) tag('name');
+    // six disjoint tetrominoes of the declared kinds, exactly one T, held is the missing kind
+    const pcs: Pc[] = b.pieces;
+    const kinds = pcs.map((p) => p[0]).sort().join('');
+    const held = b.held;
+    if (!KINDS.includes(held) || kinds !== [...'T' + KINDS.replace(held, '')].sort().join('')) tag('kinds');
+    const cells = pcs.flatMap((p) => p[1]);
+    if (cells.length !== 24 || new Set(cells).size !== 24 || cells.some((c: number) => c < 0 || c >= 120)) tag('cells');
+    for (const [k, cs] of pcs) if (cs.length !== 4 || !cs.every((c) => c % 10 < 10)) tag('piece');
+    // every listed shape has a tiling holding the board, ntil counts them, classes are exactly the B>0 set in order
+    let ntil = 0;
+    if (!b.shapes.every((id: number) => cat.has(id))) { tag('shape id'); return; }
+    if (new Set(b.shapes).size !== b.shapes.length) tag('shape dup');
+    for (const id of b.shapes) {
+      const n = cat.get(id)!.til.filter((t) => holds(t, pcs)).length;
+      if (n === 0) tag('shape no tiling');
+      ntil += n;
+    }
+    if (b.ntil !== ntil) tag('ntil');
+    // classes: every (shape, leftover, p5) over the listed shapes' tilings with B > 0 (not only those holding the board), ranked
+    const exp = classesOf(b.shapes, cat);
+    const gotc: [number, string, number][] = b.classes.map((c: any) => [c[0], c[1], c[2]]);
+    if (JSON.stringify([...gotc].sort()) !== JSON.stringify([...exp].sort())) tag('classes');
+    else if (!art.mirror.assumed && JSON.stringify(gotc) !== JSON.stringify(exp)) tag('classes order');
+    // cum: lengths, non-decreasing, at most N2, monotone across budgets
+    let prev: number[] | null = null;
+    for (const bk of ['0', '1', '2', 'inf']) {
+      const c: number[] = b.cum[bk];
+      if (c.length !== b.classes.length || c.some((x, j) => j > 0 && x < c[j - 1]!) || c.some((x) => x < 0 || x > N2)) tag('cum');
+      if (prev && prev.some((x, j) => x > c[j]!)) tag('budgets');
+      prev = c;
+    }
+    const inf = b.cum.inf;
+    const sum = b.built1.reduce((a: number, x: number) => a + x, 0);
+    if (b.built1.length !== b.shapes.length || !(Math.max(...b.built1) <= inf[inf.length - 1] && inf[inf.length - 1] <= sum)) tag('built1');
+    if (!ubExceeds(b.shapes, b.built1, cat)) tag('ub');
+  });
+  if (keys.size !== art.boards.length) bad.push('duplicate board');
+  // mirror: an involution onto the mirrored pieces
+  art.boards.forEach((b: any) => {
+    const mk2 = keyOf(mirrorPcs(b.pieces));
+    const other = keys.get(mk2);
+    if ((other?.name ?? null) !== (b.mirror ?? null)) bad.push(`mirror ${b.name}`);
+    if (other && other.mirror !== b.name) bad.push(`mirror involution ${b.name}`);
+  });
+  return bad;
+}
+
+test('(b) invariants hold over every board', () => {
+  expect(problems(ART)).toEqual([]);
+  expect(ART.boards.length).toBeGreaterThan(0);
+  expect(ART.boards.length).toBe(ART.prune.kept);
+});
+
+// ---- (c) mutants -------------------------------------------------------------------------------------------------
+test('(c) each invariant has a mutant that fires', () => {
+  // per-board checks run on a few boards only (the mutants touch the first board and one mirror pair); the whole-artefact checks always run
+  const mi = ART.boards.findIndex((b: any) => b.mirror !== null);
+  const SUBSET = [0, 1, mi];
+  const fires = (f: (a: any) => void, tag: string) => {
+    const a = clone(ART);
+    f(a);
+    expect(problems(a, SUBSET).some((p) => p.startsWith(tag))).toBe(true);
+  };
+  const first = (a: any) => a.boards[0];
+  const withMirror = (a: any) => a.boards.find((b: any) => b.mirror !== null);
+  fires((a) => { first(a).name = 'tX'; }, 'name');
+  fires((a) => { first(a).held = first(a).held === 'I' ? 'J' : 'I'; }, 'kinds');
+  fires((a) => { first(a).pieces[0][1][0] = first(a).pieces[1][1][0]; }, 'cells');
+  fires((a) => { first(a).pieces[0][1].pop(); }, 'piece');
+  fires((a) => { first(a).shapes.push(first(a).shapes[0]); }, 'shape dup');
+  fires((a) => { first(a).ntil += 1; }, 'ntil');
+  fires((a) => { first(a).classes.pop(); for (const k of ['0', '1', '2', 'inf']) first(a).cum[k].pop(); }, 'classes');
+  fires((a) => { first(a).classes[0][2] += 1; }, 'classes');
+  if (!ART.mirror.assumed) fires((a) => { const c = first(a).classes; [c[0], c[1]] = [c[1], c[0]]; }, 'classes order');
+  fires((a) => { first(a).cum.inf[0] = N2 + 1; }, 'cum');
+  fires((a) => { const c = first(a).cum.inf; c[1] = c[c.length - 1] + 1; }, 'cum');
+  fires((a) => { first(a).cum['0'] = first(a).cum.inf.map((x: number) => x + 1); }, 'budgets');
+  fires((a) => { first(a).built1[0] = first(a).cum.inf[first(a).cum.inf.length - 1] + 1; }, 'built1');
+  fires((a) => { first(a).built1 = first(a).built1.map(() => 1); }, 'built1');
+  fires((a) => { first(a).built1 = first(a).built1.map(() => 0); }, 'ub');
+  fires((a) => { withMirror(a).mirror = null; }, 'mirror');
+  fires((a) => { const b = withMirror(a); const o = a.boards.find((x: any) => x.name !== b.name && x.name !== b.mirror); b.mirror = o.name; }, 'mirror');
+  fires((a) => { a.mirror_shapes.pop(); }, 'mirror_shapes');
+  fires((a) => { a.prune.kept += 1; }, 'prune kept');
+  fires((a) => { a.boards.push(clone(a.boards[0])); }, 'duplicate board');
+}, 120_000);
+
+// ---- the crate ----------------------------------------------------------------------------------------------------
+const CRATE = join(SIM, 'tst2bag-tp-rs');
+function crateBin(): string | null {
+  const bin = join(CRATE, 'target', 'release', 'tst2bag-tp');
+  const r = Bun.spawnSync(['cargo', 'build', '--release', '--manifest-path', join(CRATE, 'Cargo.toml')], { stderr: 'pipe' });
+  return r.exitCode === 0 && existsSync(bin) ? bin : null;
+}
+const run = (bin: string, lines: string[], env: Record<string, string>) => {
+  const r = Bun.spawnSync([bin], { stdin: Buffer.from(lines.join('\n') + '\n'), stderr: 'pipe', env: { ...process.env, JOBS: '2', ...env } });
+  expect(r.exitCode).toBe(0);
+  return r.stdout.toString().trim().split('\n').map((l) => JSON.parse(l));
+};
+const CAT = catalogue(ART);
+
+test('(d) pinned boards re-run as MULTI lines equal cum at every soft-drop budget', () => {
+  const bin = crateBin();
+  if (!bin) { console.warn('SKIPPED (d): cargo is unavailable or the crate failed to build; the recount is NOT re-checked'); return; }
+  const boards = PINNED_BOARDS.map((k) => ART.boards.find((b: any) => keyOf(b.pieces) === k));
+  expect(boards.every((b: any) => b)).toBe(true);
+  const lines = boards.map((b: any, i: number) => {
+    const b1 = [...b.pieces].map(([k, cs]: Pc) => `${k}:${cs.join(',')}`).join('/');
+    const sh = b.shapes.map((id: number) => `${pts(CAT.get(id)!.cells)}|${pts(CAT.get(id)!.tst)}`).join('#');
+    const cl = b.classes.map(([si, l]: [number, string]) => `${si}:${l || '-'}`).join(';');
+    return `p${i}#${b1}#${sh}#${cl}`;
+  });
+  for (const [bk, env] of [['0', { SDB: '0' }], ['1', { SDB: '1' }], ['2', { SDB: '2' }], ['inf', {}]] as [string, Record<string, string>][]) {
+    const got = run(bin, lines, { MULTI: '1', ...env });
+    boards.forEach((b: any, i: number) => {
+      const g = got.find((x: any) => x.name === `p${i}`);
+      expect({ ntil: g.ntil, cum: g.cum }).toEqual({ ntil: b.ntil, cum: b.cum[bk] });
+    });
+  }
+}, 300_000);
+
+test('(e) TPL+LASTONLY of two cheap original shapes equals built1 on every board listing them', () => {
+  const bin = crateBin();
+  if (!bin) { console.warn('SKIPPED (e): cargo is unavailable or the crate failed to build; built1 is NOT re-checked'); return; }
+  const lines = PINNED_E.map((id) => {
+    const c = CAT.get(id)!;
+    const cl = [...c.classes].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1)).map(([l]) => l || '-');
+    return `s${id}|${pts(c.cells)}|${pts(c.tst)}|${cl.join(';')}`;
+  });
+  const got = run(bin, lines, { FIXED: '1', TPL: '1', LASTONLY: '1' });
+  let checked = 0;
+  for (const id of PINNED_E) {
+    const g = got.find((x: any) => x.name === `s${id}`);
+    const by = new Map<string, number>(g.b1.map((b: any) => [keyOf(b.pieces), b.cum[b.cum.length - 1]]));
+    for (const b of ART.boards) {
+      const j = b.shapes.indexOf(id);
+      if (j < 0) continue;
+      expect(by.get(keyOf(b.pieces))).toBe(b.built1[j]);
+      checked++;
+    }
+  }
+  expect(checked).toBeGreaterThan(0);
+}, 300_000);
+
+test('(f) symmetry probe: the mirrors of five cheap shapes re-run in default mode equal mirror_shapes', () => {
+  const bin = crateBin();
+  if (!bin) { console.warn('SKIPPED (f): cargo is unavailable or the crate failed to build; the mirrors are NOT re-checked'); return; }
+  const recs = PINNED_F.map((id) => ART.mirror_shapes.find((m: any) => m.mirror_of === id)).filter((m: any) => m);
+  expect(recs.length).toBeGreaterThan(0);
+  const lines = recs.map((m: any) => { const c = CAT.get(m.id)!; return `s${m.id}|${pts(c.cells)}|${pts(c.tst)}`; });
+  const got = run(bin, lines, {});
+  for (const m of recs) {
+    const g = got.find((x: any) => x.name === `s${m.id}`);
+    const c = CAT.get(m.id)!;
+    const by = new Map<string, any>(g.til.map((t: any) => [[...pieceKeys(t.pieces)].sort().join('|'), t]));
+    expect(g.til.length).toBe(c.til.length);
+    c.til.forEach((t, i) => {
+      const r = by.get([...pieceKeys(t.pieces)].sort().join('|'));
+      expect(r).toBeTruthy();
+      expect([r.A, r.B, r.p5]).toEqual(m.til[i]);
+      expect(r.left).toBe(t.left);
+    });
+  }
+}, 300_000);
+
+test('the pinned boards exist', () => {
+  for (const k of PINNED_BOARDS) expect(ART.boards.some((b: any) => keyOf(b.pieces) === k)).toBe(true);
+  for (const id of PINNED_F) expect(OLD.shapes.some((o: any) => o.id === id)).toBe(true);
+});

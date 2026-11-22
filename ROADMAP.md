@@ -4529,6 +4529,17 @@ implementation 夾過)，但依然冇 committed artefact re-derive 佢。今次 
 0.0081 行到 **0.022** —— 仲係 survivor，但已經唔算舒服，再多一個 sub-50 session 就過返界。
 **一個會郁到 verdict 邊緣嘅 table，冇 gate 守住，係而家個 repo 最大嗰個 冇第二份 exposure。**
 
+## TST 開局排名頁 — T-placed page replaces it (2026-11-22)
+
+`docs/tst-openers.html` is now the T-placed ranking (`pipeline/tst_openers_tp_page.py`, artefact `analysis/tst-openers-tp.json`, crate
+`pipeline/sim/tst2bag-tp-rs`); the first page is kept as the reference `docs/tst-openers-held.html` (yachi: 「Replace the page, but keep the page
+as reference」). See CLAUDE.md, 「TST 開局排名頁」.
+
+- [ ] A mirror pair whose partner exceeds the 36% threshold while the representative does not is excluded from the ranking; count them and rank them.
+- [ ] If `analysis/tst-openers-tp.json` is the fallback (`mirror.assumed: true`), re-emit with the mirror half counted.
+- [ ] The hand-typed OPEN opener labels on cards are checked by nothing (out of scope for this page).
+- [ ] The detail rows have no dashed TST marker on their figures.
+
 ## TST 開局排名頁 (2026-11-21)
 
 Added `docs/tst-openers.html`: every two-bag TST shape from harddrop's Triple Double openers category, the committed route pages, johnbeak's
