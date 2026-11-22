@@ -6508,7 +6508,8 @@ figures are exact fractions re-derived by the page audit, floored for print.
 | emitter, artefact | `pipeline/sim/emit-tst-openers-tp.py` → `analysis/tst-openers-tp.json` (schema `tst-openers-tp/1`) |
 | test | `pipeline/openers/tst-openers-tp.test.ts` |
 | page | `pipeline/tst_openers_tp_page.py` + `tst_openers_tp_prose.json` + `.css` + `.js` → `docs/tst-openers.html`; reuses `tst_openers_page`'s card, tiling and PC-replay functions; `--selftest` plants the corruptions |
-| worked PCs | `emit-tst-pc-examples.py --tp` → `analysis/tst-openers-tp-pc-examples.json`, lines from `tst_openers_tp_page.pcx_lines()`; `--tp --check` re-runs it in CI |
+| worked PCs | `emit-tst-pc-examples.py --tp` → `analysis/tst-openers-tp-pc-examples.json`, lines from `tst_openers_tp_page.pcx_lines()` (every live class of every card since 2026-11-22, not only the drawn one); `--tp --check` re-runs it in CI |
+| builds | `pipeline/sim/tst-build-rs` (binary `tst-build`) run by `pipeline/sim/emit-tst-builds.py` → `analysis/tst-openers-tp-builds.json` (`tst-openers-tp-builds/1`, constructed): per card and live class, one placement order the engine plays from empty (bag 1 first, soft-drop counts) ending on that class's tiling with the TST slot open. Clicking a class tile in 「睇晒 N 種收尾」 steps it and shows that class's worked PCs (yachi 2026-11-22: 「㩒去啲其他形，出咩好？ 3 巡PC 方法？」). The page audit (`audit_builds`) checks every build against the drawn grid, whole pieces, bag 1 first, soft-drop sums and the TST cells, and replays every worked PC; `--check` re-runs it in CI (about two minutes) |
 
 Rules the page depends on, each of which a simplification would break:
 

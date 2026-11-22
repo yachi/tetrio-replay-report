@@ -1767,6 +1767,13 @@ jobs:
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 pipeline/sim/emit-tst-pc-examples.py --tp --check
 
+      # One engine-verified build per finishing class (pipeline/sim/tst-build-rs), drawn when a class tile is
+      # clicked on docs/tst-openers.html: re-run in full (about two minutes) and byte-compared with
+      # analysis/tst-openers-tp-builds.json, which names the analysis/tst-openers-tp.json it was built from.
+      - name: Re-run the TST opener T-placed builds
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 pipeline/sim/emit-tst-builds.py --check
+
       - name: Warm the oracle cache
         if: env.INPUTS_UNCHANGED != '1'
         run: bun pipeline/sim/oracle-cache.ts --warm --jobs 4
