@@ -310,6 +310,7 @@ fn run_fixed(line: &str) -> String {
     }
     boards.sort(); boards.dedup();
     let mut out = vec![];
+    let boards_only = std::env::var("FIXED_BOARDS").is_ok();
     for b1 in boards {
         // buildable: BFS over subsets of b1 from root
         let mut seen = std::collections::HashSet::new(); seen.insert(root); let mut q = vec![root]; let mut b1_id = None;
@@ -319,12 +320,14 @@ fn run_fixed(line: &str) -> String {
         }
         let Some(b1_id) = b1_id else { continue; };
         let mut cum = vec![];
-        for k in 0..classes.len() {
+        // FIXED_BOARDS=1 lists the buildable boards in this same order and counts nothing (the page maps
+        // `fixed.cums[i]` to its board's pieces with it); FIXED alone counts.
+        if !boards_only { for k in 0..classes.len() {
             let allowed: Vec<bool> = til_left.iter().map(|l| classes[..=k].contains(l)).collect();
             if k > 0 && allowed == til_left.iter().map(|l| classes[..k].contains(l)).collect::<Vec<_>>() { let last = *cum.last().unwrap(); cum.push(last); continue; }
             let mut c = FCounter { u: &mut u, rc: &mut rc, b1: b1.clone(), b1_id, allowed, memo: HashMap::new() };
             cum.push(c.rec(vec![fenc(root, 0, 0)], 127, 0));
-        }
+        } }
         let pieces: Vec<String> = b1.iter().map(|&p| format!("[\"{}\",[{}]]", pl[p].0 as char, pl[p].1.iter().map(|c| c.to_string()).collect::<Vec<_>>().join(","))).collect();
         let ntil = u.nodes[b1_id as usize].tils.len();
         out.push(format!("{{\"pieces\":[{}],\"ntil\":{},\"cum\":[{}]}}", pieces.join(","), ntil, cum.iter().map(|c| c.to_string()).collect::<Vec<_>>().join(",")));
