@@ -33,7 +33,9 @@ import html
 import json
 import os
 import re
+import shutil
 import sys
+import tempfile
 from fractions import Fraction
 
 from pipeline import replay_page as RP
@@ -151,6 +153,19 @@ def load_pcx(repo=REPO):
         _need(ex["md5"]["tst_openers_tp"] == hashlib.md5(f.read()).hexdigest(),
               "the PC examples artefact was built from another analysis/tst-openers-tp.json: re-run emit-tst-pc-examples.py --tp")
     return {e["line"]: e for e in ex["examples"]}
+
+
+def load_builds(repo=REPO):
+    """The engine-checked placement order of every live class (`emit-tst-builds.py`), keyed `<card>#<class index>`;
+    refuses an artefact built from another analysis/tst-openers-tp.json."""
+    with open(os.path.join(repo, "analysis", "tst-openers-tp-builds.json"), encoding="utf-8") as f:
+        bd = json.load(f)
+    _need(bd.get("report_eligible") is False and bd.get("constructed") is True,
+          "the builds artefact is not marked report_eligible: false / constructed: true")
+    with open(os.path.join(repo, "analysis", "tst-openers-tp.json"), "rb") as f:
+        _need(bd["md5"]["tst_openers_tp"] == hashlib.md5(f.read()).hexdigest(),
+              "the builds artefact was built from another analysis/tst-openers-tp.json: re-run emit-tst-builds.py")
+    return bd["builds"]
 
 
 # ------------------------------------------------------------------ figures
@@ -471,16 +486,49 @@ def counts_line(b, k, C):
     return C["counts"].format(bk=C["bk_" + k], cum=f"{cum:,}", n2=f"{N2:,}", p3n=f"{n:,}", p3d=f"{cum * BAG:,}")
 
 
-def build_data(art, cat, R, PR):
+CL_KEYS = ("pcx_b3", "pcx_b4", "pcx_left", "pcx_deal3", "pcx_deal34", "pcx_hold", "pcx_none3", "pcx_none4", "pcx_always3",
+           "cl_hint", "bo_title", "bo_note", "bo_b1", "bo_rest", "bo_tst", "bo_sd", "bo_step", "bo_first", "bo_prev", "bo_next",
+           "bo_last", "bo_pc", "bo_pc_note", "bo_none")
+
+
+def tst_cells(s):
+    """The T's cells of shape `s` (y*10+x, y=0 the floor), sorted."""
+    return sorted(y * 10 + x for x, y in s["tst"])
+
+
+def px_entry(rows, left, ex):
+    """The island's worked PC of one line: residue rows, leftover, and per example its deal, height, the placed cells in the
+    original frame ([x, y, piece, step]) and the plan's steps."""
+    def one(deal, d, h, plan):
+        placed, _ = OP.replay(rows, left, deal, h, plan)
+        return [d, h, sorted([x, y, p, n] for (x, y), (p, n) in placed.items()), [[p, list(c), int(hd)] for p, c, hd in plan]]
+    b3 = ex and ex["b3"]
+    b4 = ex and ex["b4"]
+    return dict(r=list(rows), l=left,
+                b3=one(b3["deal"], [b3["deal"]], b3["h"], b3["plan"]) if b3 else None,
+                b4=one(b4["deal3"] + b4["deal4"], [b4["deal3"], b4["deal4"]], b4["h"], b4["plan"]) if b4 else None)
+
+
+def build_data(art, cat, R, PR, builds, pcxd):
     rk, od = rank_data(art, R)
-    cards = {}
+    cards, px = {}, {}
     for n, (r, _p) in enumerate(R):
-        t = holders(cat, r)[shown_class(r)]
         s = cat[r["shapes"][r["classes"][shown_class(r)][0]]]
+        lv = live(r)
+        bb, xx = [], []
+        for i in lv:
+            si, left, p5 = r["classes"][i]
+            b = builds.get(f'{r["name"]}#{i}')
+            bb.append([[[k, list(c), sd] for k, c, sd in b["order"]], b["sd"]] if b else None)
+            ln = class_line(cat, r, i)
+            xx.append([tst_cells(cat[r["shapes"][si]]), ln, int(p5 >= BAG)])
+            if ln not in px:
+                px[ln] = px_entry(cat[r["shapes"][si]]["rows"], left, pcxd.get(ln))
         cards[r["name"]] = dict(tst=s["tst"], f=strings(r), rk={k: rk[k][n] for k in BK}, o={k: od[k][n] for k in BK},
-                                t=card_rows(cat, r),
+                                t=card_rows(cat, r), n1=len(r["pieces"]), b=bb, x=xx,
                                 cnt={k: counts_line(r, k, PR["card"]) for k in BK})
-    return dict(labels=PR["labels"], bk=BK, filter_default=PR["pos_centre"], sd_default=BK_SHOWN, cards=cards)
+    return dict(labels=PR["labels"], bk=BK, filter_default=PR["pos_centre"], sd_default=BK_SHOWN, cards=cards, px=px,
+                cl={k: PR["card"][k] for k in CL_KEYS})
 
 
 # ------------------------------------------------------------------ pcx lines
@@ -492,15 +540,22 @@ def shown_line(cat, b):
     return ",".join(map(str, s["rows"])) + "|" + b["classes"][i][1]
 
 
+def class_line(cat, b, i):
+    """`rows|left` of class `i` of board `b`: its shape's residue rows and the leftover."""
+    s = cat[b["shapes"][b["classes"][i][0]]]
+    return ",".join(map(str, s["rows"])) + "|" + b["classes"][i][1]
+
+
 def pcx_lines(art=None, repo=REPO):
-    """Every ranked card's worked-PC line, unique, in card order (`emit-tst-pc-examples.py --tp` solves these)."""
+    """The worked-PC line of every live class of every ranked card (the shown one first), unique, in card order
+    (`emit-tst-pc-examples.py --tp` solves these)."""
     a, cat = load_inputs(repo)
     seen, out = set(), []
     for r, _ in ranked(art or a, cat):
-        ln = shown_line(cat, r)
-        if ln not in seen:
-            seen.add(ln)
-            out.append(ln)
+        for ln in [shown_line(cat, r)] + [class_line(cat, r, i) for i in live(r)]:
+            if ln not in seen:
+                seen.add(ln)
+                out.append(ln)
     return out
 
 
@@ -672,7 +727,8 @@ def fmt_for(art, cat, R, U):
                 wall=WALL, mirror_state=None)
 
 
-def render(art, cat, PR, pcxd):
+def render(art, cat, PR, pcxd, builds=None):
+    builds = builds if builds is not None else load_builds()
     R, U = ranked(art, cat), unranked(art, cat)
     fm = fmt_for(art, cat, R, U)
     fm["mirror_state"] = PR["mirror_assumed" if art["mirror"]["assumed"] else "mirror_counted"]
@@ -682,7 +738,7 @@ def render(art, cat, PR, pcxd):
     cards = "\n".join(card(rk0[n], r, m, cat, art, PR, pcxd, fam_block(r, fam, head_of, rkmap, cat, art, PR))
                        for n, (r, m) in enumerate(R))
     title = PR["title"] + RS.TITLE_MARK
-    data = json.dumps(build_data(art, cat, R, PR), separators=(",", ":"), ensure_ascii=False).replace("</", "<\\/")
+    data = json.dumps(build_data(art, cat, R, PR, builds, pcxd), separators=(",", ":"), ensure_ascii=False).replace("</", "<\\/")
     with open(OP.CSS_PATH, encoding="utf-8") as f:
         css = f.read().strip("\n")
     with open(CSS_PATH, encoding="utf-8") as f:
@@ -785,6 +841,84 @@ def audit_pcx(cards, R, cat, pcxd):
     return bad
 
 
+def audit_builds(island, R, cat, pcxd):
+    """A second reading of every class's build and worked PC in the island: the build is the class's drawn tiling, bag 1
+    first, whole pieces, no overlap, with the soft-drop total its pieces' sum; the T cells are a T, off the build; and every
+    worked PC replays from the class's residue to the placed cells the island draws, with the examples artefact's plan."""
+    bad = []
+    for r, _ in R:
+        name = r["name"]
+        c = island["cards"].get(name)
+        if c is None:
+            bad.append(f"island card {name}: missing")
+            continue
+        lv = live(r)
+        if c.get("n1") != len(r["pieces"]):
+            bad.append(f"island card {name}: the bag-1 piece count is not the board's")
+        if len(c.get("b", [])) != len(lv) or len(c.get("x", [])) != len(lv):
+            bad.append(f"island card {name}: not one build per live class")
+            continue
+        for j, i in enumerate(lv):
+            si, left, p5 = r["classes"][i]
+            tag = f"island card {name} class {j + 1}"
+            if c["b"][j] is None:
+                bad.append(f"{tag}: no build")
+                continue
+            order, sd = c["b"][j]
+            b1 = frozenset((k, tuple(sorted(cs))) for k, cs, _ in order[:c["n1"]])
+            if b1 != piece_set(r["pieces"]):
+                bad.append(f"{tag}: the build does not place the bag-1 board first")
+            seen = set()
+            for k, cs, _ in order:
+                if len(cs) != 4 or OP._norm([(q % 10, q // 10) for q in cs]) not in OP.SHAPE.get(k, ()):
+                    bad.append(f"{tag}: a build step is not a whole {k}")
+                if seen & set(cs):
+                    bad.append(f"{tag}: two build steps overlap")
+                seen |= set(cs)
+            g = c["t"][j][0]
+            H = len(g) // 10
+            drawn = {(H - 1 - q // 10) * 10 + q % 10: ch.upper() for q, ch in enumerate(g) if ch != "."}
+            built = {q: k for k, cs, _ in order for q in cs}
+            if built != drawn:
+                bad.append(f"{tag}: the build is not the class's drawn tiling")
+            if sd != sum(x for _, _, x in order):
+                bad.append(f"{tag}: the soft-drop total is not its steps' sum")
+            tc, ln, a3 = c["x"][j]
+            s = cat[r["shapes"][si]]
+            if tc != tst_cells(s) or set(tc) & set(built) or OP._norm([(q % 10, q // 10) for q in tc]) not in OP.SHAPE["T"]:
+                bad.append(f"{tag}: the TST cells are not the shape's T, or overlap the build")
+            if ln != class_line(cat, r, i) or a3 != int(p5 >= BAG):
+                bad.append(f"{tag}: the worked-PC line or the every-deal flag is not the class's")
+            if ln not in island["px"]:
+                bad.append(f"{tag}: no worked-PC entry for its line")
+    for ln, e in island.get("px", {}).items():
+        rows = [int(v) for v in ln.split("|")[0].split(",")]
+        left = ln.split("|")[1]
+        ex = pcxd.get(ln)
+        if e["r"] != rows or e["l"] != left:
+            bad.append(f"worked PC {ln}: its residue or leftover is not its line's")
+        for key, part in (("b3", ex and ex["b3"]), ("b4", ex and ex["b4"])):
+            got = e.get(key)
+            if (got is None) != (part is None):
+                bad.append(f"worked PC {ln}: the {key} example is not the artefact's")
+                continue
+            if got is None:
+                continue
+            d, h, placed, steps = got
+            plan = [[p, list(cs), bool(hd)] for p, cs, hd in steps]
+            if plan != [[p, list(cs), bool(hd)] for p, cs, hd in part["plan"]] or h != part["h"]:
+                bad.append(f"worked PC {ln}: the {key} steps are not the artefact's plan")
+            want_d = [part["deal"]] if key == "b3" else [part["deal3"], part["deal4"]]
+            if d != want_d:
+                bad.append(f"worked PC {ln}: the {key} deal is not the artefact's")
+            pl, why = OP.replay(rows, left, "".join(d), h, plan)
+            if why:
+                bad.append(f"worked PC {ln}: the {key} example does not replay ({why[0]})")
+            if sorted([x, y, p, n] for (x, y), (p, n) in pl.items()) != placed:
+                bad.append(f"worked PC {ln}: the {key} drawing is not what its steps place")
+    return bad
+
+
 def _b1_grid_check(b, names, lib):
     """A second reading: each named bag 1, drawn as text rows bottom-aligned, equals the board's own text rows, as drawn or
     mirrored by reversing each row and swapping J/L and S/Z letters."""
@@ -806,7 +940,9 @@ def _b1_grid_check(b, names, lib):
         if not ok:
             return False
     return True
-def audit(page, art, cat, PR, pcxd=None):
+def audit(page, art, cat, PR, pcxd=None, builds=None):
+    builds = builds if builds is not None else load_builds()
+    pcxd = pcxd if pcxd is not None else load_pcx()
     bad = RP.audit_quarantine(page, [RS.EYEBROW, RS.NO_CLAIM, PR["quarantine"]], DATA_ID)
     if PR["held_note"] not in page or f'<a href="{HELD_PAGE}">' not in page:
         bad.append("the note or the link to the reference page is missing")
@@ -924,8 +1060,7 @@ def audit(page, art, cat, PR, pcxd=None):
         if sorted(od[k]) != list(range(len(R))) or [i for i, _ in sorted(enumerate(od[k]), key=lambda x: x[1])] != \
                 sorted(range(len(R)), key=lambda i: (-j[i], i)):
             bad.append(f"budget {k}: the card order is not by that budget's figure")
-    if pcxd is not None:
-        bad += audit_pcx(cards, R, cat, pcxd)
+    bad += audit_pcx(cards, R, cat, pcxd)
     # the ranking table and the folded table
     got = [(n, {k: re.sub(r"<[^>]+>", "", v) for k, v in _G.findall(b)}) for n, b in _TROW.findall(page)]
     exp_order = sorted(range(len(R)), key=lambda i: (-sum((R[i][0]["cum"][TABLE_BK][j] - (R[i][0]["cum"][TABLE_BK][j - 1] if j else 0)) * R[i][0]["classes"][j][2]
@@ -954,9 +1089,11 @@ def audit(page, art, cat, PR, pcxd=None):
             island = json.loads(m.group(1).replace("<\\/", "</"))
         except ValueError:
             island = None
-        if island != build_data(art, cat, R, PR):
+        if island != build_data(art, cat, R, PR, builds, pcxd):
             bad.append("the data island is not what the artefact builds")
-        elif island:
+        if island:
+            bad += audit_builds(island, R, cat, pcxd)
+        if island == build_data(art, cat, R, PR, builds, pcxd):
             for n, (r, _) in enumerate(R):
                 c = island["cards"][r["name"]]
                 if c["cnt"] != {k: ex_counts(r, k, PR["card"]) for k in BK}:
@@ -1014,9 +1151,11 @@ def selftest(repo=REPO):
     page = render(art, cat, PR, pcxd)
     killed = survived = 0
 
-    def expect(label, mutated, want, a=None, c=None):
+    builds = load_builds(repo)
+
+    def expect(label, mutated, want, a=None, c=None, bd=None, px=None):
         nonlocal killed, survived
-        bad = audit(mutated, a or art, c or cat, PR, pcxd)
+        bad = audit(mutated, a or art, c or cat, PR, px or pcxd, bd or builds)
         if bool(bad) == want:
             killed += want
             print(f'  {"killed" if want else "passed"}: {label}')
@@ -1114,6 +1253,50 @@ def selftest(repo=REPO):
     worse = copy.deepcopy(art)
     worse["prune"]["kept"] += 1
     expect("the pruning count edited in the artefact", page, True, a=worse)
+    # the builds and worked PCs: rendered from corrupted inputs, so only audit_builds can see it
+    k0 = f'{ranked(art, cat)[0][0]["name"]}#{live(ranked(art, cat)[0][0])[0]}'
+    bd = copy.deepcopy(builds)
+    o = bd[k0]["order"]
+    o[-1][1] = [q + 1 for q in o[-1][1]]
+    expect("a build piece moved", render(art, cat, PR, pcxd, bd), True, bd=bd)
+    bd = copy.deepcopy(builds)
+    o = bd[k0]["order"]
+    n1 = len(ranked(art, cat)[0][0]["pieces"])
+    o[0], o[n1] = o[n1], o[0]
+    expect("bag 1 not placed first", render(art, cat, PR, pcxd, bd), True, bd=bd)
+    bd = copy.deepcopy(builds)
+    bd[k0]["order"][0][2] += 1
+    expect("a soft-drop count edited", render(art, cat, PR, pcxd, bd), True, bd=bd)
+    bd = copy.deepcopy(builds)
+    del bd[k0]
+    expect("a build missing", render(art, cat, PR, pcxd, bd), True, bd=bd)
+    px = copy.deepcopy(pcxd)
+    shown = {shown_line(cat, r) for r, _ in ranked(art, cat)}
+    ln = next(k for k, v in px.items() if v["b3"] and k not in shown)
+    pl = px[ln]["b3"]["plan"]
+    pl[0][1] = [q + 1 for q in pl[0][1]]
+    expect("a class's worked-PC step moved", render(art, cat, PR, px), True, px=px)
+    m = OP._ISLAND.search(page)
+    isl = json.loads(m.group(1).replace("<\\/", "</"))
+    e = next(v for v in isl["px"].values() if v["b3"])
+    e["b3"][2][0][0] = (e["b3"][2][0][0] + 1) % 10
+    expect("a class's worked-PC drawing moved in the island", page[:m.start(1)] + json.dumps(isl, separators=(",", ":"),
+           ensure_ascii=False).replace("</", "<\\/") + page[m.end(1):], True)
+    bdj = os.path.join(repo, "analysis", "tst-openers-tp-builds.json")
+    try:
+        bad_md5 = json.load(open(bdj))
+        bad_md5["md5"]["tst_openers_tp"] = "0" * 32
+        tmp = os.path.join(tempfile.mkdtemp(), "analysis")
+        os.makedirs(tmp)
+        json.dump(bad_md5, open(os.path.join(tmp, "tst-openers-tp-builds.json"), "w"))
+        for f in ("tst-openers-tp.json",):
+            shutil.copy(os.path.join(repo, "analysis", f), tmp)
+        load_builds(os.path.dirname(tmp))
+        survived += 1
+        print("  SURVIVED: a stale builds artefact", file=sys.stderr)
+    except Exception:
+        killed += 1
+        print("  killed: a stale builds artefact")
     print(f"selftest: {killed} killed, {survived} survived")
     return 1 if survived else 0
 
