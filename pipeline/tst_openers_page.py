@@ -197,7 +197,7 @@ def class_figs(o, idx):
     return out
 
 
-def fixed_figs(o, idx):
+def fixed_figs(o, idx, i=None, cf=None):
     """The fixed-bag-1 figures of shape `o` (None when it has no `fixed` block): the bag-1 board is the one the
     artefact picked, bag 2 is random, the player then ends on the best leftover class the deal allows.
     Returns dict(cum, rate, pc3n, pc3d, pc3, pc4, n4, joint, same) with exact fractions; `pc4` is None when a
@@ -207,8 +207,8 @@ def fixed_figs(o, idx):
         return None
     if not f["nb1"]:
         return dict(cum=0, rate=Fraction(0), pc3n=0, pc3d=0, pc3=None, pc4=None, n4=0, joint=Fraction(0), same=True)
-    cf = class_figs(o, idx)
-    cum = f["cums"][f["best"]]
+    cf = cf or class_figs(o, idx)
+    cum = f["cums"][f["best"] if i is None else i]
     joint = Fraction(0)
     pc3n = 0
     n4 = 0
@@ -239,6 +239,30 @@ def fixed_strings(fx):
         return pct(0), "未計", "未計", pct(0)
     pc4 = "–" if fx["pc4"] is None else (("≈" if fx["n4"] else "") + pct(fx["pc4"]))
     return pct(fx["rate"]), pct(fx["pc3"]), pc4, pct(fx["joint"])
+
+
+def placements(o):
+    """The sorted (letter, sorted cells) union over a shape's tilings, which `fixed.b1s` indexes into."""
+    return sorted({(k, tuple(sorted(cs))) for t in o["til"] for k, cs in t["pieces"]})
+
+
+def tiling_fixed(o, idx):
+    """tiling index -> `fixed_figs` of the best bag-1 board it holds (largest joint, then larger cum, then the
+    counter's order), or None when it holds no buildable board. A board's figures count every tiling holding
+    it, so a row reads 「fix this build's best first bag」, not 「end on this build」."""
+    f = o.get("fixed")
+    out = {}
+    if not f or not f["nb1"]:
+        return out
+    pl = {p: j for j, p in enumerate(placements(o))}
+    cf = class_figs(o, idx)
+    figs = [fixed_figs(o, idx, i, cf) for i in range(f["nb1"])]
+    for ti, t in enumerate(o["til"]):
+        have = {pl[(k, tuple(sorted(cs)))] for k, cs in t["pieces"]}
+        hold = [i for i, b in enumerate(f["b1s"]) if have.issuperset(b)]
+        if hold:
+            out[ti] = figs[max(hold, key=lambda i: (figs[i]["joint"], figs[i]["cum"], -i))]
+    return out
 
 
 def shown_tiling(e):
@@ -280,6 +304,7 @@ def entries(art, shp):
         t, p4, n4 = best
         fx = fixed_figs(o, idx)
         e = dict(s=s, o=o, best=t, p4=p4, n4=n4, joint=score(t, p4) / N2, two=Fraction(t["B"], N2), scored=scored, fx=fx,
+                 tf=tiling_fixed(o, idx),
                  fjoint=fx["joint"] if fx else Fraction(0))
         k = mirror_key(s)
         if k in rows:
@@ -369,10 +394,12 @@ def build_data(ents, prose):
     """The island: per shape the player-facing rows (grid, four figure strings, leftover), best first."""
     shapes = {}
     for e in ents:
-        rows = sorted(e["scored"], key=lambda x: -score(x[0], x[1]))
+        tf = e["tf"]
+        rows = sorted(range(len(e["scored"])), key=lambda i: (-(tf[i]["joint"] if i in tf else -1), -(tf[i]["cum"] if i in tf else -1), -score(*e["scored"][i][:2]), i))
         shapes[f"s{e['s']['id']}"] = dict(
             tst=e["s"]["tst"],
-            t=[[grid(t), *fig_strings(t, p4, n4), t["left"]] for t, p4, n4 in rows])
+            t=[[grid(e["scored"][i][0]), *(fixed_strings(tf[i]) if i in tf else ("–",) * 4), e["scored"][i][0]["left"]]
+               for i in rows])
     return dict(labels=prose["labels"], filter_default=prose["pos_centre"], shapes=shapes)
 
 
@@ -712,6 +739,35 @@ def audit_pcx(cards, ents, pcxd):
     return bad
 
 
+def audit_rows(island, art, ents, cards):
+    """The per-build rows: `fixed.b1s` is the counter's board list (one placement of each of IJLOSZ, sorted,
+    distinct, board `best` = `fixed.b1`, each inside a tiling); rows are in non-increasing 合計 order; and the
+    first row of a counted shape prints the card's own four figures (re-derived by `expected_card`)."""
+    bad = []
+    printed = {int(sid): [re.sub(r"<[^>]+>", "", html.unescape(v)) for k, v in _FIG.findall(b) if k in ("two", "pc3", "pc4", "joint")]
+               for sid, _, b in cards}
+    for e in ents:
+        o, f = e["o"], e["o"].get("fixed")
+        sid = o["id"]
+        if f and f["nb1"]:
+            pl = placements(o)
+            b1s = f.get("b1s") or []
+            sets = [{(k, tuple(sorted(cs))) for k, cs in t["pieces"]} for t in o["til"]]
+            if len(b1s) != f["nb1"] or b1s != sorted(b1s) or len({tuple(b) for b in b1s}) != len(b1s):
+                bad.append(f"shape {sid}: the bag-1 board list is not {f['nb1']} distinct boards in the counter's order")
+            elif sorted(b1s[f["best"]]) != sorted(pl.index((k, tuple(sorted(cs)))) for k, cs in f["b1"]):
+                bad.append(f"shape {sid}: board {f['best']} of the list is not the fixed bag-1 board")
+            elif any(sorted(pl[j][0] for j in b) != list("IJLOSZ") or not any({pl[j] for j in b} <= S for S in sets) for b in b1s):
+                bad.append(f"shape {sid}: a listed board is not one IJLOSZ placement each inside one tiling")
+        rows = island["shapes"].get(f"s{sid}", {}).get("t", [])
+        js = [Fraction(r[4].rstrip("%")) if r[4] not in ("–",) else Fraction(-1) for r in rows]
+        if js != sorted(js, reverse=True):
+            bad.append(f"shape {sid}: the build rows are not in 合計 order")
+        if e["fx"] and e["fx"]["cum"] and sid in printed and rows and rows[0][1:5] != printed[sid]:
+            bad.append(f"shape {sid}: the first build row {rows[0][1:5]} is not the card's {printed[sid]}")
+    return bad
+
+
 def audit(page, art, shp, PR, pcxd=None):
     bad = RP.audit_quarantine(page, [RS.EYEBROW, RS.NO_CLAIM, PR["quarantine"]], DATA_ID)
     if set(page) & SIMPLIFIED:
@@ -750,6 +806,7 @@ def audit(page, art, shp, PR, pcxd=None):
             island = None
         if island != build_data(ents, PR):
             bad.append("the data island is not what the artefact builds")
+        bad += audit_rows(island, art, ents, cards)
     return bad
 
 
@@ -814,6 +871,17 @@ def selftest(repo=REPO):
     f = o["fixed"]
     f["best"] = next(i for i, c in enumerate(f["cums"]) if c[-1] != f["cums"][f["best"]][-1])
     expect("a worse bag-1 board picked", render(worse, shp, PR, pcxd), True)
+    worse = copy.deepcopy(art)
+    o = next(o for o in worse["shapes"] if o.get("fixed") and o["fixed"]["nb1"] > 1)
+    o["fixed"]["b1s"][o["fixed"]["best"]], o["fixed"]["b1s"][o["fixed"]["best"] - 1] = \
+        o["fixed"]["b1s"][o["fixed"]["best"] - 1], o["fixed"]["b1s"][o["fixed"]["best"]]
+    expect("two bag-1 boards of the list swapped", render(worse, shp, PR, pcxd), True)
+    m = _ISLAND.search(page)
+    isl = json.loads(m.group(1).replace("<\\/", "</"))
+    sk = next(k for k, v in isl["shapes"].items() if len(v["t"]) > 1 and v["t"][0][4] != v["t"][1][4])
+    isl["shapes"][sk]["t"][:2] = isl["shapes"][sk]["t"][1::-1]
+    expect("two build rows swapped", page[:m.start(1)] + json.dumps(isl, separators=(",", ":"), ensure_ascii=False)
+           .replace("</", "<\\/") + page[m.end(1):], True)
     expect("a 3巡 PC table figure edited", sub(r'data-g="j3">(\d)', lambda d: str((int(d) + 1) % 10)), True)
     rows = _P3ROW.findall(page)
     expect("two 3巡 PC table rows swapped",

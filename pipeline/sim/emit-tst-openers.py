@@ -32,6 +32,14 @@ better one. `fixed.best` is the board with the largest sum of those increments t
 chance (ties: the larger cum[-1], then the counter's order); `fixed.til` is the tiling drawn for it
 (the best-scoring one containing it); `fixed.cums` keeps every board's cum so the page audit can
 re-pick the best.
+
+BOARD LIST (`fixed.b1s`, a third pass): `FIXED=1 FIXED_BOARDS=1` lists the same buildable boards in
+the same order and counts nothing (about a minute), so `fixed.cums[i]` can be tied to board i's
+pieces. Each board is six indices into `placements(o)`, the sorted (letter, cells) union over the
+shape's tilings; the merge checks the count is `nb1` and board `best` is `fixed.b1`.
+
+  FIXED=1 FIXED_BOARDS=1 JOBS=4 pipeline/sim/tst2bag-rs/target/release/tst2bag < fixed.in > boards.out
+  python3 pipeline/sim/emit-tst-openers.py --merge-boards boards.out --out analysis/tst-openers.json
 """
 import argparse, hashlib, json, re, sys
 from pathlib import Path
@@ -211,6 +219,40 @@ def merge_fixed(art, lines):
     return art
 
 
+def placements(o):
+    """The sorted (letter, sorted cells) union over a shape's tilings: the counter's own placement order."""
+    return sorted({(k, tuple(sorted(cs))) for t in o["til"] for k, cs in t["pieces"]})
+
+
+def merge_boards(art, lines):
+    got = {}
+    for l in lines:
+        if l.strip():
+            r = json.loads(l)
+            assert r["name"] not in got, f"duplicate {r['name']}"
+            got[r["name"]] = r
+    for o in art["shapes"]:
+        f = o.get("fixed")
+        r = got.pop(f"s{o['id']}", None)
+        assert (r is None) == (f is None), f"shape {o['id']}: board list present iff a fixed block exists"
+        if r is None:
+            continue
+        f.pop("b1s", None)
+        assert len(r["b1"]) == f["nb1"], f"shape {o['id']}: {len(r['b1'])} boards listed, fixed run had {f['nb1']}"
+        assert all(not b["cum"] for b in r["b1"]), f"shape {o['id']}: the board list was a counting run"
+        if not f["nb1"]:
+            continue
+        pl = {p: i for i, p in enumerate(placements(o))}
+        b1s = [sorted(pl[(k, tuple(sorted(cs)))] for k, cs in b["pieces"]) for b in r["b1"]]
+        assert b1s == sorted(b1s) and len(set(map(tuple, b1s))) == len(b1s), f"shape {o['id']}: boards not in counter order"
+        assert b1s[f["best"]] == sorted(pl[(k, tuple(sorted(cs)))] for k, cs in f["b1"]), f"shape {o['id']}: board best is not fixed.b1"
+        assert all(b["ntil"] for b in r["b1"])
+        f["b1s"] = b1s
+    assert not got, f"board list names unknown shapes {sorted(got)}"
+    art["emitter_md5"] = emitter_md5()
+    return art
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--shapes-out")
@@ -218,6 +260,7 @@ def main():
     ap.add_argument("--timing", action="append", default=[])
     ap.add_argument("--fixed-input", action="store_true", help="print the FIXED=1 counter's input lines")
     ap.add_argument("--merge-fixed", help="a FIXED=1 counter output to merge into --out (read and rewritten)")
+    ap.add_argument("--merge-boards", help="a FIXED=1 FIXED_BOARDS=1 board list to merge into --out (read and rewritten)")
     ap.add_argument("--out")
     a = ap.parse_args()
     art_path = Path(a.out) if a.out else ROOT / "analysis" / "tst-openers.json"
@@ -229,6 +272,11 @@ def main():
         art = merge_fixed(json.loads(art_path.read_text()), Path(a.merge_fixed).read_text().splitlines())
         art_path.write_text(json.dumps(art, separators=(",", ":"), ensure_ascii=False) + "\n")
         print(f"merged fixed bag 1 into {art_path}: {sum('fixed' in o for o in art['shapes'])} shapes", file=sys.stderr)
+        return
+    if a.merge_boards:
+        art = merge_boards(json.loads(art_path.read_text()), Path(a.merge_boards).read_text().splitlines())
+        art_path.write_text(json.dumps(art, separators=(",", ":"), ensure_ascii=False) + "\n")
+        print(f"merged bag-1 board lists into {art_path}", file=sys.stderr)
         return
     assert a.shapes_out and a.pc4_out and a.out, "--shapes-out, --pc4-out and --out are required"
     shapes = json.loads(SHAPES.read_text())["shapes"]
