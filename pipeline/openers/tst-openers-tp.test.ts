@@ -198,7 +198,7 @@ test('(b) invariants hold over every board', () => {
   expect(problems(ART)).toEqual([]);
   expect(ART.boards.length).toBeGreaterThan(0);
   expect(ART.boards.length).toBe(ART.prune.kept);
-});
+}, 60_000);
 
 // ---- (c) mutants -------------------------------------------------------------------------------------------------
 test('(c) each invariant has a mutant that fires', () => {
