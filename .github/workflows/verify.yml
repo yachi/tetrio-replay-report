@@ -1816,6 +1816,8 @@ jobs:
         if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
+          # the recount uses numpy, which the runner's python3 lacks; Ubuntu's own package, installed only when missing
+          python3 -c 'import numpy' 2>/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq python3-numpy; }
           cargo test --release --locked --manifest-path pipeline/sim/tst-sets-rs/Cargo.toml
           python3 pipeline/sim/emit-tst-openers-tp.py --sets-check
 
