@@ -37,6 +37,7 @@ for (const d of document.querySelectorAll('details[data-s]')) d.addEventListener
   let open = -1;
   const toggle = (j, f) => {
     for (const o of box.children) o.setAttribute('aria-expanded', 'false');
+    if (panel._stop) panel._stop();
     if (open === j) { open = -1; panel.hidden = true; panel.replaceChildren(); return; }
     open = j; f.setAttribute('aria-expanded', 'true');
     showBuild(panel, c, j); panel.hidden = false;
@@ -61,9 +62,9 @@ for (const d of document.querySelectorAll('details[data-s]')) d.addEventListener
 });
 // The build of one class, stepped piece by piece, and its worked PC (all precomputed by the renderer and audited).
 const el = (t, cls, txt) => { const e = document.createElement(t); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
-function board(H, cells, cs) {
+function board(H, cells, cs, flash) {
   const sv = document.createElementNS(NS, 'svg');
-  sv.setAttribute('width', 10 * cs); sv.setAttribute('height', H * cs); sv.classList.add('board');
+  sv.setAttribute('viewBox', `0 0 ${10 * cs} ${H * cs}`); sv.setAttribute('width', 10 * cs); sv.setAttribute('height', H * cs); sv.classList.add('board');
   const r = (x, y, a) => { const e = document.createElementNS(NS, 'rect'); for (const k in a) e.setAttribute(k, a[k]);
     e.setAttribute('x', x * cs + .5); e.setAttribute('y', (H - 1 - y) * cs + .5); e.setAttribute('width', cs - 1); e.setAttribute('height', cs - 1); sv.appendChild(e); };
   const bg = document.createElementNS(NS, 'rect'); bg.setAttribute('width', 10 * cs); bg.setAttribute('height', H * cs); bg.setAttribute('fill', 'var(--well)'); sv.appendChild(bg);
@@ -79,61 +80,145 @@ function board(H, cells, cs) {
       t.setAttribute('text-anchor', 'middle'); t.setAttribute('font-size', (cs * .55).toFixed(1)); t.setAttribute('fill', '#fff'); t.setAttribute('font-weight', '700');
       t.textContent = k.n; sv.appendChild(t); }
   }
+  if (flash) for (const y of flash) {
+    const e = document.createElementNS(NS, 'rect'); e.setAttribute('class', 'an-fl');
+    e.setAttribute('x', 0); e.setAttribute('y', (H - 1 - y) * cs); e.setAttribute('width', 10 * cs); e.setAttribute('height', cs); sv.appendChild(e);
+  }
   return sv;
 }
+// Rows of `cells` that are full, and the board with them cleared (rows above drop).
+const fullRows = cells => { const n = new Map(); for (const q of cells.keys()) n.set(Math.floor(q / 10), (n.get(Math.floor(q / 10)) || 0) + 1);
+  return [...n].filter(([, c]) => c === 10).map(([y]) => y).sort((a, b) => a - b); };
+const clearRows = (cells, rows) => { const o = new Map();
+  for (const [q, v] of cells) { const y = Math.floor(q / 10); if (rows.includes(y)) continue; o.set((y - rows.filter(r => r < y).length) * 10 + q % 10, v); }
+  return o; };
+const plain = cells => { const o = new Map(); for (const [q, v] of cells) o.set(q, { fill: v.fill, op: v.op }); return o; };
+const REDUCE = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const SPEEDS = [1100, 650, 330];
+let speed = 1;
+// The build of one class and its worked PC as one animation: every piece of the build, the T into the TST slot and its
+// clear, then the solver's PC piece by piece until the board is empty (all precomputed by the renderer and audited).
 function showBuild(panel, c, j) {
   panel.replaceChildren();
   if (!c.b[j]) { panel.append(el('p', 'muted sm', D.cl.bo_nobuild)); return; }
-  const [order, sd] = c.b[j], [tst, line, a3] = c.x[j], n1 = c.n1, m = order.length + 1;
-  let H = 1; for (const [, cs] of order) for (const q of cs) H = Math.max(H, Math.floor(q / 10) + 1);
-  for (const q of tst) H = Math.max(H, Math.floor(q / 10) + 1);
-  panel.append(el('h4', null, D.cl.bo_title), el('p', 'muted sm', D.cl.bo_note));
-  const wrap = el('div', 'bo-w'), side = el('div', 'bo-s'), pic = el('div'), cap = el('p', 'sm');
-  const nav = el('div', 'bo-nav'), list = el('ol', 'bo-l');
-  let s = m;
-  const lis = [];
-  const draw = () => {
-    const cells = new Map();
-    order.forEach(([k, cs], i) => { if (i < s) for (const q of cs) cells.set(q, { fill: COL[k], n: i + 1, cur: i === s - 1, op: i < n1 ? null : .85 }); });
-    for (const q of tst) cells.set(q, s === m ? { fill: COL.T, n: m, cur: true } : { dash: true });
-    pic.replaceChildren(board(H, cells, 18));
-    cap.textContent = D.cl.bo_step.replace('{n}', s).replace('{m}', m) + (s === 0 ? '' : ' · ' + (s === m ? D.cl.bo_tst : order[s - 1][0] + (order[s - 1][2] ? ' ' + D.cl.bo_sd : '')));
-    lis.forEach((li, i) => li.classList.toggle('on', i === s - 1));
-  };
-  for (const [lab, f] of [[D.cl.bo_first, () => 0], [D.cl.bo_prev, () => Math.max(0, s - 1)], [D.cl.bo_next, () => Math.min(m, s + 1)], [D.cl.bo_last, () => m]]) {
-    const b = el('button', null, lab); b.type = 'button'; b.onclick = () => { s = f(); draw(); }; nav.append(b);
-  }
-  const item = (i, txt, color, extra) => {
-    const li = el('li'); const b = el('button'); b.type = 'button';
-    const k = el('b', null, txt); if (color) k.style.color = color; b.append(k); if (extra) b.append(' ' + extra);
-    b.onclick = () => { s = i + 1; draw(); }; li.append(b); lis.push(li); return li;
-  };
-  list.append(el('li', 'bo-g', D.cl.bo_b1));
-  order.forEach(([k, , d], i) => { if (i === n1) list.append(el('li', 'bo-g', D.cl.bo_rest)); list.append(item(i, k, COL[k], d ? D.cl.bo_sd : '')); });
-  list.append(el('li', 'bo-g', D.cl.bo_tst)); list.append(item(order.length, 'T', COL.T, ''));
-  side.append(nav, cap, list); wrap.append(pic, side); panel.append(wrap);
-  draw();
-  // the worked PC
-  panel.append(el('h4', null, D.cl.bo_pc));
-  const e = D.px[line];
-  if (!e || (!e.b3 && !e.b4)) { panel.append(el('p', 'muted sm', D.cl.bo_none)); return; }
-  panel.append(el('p', 'muted sm', D.cl.bo_pc_note));
+  const [order, sdTot] = c.b[j], [tst, line, a3] = c.x[j], n1 = c.n1, m = order.length + 1;
+  let bH = 1; for (const [, cs] of order) for (const q of cs) bH = Math.max(bH, Math.floor(q / 10) + 1);
+  for (const q of tst) bH = Math.max(bH, Math.floor(q / 10) + 1);
+  const e = D.px[line] || {};
+  const vars = [];
+  if (e.b3) vars.push([D.cl.an_v3, e.b3, D.cl.pcx_deal3.replace('{d}', e.b3[0][0])]);
+  if (e.b4 && !a3) vars.push([D.cl.an_v4, e.b4, D.cl.pcx_deal34.replace('{d3}', e.b4[0][0]).replace('{d4}', e.b4[0][1])]);
   const lf = e.l ? D.cl.pcx_left.replace('{left}', e.l) : '';
-  const pcx = el('div', 'pcxb');
-  const fig = (ex, title, dl) => {
-    const [d, h, placed, steps] = ex, cells = new Map();
-    e.r.forEach((row, y) => { for (let x = 0; x < 10; x++) if (row >> x & 1) cells.set(y * 10 + x, { fill: '#8a8f9c' }); });
-    for (const [x, y, p, n] of placed) cells.set(y * 10 + x, { fill: COL[p], n });
-    const f = el('figure'), fc = el('figcaption'); fc.append(el('b', null, title), ' · ' + dl); f.append(fc, board(h, cells, 16));
-    const ol = el('ol', 'steps');
-    for (const [p, , hd] of steps) { const li = el('li'); const b = el('b', null, p); b.style.color = COL[p]; li.append(b); if (hd) li.append(D.cl.pcx_hold); ol.append(li); }
-    f.append(ol); return f;
+  panel.append(el('h4', null, D.cl.bo_title));
+  const vbar = el('div', 'an-v'), deal = el('p', 'muted sm');
+  const wrap = el('div', 'bo-w'), side = el('div', 'bo-s'), pic = el('div', 'an-pic'), cap = el('p', 'an-cap');
+  const nav = el('div', 'bo-nav an-nav'), seek = el('input'), list = el('ol', 'bo-l');
+  seek.type = 'range'; seek.min = 0; seek.className = 'an-seek'; seek.setAttribute('aria-label', D.cl.an_seek);
+  let frames = [], f = 0, timer = null, vi = 0, H = bH;
+  const chips = [];
+  const build = () => {
+    frames = []; chips.length = 0; list.replaceChildren();
+    const ex = vars[vi] ? vars[vi][1] : null;
+    H = Math.max(bH, ex ? ex[1] : 0);
+    const chip = (txt, color, extra) => { const li = el('li'); const b = el('button'); b.type = 'button';
+      const k = el('b', null, txt); if (color) k.style.color = color; b.append(k); if (extra) b.append(' ' + extra);
+      const at = frames.length; b.onclick = () => { stop(); go(at); }; li.append(b); chips.push([li, at]); list.append(li); };
+    // the build
+    let cells = new Map();
+    frames.push({ cells: new Map(tst.map(q => [q, { dash: true }])), cap: D.cl.bo_step.replace('{n}', 0).replace('{m}', m) });
+    list.append(el('li', 'bo-g', D.cl.bo_b1));
+    order.forEach(([k, cs, d], i) => {
+      if (i === n1) list.append(el('li', 'bo-g', D.cl.bo_rest));
+      chip(k, COL[k], d ? D.cl.bo_sd : '');
+      const now = plain(cells); for (const q of cs) now.set(q, { fill: COL[k], op: i < n1 ? null : .85 });
+      cells = new Map(now); for (const q of cs) now.set(q, { fill: COL[k], op: i < n1 ? null : .85, cur: true });
+      for (const q of tst) now.set(q, { dash: true });
+      frames.push({ cells: now, cap: D.cl.bo_step.replace('{n}', i + 1).replace('{m}', m) + ' · ' + k + (d ? ' ' + D.cl.bo_sd : '') });
+    });
+    list.append(el('li', 'bo-g', D.cl.bo_tst)); chip('T', COL.T, '');
+    for (const q of tst) cells.set(q, { fill: COL.T });
+    const rows = fullRows(cells), withT = plain(cells); for (const q of tst) withT.set(q, { fill: COL.T, cur: true });
+    frames.push({ cells: withT, flash: rows, cap: D.cl.bo_step.replace('{n}', m).replace('{m}', m) + ' · ' + D.cl.bo_tst + ' · ' + D.cl.an_clear.replace('{n}', rows.length), hold: 2 });
+    // what the clear leaves: drawn in the build's colours when it is the audited residue, else in grey from it
+    let left = clearRows(cells, rows);
+    if (e.r) {
+      const want = new Set(); e.r.forEach((row, y) => { for (let x = 0; x < 10; x++) if (row >> x & 1) want.add(y * 10 + x); });
+      if (want.size !== left.size || [...want].some(q => !left.has(q))) left = new Map([...want].map(q => [q, { fill: '#8a8f9c' }]));
+    }
+    frames.push({ cells: left, cap: D.cl.an_left });
+    if (!ex) return;
+    // the worked PC, simulated from the residue: each step's cells are on the board as it stands at that step
+    const steps = ex[3];
+    list.append(el('li', 'bo-g', D.cl.an_pcg));
+    cells = plain(left);
+    steps.forEach(([p, cs, hd], i) => {
+      chip(p, COL[p], hd ? D.cl.pcx_hold : '');
+      for (const q of cs) cells.set(q, { fill: COL[p] });
+      const now = plain(cells); for (const q of cs) now.set(q, { fill: COL[p], cur: true });
+      const fr = fullRows(cells);
+      frames.push({ cells: now, flash: fr, hold: fr.length ? 1.6 : 1,
+        cap: D.cl.an_pc_step.replace('{n}', i + 1).replace('{m}', steps.length).replace('{p}', p) + (hd ? D.cl.pcx_hold : '') });
+      cells = clearRows(cells, fr);
+    });
+    frames.push({ cells, cap: cells.size ? '' : D.cl.an_pc_done, hold: 2.5 });
   };
-  if (e.b3) pcx.append(fig(e.b3, D.cl.pcx_b3, lf + D.cl.pcx_deal3.replace('{d}', e.b3[0][0]))); else pcx.append(el('p', 'muted sm', D.cl.pcx_none3));
-  if (a3) pcx.append(el('p', 'muted sm', D.cl.pcx_always3));
-  else if (e.b4) pcx.append(fig(e.b4, D.cl.pcx_b4, lf + D.cl.pcx_deal34.replace('{d3}', e.b4[0][0]).replace('{d4}', e.b4[0][1])));
-  else pcx.append(el('p', 'muted sm', D.cl.pcx_none4));
-  panel.append(pcx);
+  const go = i => {
+    f = Math.max(0, Math.min(frames.length - 1, i));
+    const fr = frames[f];
+    pic.replaceChildren(board(H, fr.cells, 22, fr.flash));
+    cap.textContent = fr.cap;
+    seek.value = f;
+    let on = -1; chips.forEach(([, at], k) => { if (at <= f) on = k; });
+    chips.forEach(([li], k) => li.classList.toggle('on', k === on && f > 0));
+    play.textContent = timer ? D.cl.an_pause : D.cl.an_play;
+  };
+  const tick = () => { if (f >= frames.length - 1) { stop(); return; } go(f + 1); timer = setTimeout(tick, SPEEDS[speed] * (frames[f].hold || 1)); };
+  const stop = () => { clearTimeout(timer); timer = null; if (frames.length) play.textContent = D.cl.an_play; };
+  const start = () => { stop(); if (f >= frames.length - 1) go(0); timer = setTimeout(tick, SPEEDS[speed] * (frames[f].hold || 1)); play.textContent = D.cl.an_pause; };
+  const btn = (t, fn, cls) => { const b = el('button', cls, t); b.type = 'button'; b.onclick = fn; nav.append(b); return b; };
+  btn(D.cl.bo_first, () => { stop(); go(0); });
+  btn(D.cl.bo_prev, () => { stop(); go(f - 1); });
+  const play = btn(D.cl.an_play, () => timer ? stop() : start(), 'an-play');
+  btn(D.cl.bo_next, () => { stop(); go(f + 1); });
+  btn(D.cl.bo_last, () => { stop(); go(frames.length - 1); });
+  const sp = el('div', 'an-sp'); sp.append(el('span', 'muted sm', D.cl.an_speed));
+  [D.cl.an_slow, D.cl.an_mid, D.cl.an_fast].forEach((t, k) => { const b = el('button', null, t); b.type = 'button';
+    b.setAttribute('aria-pressed', k === speed); b.onclick = () => { speed = k; for (const o of sp.querySelectorAll('button')) o.setAttribute('aria-pressed', o === b); }; sp.append(b); });
+  seek.oninput = () => { stop(); go(+seek.value); };
+  const setVar = k => {
+    vi = k; stop(); build(); seek.max = frames.length - 1;
+    for (const [b, i] of vbtns) b.setAttribute('aria-pressed', i === k);
+    deal.textContent = vars[k] ? lf + vars[k][2] : '';
+  };
+  const vbtns = vars.map(([t], k) => { const b = el('button', null, t); b.type = 'button'; b.onclick = () => { setVar(k); go(0); start(); }; vbar.append(b); return [b, k]; });
+  if (vars.length < 2) vbar.hidden = true;
+  side.append(nav, seek, sp, list);
+  wrap.append(el('div', 'an-l', null), side); wrap.firstChild.append(pic, cap);
+  panel.append(vbar, deal, wrap, el('p', 'muted sm', D.cl.bo_note));
+  if (!vars.length) panel.append(el('p', 'muted sm', D.cl.bo_none));
+  else if (!e.b3) panel.append(el('p', 'muted sm', D.cl.pcx_none3));
+  else if (a3) panel.append(el('p', 'muted sm', D.cl.pcx_always3));
+  else if (!e.b4) panel.append(el('p', 'muted sm', D.cl.pcx_none4));
+  setVar(0);
+  // the same PCs as numbered pictures, folded
+  if (vars.length) {
+    const det = el('details', 'an-st'); det.append(el('summary', null, D.cl.an_static));
+    const pcx = el('div', 'pcxb');
+    for (const [title, ex, dl] of vars) {
+      const [, h, placed, steps] = ex, cells = new Map();
+      e.r.forEach((row, y) => { for (let x = 0; x < 10; x++) if (row >> x & 1) cells.set(y * 10 + x, { fill: '#8a8f9c' }); });
+      for (const [x, y, p, n] of placed) cells.set(y * 10 + x, { fill: COL[p], n });
+      const fg = el('figure'), fc = el('figcaption'); fc.append(el('b', null, title), ' · ' + lf + dl); fg.append(fc, board(h, cells, 16));
+      const ol = el('ol', 'steps');
+      for (const [p, , hd] of steps) { const li = el('li'); const b = el('b', null, p); b.style.color = COL[p]; li.append(b); if (hd) li.append(D.cl.pcx_hold); ol.append(li); }
+      fg.append(ol); pcx.append(fg);
+    }
+    det.append(pcx); panel.append(det);
+  }
+  go(0);
+  if (panel.scrollIntoView) requestAnimationFrame(() => panel.scrollIntoView({ block: 'nearest', behavior: REDUCE ? 'auto' : 'smooth' }));
+  if (!REDUCE) start();
+  panel._stop = stop;
 }
 function apply() {
   for (const card of document.querySelectorAll('.card')) {

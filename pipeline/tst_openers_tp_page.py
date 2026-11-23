@@ -491,7 +491,8 @@ def counts_line(b, k, C):
 
 CL_KEYS = ("pcx_b3", "pcx_b4", "pcx_left", "pcx_deal3", "pcx_deal34", "pcx_hold", "pcx_none3", "pcx_none4", "pcx_always3",
            "cl_hint", "bo_title", "bo_note", "bo_b1", "bo_rest", "bo_tst", "bo_sd", "bo_step", "bo_first", "bo_prev", "bo_next",
-           "bo_last", "bo_pc", "bo_pc_note", "bo_none", "bo_nobuild")
+           "bo_last", "bo_pc", "bo_pc_note", "bo_none", "bo_nobuild", "an_v3", "an_v4", "an_play", "an_pause", "an_speed",
+           "an_slow", "an_mid", "an_fast", "an_seek", "an_clear", "an_left", "an_pcg", "an_pc_step", "an_pc_done", "an_static")
 
 
 def tst_cells(s):
