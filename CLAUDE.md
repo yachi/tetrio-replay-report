@@ -6526,6 +6526,17 @@ Rules the page depends on, each of which a simplification would break:
   counted; the page says so in its own sentence (`mirror_assumed`), and the sentence changes when the counted artefact lands.
 * **A pair whose partner exceeds the threshold while its representative does not is left out of the ranking**, and its count is not
   yet measured; the page does not print one.
+* **Held boards (since 2026-11-23, yachi: 「T 留 hold 嘅都要計」) are a second KIND in the same ranking.** A held board is six pieces
+  IJLOSZ placed and the T in hold (`held == "T"`, names `h<i>`, listed AFTER every placed board `t<i>`; schema `tst-openers-tp/2`).
+  It is counted by the same method (the counter run without `TPL`, `FIXED=1 LASTONLY=1` for the per-shape built counts, then `MULTI`
+  at the four budgets), pruned by the same bound, and ranked in ONE competition rank per budget with the placed boards; the page's kind
+  bar (全部 / T 先擺 / T 留 hold) only hides cards, it never re-ranks. `prune.kinds` holds `placed` and `held` as `[total, kept]` and the
+  sums are `boards_total` / `kept`. A held board is kept if its OWN or its MIRROR's upper bound exceeds the threshold, so a mirror pair
+  stays together (the placed rule is unchanged: its own bound). The placed boards are kept verbatim by `--merge --reuse-placed`, so
+  nothing the earlier page printed moved. The counter crate is not edited (its md5 is pinned). Cross-check without cargo: every held
+  original-shape board's `built1` is a count in `analysis/tst-openers.json`'s `fixed.cums` for that shape (same engine, same boards);
+  `--compare-held` checks the whole list order against it. Hold-swap families are unchanged (a held board's T is never swapped).
+  A link `#c<name>` to a card the filters hide resets both filters first. No count is typed here: read them off the artefact.
 * **Page size is about 4 MB** (every card's tilings and the per-class rows ride in one island); the plan's cap was about 6 MB.
 
 What re-derives what: the page audit recomputes every figure, every rank and every class row from the artefact and the shapes, checks

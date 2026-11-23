@@ -3,9 +3,10 @@ const COL = { I: '#2fb8c9', O: '#e3b425', T: '#9a46d6', S: '#4cb648', Z: '#d9433
 const NS = 'http://www.w3.org/2000/svg';
 const sdBtns = [...document.querySelectorAll('.bar[data-bar="sd"] button')];
 const posBtns = [...document.querySelectorAll('.bar[data-bar="pos"] button')];
+const kindBtns = [...document.querySelectorAll('.bar[data-bar="kind"] button')];
 const lab = {};
 for (const b of sdBtns) lab[b.dataset.b] = b.textContent;
-let sd = D.sd_default, pos = D.filter_default;
+let sd = D.sd_default, pos = D.filter_default, kind = D.kind_default || 'all';
 // Bag-1 pieces are upper case and drawn solid; bag-2 pieces are lower case and drawn lighter.
 function mini(g) {
   const H = g.length / 10, cs = 11, sv = document.createElementNS(NS, 'svg');
@@ -223,7 +224,7 @@ function showBuild(panel, c, j) {
 function apply() {
   for (const card of document.querySelectorAll('.card')) {
     const id = card.dataset.card, c = D.cards[id];
-    card.classList.toggle('hide', pos !== 'all' && card.dataset.pos !== pos);
+    card.classList.toggle('hide', (pos !== 'all' && card.dataset.pos !== pos) || (kind !== 'all' && card.dataset.kind !== kind));
     card.style.order = c.o[sd];
     card.dataset.rk = c.rk[sd];
     card.querySelector('.rk').textContent = c.rk[sd];
@@ -233,8 +234,20 @@ function apply() {
     card.querySelector('[data-f="joint"]').textContent = c.f[sd][2];
   }
   for (const b of posBtns) b.setAttribute('aria-pressed', b.dataset.f === pos);
+  for (const b of kindBtns) b.setAttribute('aria-pressed', b.dataset.k === kind);
   for (const b of sdBtns) b.setAttribute('aria-pressed', b.dataset.b === sd);
 }
 posBtns.forEach(b => b.onclick = () => { pos = b.dataset.f; apply(); });
+kindBtns.forEach(b => b.onclick = () => { kind = b.dataset.k; apply(); });
 sdBtns.forEach(b => b.onclick = () => { sd = b.dataset.b; apply(); });
+// A link to a card the filters hide resets both filters, then scrolls to it.
+function reveal() {
+  const m = /^#(c[\w]+)$/.exec(location.hash);
+  const el = m && document.getElementById(m[1]);
+  if (!el || !el.classList.contains('card')) return;
+  if (el.classList.contains('hide')) { pos = 'all'; kind = 'all'; apply(); }
+  if (el.scrollIntoView) el.scrollIntoView({ block: 'start' });
+}
+window.addEventListener('hashchange', reveal);
 apply();
+reveal();

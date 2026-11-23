@@ -9,7 +9,10 @@
  *   (c) a mutant per invariant, each of which must trip it;
  *   (d) a PINNED set of boards re-run as MULTI lines at soft-drop budgets 0, 1, 2 and unlimited equal `cum`;
  *   (e) two cheap original shapes re-run with TPL+LASTONLY equal `built1` on every board listing them;
- *   (f) the symmetry probe: the mirrors of five cheap shapes re-run in default mode equal `mirror_shapes[].til`.
+ *   (f) the symmetry probe: the mirrors of five cheap shapes re-run in default mode equal `mirror_shapes[].til`;
+ *   (g) the HELD boards (six pieces IJLOSZ, the T in hold, names h<i>, after every placed board t<i>): cheap shapes re-run with
+ *       FIXED+LASTONLY equal `built1` on every held board listing them, and every held original-shape `built1` is a count the
+ *       committed analysis/tst-openers.json holds (its `fixed.cums`), checked without cargo.
  * (d)-(f) build the crate on first use and skip loudly without cargo. Run: bun test pipeline/openers/tst-openers-tp.test.ts
  */
 import { test, expect } from 'bun:test';
@@ -37,6 +40,13 @@ const PINNED_BOARDS = [
   'I:0,10,20,30/J:5,6,16,26/L:7,8,9,19/O:40,41,50,51/S:2,3,13,14/T:1,11,12,21',
   'I:0,10,20,30/J:5,6,16,26/L:7,8,9,19/S:2,3,13,14/T:1,11,12,21/Z:18,28,29,39',
 ];
+/** HELD boards (six pieces, the T in hold) re-run in (d) too: the Honey Cup board (shapes 0 and 1) and a one-shape board. */
+const PINNED_HELD = [
+  'I:1,11,21,31/J:28,29,39,49/L:2,3,12,22/O:8,9,18,19/S:32,41,42,51/Z:5,6,14,15',
+  'I:0,10,20,30/J:5,6,16,26/L:7,8,9,19/O:40,41,50,51/S:2,3,13,14/Z:18,28,29,39',
+];
+/** Original shapes re-run in (g) with FIXED+LASTONLY (no TPL): their held boards' built1. */
+const PINNED_G = [0, 1, 107];
 /** Original shapes re-run in (e) and whose mirrors are re-run in (f). */
 const PINNED_E = [98, 81];
 const PINNED_F = [98, 81, 46, 47, 119];
@@ -118,7 +128,7 @@ test('(a) the three md5s are current and the artefact is quarantined', () => {
   expect(ART.md5.shapes).toBe(md5(canon(SHAPES)));
   expect(ART.report_eligible).toBe(false);
   expect(ART.constructed).toBe(true);
-  expect(ART.schema).toBe('tst-openers-tp/1');
+  expect(ART.schema).toBe('tst-openers-tp/2');
 });
 
 // ---- (b) invariants ----------------------------------------------------------------------------------------------
@@ -141,17 +151,27 @@ function problems(art: any, only?: number[]): string[] {
   if (JSON.stringify([...want].sort()) !== JSON.stringify([...got].sort()) || got.size !== art.mirror_shapes.length) bad.push('mirror_shapes');
   if (art.mirror_shapes.some((m: any) => !Array.isArray(m.til) || m.til.length !== OLD.shapes.find((o: any) => o.id === m.mirror_of)?.til.length)) bad.push('mirror_shapes til');
   if (art.prune.kept !== art.boards.length) bad.push('prune kept');
+  // prune.kinds: placed boards first, then held; kept counts equal what the list holds, totals add up
+  const nPlaced = art.boards.filter((b: any) => b.held !== 'T').length;
+  const nHeld = art.boards.length - nPlaced;
+  const pk = art.prune.kinds;
+  if (!pk || pk.placed?.[1] !== nPlaced || pk.held?.[1] !== nHeld) bad.push('prune kinds kept');
+  if (!pk || art.prune.boards_total !== pk.placed[0] + pk.held[0] || art.prune.kept !== pk.placed[1] + pk.held[1]) bad.push('prune kinds total');
+  if (!pk || pk.placed[1] > pk.placed[0] || pk.held[1] > pk.held[0]) bad.push('prune kinds order');
+  if (art.boards.slice(0, nPlaced).some((b: any) => b.held === 'T') || art.boards.slice(nPlaced).some((b: any) => b.held !== 'T')) bad.push('kind order');
   const keys = new Map<string, any>();
+  art.boards.forEach((b: any) => keys.set(keyOf(b.pieces), b));
   art.boards.forEach((b: any, i: number) => {
-    keys.set(keyOf(b.pieces), b);
     if (only && !only.includes(i)) return;
     const tag = (t: string) => bad.push(`${t} ${b.name}`);
-    if (b.name !== `t${i}`) tag('name');
+    const isHeld = b.held === 'T';
+    if (b.name !== (isHeld ? `h${i - nPlaced}` : `t${i}`)) tag('name');
     // six disjoint tetrominoes of the declared kinds, exactly one T, held is the missing kind
     const pcs: Pc[] = b.pieces;
     const kinds = pcs.map((p) => p[0]).sort().join('');
     const held = b.held;
-    if (!KINDS.includes(held) || kinds !== [...'T' + KINDS.replace(held, '')].sort().join('')) tag('kinds');
+    if (isHeld) { if (kinds !== [...KINDS].sort().join('')) tag('kinds'); }
+    else if (!KINDS.includes(held) || kinds !== [...'T' + KINDS.replace(held, '')].sort().join('')) tag('kinds');
     const cells = pcs.flatMap((p) => p[1]);
     if (cells.length !== 24 || new Set(cells).size !== 24 || cells.some((c: number) => c < 0 || c >= 120)) tag('cells');
     for (const [k, cs] of pcs) if (cs.length !== 4 || !cs.every((c) => c % 10 < 10)) tag('piece');
@@ -181,7 +201,10 @@ function problems(art: any, only?: number[]): string[] {
     const inf = b.cum.inf;
     const sum = b.built1.reduce((a: number, x: number) => a + x, 0);
     if (b.built1.length !== b.shapes.length || !(Math.max(...b.built1) <= inf[inf.length - 1] && inf[inf.length - 1] <= sum)) tag('built1');
-    if (!ubExceeds(b.shapes, b.built1, cat)) tag('ub');
+    // a held board is kept if its own or its mirror's bound exceeds the threshold; a placed board by its own
+    const ownUb = ubExceeds(b.shapes, b.built1, cat);
+    const mb = isHeld && b.mirror ? art.boards.find((x: any) => x.name === b.mirror) : null;
+    if (!ownUb && !(mb && mb.shapes.every((id: number) => cat.has(id)) && ubExceeds(mb.shapes, mb.built1, cat))) tag('ub');
   });
   if (keys.size !== art.boards.length) bad.push('duplicate board');
   // mirror: an involution onto the mirrored pieces
@@ -212,7 +235,24 @@ test('(c) each invariant has a mutant that fires', () => {
   };
   const first = (a: any) => a.boards[0];
   const withMirror = (a: any) => a.boards.find((b: any) => b.mirror !== null);
+  const hi = ART.boards.findIndex((b: any) => b.held === 'T');
+  const firstHeld = (a: any) => a.boards.find((b: any) => b.held === 'T');
+  const SUB_H = hi >= 0 ? [...SUBSET, hi] : SUBSET;
+  const firesH = (f: (a: any) => void, tag: string) => {
+    if (hi < 0) return;
+    const a = clone(ART);
+    f(a);
+    expect(problems(a, SUB_H).some((p) => p.startsWith(tag))).toBe(true);
+  };
   fires((a) => { first(a).name = 'tX'; }, 'name');
+  firesH((a) => { firstHeld(a).name = 'h999'; }, 'name');
+  firesH((a) => { firstHeld(a).held = 'I'; }, 'kinds');
+  firesH((a) => { firstHeld(a).pieces[0][0] = 'T'; }, 'kinds');
+  firesH((a) => { firstHeld(a).built1 = firstHeld(a).built1.map(() => 0); const m = a.boards.find((x: any) => x.name === firstHeld(a).mirror); if (m) m.built1 = m.built1.map(() => 0); }, 'ub');
+  firesH((a) => { a.prune.kinds.held[1] += 1; }, 'prune kinds kept');
+  firesH((a) => { a.prune.kinds.placed[0] += 1; }, 'prune kinds total');
+  firesH((a) => { a.prune.kinds.held[0] = a.prune.kinds.held[1] - 1; a.prune.boards_total = a.prune.kinds.placed[0] + a.prune.kinds.held[0]; }, 'prune kinds order');
+  firesH((a) => { const h = a.boards.findIndex((b: any) => b.held === 'T'); [a.boards[0], a.boards[h]] = [a.boards[h], a.boards[0]]; }, 'kind order');
   fires((a) => { first(a).held = first(a).held === 'I' ? 'J' : 'I'; }, 'kinds');
   fires((a) => { first(a).pieces[0][1][0] = first(a).pieces[1][1][0]; }, 'cells');
   fires((a) => { first(a).pieces[0][1].pop(); }, 'piece');
@@ -251,8 +291,9 @@ const CAT = catalogue(ART);
 test('(d) pinned boards re-run as MULTI lines equal cum at every soft-drop budget', () => {
   const bin = crateBin();
   if (!bin) { console.warn('SKIPPED (d): cargo is unavailable or the crate failed to build; the recount is NOT re-checked'); return; }
-  const boards = PINNED_BOARDS.map((k) => ART.boards.find((b: any) => keyOf(b.pieces) === k));
+  const boards = [...PINNED_BOARDS, ...PINNED_HELD].map((k) => ART.boards.find((b: any) => keyOf(b.pieces) === k));
   expect(boards.every((b: any) => b)).toBe(true);
+  expect(boards.filter((b: any) => b.held === 'T').length).toBe(PINNED_HELD.length);
   const lines = boards.map((b: any, i: number) => {
     const b1 = [...b.pieces].map(([k, cs]: Pc) => `${k}:${cs.join(',')}`).join('/');
     const sh = b.shapes.map((id: number) => `${pts(CAT.get(id)!.cells)}|${pts(CAT.get(id)!.tst)}`).join('#');
@@ -281,7 +322,41 @@ test('(e) TPL+LASTONLY of two cheap original shapes equals built1 on every board
   for (const id of PINNED_E) {
     const g = got.find((x: any) => x.name === `s${id}`);
     const by = new Map<string, number>(g.b1.map((b: any) => [keyOf(b.pieces), b.cum[b.cum.length - 1]]));
-    for (const b of ART.boards) {
+    for (const b of ART.boards.filter((x: any) => x.held !== 'T')) {
+      const j = b.shapes.indexOf(id);
+      if (j < 0) continue;
+      expect(by.get(keyOf(b.pieces))).toBe(b.built1[j]);
+      checked++;
+    }
+  }
+  expect(checked).toBeGreaterThan(0);
+}, 300_000);
+
+test('(g) held boards: FIXED+LASTONLY of cheap shapes equals built1, and every held built1 is a count tst-openers.json holds', () => {
+  const held = ART.boards.filter((b: any) => b.held === 'T');
+  expect(held.length).toBeGreaterThan(0);
+  // cargo-free: a held board of an original shape is one of that shape's FIXED boards, whose last cum is built1
+  const lasts = new Map<number, Set<number>>(OLD.shapes.map((o: any) => [o.id, new Set<number>((o.fixed?.cums ?? []).map((c: number[]) => c[c.length - 1]))]));
+  let seen = 0;
+  for (const b of held) b.shapes.forEach((id: number, j: number) => {
+    if (id >= 1000) return;
+    expect(lasts.get(id)!.has(b.built1[j])).toBe(true);
+    seen++;
+  });
+  expect(seen).toBeGreaterThan(0);
+  const bin = crateBin();
+  if (!bin) { console.warn('SKIPPED (g, re-run half): cargo is unavailable or the crate failed to build; held built1 is NOT re-run'); return; }
+  const lines = PINNED_G.map((id) => {
+    const c = CAT.get(id)!;
+    const cl = [...c.classes].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1)).map(([l]) => l || '-');
+    return `s${id}|${pts(c.cells)}|${pts(c.tst)}|${cl.join(';')}`;
+  });
+  const got = run(bin, lines, { FIXED: '1', LASTONLY: '1' });
+  let checked = 0;
+  for (const id of PINNED_G) {
+    const g = got.find((x: any) => x.name === `s${id}`);
+    const by = new Map<string, number>(g.b1.map((b: any) => [keyOf(b.pieces), b.cum[b.cum.length - 1]]));
+    for (const b of held) {
       const j = b.shapes.indexOf(id);
       if (j < 0) continue;
       expect(by.get(keyOf(b.pieces))).toBe(b.built1[j]);
@@ -314,5 +389,6 @@ test('(f) symmetry probe: the mirrors of five cheap shapes re-run in default mod
 
 test('the pinned boards exist', () => {
   for (const k of PINNED_BOARDS) expect(ART.boards.some((b: any) => keyOf(b.pieces) === k)).toBe(true);
+  for (const k of PINNED_HELD) expect(ART.boards.some((b: any) => b.held === 'T' && keyOf(b.pieces) === k)).toBe(true);
   for (const id of PINNED_F) expect(OLD.shapes.some((o: any) => o.id === id)).toBe(true);
 });

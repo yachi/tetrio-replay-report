@@ -31,3 +31,7 @@ details.inc{margin-top:10px}
 @media (prefers-reduced-motion:reduce){.an-fl{animation:none}}
 .an-st{margin-top:8px}.an-st summary{cursor:pointer}
 @media (max-width:520px){.bo{padding:8px}.bo-w{flex-wrap:nowrap;gap:8px}.an-l{flex:0 0 46%;max-width:none}.bo-s{flex:1 1 0}.an-nav{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}.an-nav button{min-width:0;padding:4px 2px;font-size:.85em}.an-nav .an-play{grid-column:1/-1;order:-1;min-width:0}.an-cap{font-size:.85em;min-height:3.6em}.an-sp button{padding:4px 8px;min-height:36px}.bo-l button{padding:2px 6px}}
+
+.bar[data-bar=kind]{flex-wrap:wrap}
+.kc{display:inline-block;font-size:.75em;padding:1px 6px;border-radius:10px;border:1px solid var(--line);color:var(--muted);margin-right:6px;vertical-align:middle}
+.kc-held{border-color:var(--accent);color:var(--fg)}
