@@ -45,7 +45,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
    '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22',
-   '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19']);
+   '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23']);
 
 /** Bag 1 matched (six pieces, either colouring) and the 7th lock was NOT the drawn TSS: the piece, the
  *  engine's spin and the lines it cleared. Both are stick spin's too: 10-12 m8r4 lays its T flat on the
@@ -155,7 +155,7 @@ const STRUCTURAL_ZERO: Record<string, string> = {
 /** Opportunities per player: bag 1 at 6 locks (both stage boards share them), the TSS at lock 7, bag 2
  *  at 13 locks, the bag-3 boards and the PC patterns under 2.tsd, bag 4 and 5 under the board reached. */
 const OPPORTUNITIES: Record<string, Record<string, number>> = {
-  'bag1.lj.left': { pinglamb: 1659, yachi: 1616 }, 'bag1.jl.left': { pinglamb: 1659, yachi: 1616 },
+  'bag1.lj.left': { pinglamb: 1737, yachi: 1693 }, 'bag1.jl.left': { pinglamb: 1737, yachi: 1693 },
   'bag1.lj': { pinglamb: 4, yachi: 7 }, 'bag1.jl': { pinglamb: 0, yachi: 90 }, '2.tsd': { pinglamb: 4, yachi: 82 },
   '3.first': { pinglamb: 4, yachi: 81 }, '3.second': { pinglamb: 4, yachi: 81 }, '3.third': { pinglamb: 4, yachi: 81 },
   '3.first.cave': { pinglamb: 0, yachi: 61 }, '3.first.trinity': { pinglamb: 0, yachi: 10 },
@@ -188,9 +188,11 @@ const STOPS: Record<string, number> = {
  *  why, which the test verifies:
  *    dt_cannon       the cell's first-bag metric has at least that many exact DT Cannon matches
  *    both_orders     the window holds a Triple before AND after the Double (`cspin_order` 1 too)
+ *    stray_cannon    the round is a Stray Cannon case of analysis/stray-cannon-facts.json that reached a bag-2 board
+ *                    (2026-11-23 m6r4: bag1.z_right then 2.ideal, one Double then one Triple in the window)
  *    garbage_bag1    garbage arrived before lock 6, so bag 1 was never compared (stick spin's jl_split
  *                    09-18 m13r1: its board under the garbage is bag1.lj) */
-const DT_NOT_SDPCSPIN: Record<string, 'dt_cannon' | 'both_orders' | 'garbage_bag1'> = {
+const DT_NOT_SDPCSPIN: Record<string, 'dt_cannon' | 'both_orders' | 'garbage_bag1' | 'stray_cannon'> = {
   '2026-08-14 m3r4 yachi': 'dt_cannon',
   '2026-08-25 m9r3 yachi': 'dt_cannon',
   '2026-09-10 m7r3 pinglamb': 'both_orders',
@@ -200,6 +202,7 @@ const DT_NOT_SDPCSPIN: Record<string, 'dt_cannon' | 'both_orders' | 'garbage_bag
   '2026-10-03 m7r3 yachi': 'dt_cannon',
   '2026-10-22 m2r7 yachi': 'dt_cannon',   // the session's one exact DT Cannon first bag (prefix 61)
   '2026-11-05 m4r4 pinglamb': 'both_orders',  // two Triples and one Double in the window, cspin_order 1 (prefix 33)
+  '2026-11-23 m6r4 pinglamb': 'stray_cannon', // pinglamb's one Double-first round of the session (prefix 104)
 };
 /** SDPC Spin rounds with a COMPLETE opener window (0-based locks 0-21) that are not Double-first: none
  *  holds a Triple in the window. Stick spin's ten (its STICKSPIN_NOT_DT) and pinglamb's 09-18 m6r4, a
@@ -330,6 +333,10 @@ test('the ordering cross-check: Double-first openers against SDPC Spin bag 1, bo
     const r = rounds.get(k)!;
     if (why === 'dt_cannon') { const cell = roundOf(k).split(' ').filter((_, i) => i !== 1).join(' '); cannons[cell] = (cannons[cell] ?? 0) + 1; }
     if (why === 'both_orders') expect(r.cspin_order, k).toBe(1);
+    if (why === 'stray_cannon') {
+      const sc = JSON.parse(readFileSync(`${import.meta.dir}/../../analysis/stray-cannon-facts.json`, 'utf8')).cases;
+      expect(sc.some((c: any) => `${c.session} m${c.match}r${c.round} ${c.player}` === k && c.bag2?.node), k).toBe(true);
+    }
     if (why === 'garbage_bag1') {
       const d = byName.get(k)!;
       expect(d.garbage.some(g => g < 6), k).toBe(true);

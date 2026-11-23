@@ -11,12 +11,12 @@
  "setups": 27,
  "solutions": 157,
  "pc_anchor": {
-  "rounds": 3480,
-  "rounds_agree": 3480,
-  "pcs_replay": 427,
+  "rounds": 3644,
+  "rounds_agree": 3644,
+  "pcs_replay": 462,
   "disagree": []
  },
- "sessions": 24,
+ "sessions": 25,
  "inputs": {
   "sessions": [
    {
@@ -138,6 +138,11 @@
     "session": "2026-11-19",
     "replays_md5": "5ee7d68b7805869cf845718cb69a3cb2",
     "replay_facts_md5": "270e2de4312471ec54cbedb095bde585"
+   },
+   {
+    "session": "2026-11-23",
+    "replays_md5": "6443f8868544148a4488f99285809387",
+    "replay_facts_md5": "29e18f7f2d2b590b40befdf756b29e90"
    }
   ],
   "setups_md5": "fa919ccdb651e5c621b0945b43983666",
@@ -145,8 +150,8 @@
  },
  "by_player": {
   "pinglamb": {
-   "pc_points": 252,
-   "no_next_pc": 243,
+   "pc_points": 273,
+   "no_next_pc": 264,
    "other_lines": 8,
    "garbage": 1,
    "rounds_rowmap_stops": 0,
@@ -172,13 +177,13 @@
    }
   },
   "yachi": {
-   "pc_points": 175,
-   "no_next_pc": 172,
+   "pc_points": 189,
+   "no_next_pc": 185,
    "other_lines": 1,
    "garbage": 0,
-   "rounds_rowmap_stops": 30,
+   "rounds_rowmap_stops": 31,
    "cases": {
-    "all": 2,
+    "all": 3,
     "verified": 0
    },
    "solution": {
@@ -190,7 +195,7 @@
     "verified": 0
    },
    "unmatched": {
-    "all": 2,
+    "all": 3,
     "verified": 0
    },
    "after_ten": {
@@ -202,10 +207,12 @@
  "by_setup": {},
  "unmatched_layouts": [
   {"layout":["IIIIJJSSSS","LOOJJSSSST","LOOJZZZZTT","LLJJJZZZZT"],"cases":1,"by_player":{"pinglamb":0,"yachi":1}},
-  {"layout":["JJJIIIIISS","OOJILLLSST","OOLIZZZZTT","LLLILZZZZT"],"cases":1,"by_player":{"pinglamb":0,"yachi":1}}
+  {"layout":["JJJIIIIISS","OOJILLLSST","OOLIZZZZTT","LLLILZZZZT"],"cases":1,"by_player":{"pinglamb":0,"yachi":1}},
+  {"layout":["JJJIJJSSSS","OOJIJSSSST","OOLIZZZZTT","LLLIJZZZZT"],"cases":1,"by_player":{"pinglamb":0,"yachi":1}}
  ],
  "cases": [
   {"session":"2026-09-18","file":"replay-2026-09-18-15.ttrm","round_index0":4,"match":15,"round":5,"player":"yachi","prev_pc_lock":19,"prev_pc_lines":8,"pieces_before":20,"first_lock":20,"pc_lock":29,"verified":false,"outcome":"unmatched","setups":[],"solutions":[],"mirrored":null,"setup_first":null,"layout":["ZZZZLLIIII","TZZZZLLOOJ","TTSSSSLOOJ","TSSSSLLLJJ"],"shape":"IIIIJJSSSS/LOOJJSSSST/LOOJZZZZTT/LLJJJZZZZT"},
-  {"session":"2026-09-19","file":"replay-2026-09-19-16.ttrm","round_index0":2,"match":16,"round":3,"player":"yachi","prev_pc_lock":19,"prev_pc_lines":8,"pieces_before":20,"first_lock":20,"pc_lock":29,"verified":false,"outcome":"unmatched","setups":[],"solutions":[],"mirrored":null,"setup_first":null,"layout":["ZZIIIIILLL","TZZJJJILOO","TTSSSSIJOO","TSSSSJIJJJ"],"shape":"JJJIIIIISS/OOJILLLSST/OOLIZZZZTT/LLLILZZZZT"}
+  {"session":"2026-09-19","file":"replay-2026-09-19-16.ttrm","round_index0":2,"match":16,"round":3,"player":"yachi","prev_pc_lock":19,"prev_pc_lines":8,"pieces_before":20,"first_lock":20,"pc_lock":29,"verified":false,"outcome":"unmatched","setups":[],"solutions":[],"mirrored":null,"setup_first":null,"layout":["ZZIIIIILLL","TZZJJJILOO","TTSSSSIJOO","TSSSSJIJJJ"],"shape":"JJJIIIIISS/OOJILLLSST/OOLIZZZZTT/LLLILZZZZT"},
+  {"session":"2026-11-23","file":"replay-2026-11-23-06.ttrm","round_index0":1,"match":6,"round":2,"player":"yachi","prev_pc_lock":12,"prev_pc_lines":7,"pieces_before":13,"first_lock":13,"pc_lock":22,"verified":false,"outcome":"unmatched","setups":[],"solutions":[],"mirrored":null,"setup_first":null,"layout":["JJJIJJSSSS","OOJIJSSSST","OOLIZZZZTT","LLLIJZZZZT"],"shape":"JJJIJJSSSS/OOJIJSSSST/OOLIZZZZTT/LLLIJZZZZT"}
  ]
 }
