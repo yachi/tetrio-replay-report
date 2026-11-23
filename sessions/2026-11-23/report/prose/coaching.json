@@ -14,6 +14,9 @@
         "<strong>6 比 6 嘅決勝局。</strong>四場打到決勝局淨係贏一場<span class=\"badge\" data-claim=\"G010\"></span><span class=\"badge\" data-claim=\"C013\"></span>；第一、四、六場決勝局對手 VS 都高過你 40 以上<span class=\"badge\" data-claim=\"G056\"></span><span class=\"badge\" data-claim=\"G058\"></span><span class=\"badge\" data-claim=\"G059\"></span>。",
         "<strong>第六場 6 比 5 領先</strong>，最後兩局都輸<span class=\"badge\" data-claim=\"C016\"></span>；第三場 6 比 3 都俾人追到 6 比 6<span class=\"badge\" data-claim=\"C013\"></span>。",
         "<strong>每粒要重啲。</strong>七場每粒方塊嘅攻擊都低過對手<span class=\"badge\" data-claim=\"C018\"></span>，粒數今晚最多填返 2.46 個百分點<span class=\"badge\" data-claim=\"C009\"></span>。"
+      ],
+      "sim_recs": [
+        "<strong>基本的なドネイト（TSD）4 次接到 Tetris 0 次</strong>；4 次都係條井俾 I 以外嘅棋填咗——捐完個窿，留條井俾 I。迷走砲 55 局有 29 局行到第二巡。（<a href=\"basicdonating.html\">基本的なドネイト頁</a>有圖）"
       ]
     },
     "pinglamb": {
@@ -26,6 +29,9 @@
       "recs": [
         "<strong>第三場攻擊多 19 條都輸</strong><span class=\"badge\" data-claim=\"C019\"></span>：6 比 3 落後追到 6 比 6，第十三局輸<span class=\"badge\" data-claim=\"C013\"></span>。",
         "<strong>第二場 5 比 7 輸</strong><span class=\"badge\" data-claim=\"C012\"></span>，嗰場總攻擊少過對手<span class=\"badge\" data-claim=\"C019\"></span>。"
+      ],
+      "sim_recs": [
+        "<strong>基本的なドネイト（TSD）7 次接到 2 次 Tetris</strong>，冇接到嗰 5 次係條井俾 I 以外嘅棋填咗——捐完個窿，留條井俾 I。迷走砲 47 局有 37 局行到第二巡。（<a href=\"basicdonating.html\">基本的なドネイト頁</a>有圖）"
       ]
     }
   },
