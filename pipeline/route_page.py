@@ -284,7 +284,7 @@ PAGE_CSS = """
   .scp-sec > h2 { font-size: 1.25rem; margin: 0 0 .5rem; }
   .scp-sec h3 { font-size: 1rem; margin: 1.4rem 0 .4rem; }
   .scp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr)); gap: .8rem; }
-  .scp-node { padding: .7rem; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-raised); min-width: 0; }
+  .scp-node { padding: .7rem; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-raised); min-width: 0; overflow-wrap: anywhere; }
   .scp-name { font-size: .92rem; margin: 0 0 .3rem; }
   .scp-name a { text-decoration: underline; }
   .scp-jp, .scp-tag, .scp-cond { font-size: .78rem; color: var(--ink-secondary); margin: .25rem 0; }

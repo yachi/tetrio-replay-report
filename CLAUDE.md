@@ -336,6 +336,8 @@ bin/verify-repo --jobs 4 [--changed] [--timings t.json]  # run jobs in parallel 
 bin/verify-repo --audit-inputs --only <job>    # run under strace; fail on a file opened outside the job's derived input closure
 bin/input-hash hash <job> [<matrix value>]     # the closure digest CI's `Input gate` step looks up (gate/record/audit are CI's)
 bin/build-docs --only <date> --out <dir>       # render one night's report + replay page only (preview; --check refuses it)
+node tools/site-check/check.js <site-dir> [--shots <dir>]  # drive a rendered site at 390 px (Playwright): errors, links, nav, replay, tiles
+node tools/site-check/selftest.js <site-dir>   #   its mutants: one planted defect per check, every one must be reported
 bin/session-loop <date>                        # rebuild one session's report and run its per-session gates (read from verify.yml)
 bin/fold-hand-claims <date> [--no-dafny]       # refold hand claims: one Dafny pass, proof map, equiv for that session
 bin/paste-fragments [--check] [--only <name>]  # run every --render and paste each marked fragment in place
@@ -828,6 +830,16 @@ equivalent marker pair.
   `pipeline/section_anchors.py`**: each section's first `h2.section-title` links to its own `#<id>`
   (text outside any existing link is wrapped, so 最癲一局's replay link is kept), with the same
   refuse-a-text-change check. report.html is still untouched.
+- **The rendered site is driven in a phone-sized browser (since 2026-11-23, yachi's choice).**
+  The `docs` job runs `tools/site-check/check.js _site` after the second render: every page at
+  390 px must load with no uncaught error, console error, failed request or request to another host,
+  and must not scroll sideways; every same-site link must name a page that exists and a fragment it
+  carries (an id, a replay page's `m<N>r<N>`, a route or technique page's case key in its `scp-data`
+  island); every ▶ 影片 link is `watch?v=<id>&t=<n>s`; and the latest report's tier nav, a replay
+  page's `@p<N>` hash and a tst-openers class tile are clicked and must respond. `selftest.js` plants
+  one defect per check and fails unless check.js reports each. The two cold-clear coach pages load
+  Google Fonts and are the named `OFFSITE_OK` exception, not a bound. Its first run found four route
+  and technique pages scrolling sideways at phone width on long ids (`.scp-node` now wraps them).
 - **I commit; the user pushes.** `git push` and remote changes are blocked for the agent.
   Stage, commit with a Conventional Commit message, then tell the user to push.
 - **CI skips a job whose input closure is unchanged since a green run (since 2026-11-17, yachi's decision).**
