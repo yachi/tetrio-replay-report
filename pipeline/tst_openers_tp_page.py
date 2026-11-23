@@ -60,7 +60,8 @@ DATA_ID = OP.DATA_ID
 BAG, N2, WALL = OP.BAG, OP.N2, OP.WALL
 pct, _esc, _need = OP.pct, OP._esc, OP._need
 BK = ["0", "1", "2", "inf"]          # the soft-drop budgets of the artefact, in its order
-BK_SHOWN = "inf"                     # the budget the page opens on
+BK_SHOWN = "2"                       # the budget the page opens on (yachi 2026-11-23: 最多兩次 soft drop)
+BK_SET = "inf"                       # the budget that decides which boards are ranked, the drawn class and family order
 TABLE_BK = "1"                       # the budget the table ranks by
 TABLE_SHOWN = 15
 ORDER = "IJLOSTZ"
@@ -226,7 +227,7 @@ def holders(cat, b):
 
 def shown_class(b):
     """The class a card draws: the largest share of the joint (delta_inf * p5), the earliest on a tie."""
-    d = deltas(b, BK_SHOWN)
+    d = deltas(b, BK_SET)
     return max(range(len(d)), key=lambda i: (d[i] * b["classes"][i][2], -i))
 
 
@@ -365,7 +366,7 @@ def routed(cat, b):
 
 
 def rep_key(b, cat):
-    return (-routed(cat, b), sum(1 for s in b["shapes"] if s >= ID_OFFSET), -figs(b, BK_SHOWN)[2], b["name"])
+    return (-routed(cat, b), sum(1 for s in b["shapes"] if s >= ID_OFFSET), -figs(b, BK_SET)[2], b["name"])
 
 
 def pairs(art, cat):
@@ -446,7 +447,7 @@ def card_layouts(r, m, art, by_name):
     seen = {}
     for i in sorted(set(by_name.get(r["name"], [])) | set(by_name.get(m["name"], []))):
         seen.setdefault(min(i, lst[i]["mirror"]), i)
-    return sorted(seen.values(), key=lambda i: (-lst[i]["num"][BK_SHOWN][1], i))
+    return sorted(seen.values(), key=lambda i: (-lst[i]["num"][BK_SET][1], i))
 
 
 def fam_block(r, m, fam, rkmap, cat, art, PR):
@@ -501,14 +502,14 @@ def ranked(art, cat):
     """The ranked pairs: those whose representative's unlimited joint is above the pruning threshold, best first. Above
     the threshold every board was counted, so a rank there is complete; at or below it uncounted boards could be higher."""
     th = threshold(art)
-    rows = [(r, p) for r, p in pairs(art, cat) if figs(r, BK_SHOWN)[2] > th]
-    rows.sort(key=lambda x: (-figs(x[0], BK_SHOWN)[2], x[0]["name"]))
+    rows = [(r, p) for r, p in pairs(art, cat) if figs(r, BK_SET)[2] > th]
+    rows.sort(key=lambda x: (-figs(x[0], BK_SET)[2], x[0]["name"]))
     return rows
 
 
 def unranked(art, cat):
     th = threshold(art)
-    return [(r, p) for r, p in pairs(art, cat) if figs(r, BK_SHOWN)[2] <= th]
+    return [(r, p) for r, p in pairs(art, cat) if figs(r, BK_SET)[2] <= th]
 
 
 def rank_data(art, R):
@@ -1479,7 +1480,7 @@ def selftest(repo=REPO):
     expect("a family variant's figure edited", sub(r'data-fg="1">(\d)', bump), True)
     expect("a family row dropped", sub(r'<details class="fam"[^>]*>.*?(<tr data-fv="\w+">.*?</tr>)', lambda t: "", re.S), True)
     expect("a family's joint edited", sub(r'data-ff="inf">(\d)', bump), True)
-    expect("a family's picked-order count edited", sub(r'data-fl="inf">(\d)', bump), True)
+    expect("a family's picked-order count edited", sub(r'data-fl="' + BK_SHOWN + r'">(\d)', bump), True)
     expect("a family's line edited", sub(r'data-fline="1"><span data-fl="0" hidden>[^<]*?(\d)', bump), True)
     expect("a with-mirror pair line edited", sub(r'data-pair="1"><span data-fl="0" hidden>[^<]*?(\d)', bump), True)
     expect("a with-mirror pair line deleted", re.sub(r'<div class="sm pairl" data-pair="1">.*?</div>', "", page, count=1, flags=re.S), True)
