@@ -1,0 +1,48 @@
+{
+  "title": "你實戰揀嘅開局，對照 TST 開局排名",
+  "desc": "逐晚逐局，睇兩個人第一包實際擺咗邊個盤面，同按派牌次序排名話應該擺邊個，差幾多。全部係模擬推導，唔屬於信任鏈。",
+  "quarantine": "<strong>呢版係模擬推導，唔係 corpus 數據</strong>：重播係真嘅，但每個盤面嘅 3 巡 PC 機會都係由構造出嚟嘅排名（TST 開局排名頁）用模擬器同 solver 窮舉或者抽樣得出，冇人打過嗰啲盤面，唔入任何計數，冇 claim 編號、冇 ✓ 標記。",
+  "subset": "<b>配對到嘅局係揀出嚟嘅子集</b>：只有第一包六粒冇消行、冇垃圾、第七粒喺 hold、而且擺法啱啱係排名收錄嘅盤面，先有數字；其餘嘅局唔入平均，喺下面按原因逐類列出。所以每個平均都寫成 N / M，唔好當成兩個人所有局嘅平均。",
+  "assume": "<b>機會嘅假設</b>：機會 J 假設玩家想打 TST 再打第三包 PC，只係話「如果咁打，呢個盤面喺呢個派牌次序下有幾大機會」，完全唔講邊個贏咗呢局，亦唔講佢嗰局有冇諗住打 TST。",
+  "back": "← 全部戰報",
+  "to_ranking": "睇返排名頁 →",
+  "intro": [
+    "每個玩家每局，第一包派咗七粒，佢擺咗六粒落去、第七粒留喺 hold。呢頁將佢實際擺嘅盤面，同 <a href=\"tst-openers.html\">TST 開局排名</a>入面「呢個派牌次序下最好嗰個」比較，兩邊都用同一個機會 J：{budget} 嘅 soft drop 上限之下，第二包隨機派，砌得成任何 TST 兩巡形，第三包再清到 PC 嘅機會。",
+    "<b>最好</b>有三個講法，唔好混：<b>自己 repertoire 入面最好</b>（成個 corpus 入面佢砌過至少 {rep_min} 次嘅盤面，呢個先係主要比較，亦係「應該揀」嘅意思）；<b>天花板</b>（排名收錄嘅所有盤面入面最好，淨係用嚟睇上限，從來唔叫做揀錯）；仲有<b>hold 互換</b>（同一個擺法、換咗第七粒同 T 嘅位，最好嗰個變體）。<b>命中</b>就係實際機會同 repertoire 最好一樣；<b>差唔多</b>係冇命中，但少過 1 個百分點。"
+  ],
+  "h_totals": "兩個人嘅總數",
+  "totals_note": "實際／最好／天花板／hold 互換都係平均機會，只計配對到嗰啲局（N），分母 M 係嗰個玩家全部局數。",
+  "cols": {
+    "who": "玩家", "match": "配對 N / M", "actual": "實際平均", "rep": "repertoire 最好", "glob": "天花板", "fam": "hold 互換最好",
+    "hit": "命中", "near": "差唔多", "ghit": "中天花板", "night": "晚", "budget": "soft drop 上限"
+  },
+  "budgets": {"0": "0 次", "1": "1 次", "2": "2 次", "inf": "冇限"},
+  "h_budgets": "每個 soft drop 上限嘅總數",
+  "h_rep": "你嘅 repertoire：砌過幾多次，幾多次揀啱",
+  "rep_note": "每張卡係一個玩家砌過至少 {rep_min} 次嘅盤面。砌過＝配對到嗰啲局入面實際砌咗佢；揀啱＝砌咗佢而且機會同 repertoire 最好一樣；應該砌＝呢個盤面先係 repertoire 最好，但佢砌咗另一個。",
+  "rep_built": "砌過", "rep_right": "揀啱", "rep_should": "應該砌",
+  "h_swaps": "最蝕嘅換法：實際 → 應該",
+  "swaps_note": "按每個「實際盤面 → repertoire 最好盤面」組合，將少咗嘅機會加埋（期望少咗幾多個三巡 PC）排序。每個組合附上蝕得最多嗰局：派牌次序同重播連結。",
+  "sw_actual": "實際", "sw_should": "應該", "sw_n": "局數", "sw_sum": "少咗（期望 PC 數）", "sw_ex": "蝕最多嗰局", "sw_deal": "派牌次序",
+  "h_nights": "逐晚逐人",
+  "nights_note": "每晚每人一行，同總數一樣嘅欄。下面每晚可以打開睇逐局：派牌次序、實際盤面、repertoire 最好盤面同機會（% 向下取整，括號入面係完整整數分子，除以 5040² 就係機會）。",
+  "night_rounds": "逐局",
+  "rd": {"round": "場／局", "who": "玩家", "status": "狀態", "deal": "派牌（第一包）", "actual": "實際", "rep": "repertoire 最好", "loss": "少咗"},
+  "h_unmatched": "冇配對到嘅局",
+  "unmatched_note": "每一局恰好屬於下面一個狀態，加埋就係全部局數。",
+  "status": {
+    "matched": "配對到：六粒冇消行冇垃圾、第七粒喺 hold，擺法係排名收錄嘅盤面",
+    "not_kept": "冇收錄：同樣係六粒加 hold，但擺法唔係排名收錄嘅盤面（機會太低被剔走，或者砌唔到任何 TST 形，呢度分唔到）",
+    "garbage_or_clear": "頭六粒入面有消行或者收到垃圾",
+    "seven_placed_no_hold": "七粒全部擺晒、冇用 hold",
+    "hold_not_bag1": "唔係第一包 hold：hold 空咗，或者第七粒連消行／垃圾一齊落，或者局已經完",
+    "short_round": "未夠六粒就完咗"
+  },
+  "status_total": "合計",
+  "h_seven": "七粒擺晒嘅擺法",
+  "seven_note": "冇 hold 都擺晒七粒嘅局，按擺法（只睇位置，唔睇次序）分組，最多嗰幾個。有「hold 互換」記號嘅擺法，係排名入面某個 hold 互換組合嘅形，砌多一步就同收錄盤面一樣。",
+  "seven_n": "局數", "seven_fam": "屬於 hold 互換組合", "seven_nofam": "排名冇呢個組合",
+  "tiles_alt": "派牌",
+  "closing": "全部數字由 analysis/tst-openers-tp-replay.json 讀出嚟，嗰份檔案由 pipeline/sim/emit-tst-opener-choices.py 逐字重建；呢頁唔打任何數字落文字入面。",
+  "index_card": {"kicker": "實戰對照", "blurb": "兩個人逐晚逐局第一包砌咗邊個盤面，對照排名話應該砌邊個，蝕咗幾多機會。"}
+}

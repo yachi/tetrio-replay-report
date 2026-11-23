@@ -1,0 +1,12 @@
+.tw{overflow-x:auto}
+table.rt{border-collapse:collapse;font-size:.85rem;min-width:480px}
+table.rt th,table.rt td{padding:4px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+table.rt td.num{text-align:right}
+table.rt a{color:var(--fg)}
+.rcs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.rc{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px}
+figure.bf{margin:0}figure.bf figcaption{font-size:.72rem;color:var(--muted);margin-top:2px}
+.pt{display:inline-block;width:1.45em;height:1.45em;line-height:1.45em;text-align:center;border-radius:3px;color:#fff;font-weight:700;font-size:.75rem;margin-right:2px}
+.tiles{margin-top:4px;white-space:nowrap}
+details.night{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 10px;margin:6px 0}
+@media (max-width:520px){table.rt{font-size:.78rem}.rcs{grid-template-columns:repeat(2,1fr)}}

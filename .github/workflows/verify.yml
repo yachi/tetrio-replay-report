@@ -1505,6 +1505,10 @@ jobs:
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.tst_openers_tp_page --selftest
 
+      - name: Check the TST opener replay page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.tst_openers_replay_page --selftest
+
       - name: Check the pc-miss page audit catches its corruptions
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.pc_miss_page --selftest
@@ -1779,6 +1783,10 @@ jobs:
       - name: Re-run the TST opener T-placed builds
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 pipeline/sim/emit-tst-builds.py --check
+
+      - name: Rebuild the TST opener replay choices
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 pipeline/sim/emit-tst-opener-choices.py --check
 
       - name: Warm the oracle cache
         if: env.INPUTS_UNCHANGED != '1'

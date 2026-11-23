@@ -876,7 +876,8 @@ def render(art, cat, PR, pcxd, builds=None):
            f'<nav class="sm"><a href="index.html">{_esc(PR["back"])}</a></nav>',
            f'<div class="eyebrow">{RS.EYEBROW}</div>', f"<h1>{_esc(title)}</h1>",
            f'<p class="quar">{PR["quarantine"]}</p>',
-           f'<p class="ref">{PR["held_note"]} <a href="{HELD_PAGE}">{PR["to_held"]}</a></p>']
+           f'<p class="ref">{PR["held_note"]} <a href="{HELD_PAGE}">{PR["to_held"]}</a></p>',
+           f'<p class="ref"><a href="tst-openers-choices.html">{PR["to_replay"]}</a></p>']
     out += [f"<p>{t.format(**fm)}</p>" for t in PR["intro"]]
     out += [f'<details class="sm"><summary><b>{_esc(PR["reading_summary"])}</b></summary>\n<ul>']
     out += [f"<li>{t.format(**fm)}</li>" for t in PR["reading"]]

@@ -6563,6 +6563,21 @@ first page; `bin/emit-corpus` skips it. The detail rows' figures drawn on open h
 and the island row format is audited), so the T is read from the caption. The hand-typed OPEN opener labels on the cards are not
 re-checked by anything.
 
+**Your own replays against the ranking (`docs/tst-openers-choices.html`, named so because `bin/build-docs` owns every `*-replay.html`; since 2026-11-23, yachi: 「用你自己嘅 replay 對照」).**
+For every player-round the first six locks of `sessions/*/sim/replay-facts.json` are decoded; a round whose six placed pieces
+equal a KEPT board (exact hand, the seventh in hold, no clear or garbage) is `matched` and gets J, the ranking's chance at the
+soft-drop budget for the dealt order (index into `itertools.permutations('IOTSZJL')` of the first seven pieces), read from the
+first-bag vectors and each board's `cum` / `classes`. Every player-round has exactly one of six statuses (`matched`, `not_kept`,
+`garbage_or_clear`, `seven_placed_no_hold`, `hold_not_bag1`, `short_round`) and the test asserts they partition the rows. The
+primary 「best」 is the best board of the player's OWN repertoire (built at least `repertoire_min` times corpus-wide); the global
+best is a ceiling and never called a miss; a hit is EQUAL J. **Matched rounds are a selected subset, means are N / M over them only,
+and J assumes a TST then a bag-3 PC: it says nothing about who won** (both are required sentences). Rounds with a prefix verified
+to fewer than six locks are not filtered. Pieces: `pipeline/sim/emit-tst-opener-choices.py` (pure Python, `--check`, rows hold
+integers only) → `analysis/tst-openers-tp-replay.json` (constructed, quarantined, hashes its inputs and the emitter);
+`pipeline/openers/tst-openers-replay.test.ts` re-derives every status, order and board and the J of a sample with its own code,
+with four mutants; `pipeline/tst_openers_replay_page.py` renders and audits the page (`--selftest`). Counts are the artefact's,
+never typed here. The full artefact is not in `bin/emit-corpus`'s graph (EXCLUDED, rebuilt by its own `--check` in CI).
+
 ## 影片實戰例子 — boards read off one match video, drawn beside the source drawings
 
 `pipeline/openers/video-examples.json` (schema `video-examples/2`) holds boards read off YouTube videos, listed in

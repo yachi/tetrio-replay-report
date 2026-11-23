@@ -57,7 +57,7 @@ def _root(session):
 
 sys.path.insert(0, str(REPO))
 from pipeline import docs_gate, forecast_pooled, replay_page, replay_section, route_page  # noqa: E402
-from pipeline import cspin_miss_page, cutcopy_practice_page, dpc_page, forecast_page, pc_miss_page, sdpc_loop_page, tst_openers_page, tst_openers_tp_page, replay_labels, replay_links, secondpc_page, section_anchors, technique_page, video_links  # noqa: E402
+from pipeline import cspin_miss_page, cutcopy_practice_page, dpc_page, forecast_page, pc_miss_page, sdpc_loop_page, tst_openers_page, tst_openers_replay_page, tst_openers_tp_page, replay_labels, replay_links, secondpc_page, section_anchors, technique_page, video_links  # noqa: E402
 from pipeline.sites import INDEX_ROUTE_SITES, TECHNIQUE_SITES  # noqa: E402
 
 # (session dir, artefact subdir, output name, label, blurb)
@@ -636,7 +636,8 @@ def main(argv=None):
     # Rust counter and committed as analysis/tst-openers.json): the same render-and-byte-compare, its card
     # right after the SDPC loop's in the 定式路線 group.
     to_inputs = tst_openers_page.load_inputs(str(REPO))
-    to_pages = {**tst_openers_page.render_all(str(REPO), to_inputs), **tst_openers_tp_page.render_all(str(REPO))}
+    to_pages = {**tst_openers_page.render_all(str(REPO), to_inputs), **tst_openers_tp_page.render_all(str(REPO)),
+                **tst_openers_replay_page.render_all(str(REPO))}
     for name, page in to_pages.items():
         dst = DOCS / name
         if check:
@@ -653,6 +654,7 @@ def main(argv=None):
                 stale.unlink()
                 print(f"  removed docs/{stale.name} (the TST opener renderer does not produce it)")
     openers.append(tst_openers_tp_page.site_card())
+    openers.append(tst_openers_replay_page.site_card())
 
     # The mid-game technique pages, rendered and byte-compared exactly like the route pages above:
     # `render_all` audits both pages before returning them, and a docs/<prefix>*.html the renderer
