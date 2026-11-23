@@ -77,7 +77,7 @@ chance m_s = max p5 / 5040: ub = min( min(1, sum b_s/5040^2) * max m_s , sum (b_
 pc3 of the union is at most ub for every budget, so a board with ub <= 9/25 can never exceed 36%: ranks are complete
 above 36% and nowhere below it.
 """
-import argparse, hashlib, json, sys
+import argparse, collections, hashlib, json, sys
 from fractions import Fraction
 from pathlib import Path
 
@@ -1005,6 +1005,7 @@ def families_of(art, b1):
         earlier one); an order no variant can build adds nothing. Stdlib only: CI installs no numpy."""
         num, pick = {}, {}
         vs = [vec[n] for n in nm]
+        cnt = collections.Counter(zip(*vs))  # identical first-bag-order columns pick identically
         for bk in BKEYS:
             lim = INFEAS - 1 if bk == "inf" else int(bk)
             keys = [[(tabs[n][bk][0][s] * 8192 + tabs[n][bk][1][s]) if s <= lim else -1 for s in range(INFEAS + 1)]
@@ -1013,7 +1014,7 @@ def families_of(art, b1):
             Bt = [tabs[n][bk][1] for n in nm]
             tb = tj = 0
             pk = [0] * len(nm)
-            for cols in zip(*vs):
+            for cols, w in cnt.items():
                 best, arg = -1, -1
                 for t, c in enumerate(cols):
                     k = keys[t][c]
@@ -1022,9 +1023,9 @@ def families_of(art, b1):
                 if arg < 0:
                     continue
                 c = cols[arg]
-                tb += Bt[arg][c]
-                tj += Jt[arg][c]
-                pk[arg] += 1
+                tb += w * Bt[arg][c]
+                tj += w * Jt[arg][c]
+                pk[arg] += w
             num[bk] = [tb, tj]
             pick[bk] = pk
         return num, pick
