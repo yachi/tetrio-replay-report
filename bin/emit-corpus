@@ -74,6 +74,10 @@ EXCLUDED = {
     'tst-openers-pc-examples.json': 'written by `python3 pipeline/sim/emit-tst-pc-examples.py` (Python over the '
                                     'tst-pcex-rs binary, not a bun emitter); re-run and byte-compared by its own '
                                     '--check in verify.yml\'s typescript job',
+    'tst-openers-tp-b1.json': 'written by pipeline/sim/tst-b1vec-rs (Rust, not a bun emitter) and merged by '
+                              '`emit-tst-openers-tp.py --b1-merge`; checked by that emitter\'s `--check`',
+    'tst-openers-tp-builds.json': 'written by `python3 pipeline/sim/emit-tst-builds.py` (Python over the tst-build-rs '
+                                  'binary, not a bun emitter); re-run and byte-compared by its own `--check`',
     'tst-openers-tp-pc-examples.json': 'written by `python3 pipeline/sim/emit-tst-pc-examples.py --tp` (Python over '
                                        'the tst-pcex-rs binary, not a bun emitter); re-run and byte-compared by its '
                                        'own `--tp --check`',

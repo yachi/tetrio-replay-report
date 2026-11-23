@@ -60,11 +60,11 @@ def lines(repo=ROOT):
     return [P.line_of(e["o"], P.shown_tiling(e)) for e in P.entries(art, shp) if P.shown_tiling(e)["B"] > 0]
 
 
-TP_ABOUT = ("One worked Perfect Clear per ranked board of docs/tst-openers.html (the residue and leftover of the board's "
-            "shown class): the first bag-3 deal, in a fixed permutation order, the solver clears, and the first bag-3 "
-            "deal it proves cannot clear followed by the first bag-4 deal that can. An example, not a figure: the "
-            "percentages come from analysis/tst-openers-tp.json. Plans are the solver's (engine movegen); a plan's "
-            "cells are in the board as it stands at that step.")
+TP_ABOUT = ("One worked Perfect Clear per live class of every ranked board of docs/tst-openers.html (the residue and "
+            "leftover of the class): the first bag-3 deal, in a fixed permutation order, the solver clears. There is no "
+            "bag-4 example: the T-placed page counts bag 3 only (schema /2 of this artefact drops the `b4` the solver "
+            "binary still computes). An example, not a figure: the percentages come from analysis/tst-openers-tp.json. "
+            "Plans are the solver's (engine movegen); a plan's cells are in the board as it stands at that step.")
 
 
 def build(jobs=4, tp=False):
@@ -75,8 +75,10 @@ def build(jobs=4, tp=False):
                        capture_output=True, check=True, env={"JOBS": str(jobs), "PATH": "/usr/bin:/bin"})
     ex = [json.loads(l) for l in r.stdout.splitlines() if l.strip()]
     assert [e["line"] for e in ex] == ls, "the binary did not answer every line in order"
+    if tp:
+        ex = [{k: v for k, v in e.items() if k != "b4"} for e in ex]
     art = {
-        "schema": "tst-openers-pc-examples/1",
+        "schema": "tst-openers-pc-examples/2" if tp else "tst-openers-pc-examples/1",
         "report_eligible": False,
         "constructed": True,
         "about": TP_ABOUT if tp else "One worked Perfect Clear per card of docs/tst-openers.html (the card's displayed tiling): the first "
@@ -84,7 +86,8 @@ def build(jobs=4, tp=False):
                  "cannot clear followed by the first bag-4 deal that can. An example, not a figure: the card's "
                  "percentages come from analysis/tst-openers.json. Plans are the solver's (engine movegen); a plan's "
                  "cells are in the board as it stands at that step.",
-        "solver": {"bag3": {"max_rows": 5, "nodes": 2000000}, "bag4": {"max_rows": 7, "nodes": 20000000}},
+        "solver": ({"bag3": {"max_rows": 5, "nodes": 2000000}} if tp else
+                   {"bag3": {"max_rows": 5, "nodes": 2000000}, "bag4": {"max_rows": 7, "nodes": 20000000}}),
         "md5": ({"crate": crate_md5(), "tst_openers_tp": md5(TP_ART.read_bytes())} if tp else
                 {"crate": crate_md5(), "tst_openers": md5((ROOT / "analysis" / "tst-openers.json").read_bytes())}),
         "examples": ex,

@@ -36,6 +36,33 @@ HELD BOARDS (schema tst-openers-tp/2) are added on top of the committed placed b
 `--fallback <scratch dir>` writes the same artefact from the scratch outputs with the mirror shapes derived by symmetry
 (`mirror.assumed: true`); it exists so a page can be built while O2-O4 run.
 
+FAMILIES (schema tst-openers-tp/4; the hold-swap figure of docs/tst-openers.html). A LAYOUT is a set of seven placements, one of
+each of IJLOSTZ, on 28 distinct cells; its VARIANTS are the kept boards that are the layout minus one piece (the piece left out is
+the one held: minus the T is a T-held board). A family is a layout with at least two variants in the artefact. With the five-piece
+preview the first bag's dealt order o1 is known before any hold decision, so the player picks the variant per o1.
+
+  F1  the bag-1 phase of the counter depends only on the board and o1: the counter's states at the end of phase 0 are
+      (soft-drop spent s, the board, the held piece), the held piece is fixed by the board, and a smaller s dominates. So for one
+      o1 a board's count is D_k(b - s(o1)) with s(o1) the least soft-drop cost of building the board from that order (or none),
+      D_k(r) the bag-2 count of the first k+1 leftover classes with r budget left, and
+      cum_b[k] = sum_s n_s D_k(b - s), cum_inf[k] = n_feasible D_k(inf). `pipeline/sim/tst-b1vec-rs` computes s(o1) for every
+      board and every one of the 5040 dealt orders; D is solved from the committed `cum` by a triangular solve in which EVERY
+      division must be exact (`solve_D`: that exactness is the proof of the identity, no recount of any board is needed).
+  F2  with J_v(r) = sum_k (D_k(r) - D_{k-1}(r)) p5_k, the policy picks per o1 the variant maximising J_v(b - s_v(o1)) (ties:
+      larger built count, then the earlier name); pc3_F = sum_o1 that maximum, joint_F = pc3_F / 5040^3, built_F = the sum of the
+      chosen variants' bag-2 counts over 5040^2. The choice is made per budget.
+  F3  a variant pruned from the artefact (upper bound <= 36%) is not in the family, so a family figure is a lower bound
+      (`families.complete: false`). Cards and ranks stay per mirror pair by the board's own joint.
+  F4  `both` (per family) runs the F2 policy over the variants AND their mirror boards, so each o1 picks the better hand too;
+      `pairs` runs it over each board and its mirror board. Each is a superset of either hand's options, so its joint is at least
+      either hand's (`validate_families` checks that sandwich).
+
+  B1  python3 $E --b1-input > $W/b1.in ; pipeline/sim/tst-b1vec-rs/target/release/tst-b1vec < $W/b1.in > $W/b1.out     # about 40 s
+      python3 $E --b1-merge $W/b1.out                                          # writes analysis/tst-openers-tp-b1.json
+  B2  python3 $E --families                                                    # adds `families` to analysis/tst-openers-tp.json (boards untouched)
+  B3  python3 $E --check                                                       # CI: the b1 artefact is what the crate gives, the families recompute
+      python3 $E --cross-check <tst2bag-tp binary>                             # MULTI=1 B1ONLY=1 SDB=n against the vectors, on sampled boards
+
 MIRRORING. A mirror is x -> 9 - x with J<->L, S<->Z (`mirror_shape` / `mirror_pieces`, the one implementation here; the
 TS test and the page audit each re-implement it). Mirror shapes are not added to `tst-openers-shapes.json` (they have no
 recorded drawing for the shape gate to re-read): the emitter derives them, id `1000 + id`, a shape whose mirror is already
@@ -60,8 +87,12 @@ SHAPES = ROOT / "pipeline" / "openers" / "tst-openers-shapes.json"
 OLD = ROOT / "analysis" / "tst-openers.json"
 OUT = ROOT / "analysis" / "tst-openers-tp.json"
 CRATES = ["tst2bag-tp-rs", "oracle-rs", "pc-solver-rs"]
-SCHEMA = "tst-openers-tp/2"
+SCHEMA = "tst-openers-tp/4"
+SCHEMA_V2 = "tst-openers-tp/2"
 SCHEMA_V1 = "tst-openers-tp/1"
+B1_SCHEMA = "tst-openers-tp-b1/1"
+B1_OUT = ROOT / "analysis" / "tst-openers-tp-b1.json"
+B1_CRATE = "tst-b1vec-rs"
 B = 5040
 N2 = B * B
 THRESH = (9, 25)
@@ -351,7 +382,7 @@ def board_records(plan, results, prefix="t"):
 
 def header(shapes, mirror_shapes, assumed, boards, prune):
     return {
-        "schema": SCHEMA,
+        "schema": SCHEMA_V2,
         "report_eligible": False,
         "constructed": True,
         "quarantine": QUARANTINE,
@@ -468,7 +499,8 @@ def built_of(cum):
 
 def validate(art, cat_given=None, path="artefact"):
     """Python-side invariants. Raises AssertionError; the TS test re-checks them independently and more."""
-    assert art["schema"] == SCHEMA, f"{path}: schema {art['schema']} (need {SCHEMA})"
+    assert art["schema"] in (SCHEMA_V2, SCHEMA), f"{path}: schema {art['schema']} (need {SCHEMA_V2} or {SCHEMA})"
+    assert ("families" in art) == (art["schema"] == SCHEMA), f"{path}: families present iff schema {SCHEMA}"
     assert art["report_eligible"] is False and art["constructed"] is True
     old, shapes = load_inputs()
     cat = cat_given or Cat(old, shapes, art["mirror_shapes"])
@@ -523,7 +555,83 @@ def validate(art, cat_given=None, path="artefact"):
             o = names[b["mirror"]]
             ok = upper_bound(dict(zip(o["shapes"], o["built1"])), cat) > th
         assert ok, f"{b['name']}: upper bound under the threshold"
+    if art["schema"] == SCHEMA:
+        validate_families(art)
     return True
+
+
+def validate_families(art):
+    """The b1 artefact is current, the families recompute from it, and the sandwiches hold."""
+    b1 = json.loads(B1_OUT.read_text())
+    assert b1["schema"] == B1_SCHEMA
+    assert b1["md5"]["boards"] == boards_md5(art["boards"]), "b1 artefact: boards changed"
+    assert b1["md5"]["crate"] == b1_crate_md5(), "b1 artefact: crate sources changed"
+    assert art["md5"]["b1"] == md5(canon(b1).encode()), "families: b1 artefact changed"
+    fams = families_of(art, b1)
+    assert fams == art["families"], "families differ from a recomputation"
+    bs = {b["name"]: b for b in art["boards"]}
+    for f in fams["list"]:
+        assert len(f["variants"]) >= 2 and f["variants"] == sorted(f["variants"], key=lambda n: list(bs).index(n))
+        for bk in BKEYS:
+            js = [joint(bs[v]["cum"][bk], bs[v]["classes"]) for v in f["variants"]]
+            bl = [built_of(bs[v]["cum"][bk]) for v in f["variants"]]
+            jf, bf = Fraction(f["num"][bk][1], N2 * B), Fraction(f["num"][bk][0], N2)
+            assert max(js) <= jf <= min(1, sum(js)), f"{f['variants']} {bk}: joint sandwich"
+            assert bf <= min(1, sum(bl)), f"{f['variants']} {bk}: built bound"
+            assert sum(f["pick"][bk]) <= B
+            # `both`: the variants and their mirror boards; a superset of each hand's options, so at least either hand's joint
+            bv = f["both"]["variants"]
+            jb = Fraction(f["both"]["num"][bk][1], N2 * B)
+            js2 = [joint(bs[v]["cum"][bk], bs[v]["classes"]) for v in bv]
+            hands = [jf] + ([Fraction(fams["list"][f["mirror"]]["num"][bk][1], N2 * B)] if f["mirror"] is not None else [])
+            assert max(hands) <= jb <= min(1, sum(js2)), f"{bv} {bk}: both sandwich"
+            assert sum(f["both"]["pick"][bk]) <= B
+    for p in fams["pairs"]:
+        a, m = (bs[n] for n in p["boards"])
+        assert a["mirror"] == m["name"] and m["mirror"] == a["name"]
+        for bk in BKEYS:
+            ja, jm = joint(a["cum"][bk], a["classes"]), joint(m["cum"][bk], m["classes"])
+            jp = Fraction(p["num"][bk][1], N2 * B)
+            assert max(ja, jm) <= jp <= min(1, ja + jm), f"{p['boards']} {bk}: pair sandwich"
+            assert sum(p["pick"][bk]) <= B
+    assert len(fams["pairs"]) * 2 == len(bs)
+    return True
+
+
+def cross_check_cmd(args):
+    """The pinned counter's FCounter, run with MULTI=1 B1ONLY=1 SDB=n, counts 5040 x (orders of cost <= n) per board and class
+    prefix: the b1 vectors agree with the counter on a sample of boards."""
+    import os, random, subprocess
+    art = json.loads(Path(args.out).read_text())
+    b1 = json.loads(B1_OUT.read_text())
+    vec = b1_vectors(b1)
+    old, shapes = load_inputs()
+    cat = Cat(old, shapes, art["mirror_shapes"])
+    rnd = random.Random(5)
+    placed = [b for b in art["boards"] if b["held"] != "T"]
+    held = [b for b in art["boards"] if b["held"] == "T"]
+    sel = rnd.sample(placed, 10) + rnd.sample(held, 6) + placed[:2]
+    lines = []
+    for b in sel:
+        b1s = "/".join("%s:%s" % (k, ",".join(map(str, cs))) for k, cs in sorted(b["pieces"]))
+        sh = "#".join(f"{pt(cat.by[s]['cells'])}|{pt(cat.by[s]['tst'])}" for s in b["shapes"])
+        cl = ";".join(f"{si}:{l or '-'}" for si, l, _ in b["classes"])
+        lines.append(f"{b['name']}#{b1s}#{sh}#{cl}")
+    bad = 0
+    for n in (0, 1, 2, None):
+        env = dict(os.environ, MULTI="1", B1ONLY="1", JOBS="4")
+        if n is not None:
+            env["SDB"] = str(n)
+        out = subprocess.run([args.cross_check], input="\n".join(lines) + "\n", capture_output=True, text=True, env=env, check=True).stdout
+        got = {json.loads(l)["name"]: json.loads(l)["cum"] for l in out.splitlines()}
+        for b in sel:
+            v = vec[b["name"]]
+            feas = int(((v < INFEAS) if n is None else (v <= n)).sum())
+            if not got.get(b["name"]) or any(x != B * feas for x in got[b["name"]]):
+                bad += 1
+                print("MISMATCH", b["name"], n)
+    print(f"cross-check: {len(sel)} boards x 4 budgets, mismatches {bad}")
+    assert bad == 0
 
 
 def residue_rows(cells, tst):
@@ -574,7 +682,7 @@ def merge_held(args):
     """Keep every placed board of --reuse-placed verbatim, append the held boards counted from the --h* outputs."""
     old, shapes = load_inputs()
     prev = json.loads(Path(args.reuse_placed).read_text())
-    assert prev["schema"] in (SCHEMA_V1, SCHEMA), prev["schema"]
+    assert prev["schema"] in (SCHEMA_V1, SCHEMA_V2, SCHEMA), prev["schema"]
     assert prev["md5"]["crate"] == crate_md5() and prev["md5"]["tst_openers"] == md5(OLD.read_bytes()) \
         and prev["md5"]["shapes"] == md5(canon(shapes).encode()), "the reused artefact is stale"
     placed = [b for b in prev["boards"] if b["held"] != "T"]
@@ -737,6 +845,246 @@ def compare_scratch(args):
     print("deduped top 5 same boards as scratch (as pairs):", all(any(k == s or k == mirror_board_key(s) for s in sc_top) for k in my_top))
 
 
+# ---- hold-swap families (schema /4) ----------------------------------------------------------------------------------
+import base64, zlib
+
+INFEAS = 10          # the code of a '.' (no build from this order) in a decoded b1 vector
+
+
+def b1_crate_md5():
+    h = hashlib.md5()
+    fs = [SIM / B1_CRATE / "Cargo.toml"] + list((SIM / B1_CRATE / "src").rglob("*.rs")) + list((SIM / "oracle-rs" / "src").rglob("*.rs"))
+    for p in sorted(fs, key=lambda p: p.relative_to(SIM).as_posix()):
+        h.update(f"{p.relative_to(SIM).as_posix()}\0{md5(p.read_bytes())}\n".encode())
+    return h.hexdigest()
+
+
+def boards_md5(boards):
+    return md5(canon([[b["name"], b["pieces"]] for b in boards]).encode())
+
+
+def b1_input_lines(art):
+    return ["%s#%s" % (b["name"], "/".join("%s:%s" % (k, ",".join(map(str, cs))) for k, cs in b["pieces"]))
+            for b in art["boards"]]
+
+
+def b1_build(art, jsonl):
+    """The b1 artefact from the crate's output lines (`{"name","v"}` per board)."""
+    vec = {}
+    for r in read_jsonl(jsonl):
+        assert r["name"] not in vec and len(r["v"]) == B and set(r["v"]) <= set(".0123456789"), r["name"]
+        vec[r["name"]] = r["v"]
+    assert sorted(vec) == sorted(b["name"] for b in art["boards"]), "the crate output does not cover the boards"
+    return {"schema": B1_SCHEMA, "report_eligible": False, "constructed": True,
+            "means": "per board and first-bag dealt order (the counter's IOTSZJL recursion order), the least soft-drop cost "
+                     "min(s, 9) of building the board from that order with one hold slot, '.' when none; zlib + base64",
+            "md5": {"crate": b1_crate_md5(), "boards": boards_md5(art["boards"])},
+            "vectors": {n: base64.b64encode(zlib.compress(v.encode(), 9)).decode() for n, v in sorted(vec.items())}}
+
+
+def b1_vectors(b1):
+    """{board: bytes of B cost codes 0..INFEAS} (stdlib only: CI installs no numpy)."""
+    out = {}
+    for n, z in b1["vectors"].items():
+        v = zlib.decompress(base64.b64decode(z)).decode()
+        assert len(v) == B
+        out[n] = bytes(ord(ch) - 48 for ch in v.replace(".", chr(48 + INFEAS)))
+    return out
+
+
+def solve_D(cum, vec):
+    """D by the triangular solve cum_b[k] = sum_s n_s D_k(b - s), n_s the number of first-bag orders with cost s.
+    Every division is asserted exact: that IS the proof that a board's count for one order depends only on (board, order).
+    Returns (Dfin, Dinf): Dfin[r] the class-cumulative bag-2 counts with r budget left (r = 0..2-smin), Dinf the same unlimited."""
+    n = [0] * (INFEAS + 1)
+    for c in vec:
+        n[c] += 1
+    nfeas = sum(n[:INFEAS])
+    ncls = len(cum["inf"])
+    assert nfeas > 0
+    Dinf = []
+    for c in cum["inf"]:
+        assert c % nfeas == 0, "inf: cum not divisible by the feasible order count"
+        Dinf.append(c // nfeas)
+    smin = next(s for s in range(INFEAS) if n[s])
+    Dfin = {}
+    for b in (0, 1, 2):
+        c = cum[str(b)]
+        if b < smin:
+            assert all(x == 0 for x in c), f"budget {b} below the least cost {smin} but cum is not 0"
+            continue
+        row = []
+        for k in range(ncls):
+            num = c[k] - sum(int(n[s]) * Dfin[b - s][k] for s in range(smin + 1, b + 1))
+            assert num % int(n[smin]) == 0, f"b={b} k={k}: inexact division"
+            row.append(num // int(n[smin]))
+        Dfin[b - smin] = row
+    for r, row in Dfin.items():
+        assert all(0 <= x <= B for x in row) and all(x <= y for x, y in zip(row, row[1:])), "D range / monotone in k"
+        assert all(x <= y for x, y in zip(row, Dinf)), "D finite above D inf"
+        if r + 1 in Dfin:
+            assert all(x <= y for x, y in zip(row, Dfin[r + 1])), "D not monotone in r"
+    return Dfin, Dinf
+
+
+def j_tables(board, D):
+    """Per budget key, (J, built) over the cost code s (0..INFEAS), lists of ints; J_v(r) = sum_k dD_k p5_k, built = D_last(r)."""
+    Dfin, Dinf = D
+    p5 = [c[2] for c in board["classes"]]
+
+    def jb(row):
+        prev, j = 0, 0
+        for d, p in zip(row, p5):
+            j += (d - prev) * p
+            prev = d
+        return j, row[-1]
+    out = {}
+    for bk, b in (("0", 0), ("1", 1), ("2", 2), ("inf", None)):
+        J = [0] * (INFEAS + 1)
+        Bt = [0] * (INFEAS + 1)
+        for s in range(INFEAS):
+            if b is None:
+                J[s], Bt[s] = jb(Dinf)
+            elif b - s >= 0 and (b - s) in Dfin:
+                J[s], Bt[s] = jb(Dfin[b - s])
+        out[bk] = (J, Bt)
+    return out
+
+
+def layouts_of(art):
+    """{layout (frozenset of 7 (kind, cells)): sorted board indices of the kept boards equal to the layout minus one piece}:
+    every set of seven placements, one per kind on 28 disjoint cells, with at least two such kept boards."""
+    bs = art["boards"]
+    by_key = {board_key(b["pieces"]): i for i, b in enumerate(bs)}
+    cores = {}
+    for i, b in enumerate(bs):
+        ps = [(k, tuple(sorted(cs))) for k, cs in b["pieces"]]
+        for j, p in enumerate(ps):
+            cores.setdefault(frozenset(ps[:j] + ps[j + 1:]), []).append((i, p))
+    lay = set()
+    for core, lst in cores.items():
+        for a in range(len(lst)):
+            for c in range(a + 1, len(lst)):
+                pa, pc = lst[a][1], lst[c][1]
+                if pa[0] == pc[0]:
+                    continue
+                cells = [x for _, cs in core for x in cs] + list(pa[1]) + list(pc[1])
+                if len(set(cells)) != 28:
+                    continue
+                lay.add(frozenset(core | {pa, pc}))
+    out = {}
+    for L in lay:
+        vs = sorted(by_key[tuple(sorted(L - {p}))] for p in L if tuple(sorted(L - {p})) in by_key)
+        assert len(vs) >= 2
+        out[L] = vs
+    return out
+
+
+def families_of(art, b1):
+    """The families object (schema /4) recomputed from the boards and the b1 vectors: per layout its variants' figures under
+    the policy, and `both`, the same policy over the variants and their mirror boards (each first-bag order picks the better
+    hand); `pairs`, the policy over each board and its mirror board."""
+    bs = art["boards"]
+    pos = {b["name"]: i for i, b in enumerate(bs)}
+    vec = b1_vectors(b1)
+    tabs = {}
+    for b in bs:
+        tabs[b["name"]] = j_tables(b, solve_D(b["cum"], vec[b["name"]]))
+        for bk in BKEYS:       # a one-board family reproduces the board's own figures: the policy identity
+            J, Bt = tabs[b["name"]][bk]
+            v = vec[b["name"]]
+            cnt = [0] * (INFEAS + 1)
+            for c in v:
+                cnt[c] += 1
+            assert sum(cnt[s] * Bt[s] for s in range(INFEAS + 1)) == b["cum"][bk][-1], f"{b['name']} {bk}: built identity"
+            assert sum(cnt[s] * J[s] for s in range(INFEAS + 1)) == joint(b["cum"][bk], b["classes"]) * N2 * B, \
+                f"{b['name']} {bk}: pc3 identity"
+
+    def policy(nm):
+        """Per budget, each first-bag order picks the available variant with the largest J*8192 + built (ties to the
+        earlier one); an order no variant can build adds nothing. Stdlib only: CI installs no numpy."""
+        num, pick = {}, {}
+        vs = [vec[n] for n in nm]
+        for bk in BKEYS:
+            lim = INFEAS - 1 if bk == "inf" else int(bk)
+            keys = [[(tabs[n][bk][0][s] * 8192 + tabs[n][bk][1][s]) if s <= lim else -1 for s in range(INFEAS + 1)]
+                    for n in nm]
+            Jt = [tabs[n][bk][0] for n in nm]
+            Bt = [tabs[n][bk][1] for n in nm]
+            tb = tj = 0
+            pk = [0] * len(nm)
+            for cols in zip(*vs):
+                best, arg = -1, -1
+                for t, c in enumerate(cols):
+                    k = keys[t][c]
+                    if k > best:
+                        best, arg = k, t
+                if arg < 0:
+                    continue
+                c = cols[arg]
+                tb += Bt[arg][c]
+                tj += Jt[arg][c]
+                pk[arg] += 1
+            num[bk] = [tb, tj]
+            pick[bk] = pk
+        return num, pick
+    lays = layouts_of(art)
+    keys = sorted(lays, key=lambda L: sorted(L))
+    index = {L: i for i, L in enumerate(keys)}
+    fams = []
+    for L in keys:
+        nm = [bs[i]["name"] for i in lays[L]]
+        num, pick = policy(nm)
+        both = sorted(set(nm) | {bs[pos[n]]["mirror"] for n in nm}, key=pos.get)
+        bnum, bpick = policy(both)
+        ml = frozenset((p[0], tuple(p[1])) for p in mirror_pieces([[k, list(cs)] for k, cs in L]))
+        mi = index.get(ml)
+        if mi is not None:
+            assert set(both) == set(nm) | {bs[i]["name"] for i in lays[keys[mi]]}, "mirror family variants are the mirrors"
+        fams.append({"pieces": [[k, list(cs)] for k, cs in sorted(L)], "variants": nm,
+                     "mirror": mi, "num": num, "pick": pick,
+                     "both": {"variants": both, "num": bnum, "pick": bpick}})
+    prs = []
+    for b in bs:
+        if pos[b["name"]] < pos[b["mirror"]]:
+            num, pick = policy([b["name"], b["mirror"]])
+            prs.append({"boards": [b["name"], b["mirror"]], "num": num, "pick": pick})
+    return {"complete": all(len(f["variants"]) == 7 for f in fams),
+            "policy": "per first-bag order, the variant with the larger joint, then built, then the earlier board, at that budget",
+            "list": fams, "pairs": prs}
+
+
+def families_cmd(args):
+    art = json.loads(Path(args.out).read_text())
+    old_boards = canon(art["boards"])
+    b1 = json.loads(B1_OUT.read_text())
+    assert b1["md5"]["boards"] == boards_md5(art["boards"]) and b1["md5"]["crate"] == b1_crate_md5(), "b1 artefact is stale"
+    fams = families_of(art, b1)
+    art["schema"] = SCHEMA
+    art["md5"]["b1"] = md5(canon(b1).encode())
+    art["families"] = fams
+    assert canon(art["boards"]) == old_boards
+    validate(art)
+    write_art(art, args.out)
+    print(f"wrote {args.out}: {len(fams['list'])} families, complete={fams['complete']}", file=sys.stderr)
+
+
+def check_cmd(args):
+    art = json.loads(Path(args.out).read_text())
+    validate(art)
+    print(f"ok: {len(art['boards'])} boards, {len(art['families']['list'])} families recomputed from the b1 vectors")
+
+
+def b1_cmd(args):
+    art = json.loads(Path(args.out).read_text())
+    if args.b1_input:
+        print("\n".join(b1_input_lines(art)))
+        return
+    b1 = b1_build(art, args.b1_merge)
+    B1_OUT.write_text(json.dumps(b1, separators=(",", ":"), ensure_ascii=False) + "\n")
+    print(f"wrote {B1_OUT}: {len(b1['vectors'])} vectors", file=sys.stderr)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--shape-input", action="store_true")
@@ -761,8 +1109,21 @@ def main():
     ap.add_argument("--hsd2")
     ap.add_argument("--hinf")
     ap.add_argument("--compare-held")
+    ap.add_argument("--b1-input", action="store_true")
+    ap.add_argument("--b1-merge")
+    ap.add_argument("--families", action="store_true")
+    ap.add_argument("--check", action="store_true")
+    ap.add_argument("--cross-check")
     ap.add_argument("--out", default=str(OUT))
     a = ap.parse_args()
+    if a.b1_input or a.b1_merge:
+        return b1_cmd(a)
+    if a.families:
+        return families_cmd(a)
+    if a.check:
+        return check_cmd(a)
+    if a.cross_check:
+        return cross_check_cmd(a)
     if a.validate is not None:
         return validate_cmd(a)
     if a.compare_held:

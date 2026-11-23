@@ -102,13 +102,12 @@ let speed = 1;
 function showBuild(panel, c, j) {
   panel.replaceChildren();
   if (!c.b[j]) { panel.append(el('p', 'muted sm', D.cl.bo_nobuild)); return; }
-  const [order, sdTot] = c.b[j], [tst, line, a3] = c.x[j], n1 = c.n1, m = order.length + 1;
+  const [order, sdTot] = c.b[j], [tst, line] = c.x[j], n1 = c.n1, m = order.length + 1;
   let bH = 1; for (const [, cs] of order) for (const q of cs) bH = Math.max(bH, Math.floor(q / 10) + 1);
   for (const q of tst) bH = Math.max(bH, Math.floor(q / 10) + 1);
   const e = D.px[line] || {};
   const vars = [];
   if (e.b3) vars.push([D.cl.an_v3, e.b3, D.cl.pcx_deal3.replace('{d}', e.b3[0][0])]);
-  if (e.b4 && !a3) vars.push([D.cl.an_v4, e.b4, D.cl.pcx_deal34.replace('{d3}', e.b4[0][0]).replace('{d4}', e.b4[0][1])]);
   const lf = e.l ? D.cl.pcx_left.replace('{left}', e.l) : '';
   panel.append(el('h4', null, D.cl.bo_title));
   const vbar = el('div', 'an-v'), deal = el('p', 'muted sm');
@@ -198,8 +197,6 @@ function showBuild(panel, c, j) {
   panel.append(vbar, deal, wrap, el('p', 'muted sm', D.cl.bo_note));
   if (!vars.length) panel.append(el('p', 'muted sm', D.cl.bo_none));
   else if (!e.b3) panel.append(el('p', 'muted sm', D.cl.pcx_none3));
-  else if (a3) panel.append(el('p', 'muted sm', D.cl.pcx_always3));
-  else if (!e.b4) panel.append(el('p', 'muted sm', D.cl.pcx_none4));
   setVar(0);
   // the same PCs as numbered pictures, folded
   if (vars.length) {
@@ -236,6 +233,7 @@ function apply() {
   for (const b of posBtns) b.setAttribute('aria-pressed', b.dataset.f === pos);
   for (const b of kindBtns) b.setAttribute('aria-pressed', b.dataset.k === kind);
   for (const b of sdBtns) b.setAttribute('aria-pressed', b.dataset.b === sd);
+  for (const e of document.querySelectorAll('[data-fl]')) e.hidden = e.dataset.fl !== sd;
 }
 posBtns.forEach(b => b.onclick = () => { pos = b.dataset.f; apply(); });
 kindBtns.forEach(b => b.onclick = () => { kind = b.dataset.k; apply(); });

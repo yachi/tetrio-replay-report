@@ -26,6 +26,7 @@ const ART = JSON.parse(readFileSync(join(ROOT, 'analysis', 'tst-openers-tp.json'
 const OLD_PATH = join(ROOT, 'analysis', 'tst-openers.json');
 const OLD = JSON.parse(readFileSync(OLD_PATH, 'utf8'));
 const SHAPES: any[] = JSON.parse(readFileSync(join(ROOT, 'pipeline', 'openers', 'tst-openers-shapes.json'), 'utf8')).shapes;
+const B1 = JSON.parse(readFileSync(join(ROOT, 'analysis', 'tst-openers-tp-b1.json'), 'utf8'));
 const md5 = (b: string | Buffer) => createHash('md5').update(b).digest('hex');
 const B = 5040, N2 = B * B;
 const ORDER = 'IJLOSTZ';
@@ -128,7 +129,8 @@ test('(a) the three md5s are current and the artefact is quarantined', () => {
   expect(ART.md5.shapes).toBe(md5(canon(SHAPES)));
   expect(ART.report_eligible).toBe(false);
   expect(ART.constructed).toBe(true);
-  expect(ART.schema).toBe('tst-openers-tp/2');
+  expect(ART.schema).toBe('tst-openers-tp/4');
+  expect(ART.md5.b1).toBe(md5(canon(B1)));
 });
 
 // ---- (b) invariants ----------------------------------------------------------------------------------------------
@@ -392,3 +394,156 @@ test('the pinned boards exist', () => {
   for (const k of PINNED_HELD) expect(ART.boards.some((b: any) => b.held === 'T' && keyOf(b.pieces) === k)).toBe(true);
   for (const id of PINNED_F) expect(OLD.shapes.some((o: any) => o.id === id)).toBe(true);
 });
+
+// ---- (h) the hold-swap families: the first-bag vectors and the policy, recomputed in TypeScript -------------------------
+// The identity cum_b[k] = sum_s n_s D_k(b - s) (n_s = first-bag orders of cost s) is solved for D with every division
+// asserted exact; the family figures are then recomputed from D and the vectors with this file's own code, and the
+// layouts are re-derived with a second implementation of "the kept boards equal to a 7-placement layout less one piece".
+import { inflateSync } from 'node:zlib';
+const INFEAS = 10;
+const BKEYS = ['0', '1', '2', 'inf'];
+const vecOf = (name: string): number[] => {
+  const s = inflateSync(Buffer.from(B1.vectors[name], 'base64')).toString();
+  expect(s.length).toBe(B);
+  return [...s].map((c) => (c === '.' ? INFEAS : c.charCodeAt(0) - 48));
+};
+function tables(b: any, v: number[]) {
+  const n = new Array(INFEAS + 1).fill(0);
+  for (const x of v) n[x]++;
+  const nfeas = B - n[INFEAS];
+  const ncls = b.cum.inf.length;
+  const Dinf = b.cum.inf.map((c: number) => { expect(c % nfeas).toBe(0); return c / nfeas; });
+  const smin = n.findIndex((x: number, s: number) => s < INFEAS && x > 0);
+  const Dfin: Record<number, number[]> = {};
+  for (const bud of [0, 1, 2]) {
+    const c = b.cum[String(bud)];
+    if (bud < smin) { expect(c.every((x: number) => x === 0)).toBe(true); continue; }
+    const row: number[] = [];
+    for (let k = 0; k < ncls; k++) {
+      let num = c[k];
+      for (let s = smin + 1; s <= bud; s++) num -= n[s] * Dfin[bud - s][k];
+      expect(num % n[smin]).toBe(0);
+      row.push(num / n[smin]);
+    }
+    Dfin[bud - smin] = row;
+  }
+  const p5 = b.classes.map((c: any) => c[2]);
+  const jb = (row: number[]): [number, number] => { let prev = 0, j = 0; row.forEach((d, i) => { j += (d - prev) * p5[i]; prev = d; }); return [j, row[row.length - 1]]; };
+  const out: Record<string, [number[], number[]]> = {};
+  for (const bk of BKEYS) {
+    const J = new Array(INFEAS + 1).fill(0), Bt = new Array(INFEAS + 1).fill(0);
+    for (let s = 0; s < INFEAS; s++) {
+      const r = bk === 'inf' ? null : Number(bk) - s;
+      const row = bk === 'inf' ? Dinf : r! >= 0 ? Dfin[r!] : undefined;
+      if (row) [J[s], Bt[s]] = jb(row);
+    }
+    out[bk] = [J, Bt];
+  }
+  return { out, n };
+}
+const bkey = (ps: Pc[]) => keyOf(ps);
+test('(h) every family figure is recomputed from the boards and the first-bag vectors', () => {
+  const F = ART.families;
+  expect(F.complete).toBe(false);
+  const byName = new Map<string, any>(ART.boards.map((b: any) => [b.name, b]));
+  const vec = new Map<string, number[]>(), tab = new Map<string, any>();
+  for (const b of ART.boards) {
+    const v = vecOf(b.name); vec.set(b.name, v);
+    const t = tables(b, v); tab.set(b.name, t.out);
+    for (const bk of BKEYS) {   // a one-board family reproduces the board's own figures
+      let bsum = 0, jsum = 0;
+      for (const x of v) { bsum += t.out[bk][1][x]; jsum += t.out[bk][0][x]; }
+      expect(bsum).toBe(b.cum[bk][b.cum[bk].length - 1]);
+      let n = 0, prev = 0;
+      b.cum[bk].forEach((c: number, i: number) => { n += (c - prev) * b.classes[i][2]; prev = c; });
+      expect(jsum).toBe(n);
+    }
+  }
+  // layouts, second implementation: group by (layout less one piece), then every pair that completes a layout
+  const lay = new Map<string, Set<string>>();
+  const cores = new Map<string, { name: string; p: Pc }[]>();
+  for (const b of ART.boards) b.pieces.forEach((p: Pc, j: number) => {
+    const rest = sortPcs(b.pieces.filter((_: Pc, i: number) => i !== j));
+    const k = bkey(rest);
+    (cores.get(k) ?? cores.set(k, []).get(k)!).push({ name: b.name, p: sortPcs([p])[0] });
+  });
+  for (const [k, lst] of cores) for (let a = 0; a < lst.length; a++) for (let c = a + 1; c < lst.length; c++) {
+    if (lst[a].p[0] === lst[c].p[0]) continue;
+    const base = k.split('/').map((t) => { const [kk, cs] = t.split(':'); return [kk, cs.split(',').map(Number)] as Pc; });
+    const all = sortPcs([...base, lst[a].p, lst[c].p]);
+    if (new Set(all.flatMap(([, cs]) => cs)).size !== 28) continue;
+    (lay.get(bkey(all)) ?? lay.set(bkey(all), new Set()).get(bkey(all))!);
+  }
+  const byKey = new Map<string, string>(ART.boards.map((b: any) => [keyOf(b.pieces), b.name]));
+  const check = (names: string[], num: any, pk: any) => {
+    for (const bk of BKEYS) {
+      let bn = 0, pn = 0;
+      const pick = names.map(() => 0);
+      for (let o = 0; o < B; o++) {
+        let best = -1, arg = -1;
+        names.forEach((n, t) => {
+          const s = vec.get(n)![o];
+          const ok = bk === 'inf' ? s < INFEAS : s <= Number(bk);
+          if (!ok) return;
+          const key = tab.get(n)[bk][0][s] * 8192 + tab.get(n)[bk][1][s];
+          if (key > best) { best = key; arg = t; }
+        });
+        if (arg < 0) continue;
+        const s = vec.get(names[arg])![o];
+        bn += tab.get(names[arg])[bk][1][s]; pn += tab.get(names[arg])[bk][0][s]; pick[arg]++;
+      }
+      expect([bn, pn]).toEqual(num[bk]);
+      expect(pick).toEqual(pk[bk]);
+    }
+  };
+  expect(lay.size).toBe(F.list.length);
+  const listed = new Set(F.list.map((L: any) => bkey(L.pieces)));
+  for (const k of lay.keys()) expect(listed.has(k)).toBe(true);
+  for (const L of F.list) {
+    const names: string[] = L.variants;
+    expect(names.length).toBeGreaterThanOrEqual(2);
+    // each variant is the layout less one piece, and every kept such board is listed
+    const want = new Set<string>();
+    for (const b of ART.boards) { const ks = pieceKeys(b.pieces), all = pieceKeys(L.pieces); if (ks.size === 6 && [...ks].every((x) => all.has(x))) want.add(b.name); }
+    expect(new Set(names)).toEqual(want);
+    check(names, L.num, L.pick);
+    // `both`: the variants and every variant's mirror board (independently, by mirroring each variant's pieces)
+    const both = new Set(names);
+    for (const n of names) both.add(byKey.get(keyOf(mirrorPcs(byName.get(n).pieces)))!);
+    const order = new Map<string, number>(ART.boards.map((b: any, i: number) => [b.name, i]));
+    expect(L.both.variants).toEqual([...both].sort((a, b) => order.get(a)! - order.get(b)!));
+    check(L.both.variants, L.both.num, L.both.pick);
+    for (const bk of BKEYS) expect(L.both.num[bk][1]).toBeGreaterThanOrEqual(L.num[bk][1]);
+  }
+  // `pairs`: every board with its mirror board, once
+  expect(F.pairs.length * 2).toBe(ART.boards.length);
+  const seen = new Set<string>();
+  for (const P of F.pairs) {
+    const [a, m] = P.boards;
+    expect(byKey.get(keyOf(mirrorPcs(byName.get(a).pieces)))).toBe(m);
+    seen.add(a); seen.add(m);
+    check(P.boards, P.num, P.pick);
+  }
+  expect(seen.size).toBe(ART.boards.length);
+}, 300_000);
+
+test('(i) cross-crate: the pinned counter with B1ONLY counts 5040 x the orders each vector says build the board', () => {
+  const bin = crateBin();
+  if (!bin) { console.warn('SKIPPED (i): cargo is unavailable or the crate failed to build; the b1 vectors are NOT re-checked'); return; }
+  const boards = [...PINNED_BOARDS, ...PINNED_HELD].map((k) => ART.boards.find((b: any) => keyOf(b.pieces) === k));
+  const lines = boards.map((b: any, i: number) => {
+    const b1 = [...b.pieces].map(([k, cs]: Pc) => `${k}:${cs.join(',')}`).join('/');
+    const sh = b.shapes.map((id: number) => `${pts(CAT.get(id)!.cells)}|${pts(CAT.get(id)!.tst)}`).join('#');
+    const cl = b.classes.map(([si, l]: [number, string]) => `${si}:${l || '-'}`).join(';');
+    return `p${i}#${b1}#${sh}#${cl}`;
+  });
+  for (const [n, env] of [[0, { SDB: '0' }], [1, { SDB: '1' }], [2, { SDB: '2' }], [INFEAS, {}]] as [number, Record<string, string>][]) {
+    const got = run(bin, lines, { MULTI: '1', B1ONLY: '1', ...env });
+    boards.forEach((b: any, i: number) => {
+      const g = got.find((x: any) => x.name === `p${i}`);
+      const v = vecOf(b.name);
+      const cnt = v.filter((x) => (n === INFEAS ? x < INFEAS : x <= n)).length;
+      expect(g.cum[g.cum.length - 1]).toBe(B * cnt);
+    });
+  }
+}, 300_000);
