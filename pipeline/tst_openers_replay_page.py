@@ -49,6 +49,7 @@ COL = OP.COL
 BY_COL = {v: k for k, v in COL.items()}
 STATUSES = ["matched", "not_kept", "garbage_or_clear", "seven_placed_no_hold", "hold_not_bag1", "short_round"]
 SCHEMA = "tst-openers-replay/1"
+NEAR_DEN = 50  # 差唔多 = 0 < loss <= N2 / NEAR_DEN; must equal the artefact's params.near_den
 
 
 def _need(cond, msg):
@@ -126,7 +127,7 @@ def stats(rows, bk, n2):
         loss = rj - a
         if loss == 0:
             st["hit"] += 1
-        elif 100 * loss <= n2:
+        elif NEAR_DEN * loss <= n2:
             st["near"] += 1
         if gj == a:
             st["ghit"] += 1
@@ -216,6 +217,7 @@ def best_of(rows, bk, n2):
 
 def render(art, tp, PR):
     n2 = art["params"]["n2"]
+    _need(art["params"]["near_den"] == NEAR_DEN, "near_den differs from the artefact")
     rows = art["rows"]
     bk = BK_SHOWN
     pcs = {b["name"]: [(k, list(cs)) for k, cs in b["pieces"]] for b in tp["boards"]}
@@ -376,7 +378,7 @@ def ex_figs(rows, bk, n2):
     glo = sum(r["j"][bk][3] for r in matched)
     fam = sum(r["j"][bk][5] for r in matched)
     hit = len([1 for r in matched if r["j"][bk][1] == r["j"][bk][0]])
-    near = len([1 for r in matched if 0 < r["j"][bk][1] - r["j"][bk][0] and 100 * (r["j"][bk][1] - r["j"][bk][0]) <= 5040 * 5040])
+    near = len([1 for r in matched if 0 < r["j"][bk][1] - r["j"][bk][0] and NEAR_DEN * (r["j"][bk][1] - r["j"][bk][0]) <= 5040 * 5040])
     gh = len([1 for r in matched if r["j"][bk][3] == r["j"][bk][0]])
     den = n * 5040 * 5040
     return {"match": f"{n} / {len(rows)}", "actual": pct(act, den), "rep": pct(rep, den), "glob": pct(glo, den), "fam": pct(fam, den),

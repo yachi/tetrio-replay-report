@@ -51,7 +51,7 @@ SIM = ROOT / "pipeline" / "sim"
 OUT = ROOT / "analysis" / "tst-openers-tp-replay.json"
 SCHEMA = "tst-openers-replay/1"
 REPERTOIRE_MIN = 3
-NEAR_DEN = 100                  # near = loss <= N2 / NEAR_DEN
+NEAR_DEN = 50                   # near = 0 < loss <= N2 / NEAR_DEN (2 points; at budget 2 no miss is under 1)
 FIRST = 6
 SHOWN = 5
 BKEYS = ["0", "1", "2", "inf"]
