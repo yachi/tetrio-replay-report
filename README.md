@@ -33,6 +33,8 @@ formal claim, and proved with [Dafny](https://dafny.org).
 | [2026-11-01](sessions/2026-11-01) | yachi 7 : 11 pinglamb | 130 over 18 matches | 129 |
 | [2026-11-05](sessions/2026-11-05) | yachi 2 : 6 pinglamb | 67 over 8 replayed matches | 109 |
 | [2026-11-17](sessions/2026-11-17) | yachi 0 : 3 pinglamb | 24 over 3 matches | 92 |
+| [2026-11-19](sessions/2026-11-19) | yachi 1 : 3 pinglamb | 44 over 4 matches | 95 |
+| [2026-11-23](sessions/2026-11-23) | yachi 2 : 5 pinglamb | 82 over 7 matches | 105 |
 
 **Two things about that last column.** It is `claims-proof-map.json`'s row count, i.e. what
 `dafny verify` actually certified for that session — not a target and not comparable across
@@ -236,6 +238,7 @@ unless it is:
 | 2026-11-05 | 15 of 18 testable — **83%** | 13 of 18 — **72%** | 13 of 18 — **72%** |
 | 2026-11-17 | 10 of 13 testable — **77%** | 8 of 13 — **62%** | 8 of 13 — **62%** |
 | 2026-11-19 | 11 of 15 testable — **73%** | 9 of 15 — **60%** | 9 of 15 — **60%** |
+| 2026-11-23 | 14 of 18 testable — **78%** | 12 of 18 — **67%** | 12 of 18 — **67%** |
 
 Every figure above is measured, and `pipeline/claims/check_equiv_coverage.py` re-derives
 them on push. **Until 2026-08-15 none of that was true**: three of the six sessions had
@@ -246,8 +249,8 @@ the denominator moving too. Enumerating every kind costs ~5× the wall clock and
 that session at 81%. A figure that moved with an argument nobody varied had been reading as
 a property of the data.
 
-The **≥85%** acceptance gate P4 declared is missed by <!--equiv:gate-count-->seventeen of the 24<!--/equiv:gate-count-->
-rows above (<!--equiv:gate-sessions-->2026-07-22, 08-09, 08-14, 08-19, 08-25, 09-03, 09-10, 09-11, 09-17, 10-09, 10-12, 10-20, 10-22, 10-29, 11-05, 11-17 and 11-19<!--/equiv:gate-sessions-->), and
+The **≥85%** acceptance gate P4 declared is missed by <!--equiv:gate-count-->eighteen of the 25<!--/equiv:gate-count-->
+rows above (<!--equiv:gate-sessions-->2026-07-22, 08-09, 08-14, 08-19, 08-25, 09-03, 09-10, 09-11, 09-17, 10-09, 10-12, 10-20, 10-22, 10-29, 11-05, 11-17, 11-19 and 11-23<!--/equiv:gate-sessions-->), and
 2026-07-22 — the session the gate was declared on — is one of them at 81%. That is reported rather than enforced: one hand claim is worth 10.0
 points on 2026-07-28, so no threshold exists that is both honest and stable, and a floor all
 twenty-four pass would sit at 60% and bless that session's artefact by definition. The gate compares

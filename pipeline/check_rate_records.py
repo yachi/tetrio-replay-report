@@ -44,9 +44,9 @@ from .docs_gate import (Incomplete, fragment_mutants, fragment_problems, load_do
 
 DOCS = ("CLAUDE.md",)
 REWORD = reword("pipeline/check_rate_records.py")
-_EN = ("zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
-       "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen",
-       "seventeen", "eighteen", "nineteen", "twenty", "twenty-one", "twenty-two", "twenty-three", "twenty-four")
+from pipeline.check_donation_bands import WORDS as _WORDS  # noqa: E402
+_EN = tuple(("zero", "one", "two", "three", "four", "five", "six")[n] if n < 7 else _WORDS[n]
+            for n in range(100))
 MINUS = "−"          # the character the section uses, not an ASCII hyphen
 
 

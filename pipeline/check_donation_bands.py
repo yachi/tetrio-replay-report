@@ -49,11 +49,13 @@ REGEN = ("REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-opener-facts.ts "
 #: the ablation chain, widest last. Every entry deletes a clause the one before it kept, so the
 #: counts must be non-decreasing along it — see `_invariants`.
 CHAIN = ("shipped", "no_reopen", "cavity1_no_reopen", "naive")
-WORDS = {7: "seven", 8: "eight", 9: "nine", 10: "ten", 11: "eleven", 12: "twelve",
-         13: "thirteen", 14: "fourteen", 15: "fifteen", 16: "sixteen",
-         17: "seventeen", 18: "eighteen", 19: "nineteen", 20: "twenty",
-         21: "twenty-one", 22: "twenty-two",
-         23: "twenty-three", 24: "twenty-four"}
+_ONES = ("zero one two three four five six seven eight nine ten eleven twelve thirteen "
+         "fourteen fifteen sixteen seventeen eighteen nineteen").split()
+#: spelled out up to 99, so a new session never needs a hand-added word
+WORDS = {n: (_ONES[n] if n < 20 else
+             ("twenty thirty forty fifty sixty seventy eighty ninety".split()[n // 10 - 2]
+              + ("-" + _ONES[n % 10] if n % 10 else "")))
+         for n in range(7, 100)}
 
 
 def pct2(n, d):
