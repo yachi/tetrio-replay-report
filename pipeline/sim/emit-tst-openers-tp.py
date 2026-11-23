@@ -65,6 +65,8 @@ preview the first bag's dealt order o1 is known before any hold decision, so the
   B2  python3 $E --families                                                    # adds `families` to analysis/tst-openers-tp.json (boards untouched)
   B3  python3 $E --check                                                       # CI: the b1 artefact is what the crate gives, the families recompute
       python3 $E --cross-check <tst2bag-tp binary>                             # MULTI=1 B1ONLY=1 SDB=n against the vectors, on sampled boards
+  S1  python3 $E --sets                                                        # writes analysis/tst-openers-tp-sets.json via pipeline/sim/tst-sets-rs (about 5 s)
+  S2  python3 $E --sets-check                                                  # CI: byte-compares a fresh crate run, recomputes every set, pick and tree in numpy (about 30 s)
 
 THE X BOARDS (schema tst-openers-tp-x/1, md5 in the main artefact's md5.x; offline, about 25 min on 4 cores):
 
@@ -1327,6 +1329,302 @@ def b1_cmd(args):
     print(f"wrote {B1_OUT}: {len(b1['vectors'])} vectors", file=sys.stderr)
 
 
+# ---- learn-these-boards sets (tst-openers-tp-sets/1) ----------------------------------------------------------------------
+import subprocess
+
+SETS_SCHEMA = "tst-openers-tp-sets/1"
+SETS_OUT = ROOT / "analysis" / "tst-openers-tp-sets.json"
+SETS_CRATE = "tst-sets-rs"
+KINDS = "IOTSZJL"
+FEATURES = [f"{KINDS[i]}<{KINDS[j]}" for i in range(7) for j in range(i + 1, 7)] + [f"first={k}" for k in KINDS]
+SH = 13                                          # key = J << 13 | built (built <= 5040 < 8192)
+
+
+def sets_crate_md5():
+    h = hashlib.md5()
+    fs = [SIM / SETS_CRATE / "Cargo.toml", SIM / SETS_CRATE / "Cargo.lock"] + list((SIM / SETS_CRATE / "src").rglob("*.rs"))
+    for p in sorted(fs, key=lambda p: p.relative_to(SIM).as_posix()):
+        h.update(f"{p.relative_to(SIM).as_posix()}\0{md5(p.read_bytes())}\n".encode())
+    return h.hexdigest()
+
+
+def board_tables(art, b1):
+    """{name: {bk: (J[0..10], Bt[0..10])}} and {name: b1 vector (numpy uint8, INFEAS for '.')}."""
+    vec = b1_vectors(b1)
+    return {b["name"]: j_tables(b, solve_D(b["cum"], vec[b["name"]])) for b in art["boards"]}, vec
+
+
+def sets_input_lines(art, b1):
+    tabs, _ = board_tables(art, b1)
+    raw = {n: zlib.decompress(base64.b64decode(z)).decode() for n, z in b1["vectors"].items()}
+    out = []
+    for b in art["boards"]:
+        f = ["%s/%s" % (",".join(str(int(x)) for x in tabs[b["name"]][bk][0][:INFEAS]),
+                        ",".join(str(int(x)) for x in tabs[b["name"]][bk][1][:INFEAS])) for bk in BKEYS]
+        out.append("|".join([b["name"], raw[b["name"]]] + f))
+    return out
+
+
+def sets_crate_run(art, b1):
+    r = subprocess.run(["cargo", "build", "--release", "--locked", "--quiet", "--manifest-path", str(SIM / SETS_CRATE / "Cargo.toml")],
+                       capture_output=True, text=True)
+    assert r.returncode == 0, "cargo build of tst-sets-rs failed:\n" + r.stderr
+    exe = SIM / SETS_CRATE / "target" / "release" / "tst-sets"
+    r = subprocess.run([str(exe)], input="\n".join(sets_input_lines(art, b1)) + "\n", capture_output=True, text=True)
+    assert r.returncode == 0, "tst-sets failed:\n" + r.stderr
+    sys.stderr.write(r.stderr)
+    return json.loads(r.stdout)
+
+
+def sets_artefact(art, b1, raw):
+    bs = art["boards"]
+
+    def brd(i):
+        b = bs[i]
+        return {"pos": i, "name": b["name"], "held": b.get("held"), "pieces": b["pieces"]}
+
+    def setrec(r):
+        return {"boards": [brd(i) for i in r["set"]], "pc3": r["pc3"], "built": r["built"]}
+
+    def node(n):
+        return {"m": n["m"]} if "m" in n else {"f": n["f"], "feature": FEATURES[n["f"]], "y": node(n["y"]), "n": node(n["n"])}
+    budgets = {}
+    for bk in BKEYS:
+        r = raw["budgets"][bk]
+        ex = {str(e["k"]): setrec(e) for e in r["exact"]}
+        rule = {}
+        for t in r["trees"]:
+            rule[str(t["depth"])] = {"pc3": t["pc3"], "built": t["built"], "differs": t["differs"], "unbuildable": t["unbuildable"],
+                                     "loss_pc3": ex["3"]["pc3"] - t["pc3"], "loss_built": ex["3"]["built"] - t["built"], "tree": node(t["tree"])}
+        budgets[bk] = {"reduced": r["reduced"],
+                       "dominated": {"count": len(r["dominated"]), "md5": md5(canon(r["dominated"]).encode())},
+                       "exact": ex,
+                       "greedy": {str(g["k"]): setrec(g) for g in r["greedy"]},
+                       "from_exact3": {str(g["k"]): setrec(g) for g in r["from_exact3"]},
+                       "picks": r["picks"], "rule": rule}
+    fx = raw["fixed"]
+    return {"schema": SETS_SCHEMA, "report_eligible": False, "constructed": True, "complete": False,
+            "means": QUARANTINE + " Per soft-drop budget, the set of k boards (one hand each) maximising the number of "
+                     "(first-bag order, bag-2 deal, bag-3 deal) triples that build and get a bag-3 Perfect Clear when the best member "
+                     "is picked for each first-bag order; a lower bound, because boards at or under the pruning threshold are absent.",
+            "rules": {"pick": "larger (J, built), ties to the earlier board position; none when no member builds within the budget",
+                      "set": "larger pc3, then larger built, then the smaller tuple of board positions",
+                      "dominance": "u is dropped when v has key >= key_u on every order (key = J*8192+built, 0 when unavailable) and "
+                                   "the keys differ somewhere or v is earlier; the dominator recorded is the earliest non-dominated one",
+                      "exact": "k = 1, 2 by scan, k = 3 by branch and bound on f(abc) <= f(ab) + min(f(ac) - f(a), f(bc) - f(b)) over pc3",
+                      "greedy": "best (pc3, built) added each step, ties to the smaller position; from_exact3 extends the exact triple",
+                      "tree": "optimal depth <= d over the 28 features, leaf = member maximising the leaf's (sum J, sum built)"},
+            "den": {"pc3": B ** 3, "built": B ** 2},
+            "features": FEATURES,
+            "md5": {"crate": sets_crate_md5(), "art": md5(canon(art).encode()), "b1": md5(canon(b1).encode())},
+            "boards": len(bs),
+            "budgets": budgets,
+            "fixed": {"budget": fx["budget"], "boards": [brd(i) for i in fx["set"]], "values": fx["values"]}}
+
+
+def perms_order():
+    out = []
+
+    def r(p, rest):
+        if not rest:
+            out.append("".join(p))
+            return
+        for i in range(len(rest)):
+            c = rest[i]
+            r(p + [c], rest[:i] + rest[i + 1:])
+    r([], list(KINDS))
+    return out
+
+
+def sets_load():
+    art = json.loads(OUT.read_text())
+    b1 = json.loads(B1_OUT.read_text())
+    assert b1["md5"]["boards"] == boards_md5(art["boards"]) and b1["md5"]["crate"] == b1_crate_md5(), "b1 artefact is stale"
+    return art, b1
+
+
+def sets_cmd(args):
+    art, b1 = sets_load()
+    if args.sets_input:
+        print("\n".join(sets_input_lines(art, b1)))
+        return
+    raw = sets_crate_run(art, b1)
+    out = sets_artefact(art, b1, raw)
+    SETS_OUT.write_text(json.dumps(out, separators=(",", ":"), ensure_ascii=False) + "\n")
+    print(f"wrote {SETS_OUT}", file=sys.stderr)
+
+
+def sets_check_cmd(args):
+    import numpy as np
+    art, b1 = sets_load()
+    bs = art["boards"]
+    n = len(bs)
+    raw = sets_crate_run(art, b1)
+    want = json.dumps(sets_artefact(art, b1, raw), separators=(",", ":"), ensure_ascii=False) + "\n"
+    assert SETS_OUT.read_text() == want, "analysis/tst-openers-tp-sets.json is not what the crate run builds"
+    tabs, vec = board_tables(art, b1)
+    pos = np.arange(n)
+    P = perms_order()
+    assert len(P) == B and len(set(P)) == B
+    feat = np.array([[(p.index(KINDS[i]) < p.index(KINDS[j])) for i in range(7) for j in range(i + 1, 7)] +
+                     [p[0] == k for k in KINDS] for p in P], dtype=bool)          # B x 28
+    notes = []
+
+    def val_of(key):                       # the (pc3, built) of an order-wise max key array
+        return int((key >> SH).sum()), int((key & 8191).sum())
+
+    for bk in BKEYS:
+        r = raw["budgets"][bk]
+        lim = INFEAS - 1 if bk == "inf" else int(bk)
+        J = np.stack([tabs[b["name"]][bk][0][vec[b["name"]]] for b in bs]).astype(np.int64)
+        Bt = np.stack([tabs[b["name"]][bk][1][vec[b["name"]]] for b in bs]).astype(np.int64)
+        av = np.stack([vec[b["name"]] <= lim for b in bs])
+        J = np.where(av, J, 0); Bt = np.where(av, Bt, 0)
+        assert Bt.max() < 8192
+        key = np.where(av, (J << SH) | Bt, 0)
+        # dominance, pointwise: every listed claim, and no non-listed board is dominated
+        dom = {u: v for u, v in r["dominated"]}
+        assert len(dom) == len(r["dominated"])
+
+        def dominated_by(v, u):
+            return bool((key[v] >= key[u]).all()) and (bool((key[v] != key[u]).any()) or v < u)
+        reduced = [i for i in range(n) if i not in dom]
+        assert len(reduced) == r["reduced"]
+        for u, v in dom.items():
+            assert v in reduced and dominated_by(v, u), f"dominance claim {u} <- {v} fails ({bk})"
+            assert not any(dominated_by(w, u) for w in reduced if w < v), f"dominator of {u} is not the earliest ({bk})"
+        for u in reduced:
+            ge = (key >= key[u]).all(1) & (((key != key[u]).any(1)) | (pos < u))
+            ge[u] = False
+            assert not ge.any(), f"board {u} is dominated but not listed ({bk})"
+        red = np.array(reduced)
+
+        def setval(s):
+            return val_of(key[list(s)].max(0))
+
+        def check_set(rec, k):
+            s = rec["set"]
+            assert s == sorted(s) and len(s) == k and len(set(s)) == k
+            assert setval(s) == (rec["pc3"], rec["built"]), f"set value wrong ({bk}, {s})"
+
+        for e in r["exact"]:
+            check_set(e, e["k"])
+        ex = {e["k"]: e for e in r["exact"]}
+        # k = 1 over every board, k = 2 over every pair of the full list
+        v1 = [(val_of(key[i]), i) for i in range(n)]
+        m1 = max(v for v, _ in v1)
+        assert m1 == (ex[1]["pc3"], ex[1]["built"])
+        assert ex[1]["set"] == [min(i for v, i in v1 if v == m1 and i in set(reduced))]
+        bestp = (-1, -1); bestl = []
+        J32 = J.astype(np.int32)
+        for a in range(n):
+            pp = np.maximum(J32[a], J32[a + 1:]).sum(1, dtype=np.int64)       # pc3 of every pair (a, b > a), from J alone
+            for t in np.nonzero(pp >= bestp[0])[0]:
+                mk = np.maximum(key[a], key[a + 1 + int(t)])
+                v = val_of(mk)
+                assert v[0] == int(pp[t])
+                if v > bestp:
+                    bestp, bestl = v, []
+                if v == bestp:
+                    bestl.append((a, a + 1 + int(t)))
+        assert bestp == (ex[2]["pc3"], ex[2]["built"]), f"a better pair exists ({bk})"
+        rs = set(reduced)
+        assert ex[2]["set"] == list(min(t for t in bestl if t[0] in rs and t[1] in rs)), f"pair tie rule ({bk})"
+        # k = 3, by an independent certificate over the reduced list: every triple has either an upper bound under the reported
+        # pc3 (f(abc) <= f(ab) + min(f(ac) - f(a), f(bc) - f(b)), by submodularity of a sum of maxima) or is valued exactly
+        Jr = J32[red]; m = len(red)
+        f1 = Jr.sum(1, dtype=np.int64)
+        F2 = np.stack([np.maximum(Jr[a], Jr).sum(1, dtype=np.int64) for a in range(m)])
+        t3 = (ex[3]["pc3"], ex[3]["built"])
+        surv = 0; best3 = []
+        for a in range(m):
+            ub = F2[a][:, None] + np.minimum(F2[a][None, :] - f1[a], F2 - f1[:, None])     # [b, c]
+            ok = np.triu(np.ones((m, m), dtype=bool), 1) & (ub >= t3[0])
+            ok[: a + 1] = False
+            ok[:, : a + 1] = False
+            for b_, c_ in zip(*np.nonzero(ok)):
+                surv += 1
+                v = setval([red[a], red[b_], red[c_]])
+                assert v <= t3, f"a better triple exists ({bk}): {[red[a], red[b_], red[c_]]}"
+                if v == t3:
+                    best3.append([int(red[a]), int(red[b_]), int(red[c_])])
+        assert min(best3) == ex[3]["set"], f"triple tie rule ({bk})"
+        notes.append(f"{bk}: reduced {m}, triple certificate evaluated {surv} of {m*(m-1)*(m-2)//6}")
+        # greedy chains: every step the argmax over all boards, the first of the tied reduced boards
+        def step_ok(prev, rec, k):
+            s = rec["set"]
+            assert set(prev) <= set(s) and len(s) == k
+            new = (set(s) - set(prev)).pop()
+            cur = key[prev].max(0) if prev else np.zeros(B, dtype=np.int64)
+            mk = np.maximum(cur, key)
+            vs = list(zip((mk >> SH).sum(1).tolist(), (mk & 8191).sum(1).tolist()))
+            top = max(vs)
+            assert top == (rec["pc3"], rec["built"]), f"greedy step {k} is not the best ({bk})"
+            assert new == min(i for i in reduced if vs[i] == top and i not in prev), f"greedy step {k} tie rule ({bk})"
+        prev = []
+        for g in r["greedy"]:
+            check_set(g, g["k"]); step_ok(prev, g, g["k"]); prev = g["set"]
+        prev = ex[3]["set"]
+        for g in r["from_exact3"]:
+            check_set(g, g["k"]); step_ok(prev, g, g["k"]); prev = g["set"]
+        # picks
+        s3 = ex[3]["set"]
+        kk = np.where(av[s3], key[s3] + 1, 0)                      # first strictly larger wins = earliest position
+        arg = kk.argmax(0)
+        pk = np.where(kk.max(0) > 0, arg, -1)
+        assert r["picks"] == "".join("x" if x < 0 else str(int(x)) for x in pk), f"picks string ({bk})"
+        # rule trees: walk every order, recompute the figures and each leaf's label; depth 1 by brute force
+        sub = np.stack([np.where(av[i], (J[i] << 26) + Bt[i], 0) for i in s3]).astype(object)
+        exv = (ex[3]["pc3"], ex[3]["built"])
+
+        def walk(nd, idx):
+            """-> member per order of idx (array), checking leaf labels."""
+            out = np.full(len(idx), -1)
+            if "m" in nd:
+                tot = [sub[mm][idx].sum() for mm in range(3)]
+                assert nd["m"] == max(range(3), key=lambda mm: (tot[mm], -mm)), f"leaf label ({bk})"
+                out[:] = nd["m"]
+                return out
+            f = nd["f"]
+            yes = feat[idx, f]
+            assert yes.any() and (~yes).any(), "a split with an empty side"
+            out[yes] = walk(nd["y"], idx[yes]); out[~yes] = walk(nd["n"], idx[~yes])
+            return out
+        for d in ("1", "2", "3"):
+            t = raw["budgets"][bk]["trees"][int(d) - 1]
+            assert t["depth"] == int(d)
+            mem = walk(t["tree"], np.arange(B))
+            ids = np.array(s3)[mem]
+            avail = av[ids, np.arange(B)]
+            p = int((J[ids, np.arange(B)]).sum()); b_ = int(Bt[ids, np.arange(B)].sum())
+            assert (p, b_) == (t["pc3"], t["built"]), f"rule value depth {d} ({bk})"
+            assert int((~avail).sum()) == t["unbuildable"]
+            assert int(((pk >= 0) & (pk != mem)).sum()) == t["differs"]
+            assert (p, b_) <= exv
+            assert depth_of(t["tree"]) <= int(d)
+        t1 = raw["budgets"][bk]["trees"][0]
+        best1 = max(sub[mm].sum() for mm in range(3))
+        for f in range(28):
+            y = feat[:, f]
+            if y.any() and (~y).any():
+                best1 = max(best1, max(sub[mm][y].sum() for mm in range(3)) + max(sub[mm][~y].sum() for mm in range(3)))
+        assert (t1["pc3"], t1["built"]) == (int(best1 >> 26), int(best1 & ((1 << 26) - 1))), f"depth-1 tree is not optimal ({bk})"
+    fx = raw["fixed"]
+    s = fx["set"]
+    assert s == raw["budgets"]["2"]["exact"][2]["set"]
+    for bk in BKEYS:
+        lim = INFEAS - 1 if bk == "inf" else int(bk)
+        K = np.stack([np.where(vec[b["name"]] <= lim, (tabs[b["name"]][bk][0][vec[b["name"]]].astype(np.int64) << SH) | tabs[b["name"]][bk][1][vec[b["name"]]], 0) for b in (bs[i] for i in s)])
+        v = val_of(K.max(0))
+        assert fx["values"][bk] == {"pc3": v[0], "built": v[1]}, f"fixed value ({bk})"
+    print("ok: " + "; ".join(notes))
+    print("ok: sets artefact equals the crate run; every set value, pick, greedy step, pair, dominance claim, triple certificate and tree recomputed")
+
+
+def depth_of(nd):
+    return 0 if "m" in nd else 1 + max(depth_of(nd["y"]), depth_of(nd["n"]))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--shape-input", action="store_true")
@@ -1355,6 +1653,9 @@ def main():
     ap.add_argument("--b1-merge")
     ap.add_argument("--families", action="store_true")
     ap.add_argument("--check", action="store_true")
+    ap.add_argument("--sets", action="store_true")
+    ap.add_argument("--sets-input", action="store_true")
+    ap.add_argument("--sets-check", action="store_true")
     ap.add_argument("--cross-check")
     ap.add_argument("--cand-merge", nargs=2, metavar=("T_OUT", "H_OUT"))
     ap.add_argument("--cand-out", default="cand.json")
@@ -1376,6 +1677,10 @@ def main():
         return x_verify_cmd(a)
     if a.x_compare:
         return x_compare_cmd(a)
+    if a.sets_check:
+        return sets_check_cmd(a)
+    if a.sets or a.sets_input:
+        return sets_cmd(a)
     if a.b1_input or a.b1_merge:
         return b1_cmd(a)
     if a.families:

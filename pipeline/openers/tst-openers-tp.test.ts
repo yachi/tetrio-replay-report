@@ -567,3 +567,209 @@ test('(i) cross-crate: the pinned counter with B1ONLY counts 5040 x the orders e
     });
   }
 }, 300_000);
+
+// ---- (j) the learn-these-boards sets (analysis/tst-openers-tp-sets.json) ------------------------------------------------
+// Everything below is recomputed here, in TypeScript, from the section-(h) tables (J and built per first-bag cost code) and
+// the first-bag vectors: every set's value, the greedy steps and k=1 over all boards, k=2 optimality (bounded exhaustive),
+// the picks string and every rule tree. Triple optimality is NOT re-derived here (the numpy certificate and the crate's own unit
+// test against brute force carry it). The part that needs the tst-sets crate skips loudly without cargo.
+const SETS = JSON.parse(readFileSync(join(ROOT, 'analysis', 'tst-openers-tp-sets.json'), 'utf8'));
+const KINDS_J = 'IOTSZJL';
+const SETS_CRATE = join(SIM, 'tst-sets-rs');
+function setsCrateMd5(): string {
+  const files = ['tst-sets-rs/Cargo.lock', 'tst-sets-rs/Cargo.toml'];
+  for (const f of readdirSync(join(SETS_CRATE, 'src'), { recursive: true }) as string[]) if (f.endsWith('.rs')) files.push(`tst-sets-rs/src/${f}`);
+  files.sort();
+  const h = createHash('md5');
+  for (const f of files) h.update(`${f}\0${md5(readFileSync(join(SIM, f)))}\n`);
+  return h.digest('hex');
+}
+function permsJ(): string[] {
+  const out: string[] = [];
+  const r = (p: string[], rest: string[]) => {
+    if (!rest.length) { out.push(p.join('')); return; }
+    for (let i = 0; i < rest.length; i++) r([...p, rest[i]!], [...rest.slice(0, i), ...rest.slice(i + 1)]);
+  };
+  r([], [...KINDS_J]);
+  return out;
+}
+const PERMS = permsJ();
+const FEAT_NAMES: string[] = [];
+for (let i = 0; i < 7; i++) for (let j = i + 1; j < 7; j++) FEAT_NAMES.push(`${KINDS_J[i]}<${KINDS_J[j]}`);
+for (const k of KINDS_J) FEAT_NAMES.push(`first=${k}`);
+const FEAT: boolean[][] = FEAT_NAMES.map((nm) => PERMS.map((p) => nm.startsWith('first=') ? p[0] === nm[6] : p.indexOf(nm[0]!) < p.indexOf(nm[2]!)));
+const STAT = ART.boards.map((b: any) => tables(b, vecOf(b.name)));
+/** per budget: key (J*8192+built) and availability per board and order, with this file's own cost rule. */
+function keysFor(bk: string) {
+  const lim = bk === 'inf' ? INFEAS - 1 : Number(bk);
+  return ART.boards.map((b: any, i: number) => {
+    const v = vecOf(b.name), [J, Bt] = STAT[i].out[bk];
+    const key = new Float64Array(B), av = new Uint8Array(B), j = new Float64Array(B), bt = new Float64Array(B);
+    for (let o = 0; o < B; o++) if (v[o]! <= lim) { av[o] = 1; j[o] = J[v[o]!]; bt[o] = Bt[v[o]!]; key[o] = j[o]! * 8192 + bt[o]!; }
+    return { key, av, j, bt };
+  });
+}
+const KEYS: Record<string, any[]> = {};
+for (const bk of BKEYS) KEYS[bk] = keysFor(bk);
+function valOf(K: any[], set: number[]): [number, number] {
+  let p = 0, bu = 0;
+  for (let o = 0; o < B; o++) {
+    let best = -1, a = -1;
+    for (const i of set) if (K[i].av[o] && K[i].key[o] > best) { best = K[i].key[o]; a = i; }
+    if (a >= 0) { p += K[a].j[o]; bu += K[a].bt[o]; }
+  }
+  return [p, bu];
+}
+function picksOf(K: any[], set: number[]): number[] {
+  const out: number[] = [];
+  for (let o = 0; o < B; o++) {
+    let best = -1, a = -1;
+    set.forEach((i, m) => { if (K[i].av[o] && K[i].key[o] > best) { best = K[i].key[o]; a = m; } });
+    out.push(a);
+  }
+  return out;
+}
+function walkTree(nd: any, idx: number[], K: any[], set: number[], mem: number[]) {
+  if ('m' in nd) {
+    const tot = set.map((i) => idx.reduce((s, o) => s + (K[i].av[o] ? K[i].j[o] * 2 ** 26 + K[i].bt[o] : 0), 0));
+    let bm = 0;
+    tot.forEach((t: number, m: number) => { if (t > tot[bm]!) bm = m; });
+    expect(nd.m).toBe(bm);
+    for (const o of idx) mem[o] = nd.m;
+    return;
+  }
+  const y = idx.filter((o) => FEAT[nd.f]![o]), n = idx.filter((o) => !FEAT[nd.f]![o]);
+  expect(y.length > 0 && n.length > 0).toBe(true);
+  expect(nd.feature).toBe(FEAT_NAMES[nd.f]);
+  walkTree(nd.y, y, K, set, mem); walkTree(nd.n, n, K, set, mem);
+}
+const depthOf = (nd: any): number => ('m' in nd ? 0 : 1 + Math.max(depthOf(nd.y), depthOf(nd.n)));
+
+test('(j) pins: the sets crate, the artefact and the b1 vectors it was built from are current; flags', () => {
+  expect(SETS.schema).toBe('tst-openers-tp-sets/1');
+  expect(SETS.constructed).toBe(true);
+  expect(SETS.report_eligible).toBe(false);
+  expect(SETS.complete).toBe(false);
+  expect(SETS.md5.crate).toBe(setsCrateMd5());
+  expect(SETS.md5.b1).toBe(md5(canon(B1)));
+  expect(SETS.md5.art).toBe(md5(canon(ART)));
+  expect(SETS.features).toEqual(FEAT_NAMES);
+  expect(SETS.den.pc3).toBe(B ** 3);
+  expect(SETS.den.built).toBe(B ** 2);
+  const m = clone(SETS); m.md5.crate = 'x';
+  expect(m.md5.crate === setsCrateMd5()).toBe(false);          // mutant: a stale crate pin is seen
+  expect(PERMS.length).toBe(B);
+  expect(PERMS[0]).toBe('IOTSZJL');
+  expect(PERMS[B - 1]).toBe('LJZSTOI');                         // order indexing fixture: identity first, reverse last
+  expect(new Set(PERMS).size).toBe(B);
+});
+
+test('(j) every set value, greedy step, k=1 optimum, k=2 optimum, pick string and rule tree is recomputed here', () => {
+  for (const bk of BKEYS) {
+    const K = KEYS[bk]!, r = SETS.budgets[bk];
+    const pos = (rec: any) => rec.boards.map((x: any) => x.pos);
+    const chk = (rec: any) => {
+      for (const x of rec.boards) {
+        expect(ART.boards[x.pos].name).toBe(x.name);
+        expect(keyOf(ART.boards[x.pos].pieces)).toBe(keyOf(x.pieces));
+      }
+      const p = pos(rec);
+      expect(p).toEqual([...p].sort((a, b) => a - b));
+      expect(valOf(K, p)).toEqual([rec.pc3, rec.built]);
+    };
+    for (const k of ['1', '2', '3']) chk(r.exact[k]);
+    for (const k of ['1', '2', '3', '4', '5']) chk(r.greedy[k]);
+    for (const k of ['4', '5']) chk(r.from_exact3[k]);
+    // exact >= greedy, and the chains are nested
+    for (const k of ['1', '2', '3']) expect([r.exact[k].pc3, r.exact[k].built] >= [r.greedy[k].pc3, r.greedy[k].built] || r.exact[k].pc3 >= r.greedy[k].pc3).toBe(true);
+    // k = 1 over all boards
+    const f1 = K.map((x: any) => { let p = 0, b = 0; for (let o = 0; o < B; o++) if (x.av[o]) { p += x.j[o]; b += x.bt[o]; } return [p, b]; });
+    let best = 0;
+    f1.forEach((v: number[], i: number) => { const bv = f1[best]!; if (v[0]! > bv[0]! || (v[0] === bv[0] && v[1]! > bv[1]!)) best = i; });
+    expect(pos(r.exact['1'])).toEqual([best]);
+    // k = 2: bounded exhaustive (f(ab) <= f(a) + f(b)), pc3 only
+    const order = f1.map((_: any, i: number) => i).sort((a: number, b: number) => f1[b]![0]! - f1[a]![0]!);
+    let top = 0;
+    for (let x = 0; x < order.length; x++) {
+      const a = order[x]!;
+      if (f1[a]![0]! * 2 < top) break;
+      for (let y = x + 1; y < order.length; y++) {
+        const b = order[y]!;
+        if (f1[a]![0]! + f1[b]![0]! < top) break;
+        let p = 0;
+        for (let o = 0; o < B; o++) {
+          const ka = K[a].av[o] ? K[a].key[o] : -1, kb = K[b].av[o] ? K[b].key[o] : -1;
+          if (ka < 0 && kb < 0) continue;
+          p += ka >= kb ? K[a].j[o] : K[b].j[o];
+        }
+        if (p > top) top = p;
+      }
+    }
+    expect(top).toBe(r.exact['2'].pc3);
+    // greedy step k = argmax over all boards of the grown set
+    for (const k of [2, 3, 4, 5]) {
+      const prev = pos(r.greedy[String(k - 1)]);
+      let bp = -1, bb = -1;
+      for (let i = 0; i < K.length; i++) {
+        if (prev.includes(i)) continue;
+        const [p, b] = valOf(K, [...prev, i]);
+        if (p > bp || (p === bp && b > bb)) { bp = p; bb = b; }
+      }
+      expect([bp, bb]).toEqual([r.greedy[String(k)].pc3, r.greedy[String(k)].built]);
+    }
+    // picks and trees over the exact triple
+    const s3 = pos(r.exact['3']);
+    expect(r.picks).toBe(picksOf(K, s3).map((x) => (x < 0 ? 'x' : String(x))).join(''));
+    const pk = picksOf(K, s3);
+    for (const d of [1, 2, 3]) {
+      const rule = r.rule[String(d)], mem: number[] = new Array(B).fill(-1);
+      walkTree(rule.tree, [...Array(B).keys()], K, s3, mem);
+      let p = 0, b = 0, unb = 0, diff = 0;
+      for (let o = 0; o < B; o++) {
+        const i = s3[mem[o]!]!;
+        if (K[i].av[o]) { p += K[i].j[o]; b += K[i].bt[o]; } else unb++;
+        if (pk[o]! >= 0 && pk[o] !== mem[o]) diff++;
+      }
+      expect([p, b, unb, diff]).toEqual([rule.pc3, rule.built, rule.unbuildable, rule.differs]);
+      expect(depthOf(rule.tree)).toBeLessThanOrEqual(d);
+      expect(rule.loss_pc3).toBe(r.exact['3'].pc3 - rule.pc3);
+      expect(rule.loss_built).toBe(r.exact['3'].built - rule.built);
+      // mutant: a wrong leaf label is caught by the walker
+      if (d === 1) {
+        const bad = clone(rule.tree); bad.m = (bad.m + 1) % 3;
+        if ('m' in bad) expect(() => walkTree(bad, [...Array(B).keys()], K, s3, mem.slice())).toThrow();
+      }
+    }
+    // mutants: a perturbed value and a flipped pick char are both unequal to the recomputation
+    expect(valOf(K, pos(r.exact['3']).slice(0, 2))).not.toEqual([r.exact['3'].pc3, r.exact['3'].built]);
+    expect(r.picks.replace(/./, (c: string) => (c === '0' ? '1' : '0'))).not.toBe(picksOf(K, s3).map((x) => (x < 0 ? 'x' : String(x))).join(''));
+  }
+}, 600_000);
+
+test('(j) the fixed set (budget 2 exact triple) is valued at every budget, and pinned by pieces', () => {
+  const fx = SETS.fixed, p = fx.boards.map((x: any) => x.pos);
+  expect(p).toEqual(SETS.budgets['2'].exact['3'].boards.map((x: any) => x.pos));
+  const want = ['I:2,12,22,32/L:7,8,9,19/O:0,1,10,11/S:4,5,15,16/T:3,13,14,23/Z:18,28,29,39', 'I:7,17,27,37/J:0,1,2,10/O:8,9,18,19/S:11,20,21,30/T:6,15,16,26/Z:4,5,13,14', 'I:10,20,30,40/J:8,9,19,29/O:21,22,31,32/S:0,1,11,12/T:5,15,16,25/Z:7,17,18,28'];
+  expect(fx.boards.map((x: any) => keyOf(x.pieces))).toEqual(want);
+  for (const bk of BKEYS) expect(valOf(KEYS[bk]!, p)).toEqual([fx.values[bk].pc3, fx.values[bk].built]);
+  expect(valOf(KEYS['0']!, p)).not.toEqual([fx.values['1'].pc3, fx.values['1'].built]);
+});
+
+test('(j) cross-crate: the tst-sets binary on input built here reproduces the artefact (skipped without cargo)', () => {
+  const r0 = Bun.spawnSync(['cargo', 'build', '--release', '--locked', '--quiet', '--manifest-path', join(SETS_CRATE, 'Cargo.toml')], { stderr: 'pipe' });
+  const bin = join(SETS_CRATE, 'target', 'release', 'tst-sets');
+  if (r0.exitCode !== 0 || !existsSync(bin)) { console.warn('SKIPPED (j): cargo is unavailable or tst-sets failed to build; the sets are NOT re-run through the crate'); return; }
+  const lines = ART.boards.map((b: any, i: number) => {
+    const raw = inflateSync(Buffer.from(B1.vectors[b.name], 'base64')).toString();
+    const f = BKEYS.map((bk) => `${STAT[i].out[bk][0].slice(0, INFEAS).join(',')}/${STAT[i].out[bk][1].slice(0, INFEAS).join(',')}`);
+    return [b.name, raw, ...f].join('|');
+  });
+  const r = Bun.spawnSync([bin], { stdin: Buffer.from(lines.join('\n') + '\n'), stderr: 'pipe' });
+  expect(r.exitCode).toBe(0);
+  const out = JSON.parse(r.stdout.toString());
+  for (const bk of BKEYS) {
+    const g = out.budgets[bk], a = SETS.budgets[bk];
+    expect(g.exact.map((s: any) => s.set)).toEqual([1, 2, 3].map((k) => a.exact[String(k)].boards.map((x: any) => x.pos)));
+    expect(g.greedy.map((s: any) => s.set)).toEqual([1, 2, 3, 4, 5].map((k) => a.greedy[String(k)].boards.map((x: any) => x.pos)));
+  }
+}, 300_000);

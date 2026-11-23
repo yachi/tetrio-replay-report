@@ -1800,6 +1800,17 @@ jobs:
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 pipeline/sim/emit-tst-openers-tp.py --check
 
+      # The boards worth learning (pipeline/sim/tst-sets-rs): per soft-drop budget the best k = 1..3 boards (exact, branch and
+      # bound; the crate's unit tests hold the bound to brute force on random boards), greedy 4..5 and a decision tree. The
+      # check builds the crate, re-runs it, byte-compares analysis/tst-openers-tp-sets.json and recomputes every figure in numpy
+      # from tst-openers-tp.json and the first-bag vectors (all pairs over every board, a certificate for the triples).
+      - name: Check the TST opener learn-these-boards sets
+        if: env.INPUTS_UNCHANGED != '1'
+        run: |
+          set -euo pipefail
+          cargo test --release --locked --manifest-path pipeline/sim/tst-sets-rs/Cargo.toml
+          python3 pipeline/sim/emit-tst-openers-tp.py --sets-check
+
       - name: Re-run the TST opener T-placed builds
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 pipeline/sim/emit-tst-builds.py --check
