@@ -916,8 +916,8 @@ def load_sets(repo=REPO):
           "the x artefact is not tst-openers-tp-x/1 marked report_eligible: false / constructed: true")
     _need(S["md5"]["x"] == hashlib.md5(xraw).hexdigest(),
           "analysis/tst-openers-tp-sets.json was built from another tst-openers-tp-x.json: re-run emit-tst-openers-tp.py --sets")
-    _need(S["schema"] == "tst-openers-tp-sets/2" and S["report_eligible"] is False and S["constructed"] is True,
-          "the sets artefact is not tst-openers-tp-sets/2 marked report_eligible: false / constructed: true")
+    _need(S["schema"] == "tst-openers-tp-sets/3" and S["report_eligible"] is False and S["constructed"] is True,
+          "the sets artefact is not tst-openers-tp-sets/3 marked report_eligible: false / constructed: true")
     _need(S["md5"]["art"] == _canon_md5(A) and S["md5"]["b1"] == _canon_md5(B1),
           "analysis/tst-openers-tp-sets.json was built from another tst-openers-tp.json or -b1.json: re-run emit-tst-openers-tp.py --sets")
     _need(S["features"] == FEATURES7 and S["den"] == {"pc3": BAG ** 3, "built": BAG ** 2}, "the sets artefact's features or denominators moved")
@@ -1077,6 +1077,17 @@ def sx_set_names(cat, by, names, sfx, PR):
     return out
 
 
+def lead_parts(cat, by, sfx, PR, S, bk):
+    """The names for the lead sentence (the best single pair and the best two pairs) when the best single pair is not among the
+    best two; else None. A pair is a board and its mirror."""
+    e1, e2 = _members(S, bk, 1), _members(S, bk, 2)
+    a, pair = [x["name"] for x in e1["boards"]], [x["name"] for x in e2["boards"]]
+    if set(a) <= set(pair):
+        return None
+    return ("＋".join(sx_set_names(cat, by, a, sfx, PR)), Fraction(e1["pc3"], BAG ** 3),
+            "＋".join(sx_set_names(cat, by, pair, sfx, PR)), Fraction(e2["pc3"], BAG ** 3))
+
+
 def sx_ids(names):
     return f'<span class="sx-id">{_esc(" ".join(names))}</span>'
 
@@ -1172,7 +1183,7 @@ def sets_data(art_by, L):
     for bk in BK:
         picks[bk] = {k: set_picks(T, sx_members(S, bk, k), bk)[0] for k in SX_KS}
         _need(picks[bk]["3"] == S["budgets"][bk]["picks"], f"the recomputed picks of the best three at budget {bk} are not the artefact's")
-        shares[bk] = [picks[bk]["3"].count(str(i)) for i in range(3)]
+        shares[bk] = [picks[bk]["3"].count(str(i)) for i in range(len(sx_members(S, bk, 3)))]
     return T, picks, shares
 
 
@@ -1240,10 +1251,9 @@ def sets_block(art, cat, PR, L, R):
         parts.append(f'<table class="sx-t"><thead><tr>{head}</tr></thead><tbody>{"".join(rows)}</tbody></table>')
         parts.append(f'<details class="sx-x"><summary>{_esc(SP["ext_summary"])}</summary><table class="sx-t"><tbody>'
                      f'{"".join(ext)}</tbody></table></details><p class="muted sm">{_esc(SP["best_note"])}</p>')
-        e1, e2 = _members(S, bk, 1), _members(S, bk, 2)
-        a, pair = e1["boards"][0]["name"], [x["name"] for x in e2["boards"]]
-        if a not in pair:
-            parts.append(f'<p class="sx-lead" data-lead="1">{lead_html(SP, sx_label(cat, by[a], sfx, PR), Fraction(e1["pc3"], den3), "＋".join(sx_set_names(cat, by, pair, sfx, PR)), Fraction(e2["pc3"], den3))}</p>')
+        lp = lead_parts(cat, by, sfx, PR, S, bk)
+        if lp:
+            parts.append(f'<p class="sx-lead" data-lead="1">{lead_html(SP, *lp)}</p>')
         mem = [x["name"] for x in _members(S, bk, 3)["boards"]]
         figs_ = []
         for i, n in enumerate(mem):
@@ -1971,6 +1981,8 @@ def _audit_sets(page, art, cat, PR, L):
     if page.count('<div class="bar" data-bar="sd">') != 1 or page.find('<div class="bar" data-bar="sd">') > page.find('<section class="sx"'):
         bad.append("the soft-drop bar is not once, above the 學邊幾個 section")
     by = {b["name"]: b for b in list(art["boards"]) + list(L["X"]["boards"])}
+    names_at = [b["name"] for b in list(art["boards"]) + list(L["X"]["boards"])]
+    posn = {n: i for i, n in enumerate(names_at)}
     R = ranked(art, cat)
     reps = {r["name"] for r, _ in R}
     rep_of = {p["name"]: r["name"] for r, p in R}
@@ -1995,6 +2007,9 @@ def _audit_sets(page, art, cat, PR, L):
         for k in (1, 2, 3, 4, 5):
             m = _members(S, bk, k)
             nm = [x["name"] for x in m["boards"]]
+            if len(m["pairs"]) != k or sorted(i for q in m["pairs"] for i in q) != sorted(posn[n] for n in nm) or \
+                    any(len(q) == 2 and by[names_at[q[0]]]["mirror"] != names_at[q[1]] for q in m["pairs"]):
+                bad.append(f"{bk}/{k}: the set is not {k} mirror pairs whose boards are the listed ones")
             got = rows.get((bk, k))
             ex = ex_set(by, L["vecs"], nm, bk)
             if ex is None:
@@ -2014,9 +2029,8 @@ def _audit_sets(page, art, cat, PR, L):
         pk = ex_set(by, L["vecs"], mem, bk)
         picks_ex[bk] = pk[0] if pk else None
         lead = _SXLEAD.findall(blk)
-        a, pair = e1["boards"][0]["name"], [x["name"] for x in e2["boards"]]
-        wl = [] if a in pair else [lead_html(SP, sx_label(cat, by[a], sfx, PR), Fraction(e1["pc3"], BAG ** 3),
-                                             "＋".join(sx_set_names(cat, by, pair, sfx, PR)), Fraction(e2["pc3"], BAG ** 3))]
+        lp = lead_parts(cat, by, sfx, PR, S, bk)
+        wl = [lead_html(SP, *lp)] if lp else []
         if lead != wl:
             bad.append(f"{bk}: the lead sentence is not the one the ladder gives")
         figs_ = _SXFIG.findall(blk)
@@ -2082,7 +2096,7 @@ def _audit_sets(page, art, cat, PR, L):
                 bad.append(f"{bk}: the rule's recomputed figures are not the artefact's")
             if loss != rule_loss_html(SP, r, e3, BAG ** 3, BAG ** 2):
                 bad.append(f"{bk}: the rule's loss sentence is not the recomputed one")
-        if isl and len(figs_) == 3 and isl["m"].get(bk, {}).get("3") != mem:
+        if isl and len(figs_) == len(mem) and isl["m"].get(bk, {}).get("3") != mem:
             bad.append(f"{bk}: the lookup's members are not the best three")
     if isl:
         P = all_perms()
@@ -2203,7 +2217,8 @@ def selftest(repo=REPO):
     expect("a ladder built figure edited", sub(r'data-r="2:3"><td>[^<]*</td><td data-c="j">[^<]*</td><td data-c="b">(\d)', bump), True)
     expect("a ladder board name changed", sub(r'<td colspan="4" data-names="(t\d+)', lambda s: s + "9"), True)
     expect("a board's share of orders edited", sub(r'data-share="(\d)', bump), True)
-    expect("the lead sentence's figure edited", sub(r'data-k="lx">(\d)', bump), True)
+    if 'data-k="lx"' in page:  # the lead sentence exists only when the best single pair is not among the best two
+        expect("the lead sentence's figure edited", sub(r'data-k="lx">(\d)', bump), True)
     expect("the fixed-set figure edited", sub(r'data-k="f[jb]">(\d)', bump), True)
     expect("a rule leaf swapped", sub(r'data-leaf="(\d)"', lambda d: str((int(d) + 1) % 3)), True)
     for kk in SX_KS:

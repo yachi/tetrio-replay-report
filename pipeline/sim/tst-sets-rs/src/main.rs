@@ -1,8 +1,11 @@
-//! Which small set of TST opener boards to learn: the set of k boards (a board is one hand) that, picking the best member for
-//! each first-bag dealt order, maximises the number of (bag-1 order, bag-2 deal, bag-3 deal) triples that build AND get a
+//! Which small set of TST opener shapes to learn: the set of k candidates (a candidate is a mirror pair {board, its mirror}, a
+//! board whose mirror is itself or is not in the pool being a pair of one; learning a shape includes its mirror) that, picking
+//! the best BOARD of the union for each first-bag dealt order, maximises the number of (bag-1 order, bag-2 deal, bag-3 deal) triples that build AND get a
 //! bag-3 Perfect Clear ("pc3"), per soft-drop budget; then a learnable decision tree over the order.
 //!
-//! stdin: one line per board, in artefact order: `name|vec|F0|F1|F2|Finf`, `vec` the board's 5040-char first-bag vector
+//! stdin: one line per board, in artefact order: `name|vec|F0|F1|F2|Finf|mate`, `mate` the position of the board's mirror in
+//! this list (its own position when it has none); a candidate is the pair {i, mate[i]} listed at the smaller position;
+//! `vec` the board's 5040-char first-bag vector
 //! ('.' = no build, else the least soft-drop cost digit), each F `J0,..,J9/B0,..,B9` the board's J and built tables by cost
 //! code s = 0..9 for that budget (0 where the cost is over the budget). Budgets are 0, 1, 2 soft drops and unlimited.
 //! stdout: one JSON object (no timings; those go to stderr).
@@ -44,7 +47,7 @@ pub fn perms() -> Vec<Vec<u8>> {
     out
 }
 
-struct Board { vec: Vec<u8>, j: [[u64; 10]; 4], bt: [[u64; 10]; 4] }
+struct Board { vec: Vec<u8>, j: [[u64; 10]; 4], bt: [[u64; 10]; 4], mate: usize }
 
 fn limit(bk: usize) -> u8 { [0, 1, 2, INF - 1][bk] }
 
@@ -60,6 +63,22 @@ fn tab_of(boards: &[Board], bk: usize) -> Tab {
         t.j.push(j); t.key.push(k); t.av.push(a);
     }
     t
+}
+
+/// the candidate table: per order the best key over the pair's boards (J-major, so also the best J)
+fn pair_tab(tb: &Tab, cands: &[Vec<usize>]) -> Tab {
+    let mut t = Tab { j: vec![], key: vec![], av: vec![] };
+    for c in cands {
+        let mut k = vec![0u64; B]; let mut a = vec![false; B];
+        for o in 0..B { for &i in c { if tb.av[i][o] { a[o] = true; if tb.key[i][o] > k[o] { k[o] = tb.key[i][o]; } } } }
+        t.j.push(k.iter().map(|&x| (x >> SH) as u32).collect()); t.key.push(k); t.av.push(a);
+    }
+    t
+}
+
+fn union(cands: &[Vec<usize>], set: &[usize]) -> Vec<usize> {
+    let mut u: Vec<usize> = set.iter().flat_map(|&c| cands[c].iter().cloned()).collect();
+    u.sort(); u.dedup(); u
 }
 
 fn dominates(key: &Tab, v: usize, u: usize) -> bool {
@@ -216,14 +235,14 @@ fn node_json(n: &Node) -> String {
 }
 
 fn jlist(v: &[usize]) -> String { format!("[{}]", v.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(",")) }
-fn setj(t: &Tab, s: &[usize], k: usize) -> String {
+fn setj(t: &Tab, cands: &[Vec<usize>], s: &[usize], k: usize) -> String {
     let (p, b) = value(t, s);
-    format!("{{\"k\":{},\"set\":{},\"pc3\":{},\"built\":{}}}", k, jlist(s), p, b)
+    format!("{{\"k\":{},\"set\":{},\"ub\":{},\"pc3\":{},\"built\":{}}}", k, jlist(s), jlist(&union(cands, s)), p, b)
 }
 
 fn parse(line: &str) -> Board {
     let f: Vec<&str> = line.split('|').collect();
-    assert_eq!(f.len(), 6, "board line fields");
+    assert_eq!(f.len(), 7, "board line fields");
     let vec: Vec<u8> = f[1].bytes().map(|c| if c == b'.' { INF } else { c - b'0' }).collect();
     assert_eq!(vec.len(), B);
     let mut j = [[0u64; 10]; 4]; let mut bt = [[0u64; 10]; 4];
@@ -232,24 +251,31 @@ fn parse(line: &str) -> Board {
         for (i, x) in a.split(',').enumerate() { j[bk][i] = x.parse().unwrap(); }
         for (i, x) in b.split(',').enumerate() { bt[bk][i] = x.parse().unwrap(); }
     }
-    Board { vec, j, bt }
+    Board { vec, j, bt, mate: f[6].parse().unwrap() }
 }
 
 fn main() {
     let t0 = std::time::Instant::now();
     let boards: Vec<Board> = std::io::stdin().lock().lines().map(|l| l.unwrap()).filter(|l| !l.is_empty()).map(|l| parse(&l)).collect();
     let n = boards.len();
+    let mut cands: Vec<Vec<usize>> = vec![];
+    for i in 0..n { let m = boards[i].mate; assert!(m < n && boards[m].mate == i, "mate is an involution");
+        if m >= i { cands.push(if m == i { vec![i] } else { vec![i, m] }); } }
+    let nc = cands.len();
     let ps = perms();
     let feats = features(&ps);
     let bks = ["0", "1", "2", "inf"];
     let mut sets3: Vec<Vec<usize>> = vec![];
     let mut out = String::from("{\"boards\":");
     out += &n.to_string();
+    out += &format!(",\"cands\":{},\"pairs\":{}", nc, format!("[{}]", cands.iter().map(|c| jlist(c)).collect::<Vec<_>>().join(",")));
     out += ",\"features\":[";
     out += &feature_names().iter().map(|s| format!("\"{}\"", s)).collect::<Vec<_>>().join(",");
     out += "],\"budgets\":{";
     for bk in 0..4 {
-        let t = tab_of(&boards, bk);
+        let tb = tab_of(&boards, bk);
+        let t = pair_tab(&tb, &cands);
+        let n = nc;
         // dominance
         let mut dominated = vec![false; n];
         for u in 0..n { for v in 0..n { if v != u && dominates(&t, v, u) { dominated[u] = true; break; } } }
@@ -270,10 +296,11 @@ fn main() {
         let e3 = exact(&t, &reduced, 3, Some(chain[2].clone()));
         eprintln!("  exact done ({:?})", t0.elapsed());
         let g4 = grow(&t, &reduced, &e3); let g5 = grow(&t, &reduced, &g4);
-        let pk = picks(&t, &e3);
+        let ub = union(&cands, &e3);
+        let pk = picks(&tb, &ub);
         let pk_s: String = pk.iter().map(|&m| if m < 0 { 'x' } else { (b'0' + m as u8) as char }).collect();
         // trees on the exact triple
-        let val: Vec<Vec<u128>> = e3.iter().map(|&i| (0..B).map(|o| if t.av[i][o] { (t.key[i][o] >> SH) as u128 * (1u128 << 26) + (t.key[i][o] & 8191) as u128 } else { 0 }).collect()).collect();
+        let val: Vec<Vec<u128>> = ub.iter().map(|&i| (0..B).map(|o| if tb.av[i][o] { (tb.key[i][o] >> SH) as u128 * (1u128 << 26) + (tb.key[i][o] & 8191) as u128 } else { 0 }).collect()).collect();
         let ctx = TreeCtx { val, f: &feats };
         let all: Vec<u16> = (0..B as u16).collect();
         let mut trees = vec![];
@@ -281,8 +308,8 @@ fn main() {
             let tree = ctx.build(&all, d);
             let (mut p, mut b, mut diff, mut unb) = (0u64, 0u64, 0u64, 0u64);
             for o in 0..B {
-                let m = walk(&tree, &feats[o]); let i = e3[m];
-                if t.av[i][o] { p += t.j[i][o] as u64; b += t.key[i][o] & 8191; } else { unb += 1; }
+                let m = walk(&tree, &feats[o]); let i = ub[m];
+                if tb.av[i][o] { p += tb.j[i][o] as u64; b += tb.key[i][o] & 8191; } else { unb += 1; }
                 if pk[o] >= 0 && pk[o] as usize != m { diff += 1; }
             }
             trees.push(format!("{{\"depth\":{},\"pc3\":{},\"built\":{},\"differs\":{},\"unbuildable\":{},\"tree\":{}}}", d, p, b, diff, unb, node_json(&tree)));
@@ -291,18 +318,19 @@ fn main() {
         if bk > 0 { out += ","; }
         out += &format!("\"{}\":{{\"reduced\":{},\"dominated\":[{}],", bks[bk], reduced.len(),
             dom_pairs.iter().map(|(u, v)| format!("[{},{}]", u, v)).collect::<Vec<_>>().join(","));
-        out += &format!("\"exact\":[{},{},{}],", setj(&t, &e1, 1), setj(&t, &e2, 2), setj(&t, &e3, 3));
-        out += &format!("\"greedy\":[{}],", chain.iter().enumerate().map(|(i, s)| setj(&t, s, i + 1)).collect::<Vec<_>>().join(","));
-        out += &format!("\"from_exact3\":[{},{}],", setj(&t, &g4, 4), setj(&t, &g5, 5));
-        out += &format!("\"picks\":\"{}\",\"trees\":[{}]}}", pk_s, trees.join(","));
+        out += &format!("\"exact\":[{},{},{}],", setj(&t, &cands, &e1, 1), setj(&t, &cands, &e2, 2), setj(&t, &cands, &e3, 3));
+        out += &format!("\"greedy\":[{}],", chain.iter().enumerate().map(|(i, s)| setj(&t, &cands, s, i + 1)).collect::<Vec<_>>().join(","));
+        out += &format!("\"from_exact3\":[{},{}],", setj(&t, &cands, &g4, 4), setj(&t, &cands, &g5, 5));
+        out += &format!("\"ub\":{},\"picks\":\"{}\",\"trees\":[{}]}}", jlist(&ub), pk_s, trees.join(","));
         eprintln!("  budget {} done ({:?})", bks[bk], t0.elapsed());
     }
     // the set learnt for the default budget (<= 2 soft drops), valued at every budget
     out += "},\"fixed\":{\"budget\":\"2\",\"set\":";
     out += &jlist(&sets3[2]);
+    out += &format!(",\"ub\":{}", jlist(&union(&cands, &sets3[2])));
     out += ",\"values\":{";
     for bk in 0..4 {
-        let t = tab_of(&boards, bk);
+        let t = pair_tab(&tab_of(&boards, bk), &cands);
         let (p, b) = value(&t, &sets3[2]);
         if bk > 0 { out += ","; }
         out += &format!("\"{}\":{{\"pc3\":{},\"built\":{}}}", bks[bk], p, b);
@@ -339,6 +367,15 @@ mod tests {
             assert_eq!(bb, bf.1, "tie rule, seed {}", seed);
             let seeded = exact(&t, &cand, 3, Some(vec![0, 1, 2]));
             assert_eq!(seeded, bf.1);
+        }
+    }
+    #[test]
+    fn pair_candidates_value_the_union_of_their_boards() {
+        let tb = synth(12, 31337);
+        let cands: Vec<Vec<usize>> = vec![vec![0, 1], vec![2], vec![3, 4], vec![5, 6], vec![7], vec![8, 9]];
+        let tp = pair_tab(&tb, &cands);
+        for set in [vec![0usize, 2], vec![1, 3, 5], vec![0, 1, 2, 3]] {
+            assert_eq!(value(&tp, &set), value(&tb, &union(&cands, &set)));
         }
     }
     #[test]

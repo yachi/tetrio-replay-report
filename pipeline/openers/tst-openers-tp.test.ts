@@ -599,6 +599,15 @@ for (let i = 0; i < 7; i++) for (let j = i + 1; j < 7; j++) FEAT_NAMES.push(`${K
 for (const k of KINDS_J) FEAT_NAMES.push(`first=${k}`);
 const FEAT: boolean[][] = FEAT_NAMES.map((nm) => PERMS.map((p) => nm.startsWith('first=') ? p[0] === nm[6] : p.indexOf(nm[0]!) < p.indexOf(nm[2]!)));
 const POOL: any[] = [...ART.boards, ...X.boards];
+/** A learned shape is a mirror pair (the board and its mirror); a self-mirror board, or one with no mirror in the pool, is a pair of one.
+ * Re-derived here from this file's own mirror function, never read from the artefact. */
+const pbkey = (b: any) => `${keyOf(b.pieces)}|${b.held ?? ''}`;
+const POSOF = new Map<string, number>(POOL.map((b: any, i: number) => [pbkey(b), i] as [string, number]));
+const MATE: number[] = POOL.map((b: any, i: number) => POSOF.get(`${keyOf(mirrorPcs(b.pieces))}|${mk(b.held ?? '')}`) ?? i);
+const CANDS: number[][] = [];
+POOL.forEach((_: any, i: number) => { const m = MATE[i]!; if (m >= i) CANDS.push(m === i ? [i] : [i, m]); });
+const CIDX = new Map<string, number>(CANDS.map((c, n) => [c.join(','), n] as [string, number]));
+const unionOf = (cs: number[][]) => [...new Set(cs.flat())].sort((a, b) => a - b);
 const STAT = POOL.map((b: any) => tables(b, vecOf(b.name)));
 /** per budget: key (J*8192+built) and availability per board and order, with this file's own cost rule. */
 function keysFor(bk: string) {
@@ -612,6 +621,14 @@ function keysFor(bk: string) {
 }
 const KEYS: Record<string, any[]> = {};
 for (const bk of BKEYS) KEYS[bk] = keysFor(bk);
+/** a pair candidate: per order the best of its boards (key is J-major, so the pair's J is the winner's). */
+function candTable(K: any[]) {
+  return CANDS.map((c) => {
+    const key = new Float64Array(B), av = new Uint8Array(B), j = new Float64Array(B), bt = new Float64Array(B);
+    for (let o = 0; o < B; o++) for (const i of c) if (K[i].av[o] && (!av[o] || K[i].key[o] > key[o]!)) { av[o] = 1; key[o] = K[i].key[o]; j[o] = K[i].j[o]; bt[o] = K[i].bt[o]; }
+    return { key, av, j, bt };
+  });
+}
 function valOf(K: any[], set: number[]): [number, number] {
   let p = 0, bu = 0;
   for (let o = 0; o < B; o++) {
@@ -647,7 +664,7 @@ function walkTree(nd: any, idx: number[], K: any[], set: number[], mem: number[]
 const depthOf = (nd: any): number => ('m' in nd ? 0 : 1 + Math.max(depthOf(nd.y), depthOf(nd.n)));
 
 test('(j) pins: the sets crate, the artefact and the b1 vectors it was built from are current; flags', () => {
-  expect(SETS.schema).toBe('tst-openers-tp-sets/2');
+  expect(SETS.schema).toBe('tst-openers-tp-sets/3');
   expect(SETS.constructed).toBe(true);
   expect(SETS.report_eligible).toBe(false);
   expect(SETS.complete).toBe(false);
@@ -656,6 +673,9 @@ test('(j) pins: the sets crate, the artefact and the b1 vectors it was built fro
   expect(SETS.md5.art).toBe(md5(canon(ART)));
   expect(SETS.md5.x).toBe(md5(readFileSync(join(ROOT, 'analysis', 'tst-openers-tp-x.json'))));
   expect(SETS.features).toEqual(FEAT_NAMES);
+  expect(SETS.cands).toBe(CANDS.length);
+  expect(SETS.selfmirror).toBe(CANDS.filter((c) => c.length === 1 && MATE[c[0]!] === c[0] && POSOF.has(`${keyOf(mirrorPcs(POOL[c[0]!].pieces))}|${mk(POOL[c[0]!].held ?? '')}`)).length);
+  expect(SETS.mirror_missing).toBe(CANDS.filter((c) => c.length === 1 && !POSOF.has(`${keyOf(mirrorPcs(POOL[c[0]!].pieces))}|${mk(POOL[c[0]!].held ?? '')}`)).length);
   expect(SETS.den.pc3).toBe(B ** 3);
   expect(SETS.den.built).toBe(B ** 2);
   const m = clone(SETS); m.md5.crate = 'x';
@@ -668,28 +688,29 @@ test('(j) pins: the sets crate, the artefact and the b1 vectors it was built fro
 
 test('(j) every set value, greedy step, k=1 optimum, k=2 optimum, pick string and rule tree is recomputed here', () => {
   for (const bk of BKEYS) {
-    const K = KEYS[bk]!, r = SETS.budgets[bk];
+    const K = KEYS[bk]!, r = SETS.budgets[bk], Kc = candTable(K);
     const pos = (rec: any) => rec.boards.map((x: any) => x.pos);
     const chk = (rec: any) => {
       for (const x of rec.boards) {
         expect(POOL[x.pos].name).toBe(x.name);
         expect(keyOf(POOL[x.pos].pieces)).toBe(keyOf(x.pieces));
       }
-      const p = pos(rec);
-      expect(p).toEqual([...p].sort((a, b) => a - b));
-      expect(valOf(K, p)).toEqual([rec.pc3, rec.built]);
+      // k mirror pairs, each a candidate of this file's own derivation, whose union is the listed boards
+      for (const pr of rec.pairs) expect(CIDX.has([...pr].join(','))).toBe(true);
+      expect(pos(rec)).toEqual(unionOf(rec.pairs));
+      expect(valOf(K, pos(rec))).toEqual([rec.pc3, rec.built]);
     };
-    for (const k of ['1', '2', '3']) chk(r.exact[k]);
-    for (const k of ['1', '2', '3', '4', '5']) chk(r.greedy[k]);
+    for (const k of ['1', '2', '3']) { chk(r.exact[k]); expect(r.exact[k].pairs.length).toBe(Number(k)); }
+    for (const k of ['1', '2', '3', '4', '5']) { chk(r.greedy[k]); expect(r.greedy[k].pairs.length).toBe(Number(k)); }
     for (const k of ['4', '5']) chk(r.from_exact3[k]);
-    // exact >= greedy, and the chains are nested
+    // exact >= greedy
     for (const k of ['1', '2', '3']) { const e = r.exact[k], g = r.greedy[k]; expect(e.pc3 > g.pc3 || (e.pc3 === g.pc3 && e.built >= g.built)).toBe(true); }
-    // k = 1 over all boards
-    const f1 = K.map((x: any) => { let p = 0, b = 0; for (let o = 0; o < B; o++) if (x.av[o]) { p += x.j[o]; b += x.bt[o]; } return [p, b]; });
+    // k = 1 over all pair candidates
+    const f1 = Kc.map((x: any) => { let p = 0, b = 0; for (let o = 0; o < B; o++) if (x.av[o]) { p += x.j[o]; b += x.bt[o]; } return [p, b]; });
     let best = 0;
     f1.forEach((v: number[], i: number) => { const bv = f1[best]!; if (v[0]! > bv[0]! || (v[0] === bv[0] && v[1]! > bv[1]!)) best = i; });
-    expect(pos(r.exact['1'])).toEqual([best]);
-    // k = 2: bounded exhaustive (f(ab) <= f(a) + f(b)), pc3 only
+    expect(r.exact['1'].pairs).toEqual([CANDS[best]]);
+    // k = 2: bounded exhaustive over pairs of candidates (f(ab) <= f(a) + f(b)), pc3 only
     const order = f1.map((_: any, i: number) => i).sort((a: number, b: number) => f1[b]![0]! - f1[a]![0]!);
     let top = 0;
     for (let x = 0; x < order.length; x++) {
@@ -700,21 +721,21 @@ test('(j) every set value, greedy step, k=1 optimum, k=2 optimum, pick string an
         if (f1[a]![0]! + f1[b]![0]! < top) break;
         let p = 0;
         for (let o = 0; o < B; o++) {
-          const ka = K[a].av[o] ? K[a].key[o] : -1, kb = K[b].av[o] ? K[b].key[o] : -1;
+          const ka = Kc[a].av[o] ? Kc[a].key[o] : -1, kb = Kc[b].av[o] ? Kc[b].key[o] : -1;
           if (ka < 0 && kb < 0) continue;
-          p += ka >= kb ? K[a].j[o] : K[b].j[o];
+          p += ka >= kb ? Kc[a].j[o] : Kc[b].j[o];
         }
         if (p > top) top = p;
       }
     }
     expect(top).toBe(r.exact['2'].pc3);
-    // greedy step k = argmax over all boards of the grown set
+    // greedy step k = argmax over all pair candidates of the grown set (the union of boards)
     for (const k of [2, 3, 4, 5]) {
-      const prev = pos(r.greedy[String(k - 1)]);
+      const prev: number[][] = r.greedy[String(k - 1)].pairs;
       let bp = -1, bb = -1;
-      for (let i = 0; i < K.length; i++) {
-        if (prev.includes(i)) continue;
-        const [p, b] = valOf(K, [...prev, i]);
+      for (let c = 0; c < CANDS.length; c++) {
+        if (prev.some((q: number[]) => q.join(',') === CANDS[c]!.join(','))) continue;
+        const [p, b] = valOf(K, unionOf([...prev, CANDS[c]!]));
         if (p > bp || (p === bp && b > bb)) { bp = p; bb = b; }
       }
       expect([bp, bb]).toEqual([r.greedy[String(k)].pc3, r.greedy[String(k)].built]);
@@ -751,7 +772,8 @@ test('(j) every set value, greedy step, k=1 optimum, k=2 optimum, pick string an
 test('(j) the fixed set (budget 2 exact triple) is valued at every budget, and pinned by pieces', () => {
   const fx = SETS.fixed, p = fx.boards.map((x: any) => x.pos);
   expect(p).toEqual(SETS.budgets['2'].exact['3'].boards.map((x: any) => x.pos));
-  const want = ['I:2,12,22,32/L:7,8,9,19/O:0,1,10,11/S:4,5,15,16/T:3,13,14,23/Z:18,28,29,39', 'I:7,17,27,37/J:0,1,2,10/O:8,9,18,19/S:11,20,21,30/T:6,15,16,26/Z:4,5,13,14', 'I:10,20,30,40/J:8,9,19,29/O:21,22,31,32/S:0,1,11,12/T:5,15,16,25/Z:7,17,18,28'];
+  expect(fx.pairs).toEqual(SETS.budgets['2'].exact['3'].pairs);
+  const want = ['I:2,12,22,32/L:7,8,9,19/O:0,1,10,11/S:4,5,15,16/T:3,13,14,23/Z:18,28,29,39', 'I:7,17,27,37/J:0,1,2,10/O:8,9,18,19/S:11,20,21,30/T:6,15,16,26/Z:4,5,13,14', 'I:10,20,30,40/J:8,9,19,29/O:21,22,31,32/S:0,1,11,12/T:5,15,16,25/Z:7,17,18,28', 'I:19,29,39,49/L:0,1,10,20/O:27,28,37,38/S:2,11,12,21/T:4,13,14,24/Z:8,9,17,18', 'I:10,20,30,40/J:8,9,19,29/L:50,51,60,70/O:21,22,31,32/S:0,1,11,12/T:5,15,16,25', 'I:19,29,39,49/J:58,59,69,79/L:0,1,10,20/O:27,28,37,38/T:4,13,14,24/Z:8,9,17,18'];
   expect(fx.boards.map((x: any) => keyOf(x.pieces))).toEqual(want);
   for (const bk of BKEYS) expect(valOf(KEYS[bk]!, p)).toEqual([fx.values[bk].pc3, fx.values[bk].built]);
   expect(valOf(KEYS['0']!, p)).not.toEqual([fx.values['1'].pc3, fx.values['1'].built]);
@@ -764,14 +786,14 @@ test('(j) cross-crate: the tst-sets binary on input built here reproduces the ar
   const lines = POOL.map((b: any, i: number) => {
     const raw = inflateSync(Buffer.from(B1.vectors[b.name] ?? X.vectors[b.name], 'base64')).toString();
     const f = BKEYS.map((bk) => `${STAT[i].out[bk][0].slice(0, INFEAS).join(',')}/${STAT[i].out[bk][1].slice(0, INFEAS).join(',')}`);
-    return [b.name, raw, ...f].join('|');
+    return [b.name, raw, ...f, String(MATE[i])].join('|');
   });
   const r = Bun.spawnSync([bin], { stdin: Buffer.from(lines.join('\n') + '\n'), stderr: 'pipe' });
   expect(r.exitCode).toBe(0);
   const out = JSON.parse(r.stdout.toString());
   for (const bk of BKEYS) {
     const g = out.budgets[bk], a = SETS.budgets[bk];
-    expect(g.exact.map((s: any) => s.set)).toEqual([1, 2, 3].map((k) => a.exact[String(k)].boards.map((x: any) => x.pos)));
-    expect(g.greedy.map((s: any) => s.set)).toEqual([1, 2, 3, 4, 5].map((k) => a.greedy[String(k)].boards.map((x: any) => x.pos)));
+    expect(g.exact.map((s: any) => s.ub)).toEqual([1, 2, 3].map((k) => a.exact[String(k)].boards.map((x: any) => x.pos)));
+    expect(g.greedy.map((s: any) => s.ub)).toEqual([1, 2, 3, 4, 5].map((k) => a.greedy[String(k)].boards.map((x: any) => x.pos)));
   }
 }, 300_000);

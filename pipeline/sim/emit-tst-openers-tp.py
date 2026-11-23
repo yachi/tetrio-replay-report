@@ -1332,7 +1332,7 @@ def b1_cmd(args):
 # ---- learn-these-boards sets (tst-openers-tp-sets/1) ----------------------------------------------------------------------
 import subprocess
 
-SETS_SCHEMA = "tst-openers-tp-sets/2"
+SETS_SCHEMA = "tst-openers-tp-sets/3"
 SETS_OUT = ROOT / "analysis" / "tst-openers-tp-sets.json"
 SETS_CRATE = "tst-sets-rs"
 KINDS = "IOTSZJL"
@@ -1362,14 +1362,26 @@ def board_tables(art, b1):
     return out, vec
 
 
+def mates(bs):
+    """position of each pooled board's mirror (its own position for a self-mirror board, or one whose mirror is in neither artefact)."""
+    keys = {}
+    for i, b in enumerate(bs):
+        k = board_key(b["pieces"])
+        assert k not in keys, "duplicate board " + b["name"]
+        keys[k] = i
+    return [keys.get(mirror_board_key(board_key(b["pieces"])), i) for i, b in enumerate(bs)]
+
+
 def sets_input_lines(art, b1):
     tabs, _ = board_tables(art, b1)
+    mt = mates(art["boards"])
+    assert all(mt[mt[i]] == i for i in range(len(mt))), "mirror is not an involution on the pool"
     raw = {n: zlib.decompress(base64.b64decode(z)).decode() for n, z in b1["vectors"].items()}
     out = []
-    for b in art["boards"]:
+    for i, b in enumerate(art["boards"]):
         f = ["%s/%s" % (",".join(str(int(x)) for x in tabs[b["name"]][bk][0][:INFEAS]),
                         ",".join(str(int(x)) for x in tabs[b["name"]][bk][1][:INFEAS])) for bk in BKEYS]
-        out.append("|".join([b["name"], raw[b["name"]]] + f))
+        out.append("|".join([b["name"], raw[b["name"]]] + f + [str(mt[i])]))
     return out
 
 
@@ -1391,8 +1403,12 @@ def sets_artefact(art, b1, raw):
         b = bs[i]
         return {"pos": i, "name": b["name"], "held": b.get("held"), "pieces": b["pieces"]}
 
+    pr = raw["pairs"]
+    single = sum(1 for p in pr if len(p) == 1)
+    selfm = sum(1 for p in pr if len(p) == 1 and board_key(bs[p[0]]["pieces"]) == mirror_board_key(board_key(bs[p[0]]["pieces"])))
+
     def setrec(r):
-        return {"boards": [brd(i) for i in r["set"]], "pc3": r["pc3"], "built": r["built"]}
+        return {"pairs": [pr[c] for c in r["set"]], "boards": [brd(i) for i in r["ub"]], "pc3": r["pc3"], "built": r["built"]}
 
     def node(n):
         return {"m": n["m"]} if "m" in n else {"f": n["f"], "feature": FEATURES[n["f"]], "y": node(n["y"]), "n": node(n["n"])}
@@ -1412,11 +1428,12 @@ def sets_artefact(art, b1, raw):
                        "picks": r["picks"], "rule": rule}
     fx = raw["fixed"]
     return {"schema": SETS_SCHEMA, "report_eligible": False, "constructed": True, "complete": False,
-            "means": QUARANTINE + " Per soft-drop budget, the set of k boards (one hand each) maximising the number of "
+            "means": QUARANTINE + " Per soft-drop budget, the set of k mirror pairs (learning a shape includes its mirror; a pair is the board and its mirror, one board when they coincide or the mirror is in neither artefact) maximising the number of "
                      "(first-bag order, bag-2 deal, bag-3 deal) triples that build and get a bag-3 Perfect Clear when the best member "
-                     "is picked for each first-bag order; exact over the boards counted in the two artefacts (the kept boards and the x boards); a board in neither is uncounted.",
-            "rules": {"pick": "larger (J, built), ties to the earlier board position; none when no member builds within the budget",
-                      "set": "larger pc3, then larger built, then the smaller tuple of board positions",
+                     "of the union is picked for each first-bag order; exact over the boards counted in the two artefacts (the kept boards and the x boards); a board in neither is uncounted.",
+            "rules": {"pair": "a candidate is {board, its mirror} (one board when they coincide or the mirror is in neither artefact); k counts pairs and a set is the union of their boards",
+                      "pick": "over the boards of the union, larger (J, built), ties to the earlier board position; none when no board builds within the budget",
+                      "set": "larger pc3, then larger built, then the smaller tuple of pair positions (a pair sits at its smaller board position)",
                       "dominance": "u is dropped when v has key >= key_u on every order (key = J*8192+built, 0 when unavailable) and "
                                    "the keys differ somewhere or v is earlier; the dominator recorded is the earliest non-dominated one",
                       "exact": "k = 1, 2 by scan, k = 3 by branch and bound on f(abc) <= f(ab) + min(f(ac) - f(a), f(bc) - f(b)) over pc3",
@@ -1426,9 +1443,10 @@ def sets_artefact(art, b1, raw):
             "features": FEATURES,
             "md5": {"crate": sets_crate_md5(), "art": md5(canon(art["kept"]).encode()), "b1": md5(canon(b1["kept"]).encode()),
                     "x": md5(X_OUT.read_bytes())},
+            "cands": raw["cands"], "selfmirror": selfm, "mirror_missing": single - selfm,
             "boards": len(bs), "kept": len(art["kept"]["boards"]), "x": len(art["boards"]) - len(art["kept"]["boards"]),
             "budgets": budgets,
-            "fixed": {"budget": fx["budget"], "boards": [brd(i) for i in fx["set"]], "values": fx["values"]}}
+            "fixed": {"budget": fx["budget"], "pairs": [pr[c] for c in fx["set"]], "boards": [brd(i) for i in fx["ub"]], "values": fx["values"]}}
 
 
 def perms_order():
@@ -1470,11 +1488,23 @@ def sets_check_cmd(args):
     import numpy as np
     art, b1 = sets_load()
     bs = art["boards"]
-    n = len(bs)
+    nb = len(bs)
     raw = sets_crate_run(art, b1)
     want = json.dumps(sets_artefact(art, b1, raw), separators=(",", ":"), ensure_ascii=False) + "\n"
     assert SETS_OUT.read_text() == want, "analysis/tst-openers-tp-sets.json is not what the crate run builds"
     tabs, vec = board_tables(art, b1)
+    # the candidates: every board is in exactly one pair, a pair is {board, its mirror} (found here by the mirror key, not by the
+    # crate's mate list), and the pairs are listed at their smaller board position
+    pr = raw["pairs"]
+    bykey = {board_key(b["pieces"]): i for i, b in enumerate(bs)}
+    exp = []
+    for i, b in enumerate(bs):
+        m = bykey.get(mirror_board_key(board_key(b["pieces"])), i)
+        if m >= i:
+            exp.append([i] if m == i else [i, m])
+    assert pr == exp, "pairs are not {board, mirror}"
+    assert sorted(i for p_ in pr for i in p_) == list(range(nb)), "pairs do not partition the boards"
+    n = len(pr)
     pos = np.arange(n)
     P = perms_order()
     assert len(P) == B and len(set(P)) == B
@@ -1488,12 +1518,14 @@ def sets_check_cmd(args):
     for bk in BKEYS:
         r = raw["budgets"][bk]
         lim = INFEAS - 1 if bk == "inf" else int(bk)
-        J = np.stack([np.array(tabs[b["name"]][bk][0])[np.frombuffer(vec[b["name"]], dtype=np.uint8)] for b in bs]).astype(np.int64)
-        Bt = np.stack([np.array(tabs[b["name"]][bk][1])[np.frombuffer(vec[b["name"]], dtype=np.uint8)] for b in bs]).astype(np.int64)
-        av = np.stack([np.frombuffer(vec[b["name"]], dtype=np.uint8) <= lim for b in bs])
-        J = np.where(av, J, 0); Bt = np.where(av, Bt, 0)
-        assert Bt.max() < 8192
-        key = np.where(av, (J << SH) | Bt, 0)
+        Jb = np.stack([np.array(tabs[b["name"]][bk][0])[np.frombuffer(vec[b["name"]], dtype=np.uint8)] for b in bs]).astype(np.int64)
+        Btb = np.stack([np.array(tabs[b["name"]][bk][1])[np.frombuffer(vec[b["name"]], dtype=np.uint8)] for b in bs]).astype(np.int64)
+        avb = np.stack([np.frombuffer(vec[b["name"]], dtype=np.uint8) <= lim for b in bs])
+        Jb = np.where(avb, Jb, 0); Btb = np.where(avb, Btb, 0)
+        assert Btb.max() < 8192
+        keyb = np.where(avb, (Jb << SH) | Btb, 0)                 # per board
+        key = np.stack([keyb[p_].max(0) for p_ in pr])             # per candidate: the best key over the pair's boards
+        J = key >> SH
         # dominance, pointwise: every listed claim, and no non-listed board is dominated
         dom = {u: v for u, v in r["dominated"]}
         assert len(dom) == len(r["dominated"])
@@ -1514,10 +1546,14 @@ def sets_check_cmd(args):
         def setval(s):
             return val_of(key[list(s)].max(0))
 
+        def union_of(s):
+            return sorted({i for c in s for i in pr[c]})
+
         def check_set(rec, k):
             s = rec["set"]
             assert s == sorted(s) and len(s) == k and len(set(s)) == k
             assert setval(s) == (rec["pc3"], rec["built"]), f"set value wrong ({bk}, {s})"
+            assert rec["ub"] == union_of(s), f"union of boards wrong ({bk}, {s})"
 
         for e in r["exact"]:
             check_set(e, e["k"])
@@ -1581,20 +1617,23 @@ def sets_check_cmd(args):
             check_set(g, g["k"]); step_ok(prev, g, g["k"]); prev = g["set"]
         # picks
         s3 = ex[3]["set"]
-        kk = np.where(av[s3], key[s3] + 1, 0)                      # first strictly larger wins = earliest position
+        ub = union_of(s3)
+        assert r["ub"] == ub
+        kk = np.where(avb[ub], keyb[ub] + 1, 0)                    # first strictly larger wins = earliest position
         arg = kk.argmax(0)
         pk = np.where(kk.max(0) > 0, arg, -1)
         assert r["picks"] == "".join("x" if x < 0 else str(int(x)) for x in pk), f"picks string ({bk})"
         # rule trees: walk every order, recompute the figures and each leaf's label; depth 1 by brute force
-        sub = np.stack([np.where(av[i], (J[i] << 26) + Bt[i], 0) for i in s3]).astype(object)
+        sub = np.stack([np.where(avb[i], (Jb[i] << 26) + Btb[i], 0) for i in ub]).astype(object)
+        nu = len(ub)
         exv = (ex[3]["pc3"], ex[3]["built"])
 
         def walk(nd, idx):
             """-> member per order of idx (array), checking leaf labels."""
             out = np.full(len(idx), -1)
             if "m" in nd:
-                tot = [sub[mm][idx].sum() for mm in range(3)]
-                assert nd["m"] == max(range(3), key=lambda mm: (tot[mm], -mm)), f"leaf label ({bk})"
+                tot = [sub[mm][idx].sum() for mm in range(nu)]
+                assert nd["m"] == max(range(nu), key=lambda mm: (tot[mm], -mm)), f"leaf label ({bk})"
                 out[:] = nd["m"]
                 return out
             f = nd["f"]
@@ -1606,27 +1645,28 @@ def sets_check_cmd(args):
             t = raw["budgets"][bk]["trees"][int(d) - 1]
             assert t["depth"] == int(d)
             mem = walk(t["tree"], np.arange(B))
-            ids = np.array(s3)[mem]
-            avail = av[ids, np.arange(B)]
-            p = int((J[ids, np.arange(B)]).sum()); b_ = int(Bt[ids, np.arange(B)].sum())
+            ids = np.array(ub)[mem]
+            avail = avb[ids, np.arange(B)]
+            p = int((Jb[ids, np.arange(B)]).sum()); b_ = int(Btb[ids, np.arange(B)].sum())
             assert (p, b_) == (t["pc3"], t["built"]), f"rule value depth {d} ({bk})"
             assert int((~avail).sum()) == t["unbuildable"]
             assert int(((pk >= 0) & (pk != mem)).sum()) == t["differs"]
             assert (p, b_) <= exv
             assert depth_of(t["tree"]) <= int(d)
         t1 = raw["budgets"][bk]["trees"][0]
-        best1 = max(sub[mm].sum() for mm in range(3))
+        best1 = max(sub[mm].sum() for mm in range(nu))
         for f in range(28):
             y = feat[:, f]
             if y.any() and (~y).any():
-                best1 = max(best1, max(sub[mm][y].sum() for mm in range(3)) + max(sub[mm][~y].sum() for mm in range(3)))
+                best1 = max(best1, max(sub[mm][y].sum() for mm in range(nu)) + max(sub[mm][~y].sum() for mm in range(nu)))
         assert (t1["pc3"], t1["built"]) == (int(best1 >> 26), int(best1 & ((1 << 26) - 1))), f"depth-1 tree is not optimal ({bk})"
     fx = raw["fixed"]
     s = fx["set"]
     assert s == raw["budgets"]["2"]["exact"][2]["set"]
+    assert fx["ub"] == sorted({i for c in s for i in pr[c]})
     for bk in BKEYS:
         lim = INFEAS - 1 if bk == "inf" else int(bk)
-        K = np.stack([np.where(np.frombuffer(vec[b["name"]], dtype=np.uint8) <= lim, (np.array(tabs[b["name"]][bk][0])[np.frombuffer(vec[b["name"]], dtype=np.uint8)].astype(np.int64) << SH) | np.array(tabs[b["name"]][bk][1])[np.frombuffer(vec[b["name"]], dtype=np.uint8)], 0) for b in (bs[i] for i in s)])
+        K = np.stack([np.where(np.frombuffer(vec[b["name"]], dtype=np.uint8) <= lim, (np.array(tabs[b["name"]][bk][0])[np.frombuffer(vec[b["name"]], dtype=np.uint8)].astype(np.int64) << SH) | np.array(tabs[b["name"]][bk][1])[np.frombuffer(vec[b["name"]], dtype=np.uint8)], 0) for b in (bs[i] for i in fx["ub"])])
         v = val_of(K.max(0))
         assert fx["values"][bk] == {"pc3": v[0], "built": v[1]}, f"fixed value ({bk})"
     print("ok: " + "; ".join(notes))
