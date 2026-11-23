@@ -1770,6 +1770,12 @@ jobs:
       # One engine-verified build per finishing class (pipeline/sim/tst-build-rs), drawn when a class tile is
       # clicked on docs/tst-openers.html: re-run in full (about two minutes) and byte-compared with
       # analysis/tst-openers-tp-builds.json, which names the analysis/tst-openers-tp.json it was built from.
+      # The per-board first-bag vectors (pipeline/sim/tst-b1vec-rs) behind the hold-swap family figure: the emitter
+      # re-checks that tst-openers-tp.json's families follow from analysis/tst-openers-tp-b1.json and the boards.
+      - name: Check the TST opener hold-swap families
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 pipeline/sim/emit-tst-openers-tp.py --check
+
       - name: Re-run the TST opener T-placed builds
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 pipeline/sim/emit-tst-builds.py --check
