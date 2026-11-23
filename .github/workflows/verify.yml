@@ -1805,8 +1805,8 @@ jobs:
       # bound; the crate's unit tests hold the bound to brute force on random boards), greedy 4..5 and a decision tree. The
       # check builds the crate, re-runs it, byte-compares analysis/tst-openers-tp-sets.json and recomputes every figure in numpy
       # from tst-openers-tp.json and the first-bag vectors (all pairs over every board, a certificate for the triples).
-      # TST -> TSD -> PC (pipeline/sim/tst-tsd-rs, hours offline): the cheap check recomputes the artefact's md5s and that
-      # pt3 <= p5 equals the main artefact's class p5 on every live line; tst-openers-tp.test.ts re-runs a few lines.
+      # TST -> TSD -> PC (pipeline/sim/tst-tsd-rs, about half an hour offline): the cheap check recomputes the artefact's
+      # md5s, that each live line's p5 equals the main artefact's class p5, and that pt3 <= p5; tst-openers-tp.test.ts re-runs a few lines.
       - name: Check the TST opener TST-TSD-PC counts
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 pipeline/sim/emit-tst-openers-tp.py --tsd-check

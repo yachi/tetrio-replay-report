@@ -1389,9 +1389,10 @@ def tsd_merge_cmd(args):
     assert bad == 0, "the crate reports %d plans its own replay refused" % bad
     out = {"schema": TSD_SCHEMA, "report_eligible": False, "constructed": True,
            "means": QUARANTINE + ". Per live (shape residue rows, leftover) line: p5 = how many of the 5040 bag-3 dealt orders the Perfect Clear "
-                    "solver clears (the same figure as the class p5 of tst-openers-tp.json), pt3 = how many of those have a plan holding a full T-spin Double "
-                    "(a T placement the engine credits as spin code 2 and that clears exactly two rows). A plan counts when the solver's first answer "
-                    "holds one; pt3u is the number of orders the T-spin search could not decide (0 when pt3 is exact). Bag 4 is not counted.",
+                    "solver clears (the same figure as the class p5 of tst-openers-tp.json), pt3 = how many orders have SOME Perfect Clear plan holding a full T-spin Double "
+                    "(a T placement the engine credits as spin code 2 and that clears exactly two rows; it may be the PC's own last lock), found by a "
+                    "separate search within the same node budget, so pt3 <= p5 is checked, not built in; pt3u is the number of orders that search "
+                    "could not decide (0 when pt3 is exact). Bag 4 is not counted.",
            "den": B,
            "md5": {**tsd_input_md5s(), "crate": tsd_crate_md5()},
            "bad_plans": bad, "lines": {k: rows[k] for k in sorted(rows)}}
