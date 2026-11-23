@@ -883,12 +883,12 @@ def b1_build(art, jsonl):
 
 
 def b1_vectors(b1):
-    import numpy as np
+    """{board: bytes of B cost codes 0..INFEAS} (stdlib only: CI installs no numpy)."""
     out = {}
     for n, z in b1["vectors"].items():
         v = zlib.decompress(base64.b64decode(z)).decode()
         assert len(v) == B
-        out[n] = np.frombuffer(v.replace(".", chr(48 + INFEAS)).encode(), dtype=np.uint8) - 48
+        out[n] = bytes(ord(ch) - 48 for ch in v.replace(".", chr(48 + INFEAS)))
     return out
 
 
@@ -896,16 +896,17 @@ def solve_D(cum, vec):
     """D by the triangular solve cum_b[k] = sum_s n_s D_k(b - s), n_s the number of first-bag orders with cost s.
     Every division is asserted exact: that IS the proof that a board's count for one order depends only on (board, order).
     Returns (Dfin, Dinf): Dfin[r] the class-cumulative bag-2 counts with r budget left (r = 0..2-smin), Dinf the same unlimited."""
-    import numpy as np
-    n = np.bincount(vec, minlength=INFEAS + 1)
-    nfeas = int(n[:INFEAS].sum())
+    n = [0] * (INFEAS + 1)
+    for c in vec:
+        n[c] += 1
+    nfeas = sum(n[:INFEAS])
     ncls = len(cum["inf"])
     assert nfeas > 0
     Dinf = []
     for c in cum["inf"]:
         assert c % nfeas == 0, "inf: cum not divisible by the feasible order count"
         Dinf.append(c // nfeas)
-    smin = int(np.nonzero(n[:INFEAS])[0][0])
+    smin = next(s for s in range(INFEAS) if n[s])
     Dfin = {}
     for b in (0, 1, 2):
         c = cum[str(b)]
@@ -927,8 +928,7 @@ def solve_D(cum, vec):
 
 
 def j_tables(board, D):
-    """Per budget key, (J, built) over the cost code s (0..INFEAS), numpy int64; J_v(r) = sum_k dD_k p5_k, built = D_last(r)."""
-    import numpy as np
+    """Per budget key, (J, built) over the cost code s (0..INFEAS), lists of ints; J_v(r) = sum_k dD_k p5_k, built = D_last(r)."""
     Dfin, Dinf = D
     p5 = [c[2] for c in board["classes"]]
 
@@ -940,8 +940,8 @@ def j_tables(board, D):
         return j, row[-1]
     out = {}
     for bk, b in (("0", 0), ("1", 1), ("2", 2), ("inf", None)):
-        J = np.zeros(INFEAS + 1, dtype=np.int64)
-        Bt = np.zeros(INFEAS + 1, dtype=np.int64)
+        J = [0] * (INFEAS + 1)
+        Bt = [0] * (INFEAS + 1)
         for s in range(INFEAS):
             if b is None:
                 J[s], Bt[s] = jb(Dinf)
@@ -984,7 +984,6 @@ def families_of(art, b1):
     """The families object (schema /4) recomputed from the boards and the b1 vectors: per layout its variants' figures under
     the policy, and `both`, the same policy over the variants and their mirror boards (each first-bag order picks the better
     hand); `pairs`, the policy over each board and its mirror board."""
-    import numpy as np
     bs = art["boards"]
     pos = {b["name"]: i for i, b in enumerate(bs)}
     vec = b1_vectors(b1)
@@ -994,20 +993,40 @@ def families_of(art, b1):
         for bk in BKEYS:       # a one-board family reproduces the board's own figures: the policy identity
             J, Bt = tabs[b["name"]][bk]
             v = vec[b["name"]]
-            assert int(Bt[v].sum()) == b["cum"][bk][-1], f"{b['name']} {bk}: built identity"
-            assert int(J[v].sum()) == joint(b["cum"][bk], b["classes"]) * N2 * B, f"{b['name']} {bk}: pc3 identity"
-    cols = np.arange(B)
+            cnt = [0] * (INFEAS + 1)
+            for c in v:
+                cnt[c] += 1
+            assert sum(cnt[s] * Bt[s] for s in range(INFEAS + 1)) == b["cum"][bk][-1], f"{b['name']} {bk}: built identity"
+            assert sum(cnt[s] * J[s] for s in range(INFEAS + 1)) == joint(b["cum"][bk], b["classes"]) * N2 * B, \
+                f"{b['name']} {bk}: pc3 identity"
 
     def policy(nm):
+        """Per budget, each first-bag order picks the available variant with the largest J*8192 + built (ties to the
+        earlier one); an order no variant can build adds nothing. Stdlib only: CI installs no numpy."""
         num, pick = {}, {}
+        vs = [vec[n] for n in nm]
         for bk in BKEYS:
-            Js = np.stack([tabs[n][bk][0][vec[n]] for n in nm])
-            Bs = np.stack([tabs[n][bk][1][vec[n]] for n in nm])
-            av = np.stack([(vec[n] < INFEAS) if bk == "inf" else (vec[n] <= int(bk)) for n in nm])
-            arg = np.where(av, Js * 8192 + Bs, -1).argmax(axis=0)
-            anyav = av.any(axis=0)
-            num[bk] = [int(Bs[arg, cols][anyav].sum()), int(Js[arg, cols][anyav].sum())]
-            pick[bk] = [int(((arg == t) & anyav).sum()) for t in range(len(nm))]
+            lim = INFEAS - 1 if bk == "inf" else int(bk)
+            keys = [[(tabs[n][bk][0][s] * 8192 + tabs[n][bk][1][s]) if s <= lim else -1 for s in range(INFEAS + 1)]
+                    for n in nm]
+            Jt = [tabs[n][bk][0] for n in nm]
+            Bt = [tabs[n][bk][1] for n in nm]
+            tb = tj = 0
+            pk = [0] * len(nm)
+            for cols in zip(*vs):
+                best, arg = -1, -1
+                for t, c in enumerate(cols):
+                    k = keys[t][c]
+                    if k > best:
+                        best, arg = k, t
+                if arg < 0:
+                    continue
+                c = cols[arg]
+                tb += Bt[arg][c]
+                tj += Jt[arg][c]
+                pk[arg] += 1
+            num[bk] = [tb, tj]
+            pick[bk] = pk
         return num, pick
     lays = layouts_of(art)
     keys = sorted(lays, key=lambda L: sorted(L))
