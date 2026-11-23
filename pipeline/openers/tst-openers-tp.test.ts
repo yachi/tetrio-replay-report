@@ -681,7 +681,7 @@ test('(j) every set value, greedy step, k=1 optimum, k=2 optimum, pick string an
     for (const k of ['1', '2', '3', '4', '5']) chk(r.greedy[k]);
     for (const k of ['4', '5']) chk(r.from_exact3[k]);
     // exact >= greedy, and the chains are nested
-    for (const k of ['1', '2', '3']) expect([r.exact[k].pc3, r.exact[k].built] >= [r.greedy[k].pc3, r.greedy[k].built] || r.exact[k].pc3 >= r.greedy[k].pc3).toBe(true);
+    for (const k of ['1', '2', '3']) { const e = r.exact[k], g = r.greedy[k]; expect(e.pc3 > g.pc3 || (e.pc3 === g.pc3 && e.built >= g.built)).toBe(true); }
     // k = 1 over all boards
     const f1 = K.map((x: any) => { let p = 0, b = 0; for (let o = 0; o < B; o++) if (x.av[o]) { p += x.j[o]; b += x.bt[o]; } return [p, b]; });
     let best = 0;

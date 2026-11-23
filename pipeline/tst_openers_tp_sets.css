@@ -35,3 +35,8 @@
 .sx-r{margin:.4em 0}
 .sx-lnk{margin-top:3px}
 .sx-o b{overflow-wrap:anywhere}
+.sx-id{font-size:.75em;font-weight:400;color:var(--muted);font-family:ui-monospace,monospace;margin-left:.2em}
+.sx-kb{display:flex;flex-wrap:wrap;gap:6px;margin:.4em 0;align-items:center}
+.sx-kb button{font:inherit;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:6px;cursor:pointer;background:var(--bg);color:var(--fg)}
+.sx-kb button[aria-pressed="true"]{border-color:var(--accent);outline:2px solid var(--accent);font-weight:700}
+.sx-o .sx-lnk{margin-top:4px}

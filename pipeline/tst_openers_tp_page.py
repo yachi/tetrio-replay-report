@@ -33,6 +33,7 @@ import argparse
 import base64
 import copy
 import hashlib
+from decimal import Decimal
 import html
 import itertools
 import json
@@ -887,7 +888,7 @@ RULE_WITHIN = Fraction(1, 100)       # the rule is the shallowest (depth 2, else
 _SX = re.compile(r'<section class="sx" id="sx">(.*?)</section>', re.S)
 _SXBK = re.compile(r'<!--sx:bk (\w+)-->(.*?)<!--/sx:bk-->', re.S)
 _SXROW = re.compile(r'<tr data-r="(\w+):(\d)"><td>(.*?)</td><td data-c="j">(.*?)</td><td data-c="b">(.*?)</td>'
-                    r'<td data-c="g">(.*?)</td></tr>\s*<tr class="sx-n"><td colspan="4" data-names="([^"]*)">', re.S)
+                    r'<td data-c="g">(.*?)</td></tr>\s*<tr class="sx-n"><td colspan="4" data-names="([^"]*)">(.*?)</td></tr>', re.S)
 _SXFIG = re.compile(r'<figure class="sx-m" data-bd="(\w+)" data-share="(\d+)">(.*?)</figure>', re.S)
 _SXLEAD = re.compile(r'<p class="sx-lead" data-lead="1">(.*?)</p>', re.S)
 _SXFX = re.compile(r'<p class="sx-fx" data-fx="1">(.*?)</p>', re.S)
@@ -1040,6 +1041,52 @@ def short_label(cat, b, sfx):
     return names[0] if names else b["name"]
 
 
+def sx_label(cat, b, sfx, PR):
+    """A board's name for people: its first catalogue name (route names first) and the held piece; the id stays secondary."""
+    return short_label(cat, b, sfx) + PR["card"]["hold_tag"].format(held=b["held"])
+
+
+def sx_set_names(cat, by, names, sfx, PR):
+    """The display names of a set: a board and its mirror (both in the set, same first name) are one 「X左右手」, else each
+    board's own label."""
+    out, done = [], set()
+    for n in names:
+        if n in done:
+            continue
+        b = by[n]
+        m = b["mirror"]
+        if m in names and m != n and short_label(cat, by[m], sfx) == short_label(cat, b, sfx):
+            done |= {n, m}
+            out.append(short_label(cat, b, sfx) + PR["sets"]["lr"])
+        else:
+            done.add(n)
+            out.append(sx_label(cat, b, sfx, PR))
+    return out
+
+
+def sx_ids(names):
+    return f'<span class="sx-id">{_esc(" ".join(names))}</span>'
+
+
+def sx_pics(cat, b, sfx):
+    rt, ot, me = title_parts(cat, b, sfx)
+    return len(rt) + len(ot) + (1 if me else 0)
+
+
+def disp_dec(s):
+    """The number in a printed percentage string such as `93.1%`."""
+    _need(s.endswith("%") and not s.startswith("<"), f"cannot read the printed figure {s!r}")
+    return Decimal(s[:-1])
+
+
+def gain_text(prev_s, cur_s, SP):
+    """The gain between two printed rows, in percentage points, from the printed (floored) figures themselves."""
+    if prev_s is None:
+        return "–"
+    d = disp_dec(cur_s) - disp_dec(prev_s)
+    return SP["gain"].format(d=f"{d:f}")
+
+
 def chip(k):
     return f'<i class="chip c-{k}">{k}</i>'
 
@@ -1081,37 +1128,68 @@ def fixed_html(SP, same, names, fx, gap):
     return SP["fixed"].format(names=_esc("、".join(names)), j=j, b=bu, g=pct(gap))
 
 
-def sx_row_html(bk, k, m, prev, SP):
-    gain = "–" if prev is None else "+" + pct(Fraction(m["pc3"] - prev, BAG ** 3))
+def sx_row_html(bk, k, m, prev_s, X):
+    """One ladder row: figures floored to the printed percentage, the gain taken from the PRINTED rows, then the set's names."""
+    cat, by, sfx, PR = X
+    SP = PR["sets"]
+    js, bs = pct(Fraction(m["pc3"], BAG ** 3)), pct(Fraction(m["built"], BAG ** 2))
     nm = [x["name"] for x in m["boards"]]
-    return (f'<tr data-r="{bk}:{k}"><td>{_esc(SP["k_label"].format(k=k))}</td><td data-c="j">{pct(Fraction(m["pc3"], BAG ** 3))}</td>'
-            f'<td data-c="b">{pct(Fraction(m["built"], BAG ** 2))}</td><td data-c="g">{gain}</td></tr>\n'
-            f'<tr class="sx-n"><td colspan="4" data-names="{" ".join(nm)}">{_esc("、".join(nm))}</td></tr>')
+    return (f'<tr data-r="{bk}:{k}"><td>{_esc(SP["k_label"].format(k=k))}</td><td data-c="j">{js}</td>'
+            f'<td data-c="b">{bs}</td><td data-c="g">{gain_text(prev_s, js, SP)}</td></tr>\n'
+            f'<tr class="sx-n"><td colspan="4" data-names="{" ".join(nm)}">{_esc("、".join(sx_set_names(cat, by, nm, sfx, PR)))} '
+            f'{sx_ids(nm)}</td></tr>')
+
+
+SX_T_KEYS = ("lk_none_yet", "lk_pick", "lk_cost", "lk_fig", "lk_others", "lk_unbuildable", "lk_nopick", "lk_fail", "lk_seq",
+             "to_card", "mirror_card", "no_card")
+SX_KS = ("1", "2", "3")
+SX_K0 = "2"                          # the lookup opens on the best two boards
+
+
+def sx_members(S, bk, k):
+    return [x["name"] for x in _members(S, bk, int(k))["boards"]]
 
 
 def sets_data(art_by, L):
-    """The cost tables of every board the section names, the best three's picks per budget and each member's pick count."""
+    """The cost tables of every board the section names, the picks of the best 1, 2 and 3 boards per budget (the same rule
+    for each k) and each of the best three's pick counts. The recomputed k=3 picks must equal the artefact's own."""
     S = L["S"]
     T = set_tables(art_by, L, sx_names(S))
     picks, shares = {}, {}
     for bk in BK:
-        names = [x["name"] for x in _members(S, bk, 3)["boards"]]
-        p, pc, bt = set_picks(T, names, bk)
-        picks[bk] = p
-        shares[bk] = [p.count(str(i)) for i in range(3)]
+        picks[bk] = {k: set_picks(T, sx_members(S, bk, k), bk)[0] for k in SX_KS}
+        _need(picks[bk]["3"] == S["budgets"][bk]["picks"], f"the recomputed picks of the best three at budget {bk} are not the artefact's")
+        shares[bk] = [picks[bk]["3"].count(str(i)) for i in range(3)]
     return T, picks, shares
 
 
-def sets_island(PR, L, T, picks, fixtures):
+def sx_link(n, reps, rep_of):
+    if n in reps:
+        return ["c", n]
+    if n in rep_of:
+        return ["m", rep_of[n]]
+    return None
+
+
+def sets_island(PR, L, T, picks, fixtures, X, R, by):
     S, SP = L["S"], PR["sets"]
-    mem = {bk: [x["name"] for x in _members(S, bk, 3)["boards"]] for bk in BK}
-    names = sorted({n for v in mem.values() for n in v})
-    return {"ord": P7, "fix": fixtures, "bk": BK, "shown": BK_SHOWN, "m": mem, "p": picks,
-            "bd": {n: {"v": L["vecs"][n]} for n in names},
+    cat, _by, sfx, _PR = X
+    mem = {bk: {k: sx_members(S, bk, k) for k in SX_KS} for bk in BK}
+    names = sorted({n for v in mem.values() for w in v.values() for n in w})
+    reps = {r["name"] for r, _ in R}
+    rep_of = {p["name"]: r["name"] for r, p in R}
+    lk = {n: sx_link(n, reps, rep_of) for n in names}
+    lab = {n: sx_label(cat, by[n], sfx, PR) for n in names}
+    for v in lk.values():
+        if v:
+            lab.setdefault(v[1], sx_label(cat, by[v[1]], sfx, PR))
+    return {"ord": P7, "fix": fixtures, "bk": BK, "shown": BK_SHOWN, "ks": list(SX_KS), "k0": SX_K0, "m": mem, "p": picks,
+            "col": OP.COL, "lb": lab, "lk": lk,
+            "bd": {n: {"v": L["vecs"][n], "c": by[n]["pieces"]} for n in names},
             "f": {bk: {n: [[pct(Fraction(T[n][1][bk][1][s], BAG)), pct(Fraction(T[n][1][bk][0][s], BAG ** 2))]
-                           if s <= _lim(bk) else None for s in range(INFEAS)] for n in mem[bk]} for bk in BK},
-            "t": {k: SP[k] for k in ("lk_none_yet", "lk_pick", "lk_cost", "lk_fig", "lk_others", "lk_unbuildable", "lk_nopick",
-                                     "lk_fail", "lk_seq")}}
+                           if s <= _lim(bk) else None for s in range(INFEAS)]
+                       for n in sorted({n for w in mem[bk].values() for n in w})} for bk in BK},
+            "t": {k: SP[k] for k in SX_T_KEYS}}
 
 
 def sets_block(art, cat, PR, L, R):
@@ -1120,6 +1198,7 @@ def sets_block(art, cat, PR, L, R):
     not in the best pair, the fixed set, the shallow rule and the lookup. Returns (section html, island json text)."""
     S, SP, sfx = L["S"], PR["sets"], art["mirror"]["suffix"]
     by = {b["name"]: b for b in art["boards"]}
+    X = (cat, by, sfx, PR)
     T, picks, shares = sets_data(by, L)
     reps = {r["name"] for r, _ in R}
     rep_of = {p["name"]: r["name"] for r, p in R}
@@ -1138,20 +1217,20 @@ def sets_block(art, cat, PR, L, R):
         rows, prev = [], None
         for k in (1, 2, 3):
             m = _members(S, bk, k)
-            rows.append(sx_row_html(bk, k, m, prev, SP))
-            prev = m["pc3"]
+            rows.append(sx_row_html(bk, k, m, prev, X))
+            prev = pct(Fraction(m["pc3"], den3))
         ext = []
         for k in (4, 5):
             m = _members(S, bk, k)
-            ext.append(sx_row_html(bk, k, m, prev, SP))
-            prev = m["pc3"]
+            ext.append(sx_row_html(bk, k, m, prev, X))
+            prev = pct(Fraction(m["pc3"], den3))
         parts.append(f'<table class="sx-t"><thead><tr>{head}</tr></thead><tbody>{"".join(rows)}</tbody></table>')
         parts.append(f'<details class="sx-x"><summary>{_esc(SP["ext_summary"])}</summary><table class="sx-t"><tbody>'
                      f'{"".join(ext)}</tbody></table></details><p class="muted sm">{_esc(SP["best_note"])}</p>')
         e1, e2 = _members(S, bk, 1), _members(S, bk, 2)
         a, pair = e1["boards"][0]["name"], [x["name"] for x in e2["boards"]]
         if a not in pair:
-            parts.append(f'<p class="sx-lead" data-lead="1">{lead_html(SP, short_label(cat, by[a], sfx), Fraction(e1["pc3"], den3), "＋".join(short_label(cat, by[n], sfx) for n in pair), Fraction(e2["pc3"], den3))}</p>')
+            parts.append(f'<p class="sx-lead" data-lead="1">{lead_html(SP, sx_label(cat, by[a], sfx, PR), Fraction(e1["pc3"], den3), "＋".join(sx_set_names(cat, by, pair, sfx, PR)), Fraction(e2["pc3"], den3))}</p>')
         mem = [x["name"] for x in _members(S, bk, 3)["boards"]]
         figs_ = []
         for i, n in enumerate(mem):
@@ -1165,31 +1244,34 @@ def sets_block(art, cat, PR, L, R):
             if n in reps:
                 links.append(f'<a href="#c{n}">{_esc(SP["to_card"])}</a>')
             elif n in rep_of:
-                links.append(f'<a href="#c{rep_of[n]}">{_esc(SP["to_card"])}</a> {_esc(SP["mirror_card"].format(m=rep_of[n]))}')
+                links.append(f'<a href="#c{rep_of[n]}">{_esc(SP["to_card"])}</a> {_esc(SP["mirror_card"].format(m=sx_label(cat, by[rep_of[n]], sfx, PR)))}')
             else:
                 links.append(_esc(SP["no_card"]))
             if b["mirror"] in mem:
-                links.append(_esc(SP["mirror_in"].format(m=b["mirror"])))
+                links.append(_esc(SP["mirror_in"].format(m=sx_label(cat, by[b["mirror"]], sfx, PR))))
             figs_.append(f'<figure class="sx-m" data-bd="{n}" data-share="{shares[bk][i]}">{svg2(cells, H, 15)}<figcaption>'
-                         f'<div class="sx-tt"><b>{n}</b> · {_esc(board_title(cat, b, sfx, PR))}</div>'
+                         f'<div class="sx-tt"><b>{_esc(sx_label(cat, b, sfx, PR))}</b> {sx_ids([n])}</div>'
+                         f'<div class="muted sm" data-np="{sx_pics(cat, b, sfx)}">{_esc(SP["n_pics"].format(c=sx_pics(cat, b, sfx)))}</div>'
                          f'<div class="sx-sh">{_esc(SP["share"].format(n=shares[bk][i], p=pct(Fraction(shares[bk][i], BAG))))}</div>'
                          f'<div class="sx-lnk">{"<br>".join(links)}</div></figcaption></figure>')
         parts.append(f'<h3>{_esc(SP["boards_h"])}</h3><div class="sx-g">{"".join(figs_)}</div>')
         fx = S["fixed"]["values"][bk]
         e3 = _members(S, bk, 3)
-        parts.append(f'<p class="sx-fx" data-fx="1">{fixed_html(SP, set(mem) == set(fxn), fxn, fx, Fraction(e3["pc3"] - fx["pc3"], den3))}</p>')
+        parts.append(f'<p class="sx-fx" data-fx="1">{fixed_html(SP, set(mem) == set(fxn), sx_set_names(cat, by, fxn, sfx, PR), fx, Fraction(e3["pc3"] - fx["pc3"], den3))}</p>')
         d = rule_depth(bb["rule"], den3)
         r = bb["rule"][d]
-        labels = [f"{n} {short_label(cat, by[n], sfx)}" for n in mem]
+        labels = [sx_label(cat, by[n], sfx, PR) for n in mem]
         parts.append(f'<h3>{_esc(SP["rule_h"])}</h3><p>{_esc(SP["rule_intro"].format(d=d))}</p>')
         parts.append(f'<div class="sx-r" data-depth="{d}">{tree_html(r["tree"], labels, SP)}</div>\n'
                      f'<p class="sx-loss" data-loss="1">{rule_loss_html(SP, r, e3, den3, den2)}</p>')
         parts.append("</div>\n<!--/sx:bk-->")
     pb = "".join(f'<button class="c-{k}" data-p="{k}">{k}</button>' for k in P7)
+    kb = "".join(f'<button data-k="{k}" aria-pressed="{"true" if k == SX_K0 else "false"}">{_esc(SP["lk_k"].format(k=k))}</button>' for k in SX_KS)
     parts.append(f'<div class="sx-lk"><h3>{_esc(SP["lk_h"])}</h3><p class="muted sm">{_esc(SP["lk_hint"])}</p>'
+                 f'<div class="sx-kb" role="group" aria-label="{_esc(SP["lk_k_h"])}"><span class="muted sm">{_esc(SP["lk_k_h"])}</span>{kb}</div>'
                  f'<div class="sx-pb">{pb}<button class="sx-rs" data-p="reset">{_esc(SP["lk_reset"])}</button></div>'
                  f'<div class="sx-seq" aria-live="polite"></div><div class="sx-out"></div></div></section>')
-    isl = sets_island(PR, L, T, picks, fixtures)
+    isl = sets_island(PR, L, T, picks, fixtures, X, R, by)
     return "\n".join(parts), json.dumps(isl, separators=(",", ":"), ensure_ascii=False).replace("</", "<\\/")
 
 
@@ -1895,7 +1977,7 @@ def _audit_sets(page, art, cat, PR, L):
     picks_ex = {}
     for bk, blk in blocks:
         bb = S["budgets"][bk]
-        rows = {(k, int(i)): (a, j, b, g, nm) for k, i, a, j, b, g, nm in _SXROW.findall(blk)}
+        rows = {(k, int(i)): (a, j, b, g, nm, tx) for k, i, a, j, b, g, nm, tx in _SXROW.findall(blk)}
         prev = None
         for k in (1, 2, 3, 4, 5):
             m = _members(S, bk, k)
@@ -1907,20 +1989,21 @@ def _audit_sets(page, art, cat, PR, L):
                 continue
             if (ex[1], ex[2]) != (m["pc3"], m["built"]):
                 bad.append(f"{bk}/{k}: the set's recomputed figures are not the artefact's")
-            gain = "–" if prev is None else "+" + pct(Fraction(m["pc3"] - prev, BAG ** 3))
-            want = (html.escape(SP["k_label"].format(k=k), quote=False), pct(Fraction(ex[1], BAG ** 3)), pct(Fraction(ex[2], BAG ** 2)),
-                    gain, " ".join(nm))
+            js = pct(Fraction(ex[1], BAG ** 3))
+            want = (html.escape(SP["k_label"].format(k=k), quote=False), js, pct(Fraction(ex[2], BAG ** 2)),
+                    gain_text(prev, js, SP), " ".join(nm),
+                    html.escape("、".join(sx_set_names(cat, by, nm, sfx, PR)), quote=False) + " " + sx_ids(nm))
             if got is None or tuple(got) != tuple(want):
                 bad.append(f"{bk}/{k}: the ladder row is not the recomputed one")
-            prev = ex[1]
+            prev = js
         e1, e2, e3 = (_members(S, bk, k) for k in (1, 2, 3))
         mem = [x["name"] for x in e3["boards"]]
         pk = ex_set(by, L["vecs"], mem, bk)
         picks_ex[bk] = pk[0] if pk else None
         lead = _SXLEAD.findall(blk)
         a, pair = e1["boards"][0]["name"], [x["name"] for x in e2["boards"]]
-        wl = [] if a in pair else [lead_html(SP, short_label(cat, by[a], sfx), Fraction(e1["pc3"], BAG ** 3),
-                                             "＋".join(short_label(cat, by[n], sfx) for n in pair), Fraction(e2["pc3"], BAG ** 3))]
+        wl = [] if a in pair else [lead_html(SP, sx_label(cat, by[a], sfx, PR), Fraction(e1["pc3"], BAG ** 3),
+                                             "＋".join(sx_set_names(cat, by, pair, sfx, PR)), Fraction(e2["pc3"], BAG ** 3))]
         if lead != wl:
             bad.append(f"{bk}: the lead sentence is not the one the ladder gives")
         figs_ = _SXFIG.findall(blk)
@@ -1934,15 +2017,19 @@ def _audit_sets(page, art, cat, PR, L):
             card = f'href="#c{n if n in reps else rep_of.get(n, "")}"'
             if (n in reps or n in rep_of) != (card in fb) or (n in rep_of and n not in reps and rep_of[n] not in html.unescape(fb)):
                 bad.append(f"{bk}: {n}'s card link is wrong")
-            if by[n]["mirror"] in mem and SP["mirror_in"].format(m=by[n]["mirror"]) not in html.unescape(fb):
+            if by[n]["mirror"] in mem and SP["mirror_in"].format(m=sx_label(cat, by[by[n]["mirror"]], sfx, PR)) not in html.unescape(fb):
                 bad.append(f"{bk}: {n} does not say it mirrors {by[n]['mirror']}")
+            if f'<b>{html.escape(sx_label(cat, by[n], sfx, PR), quote=False)}</b> {sx_ids([n])}' not in fb:
+                bad.append(f"{bk}: {n}'s heading is not its opener-and-hand name with the id beside it")
+            if f'data-np="{sx_pics(cat, by[n], sfx)}"' not in fb:
+                bad.append(f"{bk}: {n}'s picture count is not the catalogue's")
             cells = len(re.findall(r"<rect", fb))
             if cells < 28:
                 bad.append(f"{bk}: {n}'s drawing holds fewer than its 28 cells")
         fx = _SXFX.findall(blk)
         fxn = [x["name"] for x in S["fixed"]["boards"]]
         fv = ex_set(by, L["vecs"], fxn, bk)
-        want = fixed_html(SP, set(mem) == set(fxn), fxn, {"pc3": fv[1], "built": fv[2]} if fv else {"pc3": 0, "built": 0},
+        want = fixed_html(SP, set(mem) == set(fxn), sx_set_names(cat, by, fxn, sfx, PR), {"pc3": fv[1], "built": fv[2]} if fv else {"pc3": 0, "built": 0},
                           Fraction(e3["pc3"] - fv[1], BAG ** 3) if fv else 0)
         if fx != [want] or not fv or (fv[1], fv[2]) != (S["fixed"]["values"][bk]["pc3"], S["fixed"]["values"][bk]["built"]):
             bad.append(f"{bk}: the fixed-set sentence is not the recomputed one")
@@ -1956,7 +2043,7 @@ def _audit_sets(page, art, cat, PR, L):
         if tree is None or depth != d:
             bad.append(f"{bk}: the rule's tree is malformed or not the printed depth")
             continue
-        labels = [f"{n} {short_label(cat, by[n], sfx)}" for n in mem]
+        labels = [sx_label(cat, by[n], sfx, PR) for n in mem]
         if tree_html(tree, labels, SP) != rbody:
             bad.append(f"{bk}: the rule's wording is not the tree's")
         # evaluate the tree the page prints on every order, with positions rather than the artefact's feature code
@@ -1982,27 +2069,57 @@ def _audit_sets(page, art, cat, PR, L):
                 bad.append(f"{bk}: the rule's recomputed figures are not the artefact's")
             if loss != rule_loss_html(SP, r, e3, BAG ** 3, BAG ** 2):
                 bad.append(f"{bk}: the rule's loss sentence is not the recomputed one")
-        if isl and len(figs_) == 3 and isl["m"].get(bk) != mem:
+        if isl and len(figs_) == 3 and isl["m"].get(bk, {}).get("3") != mem:
             bad.append(f"{bk}: the lookup's members are not the best three")
     if isl:
         P = all_perms()
         if isl["fix"] != [[P[i], i] for i in FIX_IDX] or any(P.index(p) != i for p, i in isl["fix"]):
             bad.append("the lookup's order-index fixtures are not the permutation ranks")
-        if isl["p"] != picks_ex:
-            bad.append("the lookup's picks are not the recomputed ones")
-        mem = {bk: [x["name"] for x in _members(S, bk, 3)["boards"]] for bk in BK}
-        if isl["bd"] != {n: {"v": L["vecs"][n]} for n in sorted({n for v in mem.values() for n in v})}:
-            bad.append("the lookup's cost vectors are not the artefact's")
+        if isl.get("ks") != list(SX_KS) or isl.get("k0") != SX_K0 or "2" not in isl.get("ks", []):
+            bad.append("the lookup's choices of how many boards to learn are not 1, 2, 3 opening on 2")
+        mem = {bk: {k: sx_members(S, bk, k) for k in SX_KS} for bk in BK}
+        if isl["m"] != mem:
+            bad.append("the lookup's board sets for 1, 2 and 3 boards are not the artefact's")
+        for bk in BK:
+            for k in SX_KS:
+                pk = ex_set(by, L["vecs"], mem[bk][k], bk)
+                if not pk or isl["p"].get(bk, {}).get(k) != pk[0]:
+                    bad.append(f"the lookup's pick string for the best {k} at budget {bk} is not the recomputed one")
+            if isl["p"].get(bk, {}).get("3") != S["budgets"][bk]["picks"]:
+                bad.append(f"the lookup's best-three picks at budget {bk} are not the artefact's")
+        allm = sorted({n for v in mem.values() for w in v.values() for n in w})
+        if isl["bd"] != {n: {"v": L["vecs"][n], "c": by[n]["pieces"]} for n in allm}:
+            bad.append("the lookup's cost vectors or board cells are not the artefact's")
+        lk = {n: sx_link(n, reps, rep_of) for n in allm}
+        if isl["lk"] != lk:
+            bad.append("the lookup's card links are not the page's cards")
+        lb = {n: sx_label(cat, by[n], sfx, PR) for n in allm}
+        for v in lk.values():
+            if v:
+                lb.setdefault(v[1], sx_label(cat, by[v[1]], sfx, PR))
+        if isl["lb"] != lb:
+            bad.append("the lookup's board names are not each board's opener-and-hand name")
         T = set_tables(by, L, sx_names(S))
         for bk in BK:
-            for n in mem[bk]:
+            if set(isl["f"].get(bk, {})) != {n for w in mem[bk].values() for n in w}:
+                bad.append(f"the lookup's figures at budget {bk} do not name the boards of the three choices")
+                continue
+            for n in isl["f"][bk]:
                 for s in range(INFEAS):
                     f = isl["f"][bk][n][s]
                     w = None if s > _lim(bk) else [pct(Fraction(T[n][1][bk][1][s], BAG)), pct(Fraction(T[n][1][bk][0][s], BAG ** 2))]
                     if f != w:
                         bad.append(f"the lookup's figure for {n} at {bk}/{s} is not the recomputed one")
-        if isl["t"] != {k: SP[k] for k in ("lk_none_yet", "lk_pick", "lk_cost", "lk_fig", "lk_others", "lk_unbuildable", "lk_nopick", "lk_fail", "lk_seq")}:
+        if isl["t"] != {k: SP[k] for k in SX_T_KEYS}:
             bad.append("the lookup's texts are not the prose's")
+        tg = re.findall(r'<button data-k="(\d)" aria-pressed="(\w+)">', body)
+        if tg != [(k, "true" if k == SX_K0 else "false") for k in SX_KS]:
+            bad.append("the lookup's 1 / 2 / 3 toggle is not there, or does not open on 2")
+    for w in ("至少", "逐個組合窮舉", "窮舉"):
+        if w in re.sub(r"<[^>]+>", "", body).replace(SP["best_note"], ""):
+            bad.append(f"the section says {w!r}")
+    if SP["best_note"] not in html.unescape(body):
+        bad.append("the section lacks the sentence that says which sets are exhaustive and which are proven by bound")
     return bad
 
 
@@ -2076,7 +2193,19 @@ def selftest(repo=REPO):
     expect("the lead sentence's figure edited", sub(r'data-k="lx">(\d)', bump), True)
     expect("the fixed-set figure edited", sub(r'data-k="f[jb]">(\d)', bump), True)
     expect("a rule leaf swapped", sub(r'data-leaf="(\d)"', lambda d: str((int(d) + 1) % 3)), True)
-    expect("a lookup pick edited", sub(r'"p":\{"0":"(.)', lambda c: "1" if c != "1" else "2"), True)
+    for kk in SX_KS:
+        expect(f"a lookup pick of the best {kk} edited", sub(r'"p":\{"0":\{[^}]*?"' + kk + r'":"(.)', lambda c: "1" if c != "1" else "2"), True)
+    expect("a lookup set of boards edited", sub(r'"m":\{"0":\{"1":\["(t\d+)', lambda n: n + "9"), True)
+    expect("a lookup board name edited", sub(r'"lb":\{"t\d+":"([^"]{2})', lambda c: "XX"), True)
+    expect("a lookup board cell edited", sub(r'"c":\[\["[A-Z]",\[(\d+)', lambda d: str(int(d) + 1)), True)
+    expect("a lookup card link edited", sub(r'"lk":\{"t\d+":\["(.)', lambda c: "m" if c != "m" else "c"), True)
+    expect("the lookup's 1/2/3 toggle dropped", re.sub(r'<button data-k="1" aria-pressed="false">.*?</button>', "", page, count=1), True)
+    expect("the lookup opening on 3", page.replace('data-k="2" aria-pressed="true"', 'data-k="2" aria-pressed="false"', 1), True)
+    expect("a ladder board shown by its bare id", sub(r'<td colspan="4" data-names="[^"]*">(.*?) <span class="sx-id">', lambda t: "t105"), True)
+    expect("a figure heading shown by its bare id", sub(r'<div class="sx-tt"><b>(.*?)</b>', lambda t: "t105"), True)
+    expect("a ladder gain not the printed difference", sub(r'data-c="g">\+(\d)', bump), True)
+    expect("the bound-proof sentence replaced by an exhaustive claim", page.replace(PR["sets"]["best_note"], "三者都係逐個組合窮舉。", 1), True)
+    expect("a per-set figure called at-least", sxp and page.replace(PR["sets"]["built_note"], "砌到係至少數。", 1), True)
     expect("a lookup fixture index edited", sub(r'"fix":\[\["[A-Z]+",(\d+)', lambda d: str(int(d) + 1)), True)
     expect("a lookup cost vector edited", sub(r'"bd":\{"t\d+":\{"v":"(.)', lambda c: "9" if c != "9" else "8"), True)
     expect("a card's joint figure edited", sub(r'data-f="joint">(\d)', bump), True)
