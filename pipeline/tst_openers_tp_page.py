@@ -111,8 +111,9 @@ def load_inputs(repo=REPO):
     with open(os.path.join(repo, "analysis", "tst-openers-tp.json"), "rb") as f:
         raw = f.read()
     art = json.loads(raw)
-    _need(art["schema"] == "tst-openers-tp/2" and art["report_eligible"] is False and art["constructed"] is True,
-          "the artefact is not tst-openers-tp/2 marked report_eligible: false / constructed: true")
+    _need(art["schema"] == "tst-openers-tp/3" and art["report_eligible"] is False and art["constructed"] is True
+          and "families" in art,
+          "the artefact is not tst-openers-tp/3 (with families) marked report_eligible: false / constructed: true")
     with open(os.path.join(repo, "analysis", "tst-openers.json"), "rb") as f:
         old_raw = f.read()
     _need(art["md5"]["tst_openers"] == hashlib.md5(old_raw).hexdigest(),
@@ -395,59 +396,86 @@ def swap_keys(b):
     return out
 
 
+def fam_figs(L, k):
+    """(built, pc3n, joint) of family layout `L` at budget `k`, exact: built = built_n / 5040^2, joint = pc3_n / 5040^3.
+    The artefact's own counts under the joint-maximising policy; the policy is the artefact's `families.policy`."""
+    bn, pn = L["num"][k]
+    return Fraction(bn, N2), pn, Fraction(pn, N2 * BAG)
+
+
+def fam_strings(L, k):
+    """(built, PC given built, joint) display strings of a family at budget `k`, floored; 未計 where nothing is built."""
+    built, n, joint = fam_figs(L, k)
+    bn = L["num"][k][0]
+    return [pct(built), pct(Fraction(n, bn * BAG)) if bn else "未計", pct(joint)]
+
+
 def families(art, cat):
-    """Hold-swap families, one per head: the pairs in order of their unlimited joint, each pair not yet taken heads a family
-    and takes every later pair one of whose two boards is a direct hold swap of the head (the board that matched is the
-    variant shown). A star, never a chain: a variant is a swap of its head, not of another variant.
-    Returns head name -> [(variant board, its pair's representative)], and representative name -> head name."""
-    order = sorted(pairs(art, cat), key=lambda x: (-figs(x[0], BK_SHOWN)[2], x[0]["name"]))
-    used, fam, head_of = set(), {}, {}
-    for r, p in order:
-        if r["name"] in used:
-            continue
-        used.add(r["name"])
-        hk = swap_keys(r)
-        mem = []
-        for r2, p2 in order:
-            if r2["name"] in used:
-                continue
-            for v in (r2, p2):
-                if hk & swap_keys(v):
-                    used.add(r2["name"])
-                    mem.append((v, r2))
-                    head_of[r2["name"]] = r["name"]
-                    break
-        fam[r["name"]] = mem
-    return fam, head_of
+    """Hold-swap families are the artefact's layouts (`families.list`). Returns (name -> indices of the layouts listing the
+    board, name -> its pair's representative board). The artefact is read, never recomputed here: the family counts need the
+    bag-1 vectors (`analysis/tst-openers-tp-b1.json`), which the emitter's `--validate` and the test recompute."""
+    by_name = {}
+    for i, L in enumerate(art["families"]["list"]):
+        for n in L["variants"]:
+            by_name.setdefault(n, []).append(i)
+    rep_of = {}
+    for r, p in pairs(art, cat):
+        rep_of[r["name"]] = r
+        rep_of[p["name"]] = r
+    return by_name, rep_of
 
 
-def fam_block(r, fam, head_of, rkmap, cat, art, PR):
-    """A head's variant table (each variant's own joint per budget, its rank or 未排, a link to its card) and the
-    lower bound for the family; a variant's one line pointing at its head."""
+def card_layouts(r, m, art, by_name):
+    """The layouts of a card's mirror pair, one per mirror class, the best first (larger joint at the opening budget,
+    then the lower index)."""
+    lst = art["families"]["list"]
+    seen = {}
+    for i in sorted(set(by_name.get(r["name"], [])) | set(by_name.get(m["name"], []))):
+        seen.setdefault(min(i, lst[i]["mirror"]), i)
+    return sorted(seen.values(), key=lambda i: (-lst[i]["num"][BK_SHOWN][1], i))
+
+
+def fam_block(r, m, fam, rkmap, cat, art, PR):
+    """The card's best family: each variant's own joint per budget, its rank and the orders the policy gives it, then the
+    family's own line (a lower bound: variants the pruning dropped are missing)."""
     C = PR["card"]
-    if r["name"] in head_of:
-        h = head_of[r["name"]]
-        return (f'<div class="muted sm famm" data-head="{h}">'
-                f'{_esc(C["fam_member"].format(rk=rkmap.get(h, "–")))} <a href="#c{h}">{_esc(C["fam_go"])}</a></div>')
-    mem = fam.get(r["name"]) or []
-    if not mem:
+    by_name, rep_of = fam
+    idx = card_layouts(r, m, art, by_name)
+    if not idx:
         return ""
+    lst = art["families"]["list"]
+    L = lst[idx[0]]
+    byn = {b["name"]: b for b in art["boards"]}
     sfx = art["mirror"]["suffix"]
     head = "".join(f"<th>{_esc(h)}</th>" for h in C["fam_cols"])
+
+    def spans(vals):
+        return "".join(f'<span data-fl="{k}"{"" if k == BK_SHOWN else " hidden"}>{v}</span>' for k, v in zip(BK, vals))
     rows = []
-    for v, rep in [(r, r)] + mem:
-        rk = rkmap.get(rep["name"], "–") if v is rep else C["fam_mirror"].format(rk=rkmap.get(rep["name"], "–"))
+    for j, vn in enumerate(L["variants"]):
+        v = byn[vn]
+        rep = rep_of[vn]
+        rk = rkmap.get(rep["name"], "–")
+        if v is not rep:
+            rk = C["fam_mirror"].format(rk=rk)
         nm = _esc(board_title(cat, v, sfx, PR))
         if rep["name"] in rkmap and rep is not r:
             nm = f'<a href="#c{rep["name"]}">{nm}</a>'
-        rows.append(f'<tr data-fv="{v["name"]}"><td>{nm}</td>'
+        rows.append(f'<tr data-fv="{vn}"><td>{nm}</td>'
                     + "".join(f'<td class="num" data-fg="{k}">{pct(figs(v, k)[2])}</td>' for k in BK)
-                    + f'<td class="num" data-fr="1">{rk}</td></tr>')
-    best = pct(figs(r, BK_SHOWN)[2])
-    return (f'<details class="fam" data-fam="{r["name"]}"><summary>{_esc(C["fam_summary"].format(n=len(mem)))}</summary>'
+                    + f'<td class="num" data-fr="1">{rk}</td>'
+                    + f'<td class="num" data-fp="1">{spans([L["pick"][k][j] for k in BK])}</td></tr>')
+    rows.append(f'<tr data-ffam="1"><td><b>{_esc(C["fam_row"])}</b></td>'
+                + "".join(f'<td class="num" data-ff="{k}">{fam_strings(L, k)[2]}</td>' for k in BK)
+                + '<td class="num">–</td>'
+                + f'<td class="num" data-fs="1">{spans([sum(L["pick"][k]) for k in BK])}</td></tr>')
+    line = "".join(f'<span data-fl="{k}"{"" if k == BK_SHOWN else " hidden"}>{_esc(C["fam_line"].format(a=fam_strings(L, k)[0], b=fam_strings(L, k)[1], c=fam_strings(L, k)[2]))}</span>'
+                   for k in BK)
+    other = f'<p class="muted sm" data-fother="1">{_esc(C["fam_other"].format(n=len(idx) - 1))}</p>' if len(idx) > 1 else ""
+    return (f'<details class="fam" data-fam="{idx[0]}"><summary>{_esc(C["fam_summary"].format(n=len(L["variants"])))}</summary>'
             f'<p class="muted sm">{_esc(C["fam_note"])}</p>'
             f'<div class="p3w"><table class="p3"><thead><tr>{head}</tr></thead><tbody>{"".join(rows)}</tbody></table></div>'
-            f'<p class="muted sm" data-fbest="1">{_esc(C["fam_best"].format(best=best))}</p></details>')
+            f'<p class="muted sm" data-fline="1">{line}</p>{other}</details>')
 
 
 def threshold(art):
@@ -513,9 +541,9 @@ def counts_line(b, k, C):
     return C["counts"].format(bk=C["bk_" + k], cum=f"{cum:,}", n2=f"{N2:,}", p3n=f"{n:,}", p3d=f"{cum * BAG:,}")
 
 
-CL_KEYS = ("pcx_b3", "pcx_b4", "pcx_left", "pcx_deal3", "pcx_deal34", "pcx_hold", "pcx_none3", "pcx_none4", "pcx_always3",
+CL_KEYS = ("pcx_b3", "pcx_left", "pcx_deal3", "pcx_hold", "pcx_none3",
            "cl_hint", "bo_title", "bo_note", "bo_b1", "bo_rest", "bo_tst", "bo_sd", "bo_step", "bo_first", "bo_prev", "bo_next",
-           "bo_last", "bo_pc", "bo_pc_note", "bo_none", "bo_nobuild", "an_v3", "an_v4", "an_play", "an_pause", "an_speed",
+           "bo_last", "bo_pc", "bo_pc_note", "bo_none", "bo_nobuild", "an_v3", "an_play", "an_pause", "an_speed",
            "an_slow", "an_mid", "an_fast", "an_seek", "an_clear", "an_left", "an_pcg", "an_pc_step", "an_pc_done", "an_static")
 
 
@@ -531,10 +559,8 @@ def px_entry(rows, left, ex):
         placed, _ = OP.replay(rows, left, deal, h, plan)
         return [d, h, sorted([x, y, p, n] for (x, y), (p, n) in placed.items()), [[p, list(c), int(hd)] for p, c, hd in plan]]
     b3 = ex and ex["b3"]
-    b4 = ex and ex["b4"]
     return dict(r=list(rows), l=left,
-                b3=one(b3["deal"], [b3["deal"]], b3["h"], b3["plan"]) if b3 else None,
-                b4=one(b4["deal3"] + b4["deal4"], [b4["deal3"], b4["deal4"]], b4["h"], b4["plan"]) if b4 else None)
+                b3=one(b3["deal"], [b3["deal"]], b3["h"], b3["plan"]) if b3 else None)
 
 
 def build_data(art, cat, R, PR, builds, pcxd):
@@ -617,6 +643,19 @@ def mirror_line(b, m, C):
     return (f'<div class="muted sm mir" data-same="0">{_esc(C["mirror_diff"].format(name=m["name"]))} {parts}</div>')
 
 
+def pcx3(rows, left, ex, C):
+    """The folded worked-PC section of one card: the bag-3 example only (this page counts no 4th bag). The figure and its
+    parts are the shared `OP.pcx_block`, so the held page's and this page's audit read one markup."""
+    lf = C["pcx_left"].format(left=left) if left else ""
+    if ex["b3"] is None:
+        part = f'<p class="muted sm">{_esc(C["pcx_none3"])}</p>'
+    else:
+        d = ex["b3"]["deal"]
+        part = OP.pcx_block(rows, left, d, ex["b3"], C["pcx_b3"], lf + C["pcx_deal3"].format(d=d), C)
+    return (f'<details class="pcx" data-line="{_esc(ex["line"])}"><summary>{_esc(C["pcx"])}</summary>'
+            f'<p class="muted sm">{_esc(C["pcx_note"])}</p><div class="pcxb">{part}</div></details>')
+
+
 def card(rkt, r, m, cat, art, PR, pcxd, famh=""):
     C = PR["card"]
     ci = shown_class(r)
@@ -649,7 +688,7 @@ def card(rkt, r, m, cat, art, PR, pcxd, famh=""):
     sline = ",".join(map(str, rows)) + "|" + left
     pcx = ""
     if sline in pcxd:
-        pcx = OP.pcx(dict(o=dict(rows=rows)), dict(left=left, p5=p5), pcxd[sline], C)
+        pcx = pcx3(rows, left, pcxd[sline], C)
     stats = (f'<span>{C["two"]} <b class="num" data-f="two">{fs[0]}</b></span>'
              f'<span>{C["pc3"]} <b class="num" data-f="pc3">{_esc(fs[1])}</b></span>'
              f'<span class="j">{C["joint"]} <b class="num" data-f="joint">{fs[2]}</b></span>')
@@ -800,9 +839,9 @@ def render(art, cat, PR, pcxd, builds=None):
     fm = fmt_for(art, cat, R, U)
     fm["mirror_state"] = PR["mirror_assumed" if art["mirror"]["assumed"] else "mirror_counted"]
     rk0 = rank_data(art, R)[0][BK_SHOWN]
-    fam, head_of = families(art, cat)
+    fam = families(art, cat)
     rkmap = {r["name"]: rk0[n] for n, (r, _) in enumerate(R)}
-    cards = "\n".join(card(rk0[n], r, m, cat, art, PR, pcxd, fam_block(r, fam, head_of, rkmap, cat, art, PR))
+    cards = "\n".join(card(rk0[n], r, m, cat, art, PR, pcxd, fam_block(r, m, fam, rkmap, cat, art, PR))
                        for n, (r, m) in enumerate(R))
     title = PR["title"] + RS.TITLE_MARK
     data = json.dumps(build_data(art, cat, R, PR, builds, pcxd), separators=(",", ":"), ensure_ascii=False).replace("</", "<\\/")
@@ -894,8 +933,6 @@ def audit_pcx(cards, R, cat, pcxd):
         want = []
         if ex["b3"] is not None:
             want.append((ex["b3"]["deal"], ex["b3"]["h"], ex["b3"]["plan"]))
-        if p5 < BAG and ex["b4"] is not None:
-            want.append((ex["b4"]["deal3"] + ex["b4"]["deal4"], ex["b4"]["h"], ex["b4"]["plan"]))
         got = []
         for deal, h, fb in OP._PCX_FIG.findall(secs[0][1]):
             plan = [[p, [int(x) for x in c.split(",")], bool(int(hd))] for p, c, hd in OP._PCX_STEP.findall(fb)]
@@ -978,7 +1015,7 @@ def audit_builds(island, R, cat, pcxd):
         ex = pcxd.get(ln)
         if e["r"] != rows or e["l"] != left:
             bad.append(f"worked PC {ln}: its residue or leftover is not its line's")
-        for key, part in (("b3", ex and ex["b3"]), ("b4", ex and ex["b4"])):
+        for key, part in (("b3", ex and ex["b3"]),):
             got = e.get(key)
             if (got is None) != (part is None):
                 bad.append(f"worked PC {ln}: the {key} example is not the artefact's")
@@ -989,7 +1026,7 @@ def audit_builds(island, R, cat, pcxd):
             plan = [[p, list(cs), bool(hd)] for p, cs, hd in steps]
             if plan != [[p, list(cs), bool(hd)] for p, cs, hd in part["plan"]] or h != part["h"]:
                 bad.append(f"worked PC {ln}: the {key} steps are not the artefact's plan")
-            want_d = [part["deal"]] if key == "b3" else [part["deal3"], part["deal4"]]
+            want_d = [part["deal"]]
             if d != want_d:
                 bad.append(f"worked PC {ln}: the {key} deal is not the artefact's")
             pl, why = OP.replay(rows, left, "".join(d), h, plan)
@@ -1021,6 +1058,55 @@ def _b1_grid_check(b, names, lib):
         if not ok:
             return False
     return True
+def audit_layouts(art, bad):
+    """The artefact's family layouts, re-checked from its boards: seven placements one per kind on 28 disjoint cells, every
+    variant a kept board equal to the layout less one piece, the mirror symmetric, the policy's figures between the best
+    variant and the sum of the variants (the sandwich), picks within the 5040 first-bag orders, the PC count monotone in the
+    budget (built is not: the policy maximises the joint, so it may pick a variant that builds less)."""
+    F = art["families"]
+    if F.get("complete") is not False:
+        bad.append("families.complete is not false: the pruned variants are missing, so the figures are lower bounds")
+    byn = {b["name"]: b for b in art["boards"]}
+    lst = F["list"]
+    for i, L in enumerate(lst):
+        tag = f"layout {i}"
+        ks = [k for k, _ in L["pieces"]]
+        cells = [c for _, cs in L["pieces"] for c in cs]
+        if sorted(ks) != sorted("IJLOSTZ") or len(cells) != 28 or len(set(cells)) != 28:
+            bad.append(f"{tag}: not seven placements, one per kind, on 28 disjoint cells")
+        if not (0 <= L["mirror"] < len(lst)) or lst[L["mirror"]]["mirror"] != i or lst[L["mirror"]]["variants"] == [] :
+            bad.append(f"{tag}: the mirror layout does not point back")
+        want = {k: tuple(sorted(c)) for k, c in L["pieces"]}
+        vs = []
+        for vn in L["variants"]:
+            v = byn.get(vn)
+            if v is None:
+                bad.append(f"{tag}: variant {vn} is not a board of the artefact")
+                continue
+            vs.append(v)
+            have = {k: tuple(sorted(c)) for k, c in v["pieces"]}
+            if have != {k: c for k, c in want.items() if k != v["held"]}:
+                bad.append(f"{tag}: variant {vn} is not the layout less its held piece {v['held']}")
+        if len(set(L["variants"])) < 2 or len({v["held"] for v in vs}) != len(vs):
+            bad.append(f"{tag}: fewer than two variants, or two holding the same piece")
+        for k in BK:
+            bn, pn = L["num"][k]
+            js = [Fraction(figs(v, k)[1], N2 * BAG) for v in vs]
+            bs = [figs(v, k)[0] for v in vs]
+            joint, built = Fraction(pn, N2 * BAG), Fraction(bn, N2)
+            if len(L["pick"][k]) != len(vs) or sum(L["pick"][k]) > BAG or any(x < 0 for x in L["pick"][k]):
+                bad.append(f"{tag}: the picked orders at budget {k} are not within the {BAG} first-bag orders")
+            if vs and not (max(js) <= joint <= min(Fraction(1), sum(js))):
+                bad.append(f"{tag}: the family joint at budget {k} is outside the sandwich of its variants")
+            if vs and not (built <= min(Fraction(1), sum(bs))):
+                bad.append(f"{tag}: the family built at budget {k} exceeds the sum of its variants")
+            if bn > pn // 1 * 0 + N2 or (bn == 0) != (pn == 0):
+                bad.append(f"{tag}: built / PC counts at budget {k} disagree")
+        for a, b2 in zip(BK, BK[1:]):
+            if L["num"][a][1] > L["num"][b2][1]:
+                bad.append(f"{tag}: the family PC counts are not monotone from budget {a} to {b2}")
+
+
 def audit(page, art, cat, PR, pcxd=None, builds=None):
     builds = builds if builds is not None else load_builds()
     pcxd = pcxd if pcxd is not None else load_pcx()
@@ -1089,7 +1175,11 @@ def audit(page, art, cat, PR, pcxd=None, builds=None):
             if r["cum"][a][-1] > r["cum"][b2][-1]:
                 bad.append(f"board {r['name']}: the soft-drop budgets are not monotone")
     rk, od = rank_data(art, R)
-    fam, head_of = families(art, cat)
+    fam = families(art, cat)
+    audit_layouts(art, bad)
+    if "4 巡" in page or "第 4 包" in page:
+        bad.append("the page mentions a 4th bag: this page counts bag 3 only")
+    rkm = {r["name"]: rk[BK_SHOWN][i] for i, (r, _) in enumerate(R)}
     for n, (name, rkt, body) in enumerate(cards):
         r, m = R[n]
         f = {k: re.sub(r"<[^>]+>", "", html.unescape(v)) for k, v in OP._FIG.findall(body)}
@@ -1137,32 +1227,47 @@ def audit(page, art, cat, PR, pcxd=None, builds=None):
                 bad.append(f"card {name}: the mirror board's figures are not the recomputed ones")
         if by[r["mirror"]] is not m:
             bad.append(f"card {name}: the mirror board is not the artefact's")
-        # the hold-swap family: the head's variant table, re-derived; a variant's pointer at its head
-        fb = re.search(r'<details class="fam" data-fam="(\w+)">(.*?)</details>', body, re.S)
-        fm = re.search(r'<div class="muted sm famm" data-head="(\w+)">', body)
-        mem = fam.get(name) if name not in head_of else None
-        if name in head_of:
-            if fb or not fm or fm.group(1) != head_of[name]:
-                bad.append(f"card {name}: the family pointer does not name its head {head_of[name]}")
-        elif mem:
-            if fm or not fb or fb.group(1) != name:
-                bad.append(f"card {name}: the family table of {len(mem)} variant(s) is missing")
+        # the hold-swap family: the card's best layout, its variants' own joints, its policy figures
+        fb = re.search(r'<details class="fam" data-fam="(\d+)">(.*?)</details>', body, re.S)
+        idx = card_layouts(r, m, art, fam[0])
+        if not idx:
+            if fb:
+                bad.append(f"card {name}: a family block on a board with no layout")
+        elif not fb or int(fb.group(1)) != idx[0]:
+            bad.append(f"card {name}: the family block is missing or is not the best layout {idx[0]}")
+        else:
+            L = art["families"]["list"][idx[0]]
+            fbody = fb.group(2)
+            rows = re.findall(r'<tr data-fv="(\w+)">(.*?)</tr>', fbody, re.S)
+            if [x for x, _ in rows] != L["variants"]:
+                bad.append(f"card {name}: the family rows {[x for x, _ in rows]} are not the layout's {L['variants']}")
+            byn = {b["name"]: b for b in art["boards"]}
+            for j, (vn, rb) in enumerate(rows):
+                v = byn.get(vn)
+                got = dict(re.findall(r'data-fg="(\w+)">(.*?)</td>', rb))
+                if v is None or got != {k: ex_strings(v)[k][2] for k in BK}:
+                    bad.append(f"card {name}: family variant {vn}'s figures are not its recomputed joints")
+                pk = dict(re.findall(r'data-fl="(\w+)"[^>]*>(\d+)</span>', rb))
+                if pk != {k: str(L["pick"][k][j]) for k in BK}:
+                    bad.append(f"card {name}: family variant {vn}'s picked orders are not the artefact's")
+            ff = re.search(r'<tr data-ffam="1">(.*?)</tr>', fbody, re.S)
+            if not ff:
+                bad.append(f"card {name}: the family row is missing")
             else:
-                rows = re.findall(r'<tr data-fv="(\w+)">(.*?)</tr>', fb.group(2), re.S)
-                want = [r["name"]] + [v["name"] for v, _ in mem]
-                if [x for x, _ in rows] != want:
-                    bad.append(f"card {name}: the family rows {[x for x, _ in rows]} are not the variants {want}")
-                for vn, rb in rows:
-                    v = next((b for b in art["boards"] if b["name"] == vn), None)
-                    got = dict(re.findall(r'data-fg="(\w+)">(.*?)</td>', rb))
-                    if v is None or got != {k: ex_strings(v)[k][2] for k in BK}:
-                        bad.append(f"card {name}: family variant {vn}'s figures are not its recomputed joints")
-                    if v is not None and vn != name and not (swap_keys(v) & swap_keys(r)):
-                        bad.append(f"card {name}: family variant {vn} is not a hold swap of the head")
-                if PR["card"]["fam_best"].format(best=ex[BK_SHOWN][2]) not in html.unescape(fb.group(2)):
-                    bad.append(f"card {name}: the family's lower bound is not the head's own figure")
-        elif fb or fm:
-            bad.append(f"card {name}: a family block on a board with no family")
+                got = dict(re.findall(r'data-ff="(\w+)">(.*?)</td>', ff.group(1)))
+                if got != {k: fam_strings(L, k)[2] for k in BK}:
+                    bad.append(f"card {name}: the family joints are not the recomputed ones")
+                tot = dict(re.findall(r'data-fl="(\w+)"[^>]*>(\d+)</span>', ff.group(1)))
+                if tot != {k: str(sum(L["pick"][k])) for k in BK}:
+                    bad.append(f"card {name}: the family's built-order totals are not the picks' sum")
+            lm = re.search(r'data-fline="1">(.*?)</p>', fbody, re.S)
+            want = {k: PR["card"]["fam_line"].format(a=fam_strings(L, k)[0], b=fam_strings(L, k)[1], c=fam_strings(L, k)[2]) for k in BK}
+            got = {k: html.unescape(v) for k, v in re.findall(r'data-fl="(\w+)"[^>]*>(.*?)</span>', lm.group(1))} if lm else {}
+            if got != want:
+                bad.append(f"card {name}: the family line is not the recomputed one")
+            om = re.search(r'data-fother="1">(.*?)</p>', fbody, re.S)
+            if (len(idx) > 1) != bool(om) or (om and html.unescape(om.group(1)) != PR["card"]["fam_other"].format(n=len(idx) - 1)):
+                bad.append(f"card {name}: the note on the other layouts is wrong")
     for k in BK:
         j = [Fraction(sum((r["cum"][k][i] - (r["cum"][k][i - 1] if i else 0)) * r["classes"][i][2] for i in range(len(r["classes"]))), N2 * BAG)
              for r, _ in R]
@@ -1331,9 +1436,33 @@ def selftest(repo=REPO):
     expect("a soft-drop line figure edited (budget 0)", sub(r'data-f="sd0">(\d)', bump), True)
     expect("a family variant's figure edited", sub(r'data-fg="1">(\d)', bump), True)
     expect("a family row dropped", sub(r'<details class="fam"[^>]*>.*?(<tr data-fv="\w+">.*?</tr>)', lambda t: "", re.S), True)
-    expect("a family's lower bound edited", sub(r'data-fbest="1">[^<]*?(\d)', bump), True)
-    expect("a variant's pointer at the wrong head", sub(r'data-head="(\w+)"', lambda h: "t99999"), True)
+    expect("a family's joint edited", sub(r'data-ff="inf">(\d)', bump), True)
+    expect("a family's picked-order count edited", sub(r'data-fl="inf">(\d)', bump), True)
+    expect("a family's line edited", sub(r'data-fline="1"><span data-fl="0" hidden>[^<]*?(\d)', bump), True)
     expect("a family table deleted", re.sub(r'<details class="fam".*?</details>', "", page, count=1, flags=re.S), True)
+    expect("a family pointed at another layout", sub(r'data-fam="(\d+)"', lambda h: "999"), True)
+    shown = int(re.search(r'data-fam="(\d+)"', page).group(1))
+    w = copy.deepcopy(art)
+    w["families"]["list"][0]["num"]["inf"][1] += 10 ** 12
+    expect("an edited family joint in the artefact", page, True, a=w)
+    w = copy.deepcopy(art)
+    w["families"]["list"][shown]["num"]["inf"][0] += N2 // 100
+    expect("an edited family built count in the artefact", page, True, a=w)
+    w = copy.deepcopy(art)
+    w["families"]["list"][shown]["pick"]["inf"][0] += 1
+    expect("an edited family pick count in the artefact", page, True, a=w)
+    w = copy.deepcopy(art)
+    w["families"]["list"][0]["variants"].pop()
+    w["families"]["list"][0]["pick"]["inf"].pop()
+    expect("a family variant dropped from the artefact", page, True, a=w)
+    w = copy.deepcopy(art)
+    L0 = w["families"]["list"][0]
+    L0["variants"][0] = next(b["name"] for b in art["boards"] if b["name"] not in L0["variants"])
+    expect("a family variant that is not a hold swap of the layout", page, True, a=w)
+    w = copy.deepcopy(art)
+    w["families"]["complete"] = True
+    expect("families.complete flipped", page, True, a=w)
+    expect("a 4th-bag word on the page", page.replace("</body>", "<p>4 巡</p></body>", 1), True)
     m = _CARD.search(page)
     expect("a card dropped", page.replace(m.group(0), "", 1), True)
     expect("a card's rank edited", page.replace(f'data-rk="{m.group(2)}"', 'data-rk="#999"', 1), True)
