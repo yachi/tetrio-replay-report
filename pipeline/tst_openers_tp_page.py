@@ -780,11 +780,17 @@ def b1_line(b, C):
     else:
         t = C["b1_none"]
     return f'<div class="muted sm b1" data-b1="{_esc("|".join(ex))}" data-b1s="{_esc("|".join(same))}">{_esc(t)}</div>\n'
+ROUTE_FAMILY = {"hdgamushiro": "gamushiro"}   # one opener drawn by two sites: counted once, ガムシロ積み named first
+
+
 def title_parts(cat, b, sfx):
-    """(route openers' Japanese names in ROUTE order, other names, has yachi's own shape) over ALL the board's shapes; a
-    mirror shape's name loses the mirror suffix so it counts as its original."""
-    routes, others, me = [], [], False
+    """(route openers' Japanese names, other names, has yachi's own shape) over ALL the board's shapes; a mirror shape's name
+    loses the mirror suffix so it counts as its original. Routes are ordered: an opener whose bag 1 this board IS first, then
+    by how many of the board's shapes carry that opener (so one stray shape of another route does not name the board), then
+    ROUTE order."""
+    routes, others, me, cnt = [], [], False, {}
     for sid in b["shapes"]:
+        seen = set()
         for n in (cat[sid]["names"] if sid in cat else []):
             n = n[:-len(sfx)] if sfx and n.endswith(sfx) else n
             if n.strip() == "yachi":
@@ -792,11 +798,16 @@ def title_parts(cat, b, sfx):
                 continue
             k = route_of(n)
             if k:
+                f = ROUTE_FAMILY.get(k, k)
+                if f not in seen:
+                    seen.add(f)
+                    cnt[f] = cnt.get(f, 0) + 1
                 if k not in routes:
                     routes.append(k)
             elif n not in others:
                 others.append(n)
-    routes.sort(key=list(ROUTE).index)
+    b1 = set(b.get("b1", ([], []))[0])
+    routes.sort(key=lambda k: (ROUTE[k] not in b1, -cnt[ROUTE_FAMILY.get(k, k)], list(ROUTE).index(k)))
     return [ROUTE[k] for k in routes], others, me
 
 
