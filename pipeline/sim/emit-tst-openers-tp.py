@@ -66,6 +66,8 @@ preview the first bag's dealt order o1 is known before any hold decision, so the
   B3  python3 $E --check                                                       # CI: the b1 artefact is what the crate gives, the families recompute
       python3 $E --cross-check <tst2bag-tp binary>                             # MULTI=1 B1ONLY=1 SDB=n against the vectors, on sampled boards
   S1  python3 $E --sets                                                        # writes analysis/tst-openers-tp-sets.json via pipeline/sim/tst-sets-rs (about 5 s)
+  T1  python3 $E --tsd-input > $W/tsd.in ; pipeline/sim/tst-tsd-rs/target/release/tst-tsd < $W/tsd.in > $W/tsd.out   # offline, about 30 min on 4 cores
+      python3 $E --tsd $W/tsd.out ; python3 $E --tsd-check                   # writes / checks analysis/tst-openers-tp-tsd.json (TST->TSD->PC, bag 3 only)
   S2  python3 $E --sets-check                                                  # CI: byte-compares a fresh crate run, recomputes every set, pick and tree in numpy (about 30 s)
 
 THE X BOARDS (schema tst-openers-tp-x/1, md5 in the main artefact's md5.x; offline, about 25 min on 4 cores):
@@ -1122,10 +1124,11 @@ def solve_D(cum, vec):
     return Dfin, Dinf
 
 
-def j_tables(board, D):
-    """Per budget key, (J, built) over the cost code s (0..INFEAS), lists of ints; J_v(r) = sum_k dD_k p5_k, built = D_last(r)."""
+def j_tables(board, D, p=None):
+    """Per budget key, (J, built) over the cost code s (0..INFEAS), lists of ints; J_v(r) = sum_k dD_k p_k, built = D_last(r).
+    p defaults to the classes' own p5 (a bag-3 PC of any kind); the TST->TSD->PC objective passes the classes' pt3."""
     Dfin, Dinf = D
-    p5 = [c[2] for c in board["classes"]]
+    p5 = [c[2] for c in board["classes"]] if p is None else p
 
     def jb(row):
         prev, j = 0, 0
@@ -1332,7 +1335,109 @@ def b1_cmd(args):
 # ---- learn-these-boards sets (tst-openers-tp-sets/1) ----------------------------------------------------------------------
 import subprocess
 
-SETS_SCHEMA = "tst-openers-tp-sets/3"
+TSD_SCHEMA = "tst-openers-tp-tsd/1"
+TSD_OUT = ROOT / "analysis" / "tst-openers-tp-tsd.json"
+TSD_CRATE = "tst-tsd-rs"
+
+
+def tsd_crate_md5():
+    h = hashlib.md5()
+    fs = [SIM / TSD_CRATE / "Cargo.toml", SIM / TSD_CRATE / "Cargo.lock"]
+    for c in (TSD_CRATE, "oracle-rs", "pc-solver-rs"):
+        fs += list((SIM / c / "src").rglob("*.rs"))
+    for p in sorted(set(fs), key=lambda p: p.relative_to(SIM).as_posix()):
+        h.update(f"{p.relative_to(SIM).as_posix()}\0{md5(p.read_bytes())}\n".encode())
+    return h.hexdigest()
+
+
+def tsd_line_map():
+    """({board name: {live class index: `rows|left` line}}, the page's loaded artefact), the page's own live/class_line, so
+    the lines the crate is asked about are the lines the page's tilings name."""
+    sys.path.insert(0, str(ROOT))
+    from pipeline import tst_openers_tp_page as P
+    art, cat = P.load_inputs()
+    m = {}
+    for b in art["boards"] + art["xboards"]:
+        m[b["name"]] = {i: P.class_line(cat, b, i) for i in P.live(b)}
+    return m, art
+
+
+def tsd_input_lines():
+    m, _ = tsd_line_map()
+    return sorted({l for v in m.values() for l in v.values()})
+
+
+def tsd_input_md5s(art=None):
+    return {"tst_openers_tp": md5(canon(json.loads(OUT.read_text())).encode()), "x": md5(X_OUT.read_bytes()),
+            "tst_openers": md5(OLD.read_bytes()), "shapes": md5(canon(load_inputs()[1]).encode())}
+
+
+def tsd_merge_cmd(args):
+    """--tsd <crate output>: the crate's per-line JSON -> analysis/tst-openers-tp-tsd.json."""
+    m, pa = tsd_line_map()
+    want = set(tsd_input_lines())
+    rows = {}
+    bad = 0
+    for ln in Path(args.tsd).read_text().splitlines():
+        if not ln.strip():
+            continue
+        r = json.loads(ln)
+        assert r["line"] not in rows, "duplicate line " + r["line"]
+        bad += r["bad_plans"]
+        rows[r["line"]] = {"p5": r["p5"], "p5u": r["p5u"], "pt3": r["pt3"], "pt3u": r["pt3u"]}
+    assert set(rows) == want, "crate output does not cover exactly the live lines (%d of %d)" % (len(rows), len(want))
+    assert bad == 0, "the crate reports %d plans its own replay refused" % bad
+    out = {"schema": TSD_SCHEMA, "report_eligible": False, "constructed": True,
+           "means": QUARANTINE + ". Per live (shape residue rows, leftover) line: p5 = how many of the 5040 bag-3 dealt orders the Perfect Clear "
+                    "solver clears (the same figure as the class p5 of tst-openers-tp.json), pt3 = how many of those have a plan holding a full T-spin Double "
+                    "(a T placement the engine credits as spin code 2 and that clears exactly two rows). A plan counts when the solver's first answer "
+                    "holds one; pt3u is the number of orders the T-spin search could not decide (0 when pt3 is exact). Bag 4 is not counted.",
+           "den": B,
+           "md5": {**tsd_input_md5s(), "crate": tsd_crate_md5()},
+           "bad_plans": bad, "lines": {k: rows[k] for k in sorted(rows)}}
+    TSD_OUT.write_text(json.dumps(out, separators=(",", ":"), ensure_ascii=False) + "\n")
+    print(f"wrote {TSD_OUT} ({len(rows)} lines)", file=sys.stderr)
+
+
+def tsd_load_check():
+    t = json.loads(TSD_OUT.read_text())
+    assert t["schema"] == TSD_SCHEMA and t["report_eligible"] is False and t["constructed"] is True
+    assert t["md5"] == {**tsd_input_md5s(), "crate": tsd_crate_md5()}, "analysis/tst-openers-tp-tsd.json is stale"
+    return t
+
+
+def tsd_load_lines():
+    return tsd_load_check()["lines"]
+
+
+def tsd_pt(art):
+    """{board name: per-class pt3 vector} for the boards of the pooled artefact; a class that is not live has none (0)."""
+    m, _ = tsd_line_map()
+    lines = tsd_load_lines()
+    out = {}
+    for b in art["boards"]:
+        live = m[b["name"]]
+        out[b["name"]] = [lines[live[i]]["pt3"] if i in live else 0 for i in range(len(b["classes"]))]
+    return out
+
+
+def tsd_check_cmd(args):
+    t = tsd_load_check()
+    m, pa = tsd_line_map()
+    lines = t["lines"]
+    assert t["bad_plans"] == 0
+    assert set(lines) == set(tsd_input_lines()), "lines are not the live lines"
+    bad_u = 0
+    for b in pa["boards"] + pa["xboards"]:
+        for i, ln in m[b["name"]].items():
+            r = lines[ln]
+            assert r["p5"] == b["classes"][i][2], f"{b['name']} class {i}: crate p5 {r['p5']} != artefact {b['classes'][i][2]}"
+            assert 0 <= r["pt3"] <= r["p5"] <= B, ln
+            bad_u += r["pt3u"]
+    print(f"ok: {len(lines)} lines, p5 equals the artefact's class p5, pt3 <= p5; undecided orders {bad_u}")
+
+
+SETS_SCHEMA = "tst-openers-tp-sets/4"
 SETS_OUT = ROOT / "analysis" / "tst-openers-tp-sets.json"
 SETS_CRATE = "tst-sets-rs"
 KINDS = "IOTSZJL"
@@ -1348,8 +1453,9 @@ def sets_crate_md5():
     return h.hexdigest()
 
 
-def board_tables(art, b1):
-    """{name: {bk: (J[0..10], Bt[0..10])}} and {name: b1 vector (numpy uint8, INFEAS for '.')}."""
+def board_tables(art, b1, pt=None):
+    """{name: {bk: (J[0..10], Bt[0..10])}} and {name: b1 vector (numpy uint8, INFEAS for '.')}. `pt` {name: per-class p vector}
+    swaps the objective (default: each class's p5)."""
     vec = b1_vectors(b1)
     zero = {bk: ([0] * (INFEAS + 1), [0] * (INFEAS + 1)) for bk in BKEYS}
     out = {}
@@ -1358,7 +1464,7 @@ def board_tables(art, b1):
             assert all(c == 0 for bk in BKEYS for c in b["cum"][bk]), b["name"]
             out[b["name"]] = zero
         else:
-            out[b["name"]] = j_tables(b, solve_D(b["cum"], vec[b["name"]]))
+            out[b["name"]] = j_tables(b, solve_D(b["cum"], vec[b["name"]]), None if pt is None else pt[b["name"]])
     return out, vec
 
 
@@ -1372,8 +1478,8 @@ def mates(bs):
     return [keys.get(mirror_board_key(board_key(b["pieces"])), i) for i, b in enumerate(bs)]
 
 
-def sets_input_lines(art, b1):
-    tabs, _ = board_tables(art, b1)
+def sets_input_lines(art, b1, pt=None):
+    tabs, _ = board_tables(art, b1, pt)
     mt = mates(art["boards"])
     assert all(mt[mt[i]] == i for i in range(len(mt))), "mirror is not an involution on the pool"
     raw = {n: zlib.decompress(base64.b64decode(z)).decode() for n, z in b1["vectors"].items()}
@@ -1385,18 +1491,20 @@ def sets_input_lines(art, b1):
     return out
 
 
-def sets_crate_run(art, b1):
+def sets_crate_run(art, b1, pt=None):
     r = subprocess.run(["cargo", "build", "--release", "--locked", "--quiet", "--manifest-path", str(SIM / SETS_CRATE / "Cargo.toml")],
                        capture_output=True, text=True)
     assert r.returncode == 0, "cargo build of tst-sets-rs failed:\n" + r.stderr
     exe = SIM / SETS_CRATE / "target" / "release" / "tst-sets"
-    r = subprocess.run([str(exe)], input="\n".join(sets_input_lines(art, b1)) + "\n", capture_output=True, text=True)
+    r = subprocess.run([str(exe)], input="\n".join(sets_input_lines(art, b1, pt)) + "\n", capture_output=True, text=True)
     assert r.returncode == 0, "tst-sets failed:\n" + r.stderr
     sys.stderr.write(r.stderr)
     return json.loads(r.stdout)
 
 
-def sets_artefact(art, b1, raw):
+def sets_artefact(art, b1, raw, rawt):
+    """`raw` is the crate run with the pc3 objective (any bag-3 PC, the top level of the artefact), `rawt` the run with the
+    TST->TSD->PC objective (the `tsd` block; inside it the field called pc3 is that objective's count)."""
     bs = art["boards"]
 
     def brd(i):
@@ -1404,29 +1512,34 @@ def sets_artefact(art, b1, raw):
         return {"pos": i, "name": b["name"], "held": b.get("held"), "pieces": b["pieces"]}
 
     pr = raw["pairs"]
+    assert rawt["pairs"] == pr and rawt["cands"] == raw["cands"], "the two objectives list different candidates"
     single = sum(1 for p in pr if len(p) == 1)
     selfm = sum(1 for p in pr if len(p) == 1 and board_key(bs[p[0]]["pieces"]) == mirror_board_key(board_key(bs[p[0]]["pieces"])))
 
-    def setrec(r):
-        return {"pairs": [pr[c] for c in r["set"]], "boards": [brd(i) for i in r["ub"]], "pc3": r["pc3"], "built": r["built"]}
+    def blk(raw):
+        def setrec(r):
+            return {"pairs": [pr[c] for c in r["set"]], "boards": [brd(i) for i in r["ub"]], "pc3": r["pc3"], "built": r["built"]}
 
-    def node(n):
-        return {"m": n["m"]} if "m" in n else {"f": n["f"], "feature": FEATURES[n["f"]], "y": node(n["y"]), "n": node(n["n"])}
-    budgets = {}
-    for bk in BKEYS:
-        r = raw["budgets"][bk]
-        ex = {str(e["k"]): setrec(e) for e in r["exact"]}
-        rule = {}
-        for t in r["trees"]:
-            rule[str(t["depth"])] = {"pc3": t["pc3"], "built": t["built"], "differs": t["differs"], "unbuildable": t["unbuildable"],
-                                     "loss_pc3": ex["3"]["pc3"] - t["pc3"], "loss_built": ex["3"]["built"] - t["built"], "tree": node(t["tree"])}
-        budgets[bk] = {"reduced": r["reduced"],
-                       "dominated": {"count": len(r["dominated"]), "md5": md5(canon(r["dominated"]).encode())},
-                       "exact": ex,
-                       "greedy": {str(g["k"]): setrec(g) for g in r["greedy"]},
-                       "from_exact3": {str(g["k"]): setrec(g) for g in r["from_exact3"]},
-                       "picks": r["picks"], "rule": rule}
-    fx = raw["fixed"]
+        def node(n):
+            return {"m": n["m"]} if "m" in n else {"f": n["f"], "feature": FEATURES[n["f"]], "y": node(n["y"]), "n": node(n["n"])}
+        budgets = {}
+        for bk in BKEYS:
+            r = raw["budgets"][bk]
+            ex = {str(e["k"]): setrec(e) for e in r["exact"]}
+            rule = {}
+            for t in r["trees"]:
+                rule[str(t["depth"])] = {"pc3": t["pc3"], "built": t["built"], "differs": t["differs"], "unbuildable": t["unbuildable"],
+                                         "loss_pc3": ex["3"]["pc3"] - t["pc3"], "loss_built": ex["3"]["built"] - t["built"], "tree": node(t["tree"])}
+            budgets[bk] = {"reduced": r["reduced"],
+                           "dominated": {"count": len(r["dominated"]), "md5": md5(canon(r["dominated"]).encode())},
+                           "exact": ex,
+                           "greedy": {str(g["k"]): setrec(g) for g in r["greedy"]},
+                           "from_exact3": {str(g["k"]): setrec(g) for g in r["from_exact3"]},
+                           "picks": r["picks"], "rule": rule}
+        fx = raw["fixed"]
+        return budgets, {"budget": fx["budget"], "pairs": [pr[c] for c in fx["set"]], "boards": [brd(i) for i in fx["ub"]], "values": fx["values"]}
+    budgets, fixed = blk(raw)
+    tb, tf = blk(rawt)
     return {"schema": SETS_SCHEMA, "report_eligible": False, "constructed": True, "complete": False,
             "means": QUARANTINE + " Per soft-drop budget, the set of k mirror pairs (learning a shape includes its mirror; a pair is the board and its mirror, one board when they coincide or the mirror is in neither artefact) maximising the number of "
                      "(first-bag order, bag-2 deal, bag-3 deal) triples that build and get a bag-3 Perfect Clear when the best member "
@@ -1442,11 +1555,16 @@ def sets_artefact(art, b1, raw):
             "den": {"pc3": B ** 3, "built": B ** 2},
             "features": FEATURES,
             "md5": {"crate": sets_crate_md5(), "art": md5(canon(art["kept"]).encode()), "b1": md5(canon(b1["kept"]).encode()),
-                    "x": md5(X_OUT.read_bytes())},
+                    "x": md5(X_OUT.read_bytes()), "tsd": md5(TSD_OUT.read_bytes())},
             "cands": raw["cands"], "selfmirror": selfm, "mirror_missing": single - selfm,
             "boards": len(bs), "kept": len(art["kept"]["boards"]), "x": len(art["boards"]) - len(art["kept"]["boards"]),
             "budgets": budgets,
-            "fixed": {"budget": fx["budget"], "pairs": [pr[c] for c in fx["set"]], "boards": [brd(i) for i in fx["ub"]], "values": fx["values"]}}
+            "fixed": fixed,
+            "tsd": {"means": "the same search with J counted over the (first-bag order, bag-2 deal, bag-3 deal) triples whose bag-3 Perfect Clear plan "
+                             "contains a full T-spin Double (analysis/tst-openers-tp-tsd.json); inside this block the field named pc3 is that count. "
+                             "Only bag-3 Perfect Clears are counted, bag 4 is not.",
+                    "cands": rawt["cands"], "selfmirror": selfm, "mirror_missing": single - selfm,
+                    "budgets": tb, "fixed": tf}}
 
 
 def perms_order():
@@ -1476,23 +1594,31 @@ def sets_load():
 def sets_cmd(args):
     art, b1 = sets_load()
     if args.sets_input:
-        print("\n".join(sets_input_lines(art, b1)))
+        print("\n".join(sets_input_lines(art, b1, tsd_pt(art) if args.tsd_objective else None)))
         return
     raw = sets_crate_run(art, b1)
-    out = sets_artefact(art, b1, raw)
+    rawt = sets_crate_run(art, b1, tsd_pt(art))
+    out = sets_artefact(art, b1, raw, rawt)
     SETS_OUT.write_text(json.dumps(out, separators=(",", ":"), ensure_ascii=False) + "\n")
     print(f"wrote {SETS_OUT}", file=sys.stderr)
 
 
 def sets_check_cmd(args):
-    import numpy as np
     art, b1 = sets_load()
+    raw = sets_crate_run(art, b1)
+    pt = tsd_pt(art)
+    rawt = sets_crate_run(art, b1, pt)
+    want = json.dumps(sets_artefact(art, b1, raw, rawt), separators=(",", ":"), ensure_ascii=False) + "\n"
+    assert SETS_OUT.read_text() == want, "analysis/tst-openers-tp-sets.json is not what the crate runs build"
+    sets_check_obj(art, b1, raw, None)
+    sets_check_obj(art, b1, rawt, pt)
+
+
+def sets_check_obj(art, b1, raw, pt):
+    import numpy as np
     bs = art["boards"]
     nb = len(bs)
-    raw = sets_crate_run(art, b1)
-    want = json.dumps(sets_artefact(art, b1, raw), separators=(",", ":"), ensure_ascii=False) + "\n"
-    assert SETS_OUT.read_text() == want, "analysis/tst-openers-tp-sets.json is not what the crate run builds"
-    tabs, vec = board_tables(art, b1)
+    tabs, vec = board_tables(art, b1, pt)
     # the candidates: every board is in exactly one pair, a pair is {board, its mirror} (found here by the mirror key, not by the
     # crate's mate list), and the pairs are listed at their smaller board position
     pr = raw["pairs"]
@@ -1708,6 +1834,10 @@ def main():
     ap.add_argument("--sets", action="store_true")
     ap.add_argument("--sets-input", action="store_true")
     ap.add_argument("--sets-check", action="store_true")
+    ap.add_argument("--tsd")
+    ap.add_argument("--tsd-input", action="store_true")
+    ap.add_argument("--tsd-check", action="store_true")
+    ap.add_argument("--tsd-objective", action="store_true")
     ap.add_argument("--cross-check")
     ap.add_argument("--cand-merge", nargs=2, metavar=("T_OUT", "H_OUT"))
     ap.add_argument("--cand-out", default="cand.json")
@@ -1729,6 +1859,13 @@ def main():
         return x_verify_cmd(a)
     if a.x_compare:
         return x_compare_cmd(a)
+    if a.tsd_input:
+        print("\n".join(tsd_input_lines()))
+        return
+    if a.tsd:
+        return tsd_merge_cmd(a)
+    if a.tsd_check:
+        return tsd_check_cmd(a)
     if a.sets_check:
         return sets_check_cmd(a)
     if a.sets or a.sets_input:

@@ -5,7 +5,7 @@
 .sx-t th:first-child,.sx-t td:first-child{text-align:left}
 .sx-t tr.sx-n td{text-align:left;font-size:.85em;color:var(--muted);border-bottom:1px solid var(--line)}
 .sx-t tr.sx-n td:first-child{padding-top:0}
-.sx-x{margin:.4em 0}.sx-x summary{cursor:pointer}
+.sx-x,.sx-ref{margin:.4em 0}.sx-x summary,.sx-ref summary{cursor:pointer}
 .sx-g{display:flex;flex-wrap:wrap;gap:10px;margin:.5em 0}
 .sx-m{margin:0;flex:1 1 150px;min-width:0;max-width:100%;border:1px solid var(--line);border-radius:6px;padding:6px;background:var(--bg)}
 .sx-m svg,.sx-o svg{display:block;max-width:100%;height:auto}

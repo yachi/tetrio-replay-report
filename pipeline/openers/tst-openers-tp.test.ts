@@ -664,7 +664,8 @@ function walkTree(nd: any, idx: number[], K: any[], set: number[], mem: number[]
 const depthOf = (nd: any): number => ('m' in nd ? 0 : 1 + Math.max(depthOf(nd.y), depthOf(nd.n)));
 
 test('(j) pins: the sets crate, the artefact and the b1 vectors it was built from are current; flags', () => {
-  expect(SETS.schema).toBe('tst-openers-tp-sets/3');
+  expect(SETS.schema).toBe('tst-openers-tp-sets/4');
+  expect(SETS.md5.tsd).toBe(md5(readFileSync(join(ROOT, 'analysis', 'tst-openers-tp-tsd.json'))));
   expect(SETS.constructed).toBe(true);
   expect(SETS.report_eligible).toBe(false);
   expect(SETS.complete).toBe(false);
@@ -797,3 +798,45 @@ test('(j) cross-crate: the tst-sets binary on input built here reproduces the ar
     expect(g.greedy.map((s: any) => s.ub)).toEqual([1, 2, 3, 4, 5].map((k) => a.greedy[String(k)].boards.map((x: any) => x.pos)));
   }
 }, 300_000);
+
+// ---- (k) TST -> TSD -> PC (analysis/tst-openers-tp-tsd.json) -------------------------------------------------------------
+const TSD = JSON.parse(readFileSync(join(ROOT, 'analysis', 'tst-openers-tp-tsd.json'), 'utf8'));
+const TSD_CRATE = join(SIM, 'tst-tsd-rs');
+function tsdCrateMd5(): string {
+  const files = ['tst-tsd-rs/Cargo.lock', 'tst-tsd-rs/Cargo.toml'];
+  for (const c of ['tst-tsd-rs', 'oracle-rs', 'pc-solver-rs'])
+    for (const f of readdirSync(join(SIM, c, 'src'), { recursive: true }) as string[]) if (f.endsWith('.rs')) files.push(`${c}/src/${f}`);
+  const h = createHash('md5');
+  for (const f of [...new Set(files)].sort()) h.update(`${f}\0${md5(readFileSync(join(SIM, f)))}\n`);
+  return h.digest('hex');
+}
+
+test('(k) pins: the tsd artefact is current, flagged constructed, and pt3 <= p5 <= 5040 on every line', () => {
+  expect(TSD.schema).toBe('tst-openers-tp-tsd/1');
+  expect(TSD.constructed).toBe(true);
+  expect(TSD.report_eligible).toBe(false);
+  expect(TSD.den).toBe(B);
+  expect(TSD.bad_plans).toBe(0);
+  expect(TSD.md5.crate).toBe(tsdCrateMd5());
+  expect(TSD.md5.tst_openers_tp).toBe(md5(canon(JSON.parse(readFileSync(join(ROOT, 'analysis', 'tst-openers-tp.json'), 'utf8')))));
+  expect(TSD.md5.x).toBe(md5(readFileSync(join(ROOT, 'analysis', 'tst-openers-tp-x.json'))));
+  const ls = Object.values(TSD.lines) as any[];
+  expect(ls.length).toBeGreaterThan(0);
+  for (const r of ls) expect(0 <= r.pt3 && r.pt3 <= r.p5 && r.p5 <= B).toBe(true);
+});
+
+test('(k) pilot lines re-run through the tst-tsd binary reproduce the artefact (skipped without cargo)', () => {
+  const r0 = Bun.spawnSync(['cargo', 'build', '--release', '--locked', '--quiet', '--manifest-path', join(TSD_CRATE, 'Cargo.toml')], { stderr: 'pipe' });
+  const bin = join(TSD_CRATE, 'target', 'release', 'tst-tsd');
+  if (r0.exitCode !== 0 || !existsSync(bin)) { console.warn('SKIPPED (k): cargo is unavailable or tst-tsd failed to build; pt3 is NOT re-run'); return; }
+  // the cheapest lines: the fewest leftover pieces solve fastest
+  const keys = Object.keys(TSD.lines).sort((a, b) => Number(b.split('|')[1]!.length < a.split('|')[1]!.length) - Number(a.split('|')[1]!.length < b.split('|')[1]!.length)).slice(0, 3);
+  const r = Bun.spawnSync([bin], { stdin: Buffer.from(keys.join('\n') + '\n'), stderr: 'pipe' });
+  expect(r.exitCode).toBe(0);
+  const got = r.stdout.toString().trim().split('\n').map((l) => JSON.parse(l));
+  expect(got.length).toBe(keys.length);
+  for (const g of got) {
+    const a = TSD.lines[g.line];
+    expect([g.p5, g.p5u, g.pt3, g.pt3u]).toEqual([a.p5, a.p5u, a.pt3, a.pt3u]);
+  }
+}, 600_000);

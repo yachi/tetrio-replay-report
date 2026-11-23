@@ -1,0 +1,10 @@
+[package]
+name = "tst-tsd"
+version = "0.1.0"
+edition = "2021"
+publish = false
+[dependencies]
+oracle-rs = { path = "../oracle-rs" }
+pc-solver-rs = { path = "../pc-solver-rs" }
+[profile.release]
+opt-level = 3

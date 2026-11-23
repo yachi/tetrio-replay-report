@@ -81,6 +81,8 @@ EXCLUDED = {
                              'that emitter\'s `--check`',
     'tst-openers-tp-sets.json': 'written by `python3 pipeline/sim/emit-tst-openers-tp.py --sets` (Python over the '
                                 'tst-sets-rs binary, not a bun emitter); re-run and byte-compared by its own `--sets-check`',
+    'tst-openers-tp-tsd.json': 'written by pipeline/sim/tst-tsd-rs (Rust, about half an hour on four cores) and merged by '
+                               '`emit-tst-openers-tp.py --tsd`; its md5s are rechecked by that emitter\'s `--tsd-check`',
     'tst-openers-tp-builds.json': 'written by `python3 pipeline/sim/emit-tst-builds.py` (Python over the tst-build-rs '
                                   'binary, not a bun emitter); re-run and byte-compared by its own `--check`',
     'tst-openers-tp-pc-examples.json': 'written by `python3 pipeline/sim/emit-tst-pc-examples.py --tp` (Python over '

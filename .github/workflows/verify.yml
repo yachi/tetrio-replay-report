@@ -1786,6 +1786,7 @@ jobs:
         run: |
           set -euo pipefail
           cargo build --release --locked --manifest-path pipeline/sim/tst2bag-tp-rs/Cargo.toml
+          cargo build --release --locked --manifest-path pipeline/sim/tst-tsd-rs/Cargo.toml
 
       - name: Re-run the TST opener T-placed worked PCs
         if: env.INPUTS_UNCHANGED != '1'
@@ -1804,6 +1805,12 @@ jobs:
       # bound; the crate's unit tests hold the bound to brute force on random boards), greedy 4..5 and a decision tree. The
       # check builds the crate, re-runs it, byte-compares analysis/tst-openers-tp-sets.json and recomputes every figure in numpy
       # from tst-openers-tp.json and the first-bag vectors (all pairs over every board, a certificate for the triples).
+      # TST -> TSD -> PC (pipeline/sim/tst-tsd-rs, hours offline): the cheap check recomputes the artefact's md5s and that
+      # pt3 <= p5 equals the main artefact's class p5 on every live line; tst-openers-tp.test.ts re-runs a few lines.
+      - name: Check the TST opener TST-TSD-PC counts
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 pipeline/sim/emit-tst-openers-tp.py --tsd-check
+
       - name: Check the TST opener learn-these-boards sets
         if: env.INPUTS_UNCHANGED != '1'
         run: |
