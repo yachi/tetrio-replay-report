@@ -101,6 +101,10 @@ const STMBCAVE_HITS: string[] = [
   "2026-11-05 m1r3 yachi lock 30", "2026-11-05 m2r1 pinglamb lock 23 (mirrored)",
   "2026-11-05 m4r6 pinglamb lock 67 (mirrored)", "2026-11-05 m6r1 yachi lock 33",
   "2026-11-19 m4r9 pinglamb lock 59 (mirrored)", "2026-11-19 m4r18 pinglamb lock 68 (mirrored)",
+  "2026-11-23 m3r10 yachi lock 167 (mirrored)",
+  "2026-11-23 m4r3 yachi lock 96",
+  "2026-11-23 m5r5 yachi lock 32 (mirrored)",
+  "2026-11-23 m7r5 yachi lock 33",
 ];
 const FOLLOWUP_NOT_FIRED: string[] = [
   "2026-07-22 m3r7 yachi lock 22 (next_t_elsewhere at lock 24)", "2026-07-22 m6r3 yachi lock 25 (slot_filled_before_t at lock 26)",
@@ -179,6 +183,10 @@ const FOLLOWUP_NOT_FIRED: string[] = [
   "2026-11-05 m1r3 yachi lock 30 (round_ended)", "2026-11-05 m2r1 pinglamb lock 23 (next_t_elsewhere at lock 28)",
   "2026-11-05 m4r6 pinglamb lock 67 (slot_filled_before_t at lock 71)", "2026-11-05 m6r1 yachi lock 33 (slot_filled_before_t at lock 35)",
   "2026-11-19 m4r9 pinglamb lock 59 (slot_filled_before_t at lock 60)",
+  "2026-11-23 m3r10 yachi lock 167 (past_verified at lock 169)",
+  "2026-11-23 m4r3 yachi lock 96 (slot_filled_before_t at lock 97)",
+  "2026-11-23 m5r5 yachi lock 32 (slot_filled_before_t at lock 33)",
+  "2026-11-23 m7r5 yachi lock 33 (slot_filled_before_t at lock 34)",
 ];
 const STMBCAVE_IN_OPENER: string[] = [
   "2026-08-19 m9r5 pinglamb lock 20", "2026-09-03 m6r2 yachi lock 18", "2026-10-03 m2r3 yachi lock 21",
@@ -224,6 +232,8 @@ const CAVE_METRIC_ONLY: string[] = [
   "2026-11-01 m7r6 yachi lock 60 (centred, width 3, depth 1)", "2026-11-01 m7r7 yachi lock 44 (centred, width 3, depth 1)",
   "2026-11-01 m8r7 pinglamb lock 33 (centred, width 3, depth 1)", "2026-11-01 m16r9 pinglamb lock 41 (centred, width 3, depth 1)",
   "2026-11-17 m1r4 pinglamb lock 26 (wall_wide, width 5, depth 1)", "2026-11-17 m2r4 yachi lock 37 (centred, width 3, depth 1)",
+  "2026-11-23 m5r4 yachi lock 113 (centred, width 3, depth 1)",
+  "2026-11-23 m5r9 pinglamb lock 35 (centred, width 3, depth 1)",
 ];
 
 /** The SDPC Spin rounds that reached its STMB Cave with the node verified: a hit at the next T lock. */
@@ -238,22 +248,22 @@ const SDPC_CAVE_UNSCORED: string[] = [
 ];
 
 /** Per player: the opportunity (scored full TSDs), split at the 0-based opener window. */
-const TSD_DENOM = { pinglamb: { all: 6894, in_opener: 1348, mid_game: 5546 },
-                    yachi: { all: 6249, in_opener: 1598, mid_game: 4651 } };
+const TSD_DENOM = { pinglamb: { all: 7206, in_opener: 1408, mid_game: 5798 },
+                    yachi: { all: 6508, in_opener: 1663, mid_game: 4845 } };
 /** Per player: hits, their split, the mirrored ones, the follow-ups that fired. */
 const HITS = { pinglamb: { all: 59, in_opener: 1, mid_game: 58, mirrored: 32, garbage_in_window: 0 },
-               yachi: { all: 96, in_opener: 4, mid_game: 92, mirrored: 30, garbage_in_window: 0 } };
+               yachi: { all: 100, in_opener: 4, mid_game: 96, mirrored: 32, garbage_in_window: 0 } };
 const FOLLOWUP_FIRED = { pinglamb: 2, yachi: 4 };
 /** The controls (the same window at other spins; the ablations; the orientation baseline). */
 const CONTROLS = {
   under: { TSS: { pinglamb: 4, yachi: 0 }, TST: { pinglamb: 0, yachi: 0 },
            mini_TSS: { pinglamb: 0, yachi: 0 }, mini_TSD: { pinglamb: 0, yachi: 0 } },
-  ablation: { no_must_empty: { pinglamb: 4878, yachi: 4238 }, no_roof: { pinglamb: 59, yachi: 96 },
-              t_overlap: { pinglamb: 110, yachi: 121 } },
-  orientation_baseline: { pinglamb: 65, yachi: 91 },
+  ablation: { no_must_empty: { pinglamb: 5081, yachi: 4400 }, no_roof: { pinglamb: 59, yachi: 100 },
+              t_overlap: { pinglamb: 112, yachi: 126 } },
+  orientation_baseline: { pinglamb: 69, yachi: 93 },
 };
 /** window_off_board, per player: a count with a property check, not a list (see the header). */
-const WINDOW_OFF_BOARD = { pinglamb: 2850, yachi: 2824 };
+const WINDOW_OFF_BOARD = { pinglamb: 2987, yachi: 2961 };
 
 /** Measured byte-identical on this corpus, each for its reason; asserted to STAY identical. */
 const EQUIVALENT: Record<string, string> = {
@@ -341,7 +351,7 @@ test('quarantined: report_eligible false, no claim ids', () => {
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
   const n = checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT);
-  expect(n).toBe(18623);
+  expect(n).toBe(19461);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 
@@ -501,8 +511,8 @@ test('cross-check: the SDPC Spin rounds that reached its STMB Cave', () => {
 
 test('the follow-up row map is verified against the engine at every step it uses', () => {
   const c = art().check;
-  expect(c.rowmap_unverified).toBe(33);
-  expect(c.rowmap_steps).toBe(327362);
+  expect(c.rowmap_unverified).toBe(34);
+  expect(c.rowmap_steps).toBe(343241);
   expect(art().hits.every((h: any) => h.followup.reason !== 'rowmap_unverified')).toBe(true);
 });
 

@@ -161,8 +161,8 @@ const NODE_CASES: Record<string, number> = {
 /** Opportunities: bag 1 at 6 locks, the spin step at lock 7, bag 2 at 13 locks. bag1.left's is BOTH
  *  players': pinglamb has no case, and an earlier emitter built its per-player tally from the cases
  *  alone, so his 1259 opportunities vanished and the denominator read 1223 (yachi's). Pinned per player. */
-const OPPORTUNITIES: Record<string, number> = { 'bag1.left': 3275, 'bag1.fire': 90, 'bag1.pc': 90, '2.sd': 76 };
-const BAG1_OPPORTUNITIES_BY_PLAYER = { pinglamb: 1659, yachi: 1616 };
+const OPPORTUNITIES: Record<string, number> = { 'bag1.left': 3430, 'bag1.fire': 90, 'bag1.pc': 90, '2.sd': 76 };
+const BAG1_OPPORTUNITIES_BY_PLAYER = { pinglamb: 1737, yachi: 1693 };
 /** Nodes the classifier cannot compare, and why (from the routes JSON, never a count of 0). */
 const UNMEASURED: Record<string, string> = {
   'bag1.right': 'mirror_of: bag1.left', 'bag1.fire.after': 'illustration', '2.fire.tsd': 'illustration',
@@ -191,7 +191,7 @@ const STOPS_AT_BAG1: Record<string, number> = {
  *                  the eight drawn J and L cells, which hold a J and an L split another way (garbage
  *                  rows under it stripped; 09-18 m13r1 had garbage before lock 6, so it was never
  *                  compared and is not in COLOUR_DISAGREE) */
-const DT_NOT_STICKSPIN: Record<string, 'dt_cannon' | 'both_orders' | 'jl_split'> = {
+const DT_NOT_STICKSPIN: Record<string, 'dt_cannon' | 'both_orders' | 'jl_split' | 'stray_cannon'> = {
   '2026-08-14 m3r4 yachi': 'dt_cannon',
   '2026-08-25 m9r3 yachi': 'dt_cannon',
   '2026-09-10 m7r3 pinglamb': 'both_orders',
@@ -214,6 +214,8 @@ const DT_NOT_STICKSPIN: Record<string, 'dt_cannon' | 'both_orders' | 'jl_split'>
   '2026-10-29 m2r5 yachi': 'jl_split',
   // 2026-11-05: one both_orders, pinglamb's m4r4 (prefix 33): two Triples and one Double in the window.
   '2026-11-05 m4r4 pinglamb': 'both_orders',
+  // 2026-11-23: one stray_cannon, pinglamb's m6r4 (prefix 104): a Stray Cannon case (bag1.z_right then 2.ideal) with one Double then one Triple in the window.
+  '2026-11-23 m6r4 pinglamb': 'stray_cannon',
 };
 /** Stick-spin bag-1 rounds with a COMPLETE opener window (0-based locks 0-21) that are not Double-first: none has a Triple
  *  in the window (the bag1.pc ones a TSD and no TST; bag1.left's 10-12 m8r4 no T-spin at all). */
@@ -305,6 +307,10 @@ test('the cross-check: Double-first openers against stick-spin bag 1, both ways,
     const r = rounds.get(k)!;
     if (why === 'dt_cannon') { const cell = roundOf(k).split(' ').filter((_, i) => i !== 1).join(' '); cannons[cell] = (cannons[cell] ?? 0) + 1; }
     if (why === 'both_orders') expect(r.cspin_order, k).toBe(1);
+    if (why === 'stray_cannon') {
+      const sc = JSON.parse(readFileSync(`${import.meta.dir}/../../analysis/stray-cannon-facts.json`, 'utf8')).cases;
+      expect(sc.some((c: any) => `${c.session} m${c.match}r${c.round} ${c.player}` === k && c.bag2?.node), k).toBe(true);
+    }
     if (why === 'jl_split') {
       expect(jlSplit(stripGarbage(byName.get(k)!.rows[5]!).rows!), k).toBe(true);
     }

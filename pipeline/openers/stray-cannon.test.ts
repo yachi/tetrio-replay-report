@@ -53,6 +53,7 @@ const Z_LEFT_BAG1 = [
   '2026-10-22 m1r7 yachi',      // matched z_left at 7 and the 6-lock field; prefix 102, no bag 2
   '2026-10-29 m2r8 yachi',      // matched z_left at 7 and the 6-lock field; prefix 29, no bag 2
   '2026-11-19 m3r5 yachi',
+  '2026-11-23 m6r3 yachi',
 ];
 const I_EARLY_CASES = ['2026-09-11 m7r2 yachi (mirrored)'];
 const TST_DONATE_CASES = [
@@ -80,6 +81,7 @@ const PC_OFF_PAGE = [
   '2026-10-29 m2r8 pinglamb under 2.ideal.other',  // PC on lock 19, prefix 16: `verified: false`
   '2026-10-29 m6r2 pinglamb under 2.ideal.other',  // PC on lock 19, prefix 27
   '2026-11-17 m1r3 pinglamb under 2.ideal.other',  // PC on lock 19, prefix 14: `verified: false`
+  '2026-11-23 m3r10 pinglamb under 2.ideal.other',
 ];
 /** A PC that matches patterns of two branches by colour; its own bag-2 branch decides. */
 const MULTI_COLOUR_RESOLVED_BY_BRANCH = ['2026-09-17 m4r2 pinglamb'];
@@ -111,9 +113,9 @@ const PC_GARBAGE_IN_WINDOW: string[] = [];
 // 2.normal_OS (all under its own) and 1 to 2.normal_SO (under its own), three entries to
 // TST_DONATE_CASES (m2r1, m2r2, m2r5) and one to PC_OFF_PAGE (m1r3).
 const CONDITIONS = {
-  '2.ideal': { '2.ideal': 454, '2.normal_OS': 62, '2.normal_SO': 15 },
-  '2.normal_OS': { '2.ideal': 1, '2.normal_OS': 157, '2.normal_SO': 23 },
-  '2.normal_SO': { '2.ideal': 13, '2.normal_OS': 1, '2.normal_SO': 52 },
+  '2.ideal': { '2.ideal': 487, '2.normal_OS': 74, '2.normal_SO': 20 },
+  '2.normal_OS': { '2.ideal': 1, '2.normal_OS': 167, '2.normal_SO': 26 },
+  '2.normal_SO': { '2.ideal': 14, '2.normal_OS': 1, '2.normal_SO': 54 },
   '2.i_early': { '2.normal_OS': 1 },
 };
 
