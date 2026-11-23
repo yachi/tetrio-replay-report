@@ -35,3 +35,6 @@ details.inc{margin-top:10px}
 .bar[data-bar=kind]{flex-wrap:wrap}
 .kc{display:inline-block;font-size:.75em;padding:1px 6px;border-radius:10px;border:1px solid var(--line);color:var(--muted);margin-right:6px;vertical-align:middle}
 .kc-held{border-color:var(--accent);color:var(--fg)}
+.stats b{font-size:1.05rem}
+.pairl,.fboth{margin:.3em 0;padding:4px 8px;border-left:3px solid var(--accent);background:var(--panel)}
+.pairl b,.fboth b{color:var(--fg)}

@@ -129,7 +129,7 @@ test('(a) the three md5s are current and the artefact is quarantined', () => {
   expect(ART.md5.shapes).toBe(md5(canon(SHAPES)));
   expect(ART.report_eligible).toBe(false);
   expect(ART.constructed).toBe(true);
-  expect(ART.schema).toBe('tst-openers-tp/3');
+  expect(ART.schema).toBe('tst-openers-tp/4');
   expect(ART.md5.b1).toBe(md5(canon(B1)));
 });
 
@@ -474,16 +474,8 @@ test('(h) every family figure is recomputed from the boards and the first-bag ve
     if (new Set(all.flatMap(([, cs]) => cs)).size !== 28) continue;
     (lay.get(bkey(all)) ?? lay.set(bkey(all), new Set()).get(bkey(all))!);
   }
-  expect(lay.size).toBe(F.list.length);
-  const listed = new Set(F.list.map((L: any) => bkey(L.pieces)));
-  for (const k of lay.keys()) expect(listed.has(k)).toBe(true);
-  for (const L of F.list) {
-    const names: string[] = L.variants;
-    expect(names.length).toBeGreaterThanOrEqual(2);
-    // each variant is the layout less one piece, and every kept such board is listed
-    const want = new Set<string>();
-    for (const b of ART.boards) { const ks = pieceKeys(b.pieces), all = pieceKeys(L.pieces); if (ks.size === 6 && [...ks].every((x) => all.has(x))) want.add(b.name); }
-    expect(new Set(names)).toEqual(want);
+  const byKey = new Map<string, string>(ART.boards.map((b: any) => [keyOf(b.pieces), b.name]));
+  const check = (names: string[], num: any, pk: any) => {
     for (const bk of BKEYS) {
       let bn = 0, pn = 0;
       const pick = names.map(() => 0);
@@ -500,10 +492,39 @@ test('(h) every family figure is recomputed from the boards and the first-bag ve
         const s = vec.get(names[arg])![o];
         bn += tab.get(names[arg])[bk][1][s]; pn += tab.get(names[arg])[bk][0][s]; pick[arg]++;
       }
-      expect([bn, pn]).toEqual(L.num[bk]);
-      expect(pick).toEqual(L.pick[bk]);
+      expect([bn, pn]).toEqual(num[bk]);
+      expect(pick).toEqual(pk[bk]);
     }
+  };
+  expect(lay.size).toBe(F.list.length);
+  const listed = new Set(F.list.map((L: any) => bkey(L.pieces)));
+  for (const k of lay.keys()) expect(listed.has(k)).toBe(true);
+  for (const L of F.list) {
+    const names: string[] = L.variants;
+    expect(names.length).toBeGreaterThanOrEqual(2);
+    // each variant is the layout less one piece, and every kept such board is listed
+    const want = new Set<string>();
+    for (const b of ART.boards) { const ks = pieceKeys(b.pieces), all = pieceKeys(L.pieces); if (ks.size === 6 && [...ks].every((x) => all.has(x))) want.add(b.name); }
+    expect(new Set(names)).toEqual(want);
+    check(names, L.num, L.pick);
+    // `both`: the variants and every variant's mirror board (independently, by mirroring each variant's pieces)
+    const both = new Set(names);
+    for (const n of names) both.add(byKey.get(keyOf(mirrorPcs(byName.get(n).pieces)))!);
+    const order = new Map<string, number>(ART.boards.map((b: any, i: number) => [b.name, i]));
+    expect(L.both.variants).toEqual([...both].sort((a, b) => order.get(a)! - order.get(b)!));
+    check(L.both.variants, L.both.num, L.both.pick);
+    for (const bk of BKEYS) expect(L.both.num[bk][1]).toBeGreaterThanOrEqual(L.num[bk][1]);
   }
+  // `pairs`: every board with its mirror board, once
+  expect(F.pairs.length * 2).toBe(ART.boards.length);
+  const seen = new Set<string>();
+  for (const P of F.pairs) {
+    const [a, m] = P.boards;
+    expect(byKey.get(keyOf(mirrorPcs(byName.get(a).pieces)))).toBe(m);
+    seen.add(a); seen.add(m);
+    check(P.boards, P.num, P.pick);
+  }
+  expect(seen.size).toBe(ART.boards.length);
 }, 300_000);
 
 test('(i) cross-crate: the pinned counter with B1ONLY counts 5040 x the orders each vector says build the board', () => {

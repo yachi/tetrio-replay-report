@@ -36,7 +36,7 @@ HELD BOARDS (schema tst-openers-tp/2) are added on top of the committed placed b
 `--fallback <scratch dir>` writes the same artefact from the scratch outputs with the mirror shapes derived by symmetry
 (`mirror.assumed: true`); it exists so a page can be built while O2-O4 run.
 
-FAMILIES (schema tst-openers-tp/3; the hold-swap figure of docs/tst-openers.html). A LAYOUT is a set of seven placements, one of
+FAMILIES (schema tst-openers-tp/4; the hold-swap figure of docs/tst-openers.html). A LAYOUT is a set of seven placements, one of
 each of IJLOSTZ, on 28 distinct cells; its VARIANTS are the kept boards that are the layout minus one piece (the piece left out is
 the one held: minus the T is a T-held board). A family is a layout with at least two variants in the artefact. With the five-piece
 preview the first bag's dealt order o1 is known before any hold decision, so the player picks the variant per o1.
@@ -53,6 +53,9 @@ preview the first bag's dealt order o1 is known before any hold decision, so the
       chosen variants' bag-2 counts over 5040^2. The choice is made per budget.
   F3  a variant pruned from the artefact (upper bound <= 36%) is not in the family, so a family figure is a lower bound
       (`families.complete: false`). Cards and ranks stay per mirror pair by the board's own joint.
+  F4  `both` (per family) runs the F2 policy over the variants AND their mirror boards, so each o1 picks the better hand too;
+      `pairs` runs it over each board and its mirror board. Each is a superset of either hand's options, so its joint is at least
+      either hand's (`validate_families` checks that sandwich).
 
   B1  python3 $E --b1-input > $W/b1.in ; pipeline/sim/tst-b1vec-rs/target/release/tst-b1vec < $W/b1.in > $W/b1.out     # about 40 s
       python3 $E --b1-merge $W/b1.out                                          # writes analysis/tst-openers-tp-b1.json
@@ -84,7 +87,7 @@ SHAPES = ROOT / "pipeline" / "openers" / "tst-openers-shapes.json"
 OLD = ROOT / "analysis" / "tst-openers.json"
 OUT = ROOT / "analysis" / "tst-openers-tp.json"
 CRATES = ["tst2bag-tp-rs", "oracle-rs", "pc-solver-rs"]
-SCHEMA = "tst-openers-tp/3"
+SCHEMA = "tst-openers-tp/4"
 SCHEMA_V2 = "tst-openers-tp/2"
 SCHEMA_V1 = "tst-openers-tp/1"
 B1_SCHEMA = "tst-openers-tp-b1/1"
@@ -576,6 +579,22 @@ def validate_families(art):
             assert max(js) <= jf <= min(1, sum(js)), f"{f['variants']} {bk}: joint sandwich"
             assert bf <= min(1, sum(bl)), f"{f['variants']} {bk}: built bound"
             assert sum(f["pick"][bk]) <= B
+            # `both`: the variants and their mirror boards; a superset of each hand's options, so at least either hand's joint
+            bv = f["both"]["variants"]
+            jb = Fraction(f["both"]["num"][bk][1], N2 * B)
+            js2 = [joint(bs[v]["cum"][bk], bs[v]["classes"]) for v in bv]
+            hands = [jf] + ([Fraction(fams["list"][f["mirror"]]["num"][bk][1], N2 * B)] if f["mirror"] is not None else [])
+            assert max(hands) <= jb <= min(1, sum(js2)), f"{bv} {bk}: both sandwich"
+            assert sum(f["both"]["pick"][bk]) <= B
+    for p in fams["pairs"]:
+        a, m = (bs[n] for n in p["boards"])
+        assert a["mirror"] == m["name"] and m["mirror"] == a["name"]
+        for bk in BKEYS:
+            ja, jm = joint(a["cum"][bk], a["classes"]), joint(m["cum"][bk], m["classes"])
+            jp = Fraction(p["num"][bk][1], N2 * B)
+            assert max(ja, jm) <= jp <= min(1, ja + jm), f"{p['boards']} {bk}: pair sandwich"
+            assert sum(p["pick"][bk]) <= B
+    assert len(fams["pairs"]) * 2 == len(bs)
     return True
 
 
@@ -826,7 +845,7 @@ def compare_scratch(args):
     print("deduped top 5 same boards as scratch (as pairs):", all(any(k == s or k == mirror_board_key(s) for s in sc_top) for k in my_top))
 
 
-# ---- hold-swap families (schema /3) ----------------------------------------------------------------------------------
+# ---- hold-swap families (schema /4) ----------------------------------------------------------------------------------
 import base64, zlib
 
 INFEAS = 10          # the code of a '.' (no build from this order) in a decoded b1 vector
@@ -962,9 +981,12 @@ def layouts_of(art):
 
 
 def families_of(art, b1):
-    """The families object (schema /3) recomputed from the boards and the b1 vectors."""
+    """The families object (schema /4) recomputed from the boards and the b1 vectors: per layout its variants' figures under
+    the policy, and `both`, the same policy over the variants and their mirror boards (each first-bag order picks the better
+    hand); `pairs`, the policy over each board and its mirror board."""
     import numpy as np
     bs = art["boards"]
+    pos = {b["name"]: i for i, b in enumerate(bs)}
     vec = b1_vectors(b1)
     tabs = {}
     for b in bs:
@@ -974,29 +996,43 @@ def families_of(art, b1):
             v = vec[b["name"]]
             assert int(Bt[v].sum()) == b["cum"][bk][-1], f"{b['name']} {bk}: built identity"
             assert int(J[v].sum()) == joint(b["cum"][bk], b["classes"]) * N2 * B, f"{b['name']} {bk}: pc3 identity"
-    lays = layouts_of(art)
-    keys = sorted(lays, key=lambda L: sorted(L))
-    index = {L: i for i, L in enumerate(keys)}
     cols = np.arange(B)
-    fams = []
-    for L in keys:
-        vs = lays[L]
+
+    def policy(nm):
         num, pick = {}, {}
         for bk in BKEYS:
-            nm = [bs[i]["name"] for i in vs]
             Js = np.stack([tabs[n][bk][0][vec[n]] for n in nm])
             Bs = np.stack([tabs[n][bk][1][vec[n]] for n in nm])
             av = np.stack([(vec[n] < INFEAS) if bk == "inf" else (vec[n] <= int(bk)) for n in nm])
             arg = np.where(av, Js * 8192 + Bs, -1).argmax(axis=0)
             anyav = av.any(axis=0)
             num[bk] = [int(Bs[arg, cols][anyav].sum()), int(Js[arg, cols][anyav].sum())]
-            pick[bk] = [int(((arg == t) & anyav).sum()) for t in range(len(vs))]
+            pick[bk] = [int(((arg == t) & anyav).sum()) for t in range(len(nm))]
+        return num, pick
+    lays = layouts_of(art)
+    keys = sorted(lays, key=lambda L: sorted(L))
+    index = {L: i for i, L in enumerate(keys)}
+    fams = []
+    for L in keys:
+        nm = [bs[i]["name"] for i in lays[L]]
+        num, pick = policy(nm)
+        both = sorted(set(nm) | {bs[pos[n]]["mirror"] for n in nm}, key=pos.get)
+        bnum, bpick = policy(both)
         ml = frozenset((p[0], tuple(p[1])) for p in mirror_pieces([[k, list(cs)] for k, cs in L]))
-        fams.append({"pieces": [[k, list(cs)] for k, cs in sorted(L)], "variants": [bs[i]["name"] for i in vs],
-                     "mirror": index.get(ml), "num": num, "pick": pick})
+        mi = index.get(ml)
+        if mi is not None:
+            assert set(both) == set(nm) | {bs[i]["name"] for i in lays[keys[mi]]}, "mirror family variants are the mirrors"
+        fams.append({"pieces": [[k, list(cs)] for k, cs in sorted(L)], "variants": nm,
+                     "mirror": mi, "num": num, "pick": pick,
+                     "both": {"variants": both, "num": bnum, "pick": bpick}})
+    prs = []
+    for b in bs:
+        if pos[b["name"]] < pos[b["mirror"]]:
+            num, pick = policy([b["name"], b["mirror"]])
+            prs.append({"boards": [b["name"], b["mirror"]], "num": num, "pick": pick})
     return {"complete": all(len(f["variants"]) == 7 for f in fams),
             "policy": "per first-bag order, the variant with the larger joint, then built, then the earlier board, at that budget",
-            "list": fams}
+            "list": fams, "pairs": prs}
 
 
 def families_cmd(args):

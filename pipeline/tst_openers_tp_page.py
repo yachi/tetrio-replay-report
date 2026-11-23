@@ -111,9 +111,9 @@ def load_inputs(repo=REPO):
     with open(os.path.join(repo, "analysis", "tst-openers-tp.json"), "rb") as f:
         raw = f.read()
     art = json.loads(raw)
-    _need(art["schema"] == "tst-openers-tp/3" and art["report_eligible"] is False and art["constructed"] is True
+    _need(art["schema"] == "tst-openers-tp/4" and art["report_eligible"] is False and art["constructed"] is True
           and "families" in art,
-          "the artefact is not tst-openers-tp/3 (with families) marked report_eligible: false / constructed: true")
+          "the artefact is not tst-openers-tp/4 (with families) marked report_eligible: false / constructed: true")
     with open(os.path.join(repo, "analysis", "tst-openers.json"), "rb") as f:
         old_raw = f.read()
     _need(art["md5"]["tst_openers"] == hashlib.md5(old_raw).hexdigest(),
@@ -410,6 +410,20 @@ def fam_strings(L, k):
     return [pct(built), pct(Fraction(n, bn * BAG)) if bn else "未計", pct(joint)]
 
 
+def pair_of(art, a, b):
+    """The artefact's `families.pairs` entry of the mirror pair {a, b}: the policy over the two hands."""
+    for P in art["families"]["pairs"]:
+        if set(P["boards"]) == {a, b}:
+            return P
+    raise KeyError((a, b))
+
+
+def fl_spans(fmt, L):
+    """One span per budget (`data-fl`, the budget bar switches them) of a `fam_line`-shaped sentence over policy counts `L`."""
+    return "".join(f'<span data-fl="{k}"{"" if k == BK_SHOWN else " hidden"}>'
+                   f'{_esc(fmt.format(a=fam_strings(L, k)[0], b=fam_strings(L, k)[1], c=fam_strings(L, k)[2]))}</span>' for k in BK)
+
+
 def families(art, cat):
     """Hold-swap families are the artefact's layouts (`families.list`). Returns (name -> indices of the layouts listing the
     board, name -> its pair's representative board). The artefact is read, never recomputed here: the family counts need the
@@ -471,11 +485,12 @@ def fam_block(r, m, fam, rkmap, cat, art, PR):
                 + f'<td class="num" data-fs="1">{spans([sum(L["pick"][k]) for k in BK])}</td></tr>')
     line = "".join(f'<span data-fl="{k}"{"" if k == BK_SHOWN else " hidden"}>{_esc(C["fam_line"].format(a=fam_strings(L, k)[0], b=fam_strings(L, k)[1], c=fam_strings(L, k)[2]))}</span>'
                    for k in BK)
+    both = f'<p class="sm fboth" data-fboth="1">{fl_spans(C["fam_both"], L["both"])}</p>'
     other = f'<p class="muted sm" data-fother="1">{_esc(C["fam_other"].format(n=len(idx) - 1))}</p>' if len(idx) > 1 else ""
     return (f'<details class="fam" data-fam="{idx[0]}"><summary>{_esc(C["fam_summary"].format(n=len(L["variants"])))}</summary>'
             f'<p class="muted sm">{_esc(C["fam_note"])}</p>'
             f'<div class="p3w"><table class="p3"><thead><tr>{head}</tr></thead><tbody>{"".join(rows)}</tbody></table></div>'
-            f'<p class="muted sm" data-fline="1">{line}</p>{other}</details>')
+            f'<p class="muted sm" data-fline="1">{line}</p>{both}{other}</details>')
 
 
 def threshold(art):
@@ -701,6 +716,7 @@ def card(rkt, r, m, cat, art, PR, pcxd, famh=""):
             f'<div class="small"><div class="lab">{_esc(C["left_title"])}</div>{OP.svg(res, max(4, len(rows)), 9)}</div></div></div>\n'
             f'<div class="meta"><span class="kc kc-{r["kind"]}" data-kc="1">{_esc(C["kind_" + r["kind"]])}</span><div class="src">{shown}</div>\n'
             f'<div class="stats">{stats}</div>\n'
+            f'<div class="sm pairl" data-pair="1">{fl_spans(C["pair_line"], pair_of(art, r["name"], m["name"]))}</div>\n'
             f'<div class="muted sm sdl">{_esc(C["sd_line"])} {sdl}</div>\n'
             f'<div class="muted sm cnt" data-cnt="1">{_esc(cnt)}</div>\n'
             f'<div class="muted sm">{_esc(line)}</div>\n{b1_line(r, C)}{mirror_line(r, m, C)}\n{famh}{pcx}'
@@ -1227,6 +1243,23 @@ def audit(page, art, cat, PR, pcxd=None, builds=None):
                 bad.append(f"card {name}: the mirror board's figures are not the recomputed ones")
         if by[r["mirror"]] is not m:
             bad.append(f"card {name}: the mirror board is not the artefact's")
+        # the with-mirror pair line: the policy over the card's board and its mirror board
+        pm = re.search(r'data-pair="1">(.*?)</div>', body, re.S)
+        try:
+            PP = pair_of(art, r["name"], m["name"])
+        except KeyError:
+            PP = None
+        if PP is None or not pm:
+            bad.append(f"card {name}: the with-mirror pair line or its artefact entry is missing")
+        else:
+            wp = {k: PR["card"]["pair_line"].format(a=fam_strings(PP, k)[0], b=fam_strings(PP, k)[1], c=fam_strings(PP, k)[2])
+                  for k in BK}
+            gp = {k: html.unescape(v) for k, v in re.findall(r'data-fl="(\w+)"[^>]*>(.*?)</span>', pm.group(1))}
+            if gp != wp:
+                bad.append(f"card {name}: the with-mirror pair line is not the recomputed one")
+            jp = Fraction(PP["num"][BK_SHOWN][1], N2 * BAG)
+            if jp < max(figs(r, BK_SHOWN)[2], figs(m, BK_SHOWN)[2]):
+                bad.append(f"card {name}: the with-mirror joint is below a hand's own")
         # the hold-swap family: the card's best layout, its variants' own joints, its policy figures
         fb = re.search(r'<details class="fam" data-fam="(\d+)">(.*?)</details>', body, re.S)
         idx = card_layouts(r, m, art, fam[0])
@@ -1265,6 +1298,15 @@ def audit(page, art, cat, PR, pcxd=None, builds=None):
             got = {k: html.unescape(v) for k, v in re.findall(r'data-fl="(\w+)"[^>]*>(.*?)</span>', lm.group(1))} if lm else {}
             if got != want:
                 bad.append(f"card {name}: the family line is not the recomputed one")
+            bm = re.search(r'data-fboth="1">(.*?)</p>', fbody, re.S)
+            wb = {k: PR["card"]["fam_both"].format(a=fam_strings(L["both"], k)[0], b=fam_strings(L["both"], k)[1],
+                                                    c=fam_strings(L["both"], k)[2]) for k in BK}
+            gb = {k: html.unescape(v) for k, v in re.findall(r'data-fl="(\w+)"[^>]*>(.*?)</span>', bm.group(1))} if bm else {}
+            if gb != wb:
+                bad.append(f"card {name}: the family's with-mirror line is not the recomputed one")
+            mir = {byn[x]["mirror"] for x in L["variants"]}
+            if set(L["both"]["variants"]) != set(L["variants"]) | mir:
+                bad.append(f"card {name}: the family's with-mirror variants are not the variants and their mirror boards")
             om = re.search(r'data-fother="1">(.*?)</p>', fbody, re.S)
             if (len(idx) > 1) != bool(om) or (om and html.unescape(om.group(1)) != PR["card"]["fam_other"].format(n=len(idx) - 1)):
                 bad.append(f"card {name}: the note on the other layouts is wrong")
@@ -1439,6 +1481,12 @@ def selftest(repo=REPO):
     expect("a family's joint edited", sub(r'data-ff="inf">(\d)', bump), True)
     expect("a family's picked-order count edited", sub(r'data-fl="inf">(\d)', bump), True)
     expect("a family's line edited", sub(r'data-fline="1"><span data-fl="0" hidden>[^<]*?(\d)', bump), True)
+    expect("a with-mirror pair line edited", sub(r'data-pair="1"><span data-fl="0" hidden>[^<]*?(\d)', bump), True)
+    expect("a with-mirror pair line deleted", re.sub(r'<div class="sm pairl" data-pair="1">.*?</div>', "", page, count=1, flags=re.S), True)
+    expect("a family's with-mirror line edited", sub(r'data-fboth="1"><span data-fl="0" hidden>[^<]*?(\d)', bump), True)
+    w = copy.deepcopy(art)
+    w["families"]["pairs"][0]["num"]["inf"][1] += 10 ** 12
+    expect("an edited pair joint in the artefact", page, True, a=w)
     expect("a family table deleted", re.sub(r'<details class="fam".*?</details>', "", page, count=1, flags=re.S), True)
     expect("a family pointed at another layout", sub(r'data-fam="(\d+)"', lambda h: "999"), True)
     shown = int(re.search(r'data-fam="(\d+)"', page).group(1))

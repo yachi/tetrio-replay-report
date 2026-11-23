@@ -6509,7 +6509,7 @@ figures are exact fractions re-derived by the page audit, floored for print.
 | test | `pipeline/openers/tst-openers-tp.test.ts` |
 | page | `pipeline/tst_openers_tp_page.py` + `tst_openers_tp_prose.json` + `.css` + `.js` → `docs/tst-openers.html`; reuses `tst_openers_page`'s card, tiling and PC-replay functions; `--selftest` plants the corruptions |
 | worked PCs | `emit-tst-pc-examples.py --tp` → `analysis/tst-openers-tp-pc-examples.json`, lines from `tst_openers_tp_page.pcx_lines()` (every live class of every card since 2026-11-22, not only the drawn one); `--tp --check` re-runs it in CI |
-| hold-swap families | `pipeline/sim/tst-b1vec-rs` (binary on `oracle-rs`; `Cargo.lock` committed, `target/` ignored) → `analysis/tst-openers-tp-b1.json` (`tst-openers-tp-b1/1`): per kept board a 5040-char string, one char per first-bag order, the least soft-drop cost `min(s,9)` of a first-bag build of that board or `.`; merged into `analysis/tst-openers-tp.json` (schema `tst-openers-tp/3`, `boards` byte-identical to /2) by `emit-tst-openers-tp.py --b1-merge --families`; `--check` recomputes every family from the vectors in CI, `--cross-check <tst2bag-tp binary>` re-counts a sample through the pinned counter (`MULTI=1 B1ONLY=1 SDB=n`, which returns 5040 x the orders with cost <= n); the test re-derives all families independently |
+| hold-swap families | `pipeline/sim/tst-b1vec-rs` (binary on `oracle-rs`; `Cargo.lock` committed, `target/` ignored) → `analysis/tst-openers-tp-b1.json` (`tst-openers-tp-b1/1`): per kept board a 5040-char string, one char per first-bag order, the least soft-drop cost `min(s,9)` of a first-bag build of that board or `.`; merged into `analysis/tst-openers-tp.json` (schema `tst-openers-tp/4`, `boards` byte-identical to /2) by `emit-tst-openers-tp.py --b1-merge --families`; `--check` recomputes every family from the vectors in CI, `--cross-check <tst2bag-tp binary>` re-counts a sample through the pinned counter (`MULTI=1 B1ONLY=1 SDB=n`, which returns 5040 x the orders with cost <= n); the test re-derives all families independently |
 | builds | `pipeline/sim/tst-build-rs` (binary `tst-build`) run by `pipeline/sim/emit-tst-builds.py` → `analysis/tst-openers-tp-builds.json` (`tst-openers-tp-builds/1`, constructed): per card and live class, one placement order the engine plays from empty (bag 1 first, soft-drop counts) ending on that class's tiling with the TST slot open. Clicking a class tile in 「睇晒 N 種收尾」 steps it and shows that class's worked PCs (yachi 2026-11-22: 「㩒去啲其他形，出咩好？ 3 巡PC 方法？」). The page audit (`audit_builds`) checks every build against the drawn grid, whole pieces, bag 1 first, soft-drop sums and the TST cells, and replays every worked PC; `--check` re-runs it in CI (about two minutes) |
 
 Rules the page depends on, each of which a simplification would break:
@@ -6548,6 +6548,12 @@ Rules the page depends on, each of which a simplification would break:
   built_F and the PC rate given built are not bounds either way (a pruned variant could raise or lower them);
   Stage 2 would be counting the pruned variants too. Bag 4 is removed from THIS page only (the worked PCs are bag 3;
   schema tst-openers-pc-examples/2 in tp mode); `docs/tst-openers-held.html` and its artefacts are untouched, and no rank moved.
+* **Mirror included (schema /4, yachi 2026-11-23).** Each family carries `both`: the same policy over its variants and their
+  mirror boards (which are exactly the mirror family's variants, asserted), so for each first-bag order the better hand is
+  taken; that is how online rates (はちみつ砲 65% built, 90% PC) are counted. `families.pairs` is the policy over one board and
+  its mirror, printed under each card. Both are sandwich-checked (best single hand <= figure <= min(1, sum)) in the emitter,
+  re-derived in the test and audited on the page. Ranking is still by the single board's joint; the card head prints built and
+  PC rate at the joint's size.
 * **Page size is about 4 MB** (every card's tilings and the per-class rows ride in one island); the plan's cap was about 6 MB.
 
 What re-derives what: the page audit recomputes every figure, every rank and every class row from the artefact and the shapes, checks
