@@ -502,7 +502,7 @@ def fam_block(r, m, fam, rkmap, cat, art, PR):
                     + f'<td class="num" data-fp="1">{spans([L["pick"][k][j] for k in BK])}</td></tr>')
     rows.append(f'<tr data-ffam="1"><td><b>{_esc(C["fam_row"])}</b></td>'
                 + "".join(f'<td class="num" data-ff="{k}">{fam_strings(L, k)[2]}</td>' for k in BK)
-                + '<td class="num">–</td>'
+                + '<td class="num"></td>'
                 + f'<td class="num" data-fs="1">{spans([sum(L["pick"][k]) for k in BK])}</td></tr>')
     line = "".join(f'<span data-fl="{k}"{"" if k == BK_SHOWN else " hidden"}>{_esc(C["fam_line"].format(a=fam_strings(L, k)[0], b=fam_strings(L, k)[1], c=fam_strings(L, k)[2]))}</span>'
                    for k in BK)
