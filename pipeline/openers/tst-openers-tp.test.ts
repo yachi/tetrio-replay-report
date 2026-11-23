@@ -27,6 +27,7 @@ const OLD_PATH = join(ROOT, 'analysis', 'tst-openers.json');
 const OLD = JSON.parse(readFileSync(OLD_PATH, 'utf8'));
 const SHAPES: any[] = JSON.parse(readFileSync(join(ROOT, 'pipeline', 'openers', 'tst-openers-shapes.json'), 'utf8')).shapes;
 const B1 = JSON.parse(readFileSync(join(ROOT, 'analysis', 'tst-openers-tp-b1.json'), 'utf8'));
+const X = JSON.parse(readFileSync(join(ROOT, 'analysis', 'tst-openers-tp-x.json'), 'utf8'));
 const md5 = (b: string | Buffer) => createHash('md5').update(b).digest('hex');
 const B = 5040, N2 = B * B;
 const ORDER = 'IJLOSTZ';
@@ -60,6 +61,11 @@ type Pc = [string, number[]];
 const sortPcs = (ps: Pc[]): Pc[] => ps.map(([k, cs]) => [k, [...cs].sort((a, b) => a - b)] as Pc).sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : a[1].join() < b[1].join() ? -1 : a[1].join() > b[1].join() ? 1 : 0));
 const mirrorPcs = (ps: Pc[]): Pc[] => sortPcs(ps.map(([k, cs]) => [mk(k), cs.map(mc)] as Pc));
 const keyOf = (ps: Pc[]) => sortPcs(ps).map(([k, cs]) => `${k}:${cs.join(',')}`).join('/');
+/** Python's json.dumps(sort_keys=True, separators=(',', ':'), ensure_ascii=False) for the ints, strings, lists, objects
+ * and booleans the artefacts hold (no floats). */
+const canonJson = (x: any): string => Array.isArray(x) ? `[${x.map(canonJson).join(',')}]`
+  : x !== null && typeof x === 'object' ? `{${Object.keys(x).sort().map((k) => `${JSON.stringify(k)}:${canonJson(x[k])}`).join(',')}}`
+  : JSON.stringify(x);
 const pieceKeys = (ps: Pc[]) => new Set(ps.map(([k, cs]) => `${k}:${[...cs].sort((a, b) => a - b).join(',')}`));
 const sortLeft = (l: string) => [...l].sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b)).join('');
 const leftOf = (ps: Pc[]) => [...ORDER].map((k) => k.repeat(Math.max(0, 2 - ps.filter((p) => p[0] === k).length - (k === 'T' ? 1 : 0)))).join('');
@@ -129,7 +135,7 @@ test('(a) the three md5s are current and the artefact is quarantined', () => {
   expect(ART.md5.shapes).toBe(md5(canon(SHAPES)));
   expect(ART.report_eligible).toBe(false);
   expect(ART.constructed).toBe(true);
-  expect(ART.schema).toBe('tst-openers-tp/4');
+  expect(ART.schema).toBe('tst-openers-tp/5');
   expect(ART.md5.b1).toBe(md5(canon(B1)));
 });
 
@@ -403,7 +409,7 @@ import { inflateSync } from 'node:zlib';
 const INFEAS = 10;
 const BKEYS = ['0', '1', '2', 'inf'];
 const vecOf = (name: string): number[] => {
-  const s = inflateSync(Buffer.from(B1.vectors[name], 'base64')).toString();
+  const s = inflateSync(Buffer.from(B1.vectors[name] ?? X.vectors[name], 'base64')).toString();
   expect(s.length).toBe(B);
   return [...s].map((c) => (c === '.' ? INFEAS : c.charCodeAt(0) - 48));
 };
@@ -412,6 +418,11 @@ function tables(b: any, v: number[]) {
   for (const x of v) n[x]++;
   const nfeas = B - n[INFEAS];
   const ncls = b.cum.inf.length;
+  if (nfeas === 0) {   // no first-bag order builds it: every count is zero, and so is every table
+    for (const bk of BKEYS) expect(b.cum[bk].every((x: number) => x === 0)).toBe(true);
+    const z = () => new Array(INFEAS + 1).fill(0);
+    return { out: Object.fromEntries(BKEYS.map((bk) => [bk, [z(), z()]])), n };
+  }
   const Dinf = b.cum.inf.map((c: number) => { expect(c % nfeas).toBe(0); return c / nfeas; });
   const smin = n.findIndex((x: number, s: number) => s < INFEAS && x > 0);
   const Dfin: Record<number, number[]> = {};
@@ -444,10 +455,15 @@ function tables(b: any, v: number[]) {
 const bkey = (ps: Pc[]) => keyOf(ps);
 test('(h) every family figure is recomputed from the boards and the first-bag vectors', () => {
   const F = ART.families;
-  expect(F.complete).toBe(false);
-  const byName = new Map<string, any>(ART.boards.map((b: any) => [b.name, b]));
+  expect(F.complete).toBe(true);
+  // the kept boards and the extra ones (the variants the pruning dropped, analysis/tst-openers-tp-x.json)
+  expect(X.schema).toBe('tst-openers-tp-x/1');
+  expect(ART.md5.x).toBe(md5(canonJson(X)));
+  const ALL: any[] = [...ART.boards, ...X.boards];
+  const kept = new Set<string>(ART.boards.map((b: any) => b.name));
+  const byName = new Map<string, any>(ALL.map((b: any) => [b.name, b]));
   const vec = new Map<string, number[]>(), tab = new Map<string, any>();
-  for (const b of ART.boards) {
+  for (const b of ALL) {
     const v = vecOf(b.name); vec.set(b.name, v);
     const t = tables(b, v); tab.set(b.name, t.out);
     for (const bk of BKEYS) {   // a one-board family reproduces the board's own figures
@@ -460,9 +476,10 @@ test('(h) every family figure is recomputed from the boards and the first-bag ve
     }
   }
   // layouts, second implementation: group by (layout less one piece), then every pair that completes a layout
+  const keptKeys = new Set<string>(ART.boards.map((b: any) => keyOf(b.pieces)));
   const lay = new Map<string, Set<string>>();
   const cores = new Map<string, { name: string; p: Pc }[]>();
-  for (const b of ART.boards) b.pieces.forEach((p: Pc, j: number) => {
+  for (const b of ALL) b.pieces.forEach((p: Pc, j: number) => {
     const rest = sortPcs(b.pieces.filter((_: Pc, i: number) => i !== j));
     const k = bkey(rest);
     (cores.get(k) ?? cores.set(k, []).get(k)!).push({ name: b.name, p: sortPcs([p])[0] });
@@ -472,9 +489,11 @@ test('(h) every family figure is recomputed from the boards and the first-bag ve
     const base = k.split('/').map((t) => { const [kk, cs] = t.split(':'); return [kk, cs.split(',').map(Number)] as Pc; });
     const all = sortPcs([...base, lst[a].p, lst[c].p]);
     if (new Set(all.flatMap(([, cs]) => cs)).size !== 28) continue;
+    // a layout counts only if some variant of it (the layout less one piece) is a kept board
+    if (!all.some((_, i) => keptKeys.has(bkey(all.filter((_2, j) => j !== i))))) continue;
     (lay.get(bkey(all)) ?? lay.set(bkey(all), new Set()).get(bkey(all))!);
   }
-  const byKey = new Map<string, string>(ART.boards.map((b: any) => [keyOf(b.pieces), b.name]));
+  const byKey = new Map<string, string>(ALL.map((b: any) => [keyOf(b.pieces), b.name]));
   const check = (names: string[], num: any, pk: any) => {
     for (const bk of BKEYS) {
       let bn = 0, pn = 0;
@@ -504,13 +523,14 @@ test('(h) every family figure is recomputed from the boards and the first-bag ve
     expect(names.length).toBeGreaterThanOrEqual(2);
     // each variant is the layout less one piece, and every kept such board is listed
     const want = new Set<string>();
-    for (const b of ART.boards) { const ks = pieceKeys(b.pieces), all = pieceKeys(L.pieces); if (ks.size === 6 && [...ks].every((x) => all.has(x))) want.add(b.name); }
+    for (const b of ALL) { const ks = pieceKeys(b.pieces), all = pieceKeys(L.pieces); if (ks.size === 6 && [...ks].every((x) => all.has(x))) want.add(b.name); }
+    expect(names.some((n) => kept.has(n))).toBe(true);
     expect(new Set(names)).toEqual(want);
     check(names, L.num, L.pick);
     // `both`: the variants and every variant's mirror board (independently, by mirroring each variant's pieces)
     const both = new Set(names);
     for (const n of names) both.add(byKey.get(keyOf(mirrorPcs(byName.get(n).pieces)))!);
-    const order = new Map<string, number>(ART.boards.map((b: any, i: number) => [b.name, i]));
+    const order = new Map<string, number>(ALL.map((b: any, i: number) => [b.name, i]));
     expect(L.both.variants).toEqual([...both].sort((a, b) => order.get(a)! - order.get(b)!));
     check(L.both.variants, L.both.num, L.both.pick);
     for (const bk of BKEYS) expect(L.both.num[bk][1]).toBeGreaterThanOrEqual(L.num[bk][1]);

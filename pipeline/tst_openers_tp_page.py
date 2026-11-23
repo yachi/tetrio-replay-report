@@ -112,9 +112,15 @@ def load_inputs(repo=REPO):
     with open(os.path.join(repo, "analysis", "tst-openers-tp.json"), "rb") as f:
         raw = f.read()
     art = json.loads(raw)
-    _need(art["schema"] == "tst-openers-tp/4" and art["report_eligible"] is False and art["constructed"] is True
+    _need(art["schema"] == "tst-openers-tp/5" and art["report_eligible"] is False and art["constructed"] is True
           and "families" in art,
-          "the artefact is not tst-openers-tp/4 (with families) marked report_eligible: false / constructed: true")
+          "the artefact is not tst-openers-tp/5 (with families) marked report_eligible: false / constructed: true")
+    with open(os.path.join(repo, "analysis", "tst-openers-tp-x.json"), encoding="utf-8") as f:
+        x = json.load(f)
+    _need(x["schema"] == "tst-openers-tp-x/1" and x["report_eligible"] is False and x["constructed"] is True
+          and art["md5"].get("x") == hashlib.md5(json.dumps(x, sort_keys=True, separators=(",", ":"),
+                                                             ensure_ascii=False).encode()).hexdigest(),
+          "analysis/tst-openers-tp.json's families were built from another analysis/tst-openers-tp-x.json")
     with open(os.path.join(repo, "analysis", "tst-openers.json"), "rb") as f:
         old_raw = f.read()
     _need(art["md5"]["tst_openers"] == hashlib.md5(old_raw).hexdigest(),
@@ -144,7 +150,21 @@ def load_inputs(repo=REPO):
         _need(all(s in cat for s in b["shapes"]), f"board {b['name']} names a shape outside the catalogue")
         b["kind"] = "held" if b["held"] == "T" else "placed"
         b["b1"] = bag1_names(b, lib)
+    for b in x["boards"]:
+        _need(all(s in cat for s in b["shapes"]), f"extra board {b['name']} names a shape outside the catalogue")
+        b["kind"] = "held" if b["held"] == "T" else "placed"
+        b["b1"] = bag1_names(b, lib)
+    art["xboards"] = x["boards"]
     return art, cat
+
+
+def all_boards(art):
+    """name -> board over the kept boards and the extra ones (`analysis/tst-openers-tp-x.json`: the variants of a family
+    layout the pruning dropped, counted so the family figures are exact). Extra boards have no card and no rank."""
+    by = {b["name"]: b for b in art["boards"]}
+    for b in art.get("xboards", []):
+        by[b["name"]] = b
+    return by
 
 
 def load_prose(path=PROSE_PATH):
@@ -452,7 +472,7 @@ def card_layouts(r, m, art, by_name):
 
 def fam_block(r, m, fam, rkmap, cat, art, PR):
     """The card's best family: each variant's own joint per budget, its rank and the orders the policy gives it, then the
-    family's own line (a lower bound: variants the pruning dropped are missing)."""
+    family's own line. A variant the pruning dropped (an extra board) prints its own joint, no rank and no link."""
     C = PR["card"]
     by_name, rep_of = fam
     idx = card_layouts(r, m, art, by_name)
@@ -460,7 +480,7 @@ def fam_block(r, m, fam, rkmap, cat, art, PR):
         return ""
     lst = art["families"]["list"]
     L = lst[idx[0]]
-    byn = {b["name"]: b for b in art["boards"]}
+    byn = all_boards(art)
     sfx = art["mirror"]["suffix"]
     head = "".join(f"<th>{_esc(h)}</th>" for h in C["fam_cols"])
 
@@ -469,7 +489,7 @@ def fam_block(r, m, fam, rkmap, cat, art, PR):
     rows = []
     for j, vn in enumerate(L["variants"]):
         v = byn[vn]
-        rep = rep_of[vn]
+        rep = rep_of.get(vn, v)
         rk = rkmap.get(rep["name"], "–")
         if v is not rep:
             rk = C["fam_mirror"].format(rk=rk)
@@ -1081,9 +1101,9 @@ def audit_layouts(art, bad):
     variant and the sum of the variants (the sandwich), picks within the 5040 first-bag orders, the PC count monotone in the
     budget (built is not: the policy maximises the joint, so it may pick a variant that builds less)."""
     F = art["families"]
-    if F.get("complete") is not False:
-        bad.append("families.complete is not false: the pruned variants are missing, so the figures are lower bounds")
-    byn = {b["name"]: b for b in art["boards"]}
+    if F.get("complete") is not True:
+        bad.append("families.complete is not true: the pruned variants must be counted for the family figures to be exact")
+    byn = all_boards(art)
     lst = F["list"]
     for i, L in enumerate(lst):
         tag = f"layout {i}"
@@ -1117,7 +1137,7 @@ def audit_layouts(art, bad):
                 bad.append(f"{tag}: the family joint at budget {k} is outside the sandwich of its variants")
             if vs and not (built <= min(Fraction(1), sum(bs))):
                 bad.append(f"{tag}: the family built at budget {k} exceeds the sum of its variants")
-            if bn > pn // 1 * 0 + N2 or (bn == 0) != (pn == 0):
+            if bn > N2 or (pn > 0 and bn == 0):  # a family can build at a budget whose classes never clear (PC 0)
                 bad.append(f"{tag}: built / PC counts at budget {k} disagree")
         for a, b2 in zip(BK, BK[1:]):
             if L["num"][a][1] > L["num"][b2][1]:
@@ -1275,12 +1295,14 @@ def audit(page, art, cat, PR, pcxd=None, builds=None):
             rows = re.findall(r'<tr data-fv="(\w+)">(.*?)</tr>', fbody, re.S)
             if [x for x, _ in rows] != L["variants"]:
                 bad.append(f"card {name}: the family rows {[x for x, _ in rows]} are not the layout's {L['variants']}")
-            byn = {b["name"]: b for b in art["boards"]}
+            byn = all_boards(art)
             for j, (vn, rb) in enumerate(rows):
                 v = byn.get(vn)
                 got = dict(re.findall(r'data-fg="(\w+)">(.*?)</td>', rb))
                 if v is None or got != {k: ex_strings(v)[k][2] for k in BK}:
                     bad.append(f"card {name}: family variant {vn}'s figures are not its recomputed joints")
+                if vn not in {b["name"] for b in art["boards"]} and ("<a " in rb or 'data-fr="1">–</td>' not in rb):
+                    bad.append(f"card {name}: family variant {vn} has no card, so it takes no rank and no link")
                 pk = dict(re.findall(r'data-fl="(\w+)"[^>]*>(\d+)</span>', rb))
                 if pk != {k: str(L["pick"][k][j]) for k in BK}:
                     bad.append(f"card {name}: family variant {vn}'s picked orders are not the artefact's")
@@ -1509,7 +1531,7 @@ def selftest(repo=REPO):
     L0["variants"][0] = next(b["name"] for b in art["boards"] if b["name"] not in L0["variants"])
     expect("a family variant that is not a hold swap of the layout", page, True, a=w)
     w = copy.deepcopy(art)
-    w["families"]["complete"] = True
+    w["families"]["complete"] = False
     expect("families.complete flipped", page, True, a=w)
     expect("a 4th-bag word on the page", page.replace("</body>", "<p>4 巡</p></body>", 1), True)
     m = _CARD.search(page)

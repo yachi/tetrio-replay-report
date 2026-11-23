@@ -6505,11 +6505,12 @@ figures are exact fractions re-derived by the page audit, floored for print.
 | piece | where |
 |---|---|
 | counter + sampler | `pipeline/sim/tst2bag-tp-rs` (path dependencies as `tst2bag-rs`; `Cargo.lock` committed) |
-| emitter, artefact | `pipeline/sim/emit-tst-openers-tp.py` → `analysis/tst-openers-tp.json` (schema `tst-openers-tp/1`) |
+| emitter, artefact | `pipeline/sim/emit-tst-openers-tp.py` → `analysis/tst-openers-tp.json` (schema `tst-openers-tp/5`; /1 placed boards, /2 held, /4 families, /5 exact families) |
 | test | `pipeline/openers/tst-openers-tp.test.ts` |
 | page | `pipeline/tst_openers_tp_page.py` + `tst_openers_tp_prose.json` + `.css` + `.js` → `docs/tst-openers.html`; reuses `tst_openers_page`'s card, tiling and PC-replay functions; `--selftest` plants the corruptions |
 | worked PCs | `emit-tst-pc-examples.py --tp` → `analysis/tst-openers-tp-pc-examples.json`, lines from `tst_openers_tp_page.pcx_lines()` (every live class of every card since 2026-11-22, not only the drawn one); `--tp --check` re-runs it in CI |
 | hold-swap families | `pipeline/sim/tst-b1vec-rs` (binary on `oracle-rs`; `Cargo.lock` committed, `target/` ignored) → `analysis/tst-openers-tp-b1.json` (`tst-openers-tp-b1/1`): per kept board a 5040-char string, one char per first-bag order, the least soft-drop cost `min(s,9)` of a first-bag build of that board or `.`; merged into `analysis/tst-openers-tp.json` (schema `tst-openers-tp/4`, `boards` byte-identical to /2) by `emit-tst-openers-tp.py --b1-merge --families`; `--check` recomputes every family from the vectors in CI, `--cross-check <tst2bag-tp binary>` re-counts a sample through the pinned counter (`MULTI=1 B1ONLY=1 SDB=n`, which returns 5040 x the orders with cost <= n); the test re-derives all families independently |
+| pruned variants | `pipeline/sim/tst-d-rs` (binary `tst-d`, on `oracle-rs`; `Cargo.lock` committed) → `analysis/tst-openers-tp-x.json` (`tst-openers-tp-x/1`): every candidate board below the threshold that is a listed layout less one piece, with its cum per budget built by F1 from tst-d's bag-2 counts D and its own first-bag vector; X1-X5 in the emitter's docstring. `--x-verify` (tst-d against the committed cum on every kept board) is the hard gate, run offline; CI's `--check` re-derives the families from both files |
 | builds | `pipeline/sim/tst-build-rs` (binary `tst-build`) run by `pipeline/sim/emit-tst-builds.py` → `analysis/tst-openers-tp-builds.json` (`tst-openers-tp-builds/1`, constructed): per card and live class, one placement order the engine plays from empty (bag 1 first, soft-drop counts) ending on that class's tiling with the TST slot open. Clicking a class tile in 「睇晒 N 種收尾」 steps it and shows that class's worked PCs (yachi 2026-11-22: 「㩒去啲其他形，出咩好？ 3 巡PC 方法？」). The page audit (`audit_builds`) checks every build against the drawn grid, whole pieces, bag 1 first, soft-drop sums and the TST cells, and replays every worked PC; `--check` re-runs it in CI (about two minutes) |
 
 Rules the page depends on, each of which a simplification would break:
@@ -6543,10 +6544,16 @@ Rules the page depends on, each of which a simplification would break:
   the T). For each first-bag order and soft-drop budget the policy picks the variant maximising J_v(r) = sum_k dD_k * p5_k
   (key J*8192 + built; ties to the earlier board), where D_k is the count of second-bag completions solved from the
   identity cum_b[k] = sum_s n_s * D_k(b-s) (cum_inf[k] = n_feas * D_k(inf)), triangular, every division asserted exact.
-  Figures: joint_F = pc3_n/5040^3, built_F = built_n/5040^2, PC given built = pc3_n/(built_n*5040). `families.complete` is
-  `false` while any layout lacks a variant (pruned boards are absent), so the family JOINT is printed as a lower bound (最少);
-  built_F and the PC rate given built are not bounds either way (a pruned variant could raise or lower them);
-  Stage 2 would be counting the pruned variants too. Bag 4 is removed from THIS page only (the worked PCs are bag 3;
+  Figures: joint_F = pc3_n/5040^3, built_F = built_n/5040^2, PC given built = pc3_n/(built_n*5040). **Exact since schema
+  /5**: the variants the pruning dropped are counted too (yachi 2026-11-23, 「門檻以下嘅變化都計埋」), so `families.complete`
+  is `true` and the page prints no 最少. A layout is listed when at least one variant is kept; every candidate board of the
+  counter's enumeration that is the layout less one piece is a variant. The dropped ones live in
+  `analysis/tst-openers-tp-x.json` (`tst-openers-tp-x/1`, md5 in the main artefact's `md5.x`): `pipeline/sim/tst-d-rs`
+  (binary `tst-d`, on `oracle-rs`) counts each board's bag-2 completions D per leftover class and budget from the same
+  MULTI line the old counter reads, tst-b1vec gives its first-bag vector, and the emitter forms cum by the identity above
+  (`--x-merge`); `--x-verify` holds that route equal to the committed cum and ntil on every kept board, the hard gate on
+  tst-d. On the page an extra variant prints its own joint, rank – and no link. Neither binary is re-run in CI (hours of
+  CPU); the test re-derives every family from the vectors and cum of both files. Bag 4 is removed from THIS page only (the worked PCs are bag 3;
   schema tst-openers-pc-examples/2 in tp mode); `docs/tst-openers-held.html` and its artefacts are untouched, and no rank moved.
 * **Mirror included (schema /4, yachi 2026-11-23).** Each family carries `both`: the same policy over its variants and their
   mirror boards (which are exactly the mirror family's variants, asserted), so for each first-bag order the better hand is
