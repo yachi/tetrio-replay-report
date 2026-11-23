@@ -1332,7 +1332,7 @@ def b1_cmd(args):
 # ---- learn-these-boards sets (tst-openers-tp-sets/1) ----------------------------------------------------------------------
 import subprocess
 
-SETS_SCHEMA = "tst-openers-tp-sets/1"
+SETS_SCHEMA = "tst-openers-tp-sets/2"
 SETS_OUT = ROOT / "analysis" / "tst-openers-tp-sets.json"
 SETS_CRATE = "tst-sets-rs"
 KINDS = "IOTSZJL"
@@ -1351,7 +1351,15 @@ def sets_crate_md5():
 def board_tables(art, b1):
     """{name: {bk: (J[0..10], Bt[0..10])}} and {name: b1 vector (numpy uint8, INFEAS for '.')}."""
     vec = b1_vectors(b1)
-    return {b["name"]: j_tables(b, solve_D(b["cum"], vec[b["name"]])) for b in art["boards"]}, vec
+    zero = {bk: ([0] * (INFEAS + 1), [0] * (INFEAS + 1)) for bk in BKEYS}
+    out = {}
+    for b in art["boards"]:
+        if set(vec[b["name"]]) == {INFEAS}:      # no first-bag order builds it: nothing to solve, all zero
+            assert all(c == 0 for bk in BKEYS for c in b["cum"][bk]), b["name"]
+            out[b["name"]] = zero
+        else:
+            out[b["name"]] = j_tables(b, solve_D(b["cum"], vec[b["name"]]))
+    return out, vec
 
 
 def sets_input_lines(art, b1):
@@ -1406,7 +1414,7 @@ def sets_artefact(art, b1, raw):
     return {"schema": SETS_SCHEMA, "report_eligible": False, "constructed": True, "complete": False,
             "means": QUARANTINE + " Per soft-drop budget, the set of k boards (one hand each) maximising the number of "
                      "(first-bag order, bag-2 deal, bag-3 deal) triples that build and get a bag-3 Perfect Clear when the best member "
-                     "is picked for each first-bag order; a lower bound, because boards at or under the pruning threshold are absent.",
+                     "is picked for each first-bag order; exact over the boards counted in the two artefacts (the kept boards and the x boards); a board in neither is uncounted.",
             "rules": {"pick": "larger (J, built), ties to the earlier board position; none when no member builds within the budget",
                       "set": "larger pc3, then larger built, then the smaller tuple of board positions",
                       "dominance": "u is dropped when v has key >= key_u on every order (key = J*8192+built, 0 when unavailable) and "
@@ -1416,8 +1424,9 @@ def sets_artefact(art, b1, raw):
                       "tree": "optimal depth <= d over the 28 features, leaf = member maximising the leaf's (sum J, sum built)"},
             "den": {"pc3": B ** 3, "built": B ** 2},
             "features": FEATURES,
-            "md5": {"crate": sets_crate_md5(), "art": md5(canon(art).encode()), "b1": md5(canon(b1).encode())},
-            "boards": len(bs),
+            "md5": {"crate": sets_crate_md5(), "art": md5(canon(art["kept"]).encode()), "b1": md5(canon(b1["kept"]).encode()),
+                    "x": md5(X_OUT.read_bytes())},
+            "boards": len(bs), "kept": len(art["kept"]["boards"]), "x": len(art["boards"]) - len(art["kept"]["boards"]),
             "budgets": budgets,
             "fixed": {"budget": fx["budget"], "boards": [brd(i) for i in fx["set"]], "values": fx["values"]}}
 
@@ -1440,7 +1449,10 @@ def sets_load():
     art = json.loads(OUT.read_text())
     b1 = json.loads(B1_OUT.read_text())
     assert b1["md5"]["boards"] == boards_md5(art["boards"]) and b1["md5"]["crate"] == b1_crate_md5(), "b1 artefact is stale"
-    return art, b1
+    x = load_x(art)
+    pooled = {**art, "boards": art["boards"] + x["boards"], "kept": art}
+    pb1 = {**b1, "vectors": {**b1["vectors"], **x["vectors"]}, "kept": b1}
+    return pooled, pb1
 
 
 def sets_cmd(args):
@@ -1476,9 +1488,9 @@ def sets_check_cmd(args):
     for bk in BKEYS:
         r = raw["budgets"][bk]
         lim = INFEAS - 1 if bk == "inf" else int(bk)
-        J = np.stack([tabs[b["name"]][bk][0][vec[b["name"]]] for b in bs]).astype(np.int64)
-        Bt = np.stack([tabs[b["name"]][bk][1][vec[b["name"]]] for b in bs]).astype(np.int64)
-        av = np.stack([vec[b["name"]] <= lim for b in bs])
+        J = np.stack([np.array(tabs[b["name"]][bk][0])[np.frombuffer(vec[b["name"]], dtype=np.uint8)] for b in bs]).astype(np.int64)
+        Bt = np.stack([np.array(tabs[b["name"]][bk][1])[np.frombuffer(vec[b["name"]], dtype=np.uint8)] for b in bs]).astype(np.int64)
+        av = np.stack([np.frombuffer(vec[b["name"]], dtype=np.uint8) <= lim for b in bs])
         J = np.where(av, J, 0); Bt = np.where(av, Bt, 0)
         assert Bt.max() < 8192
         key = np.where(av, (J << SH) | Bt, 0)
@@ -1614,7 +1626,7 @@ def sets_check_cmd(args):
     assert s == raw["budgets"]["2"]["exact"][2]["set"]
     for bk in BKEYS:
         lim = INFEAS - 1 if bk == "inf" else int(bk)
-        K = np.stack([np.where(vec[b["name"]] <= lim, (tabs[b["name"]][bk][0][vec[b["name"]]].astype(np.int64) << SH) | tabs[b["name"]][bk][1][vec[b["name"]]], 0) for b in (bs[i] for i in s)])
+        K = np.stack([np.where(np.frombuffer(vec[b["name"]], dtype=np.uint8) <= lim, (np.array(tabs[b["name"]][bk][0])[np.frombuffer(vec[b["name"]], dtype=np.uint8)].astype(np.int64) << SH) | np.array(tabs[b["name"]][bk][1])[np.frombuffer(vec[b["name"]], dtype=np.uint8)], 0) for b in (bs[i] for i in s)])
         v = val_of(K.max(0))
         assert fx["values"][bk] == {"pc3": v[0], "built": v[1]}, f"fixed value ({bk})"
     print("ok: " + "; ".join(notes))

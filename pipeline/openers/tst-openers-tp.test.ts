@@ -598,11 +598,12 @@ const FEAT_NAMES: string[] = [];
 for (let i = 0; i < 7; i++) for (let j = i + 1; j < 7; j++) FEAT_NAMES.push(`${KINDS_J[i]}<${KINDS_J[j]}`);
 for (const k of KINDS_J) FEAT_NAMES.push(`first=${k}`);
 const FEAT: boolean[][] = FEAT_NAMES.map((nm) => PERMS.map((p) => nm.startsWith('first=') ? p[0] === nm[6] : p.indexOf(nm[0]!) < p.indexOf(nm[2]!)));
-const STAT = ART.boards.map((b: any) => tables(b, vecOf(b.name)));
+const POOL: any[] = [...ART.boards, ...X.boards];
+const STAT = POOL.map((b: any) => tables(b, vecOf(b.name)));
 /** per budget: key (J*8192+built) and availability per board and order, with this file's own cost rule. */
 function keysFor(bk: string) {
   const lim = bk === 'inf' ? INFEAS - 1 : Number(bk);
-  return ART.boards.map((b: any, i: number) => {
+  return POOL.map((b: any, i: number) => {
     const v = vecOf(b.name), [J, Bt] = STAT[i].out[bk];
     const key = new Float64Array(B), av = new Uint8Array(B), j = new Float64Array(B), bt = new Float64Array(B);
     for (let o = 0; o < B; o++) if (v[o]! <= lim) { av[o] = 1; j[o] = J[v[o]!]; bt[o] = Bt[v[o]!]; key[o] = j[o]! * 8192 + bt[o]!; }
@@ -646,13 +647,14 @@ function walkTree(nd: any, idx: number[], K: any[], set: number[], mem: number[]
 const depthOf = (nd: any): number => ('m' in nd ? 0 : 1 + Math.max(depthOf(nd.y), depthOf(nd.n)));
 
 test('(j) pins: the sets crate, the artefact and the b1 vectors it was built from are current; flags', () => {
-  expect(SETS.schema).toBe('tst-openers-tp-sets/1');
+  expect(SETS.schema).toBe('tst-openers-tp-sets/2');
   expect(SETS.constructed).toBe(true);
   expect(SETS.report_eligible).toBe(false);
   expect(SETS.complete).toBe(false);
   expect(SETS.md5.crate).toBe(setsCrateMd5());
   expect(SETS.md5.b1).toBe(md5(canon(B1)));
   expect(SETS.md5.art).toBe(md5(canon(ART)));
+  expect(SETS.md5.x).toBe(md5(readFileSync(join(ROOT, 'analysis', 'tst-openers-tp-x.json'))));
   expect(SETS.features).toEqual(FEAT_NAMES);
   expect(SETS.den.pc3).toBe(B ** 3);
   expect(SETS.den.built).toBe(B ** 2);
@@ -670,8 +672,8 @@ test('(j) every set value, greedy step, k=1 optimum, k=2 optimum, pick string an
     const pos = (rec: any) => rec.boards.map((x: any) => x.pos);
     const chk = (rec: any) => {
       for (const x of rec.boards) {
-        expect(ART.boards[x.pos].name).toBe(x.name);
-        expect(keyOf(ART.boards[x.pos].pieces)).toBe(keyOf(x.pieces));
+        expect(POOL[x.pos].name).toBe(x.name);
+        expect(keyOf(POOL[x.pos].pieces)).toBe(keyOf(x.pieces));
       }
       const p = pos(rec);
       expect(p).toEqual([...p].sort((a, b) => a - b));
@@ -759,8 +761,8 @@ test('(j) cross-crate: the tst-sets binary on input built here reproduces the ar
   const r0 = Bun.spawnSync(['cargo', 'build', '--release', '--locked', '--quiet', '--manifest-path', join(SETS_CRATE, 'Cargo.toml')], { stderr: 'pipe' });
   const bin = join(SETS_CRATE, 'target', 'release', 'tst-sets');
   if (r0.exitCode !== 0 || !existsSync(bin)) { console.warn('SKIPPED (j): cargo is unavailable or tst-sets failed to build; the sets are NOT re-run through the crate'); return; }
-  const lines = ART.boards.map((b: any, i: number) => {
-    const raw = inflateSync(Buffer.from(B1.vectors[b.name], 'base64')).toString();
+  const lines = POOL.map((b: any, i: number) => {
+    const raw = inflateSync(Buffer.from(B1.vectors[b.name] ?? X.vectors[b.name], 'base64')).toString();
     const f = BKEYS.map((bk) => `${STAT[i].out[bk][0].slice(0, INFEAS).join(',')}/${STAT[i].out[bk][1].slice(0, INFEAS).join(',')}`);
     return [b.name, raw, ...f].join('|');
   });

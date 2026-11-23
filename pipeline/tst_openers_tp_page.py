@@ -769,7 +769,7 @@ def title_parts(cat, b, sfx):
     mirror shape's name loses the mirror suffix so it counts as its original."""
     routes, others, me = [], [], False
     for sid in b["shapes"]:
-        for n in cat[sid]["names"]:
+        for n in (cat[sid]["names"] if sid in cat else []):
             n = n[:-len(sfx)] if sfx and n.endswith(sfx) else n
             if n.strip() == "yachi":
                 me = True
@@ -909,15 +909,24 @@ def load_sets(repo=REPO):
         with open(os.path.join(repo, "analysis", n), encoding="utf-8") as f:
             return json.load(f)
     S, A, B1 = rd("tst-openers-tp-sets.json"), rd("tst-openers-tp.json"), rd("tst-openers-tp-b1.json")
-    _need(S["schema"] == "tst-openers-tp-sets/1" and S["report_eligible"] is False and S["constructed"] is True,
-          "the sets artefact is not tst-openers-tp-sets/1 marked report_eligible: false / constructed: true")
+    with open(os.path.join(repo, "analysis", "tst-openers-tp-x.json"), "rb") as f:
+        xraw = f.read()
+    X = json.loads(xraw)
+    _need(X["schema"] == "tst-openers-tp-x/1" and X["report_eligible"] is False and X["constructed"] is True,
+          "the x artefact is not tst-openers-tp-x/1 marked report_eligible: false / constructed: true")
+    _need(S["md5"]["x"] == hashlib.md5(xraw).hexdigest(),
+          "analysis/tst-openers-tp-sets.json was built from another tst-openers-tp-x.json: re-run emit-tst-openers-tp.py --sets")
+    _need(S["schema"] == "tst-openers-tp-sets/2" and S["report_eligible"] is False and S["constructed"] is True,
+          "the sets artefact is not tst-openers-tp-sets/2 marked report_eligible: false / constructed: true")
     _need(S["md5"]["art"] == _canon_md5(A) and S["md5"]["b1"] == _canon_md5(B1),
           "analysis/tst-openers-tp-sets.json was built from another tst-openers-tp.json or -b1.json: re-run emit-tst-openers-tp.py --sets")
     _need(S["features"] == FEATURES7 and S["den"] == {"pc3": BAG ** 3, "built": BAG ** 2}, "the sets artefact's features or denominators moved")
     _need(S["fixed"]["budget"] == "2" and set(S["budgets"]) == set(BK), "the sets artefact's fixed budget or budgets moved")
-    vecs = {n: zlib.decompress(base64.b64decode(z)).decode() for n, z in B1["vectors"].items()}
+    vecs = {n: zlib.decompress(base64.b64decode(z)).decode() for n, z in {**B1["vectors"], **X["vectors"]}.items()}
     _need(all(len(v) == BAG for v in vecs.values()), "a first-bag vector is not 5040 long")
-    return {"S": S, "vecs": vecs}
+    _need(S["x"] == len(X["boards"]) and S["boards"] == len(A["boards"]) + len(X["boards"]),
+          "the sets artefact's board counts do not match the kept and x boards")
+    return {"S": S, "vecs": vecs, "X": X}
 
 
 def _members(S, bk, k):
@@ -976,7 +985,11 @@ def set_tables(art_by, L, names):
     T = {}
     for n in names:
         v = [INFEAS if c == "." else int(c) for c in L["vecs"][n]]
-        T[n] = (v, _jt(art_by[n], _solve_d(art_by[n]["cum"], v)))
+        if all(c == INFEAS for c in v):
+            z = [0] * (INFEAS + 1)
+            T[n] = (v, {bk: (z, z) for bk in BK})
+        else:
+            T[n] = (v, _jt(art_by[n], _solve_d(art_by[n]["cum"], v)))
     return T
 
 
@@ -1197,7 +1210,7 @@ def sets_block(art, cat, PR, L, R):
     three), the best three drawn with their share of the 5040 first-bag orders, the sentence where the best single board is
     not in the best pair, the fixed set, the shallow rule and the lookup. Returns (section html, island json text)."""
     S, SP, sfx = L["S"], PR["sets"], art["mirror"]["suffix"]
-    by = {b["name"]: b for b in art["boards"]}
+    by = {b["name"]: b for b in list(art["boards"]) + list(L["X"]["boards"])}
     X = (cat, by, sfx, PR)
     T, picks, shares = sets_data(by, L)
     reps = {r["name"] for r, _ in R}
@@ -1957,7 +1970,7 @@ def _audit_sets(page, art, cat, PR, L):
     body = sec[0]
     if page.count('<div class="bar" data-bar="sd">') != 1 or page.find('<div class="bar" data-bar="sd">') > page.find('<section class="sx"'):
         bad.append("the soft-drop bar is not once, above the 學邊幾個 section")
-    by = {b["name"]: b for b in art["boards"]}
+    by = {b["name"]: b for b in list(art["boards"]) + list(L["X"]["boards"])}
     R = ranked(art, cat)
     reps = {r["name"] for r, _ in R}
     rep_of = {p["name"]: r["name"] for r, p in R}
