@@ -160,6 +160,7 @@ const QUALIFIED_MID_GAME: string[] = [
   '2026-10-03 m10r6 yachi lock 28',
   '2026-11-01 m14r3 yachi lock 54',
   '2026-11-01 m14r4 pinglamb lock 91',
+  '2026-11-23 m4r3 yachi lock 87',
 ];
 const COVER_NOT_ONE_SZ_OR_NULL: string[] = [
   '2026-08-19 m9r4 yachi lock 35 (null)',
@@ -185,27 +186,28 @@ const AT_VERIFIED_EDGE: string[] = [
 ];
 const QUALIFIED_PAYOFF_FIRED: string[] = [
   '2026-11-01 m14r4 pinglamb lock 91',
+  '2026-11-23 m4r3 yachi lock 87',
 ];
 
-const OPP_DENOM = { pinglamb: { all: 807, in_opener: 110, mid_game: 697 }, yachi: { all: 1305, in_opener: 313, mid_game: 992 } };
+const OPP_DENOM = { pinglamb: { all: 835, in_opener: 113, mid_game: 722 }, yachi: { all: 1370, in_opener: 320, mid_game: 1050 } };
 const HITS = { pinglamb: { all: 42, in_opener: 5, mid_game: 37, mirrored: 13, garbage_in_window: 32 },
-               yachi: { all: 187, in_opener: 101, mid_game: 86, mirrored: 143, garbage_in_window: 70 } };
+               yachi: { all: 190, in_opener: 101, mid_game: 89, mirrored: 145, garbage_in_window: 71 } };
 /** the payoff: `well_covered` / `well_filled_not_i` are another layer of the stacking (the page's Repeat) */
 const PAYOFF = { pinglamb: { fired: 23, not_fired: { i_in_well_not_quad: 5, well_covered: 3, well_filled_not_i: 11 } },
-                 yachi: { fired: 35, not_fired: { i_in_well_not_quad: 15, past_verified: 7, round_ended: 1, well_covered: 17, well_filled_not_i: 112 } } };
+                 yachi: { fired: 36, not_fired: { i_in_well_not_quad: 15, past_verified: 7, round_ended: 1, well_covered: 18, well_filled_not_i: 113 } } };
 const QUALIFY = { pinglamb: { qualified: 3, not_qualified: { dpc: 1, fragment: 28, garbage_in_shape: 6, in_opener: 5 } },
-                  yachi: { qualified: 5, not_qualified: { dpc: 1, fragment: 72, garbage_in_shape: 11, in_opener: 101, ownership_unverified: 2 } } };
+                  yachi: { qualified: 6, not_qualified: { dpc: 2, fragment: 73, garbage_in_shape: 11, in_opener: 101, ownership_unverified: 2 } } };
 /** cover kind per player, over every hit and over the qualifying ones */
 const COVER: Record<string, any> = {
   pinglamb: { all: { complete_pieces: 2, not_complete: 33, one_sz: 7 }, qualified: { complete_pieces: 2, one_sz: 1 } },
-  yachi: { all: { complete_pieces: 1, not_complete: 83, null: 2, one_sz: 101 }, qualified: { complete_pieces: 1, one_sz: 4 } },
+  yachi: { all: { complete_pieces: 1, not_complete: 84, null: 2, one_sz: 103 }, qualified: { complete_pieces: 1, one_sz: 5 } },
 };
-const CONTROLS = {under: {TSD: {pinglamb: 0, yachi: 0}, TST: {pinglamb: 0, yachi: 0}, mini_TSS: {pinglamb: 0, yachi: 0}, mini_TSD: {pinglamb: 0, yachi: 0}}, ablation: {no_must_empty: {pinglamb: 344, yachi: 499}, no_roof: {pinglamb: 42, yachi: 188}, t_overlap: {pinglamb: 46, yachi: 191}}, orientation_baseline: {pinglamb: 178, yachi: 520}};
+const CONTROLS = {under: {TSD: {pinglamb: 0, yachi: 0}, TST: {pinglamb: 0, yachi: 0}, mini_TSS: {pinglamb: 0, yachi: 0}, mini_TSD: {pinglamb: 0, yachi: 0}}, ablation: {no_must_empty: {pinglamb: 356, yachi: 518}, no_roof: {pinglamb: 42, yachi: 191}, t_overlap: {pinglamb: 46, yachi: 194}}, orientation_baseline: {pinglamb: 186, yachi: 551}};
 /** full TSSs whose anchored T meets ONE row of the window: `above` the row over the arms, `arms` the T's arm row,
  *  `cleared` the row the TSS clears (the cover and the nub), `below` the hole row under it */
-const PART_ONLY: Record<string, number> = { above: 874, arms: 530, cleared: 1261, below: 294 };
+const PART_ONLY: Record<string, number> = { above: 907, arms: 549, cleared: 1308, below: 298 };
 /** [this page's hits that are hits there, this page's hits], per other technique artefact that shares any */
-const COMMON: Record<string, number> = { basicdonating: 110 };
+const COMMON: Record<string, number> = { basicdonating: 112 };
 
 const EQUIVALENT: Record<string, string> = {
   noRecon: 'the corpus has no reconstruction disagreement (check.reconstruction_disagreed is 0)',
@@ -272,7 +274,7 @@ test('quarantined: report_eligible false, no claim ids, one variant, a payoff an
 });
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
-  expect(checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT)).toBe(18623);
+  expect(checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT)).toBe(19461);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 

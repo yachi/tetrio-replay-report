@@ -89,8 +89,8 @@ const RULE: Record<string, [number, number[]]> = {
 };
 
 const DENOM = {
-  pinglamb: { TST: { all: 1773, in_opener: 1730, mid_game: 43 } },
-  yachi: { TST: { all: 1083, in_opener: 1022, mid_game: 61 } },
+  pinglamb: { TST: { all: 1859, in_opener: 1813, mid_game: 46 } },
+  yachi: { TST: { all: 1144, in_opener: 1080, mid_game: 64 } },
 };
 const HITS = { pinglamb: { all: 0, in_opener: 0, mid_game: 0, garbage_in_window: 0 },
                yachi: { all: 0, in_opener: 0, mid_game: 0, garbage_in_window: 0 } };
@@ -230,7 +230,7 @@ test('quarantined: report_eligible false, no claim ids, one spin_rule variant wi
 });
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
-  expect(checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT)).toBe(18623);
+  expect(checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT)).toBe(19461);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 

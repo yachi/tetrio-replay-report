@@ -39,6 +39,7 @@ const caseKey = (c: any) => `${c.session} m${c.match}r${c.round} ${c.player} @${
 const CASES: [string, string, number][] = [
   ['2026-09-18 m15r5 yachi @29', 'unmatched', 20],
   ['2026-09-19 m16r3 yachi @29', 'unmatched', 20],
+  ['2026-11-23 m6r2 yachi @22', 'unmatched', 13],
 ];
 
 test('byte identity: the committed artefact is what build() produces now', () => {

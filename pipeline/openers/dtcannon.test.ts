@@ -118,21 +118,21 @@ const NOT_QUALIFIED: string[] = [
   '2026-09-11 m4r5 yachi lock 107 (ownership_unverified)',
 ];
 /** window_off_board, per player: a count with a property check, not a list (see the header). */
-const WINDOW_OFF_BOARD = { pinglamb: 889, yachi: 633 };
+const WINDOW_OFF_BOARD = { pinglamb: 935, yachi: 667 };
 
 /** Per player: the opportunity (scored full TSDs), split at the 0-based opener window. */
-const TSD_DENOM = { pinglamb: { all: 6894, in_opener: 1348, mid_game: 5546 },
-                    yachi: { all: 6249, in_opener: 1598, mid_game: 4651 } };
+const TSD_DENOM = { pinglamb: { all: 7206, in_opener: 1408, mid_game: 5798 },
+                    yachi: { all: 6508, in_opener: 1663, mid_game: 4845 } };
 const HITS = {pinglamb: {all: 0, in_opener: 0, mid_game: 0, mirrored: 0, garbage_in_window: 0}, yachi: {all: 34, in_opener: 5, mid_game: 29, mirrored: 12, garbage_in_window: 16}};
 const FOLLOWUP_FIRED = { pinglamb: 0, yachi: 30 };
 const QUALIFIED = { pinglamb: 0, yachi: 33 };
 /** The controls (the same window at other spins; the ablations; the orientation baseline). */
-const CONTROLS = {under: {TSS: {pinglamb: 0, yachi: 0}, TST: {pinglamb: 0, yachi: 0}, mini_TSS: {pinglamb: 0, yachi: 0}, mini_TSD: {pinglamb: 0, yachi: 0}}, ablation: {no_must_empty: {pinglamb: 0, yachi: 35}, no_roof: {pinglamb: 2900, yachi: 2702}, t_overlap: {pinglamb: 0, yachi: 34}}, orientation_baseline: {pinglamb: 65, yachi: 91}};
+const CONTROLS = {under: {TSS: {pinglamb: 0, yachi: 0}, TST: {pinglamb: 0, yachi: 0}, mini_TSS: {pinglamb: 0, yachi: 0}, mini_TSD: {pinglamb: 0, yachi: 0}}, ablation: {no_must_empty: {pinglamb: 0, yachi: 35}, no_roof: {pinglamb: 3017, yachi: 2796}, t_overlap: {pinglamb: 0, yachi: 34}}, orientation_baseline: {pinglamb: 69, yachi: 93}};
 /** What discriminates, measured: full TSDs whose anchored T meets ONE part of the window. `above` is the four
  *  rows over the T (the overhang over the TST stem, its second cell, the stem walled both sides, the nub row of
  *  the TST slot), of which `overhang` is the top two and `tst_side` the next two; `cleared` the two rows the TSD
  *  clears; `below` the stem's bottom cell under the nub and its two walls. */
-const PART_ONLY = { above: 35, overhang: 37, tst_side: 35, cleared: 12987, below: 5602 };
+const PART_ONLY = { above: 35, overhang: 37, tst_side: 35, cleared: 13552, below: 5813 };
 
 /** Measured byte-identical on this corpus, each for its reason; asserted to STAY identical. */
 const EQUIVALENT: Record<string, string> = {
@@ -209,7 +209,7 @@ test('quarantined: report_eligible false, no claim ids', () => {
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
   const n = checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT);
-  expect(n).toBe(18623);
+  expect(n).toBe(19461);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 

@@ -140,6 +140,12 @@ const MATCHED: [string, string, boolean, boolean][] = [
   ['2026-11-19 m4r17 pinglamb @27', 'p01.000', false, false],
   ['2026-11-19 m4r18 pinglamb @27', 'p01.000', false, true],
   ['2026-11-19 m4r20 yachi @27', 'p01.000', false, false],
+  ['2026-11-23 m2r7 pinglamb @27', 'p07.000', false, false],
+  ['2026-11-23 m3r4 pinglamb @27', 'p07.000', false, true],
+  ['2026-11-23 m3r6 pinglamb @27', 'p01.000', false, true],
+  ['2026-11-23 m3r7 pinglamb @27', 'p07.000', false, false],
+  ['2026-11-23 m5r4 pinglamb @27', 'p07.000', false, true],
+  ['2026-11-23 m7r6 pinglamb @27', 'p07.000', false, false],
 ];
 
 /** 社畜トレイン hits its qualifier calls `dpc` that are NOT a case here, with the reason */

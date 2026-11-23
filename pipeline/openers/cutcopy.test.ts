@@ -89,12 +89,12 @@ const UNCUT_HITS: string[] = [
 const FOLLOWUP_IS_A_HIT: string[] = [];
 /** window_off_board, per variant and player: a count with a property check, not a list (see the header). */
 const WINDOW_OFF_BOARD: Record<string, Record<string, number>> = {
-  cutcopy: { pinglamb: 2152, yachi: 2179 }, uncut: { pinglamb: 2659, yachi: 2674 },
+  cutcopy: { pinglamb: 2245, yachi: 2277 }, uncut: { pinglamb: 2785, yachi: 2805 },
 };
 
 /** Per player: the opportunity (scored full TSDs), split at the 0-based opener window. */
-const TSD_DENOM = { pinglamb: { all: 6894, in_opener: 1348, mid_game: 5546 },
-                    yachi: { all: 6249, in_opener: 1598, mid_game: 4651 } };
+const TSD_DENOM = { pinglamb: { all: 7206, in_opener: 1408, mid_game: 5798 },
+                    yachi: { all: 6508, in_opener: 1663, mid_game: 4845 } };
 /** Per player: hits, their split, the mirrored ones, the ones with garbage in the window, the follow-ups. */
 const HITS = { pinglamb: {all:  0,  in_opener:  0,  mid_game:  0,  mirrored:  0,  garbage_in_window:  0},
                yachi: {all:  2,  in_opener:  0,  mid_game:  2,  mirrored:  1,  garbage_in_window:  1} };
@@ -106,9 +106,9 @@ const FOLLOWUP = {
 const CONTROLS = {
   under: { TSS: { pinglamb: 0, yachi: 0 }, TST: { pinglamb: 0, yachi: 0 },
            mini_TSS: { pinglamb: 0, yachi: 0 }, mini_TSD: { pinglamb: 0, yachi: 0 } },
-  ablation: { no_must_empty: {pinglamb:  344,  yachi:  200}, no_roof: {pinglamb:  529,  yachi:  442},
-              t_overlap: {pinglamb:  9,  yachi:  10} },
-  orientation_baseline: { pinglamb: 65, yachi: 91 },
+  ablation: { no_must_empty: {pinglamb:  363,  yachi:  215}, no_roof: {pinglamb:  551,  yachi:  453},
+              t_overlap: {pinglamb:  11,  yachi:  10} },
+  orientation_baseline: { pinglamb: 69, yachi: 93 },
 };
 /** What discriminates, measured: full TSDs (not only hits) whose anchored T meets ONE part of the window — the
  *  row above the T (the outer slot's arms, the wall beside them, the roof and the cell beyond it) with the
@@ -118,7 +118,7 @@ const CONTROLS = {
  *  overhang among them) by at least ten times more again (both asserted where PART_ONLY is checked); neither alone
  *  reaches the headline, so those two are what discriminate. The
  *  `no_roof` ablation (the window less the row above the T) is exactly `below`. */
-const PART_ONLY = { above: 34, cleared: 11465, below: 971 };
+const PART_ONLY = { above: 35, cleared: 11950, below: 1004 };
 /** The second variant (harddrop's second type), pinned the same way: its hits (none), its follow-ups, its controls,
  *  and the full TSDs each part of its window admits with the T anchored (the row above the T, the cleared rows, the
  *  two rows of the second slot under them). */
@@ -128,11 +128,11 @@ const FOLLOWUP_UNCUT = { pinglamb: { fired: 0, not_fired: {} }, yachi: { fired: 
 const CONTROLS_UNCUT = {
   under: { TSS: { pinglamb: 0, yachi: 0 }, TST: { pinglamb: 0, yachi: 0 },
            mini_TSS: { pinglamb: 0, yachi: 0 }, mini_TSD: { pinglamb: 0, yachi: 0 } },
-  ablation: { no_must_empty: { pinglamb: 869, yachi: 555 }, no_roof: { pinglamb: 2, yachi: 9 },
-              t_overlap: { pinglamb: 20, yachi: 8 } },
-  orientation_baseline: { pinglamb: 65, yachi: 91 },
+  ablation: { no_must_empty: { pinglamb: 909, yachi: 585 }, no_roof: { pinglamb: 2, yachi: 9 },
+              t_overlap: { pinglamb: 21, yachi: 9 } },
+  orientation_baseline: { pinglamb: 69, yachi: 93 },
 };
-const PART_ONLY_UNCUT = { above: 5538, cleared: 11465, below: 11 };
+const PART_ONLY_UNCUT = { above: 5779, cleared: 11950, below: 11 };
 /** The second type and STMB Cave are a RELATION, not a clash: anchored on the same flat T in OPPOSITE hands their
  *  windows agree on every cell both read (the STMB Cave page's own 「連続してTSD」 board is the second type, mirrored).
  *  The corpus locks that are hits of both: measured, none through twenty sessions (the second type had no hit);
@@ -225,7 +225,7 @@ test('quarantined: report_eligible false, no claim ids', () => {
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
   const n = checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT);
-  expect(n).toBe(18623);
+  expect(n).toBe(19461);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 
@@ -536,8 +536,8 @@ test('what discriminates: each part of the window alone, with the T anchored, ag
 
 test('the follow-up row map is verified against the engine at every step it uses', () => {
   const c = art().check;
-  expect(c.rowmap_unverified).toBe(33);
-  expect(c.rowmap_steps).toBe(327362);
+  expect(c.rowmap_unverified).toBe(34);
+  expect(c.rowmap_steps).toBe(343241);
   expect(art().hits.every((h: any) => h.followup.reason !== 'rowmap_unverified')).toBe(true);
 });
 
