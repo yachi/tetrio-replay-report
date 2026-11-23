@@ -26,7 +26,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
    '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22',
-   '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19']);
+   '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23']);
 const H = 40, W = 10;
 
 let DIGESTS: TechDigest[] | null = null;
@@ -39,6 +39,7 @@ const caseKey = (c: any) => `${c.session} m${c.match}r${c.round} ${c.player} @${
 const CASES: [string, string, number][] = [
   ['2026-09-18 m15r5 yachi @29', 'unmatched', 20],
   ['2026-09-19 m16r3 yachi @29', 'unmatched', 20],
+  ['2026-11-23 m6r2 yachi @22', 'unmatched', 13],
 ];
 
 test('byte identity: the committed artefact is what build() produces now', () => {

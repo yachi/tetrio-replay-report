@@ -115,16 +115,21 @@ and both are established rather than hypothetical:
    attack/duration controls inward (-0.160 → -0.158, -0.165 → -0.163) and 食/intensity inward
    (+0.112 → +0.107) — and left the cleared-per-received ratio (+0.258) and the duration control
    (+0.027) where they were. It is 44 rounds, and it moved the headline by 0.002.
+   2026-11-23 took it to twenty-five and 1822 rounds and moved all seven a NINETEENTH time,
+   all outward — the headline +0.141 → +0.144, raw 清走 +0.135 → +0.139, the duration control
+   +0.027 → +0.039, the two attack/duration controls -0.158 → -0.163 and -0.163 → -0.168, the
+   cleared-per-received ratio +0.258 → +0.263 and 食/intensity +0.107 → +0.110. It is 82 rounds,
+   and it moved the headline by 0.003.
    Seventeen increments; the headline's run of five inward moves (10-12, 10-20, 10-22, 10-29,
    11-01) ended in a step too small to print and 11-17 turns it outward, and the sign and ordering unmoved
    throughout: that is what a corpus statistic over a growing corpus looks like, and it is the
    reason none of these digits is a finding. That is the other half of the
-   same lesson, now eighteen times over:
+   same lesson, now nineteen times over:
    invariance to a re-source is not invariance to data, which is why the guard downstream
-   re-derives rather than counting sessions. As of the current corpus they read **+0.141**
-   (cleared_pp/intensity), **+0.135** (cleared/intensity), **+0.027** (cleared_pp/duration),
-   **-0.158** (apm/duration), **-0.163** (attack/duration), **+0.258**
-   (cleared_per_received/intensity) and **+0.107** (received/intensity). Nothing else in this
+   re-derives rather than counting sessions. As of the current corpus they read **+0.144**
+   (cleared_pp/intensity), **+0.139** (cleared/intensity), **+0.039** (cleared_pp/duration),
+   **-0.163** (apm/duration), **-0.168** (attack/duration), **+0.263**
+   (cleared_per_received/intensity) and **+0.110** (received/intensity). Nothing else in this
    repo needs them typed out again, and they are typed out here only because
    `pipeline/check_intense_corpus.DOCSTRING_OWES` names this file — a module that derives a
    figure and then quotes a DIFFERENT one is the state that gate exists to make impossible.

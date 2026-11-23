@@ -180,6 +180,9 @@ const PINNED_TOTALS: Record<string, Totals> = {
   // Two mechanism events, one each (pinglamb's 02 r1, yachi's 04 r17); no path_opened, nothing
   // unattributed. Re-derived from sessions/2026-11-19/sim/ via the test's own sweep.
   '2026-11-19': { forecast_garbage: 0, forecast_lineclear: 2, path_opened: 0, self_built: 202, reactive: 231, unattributed: 0 },
+  // Two mechanism events, one each (pinglamb's 04 r6, yachi's 04 r8), both with an undetermined
+  // floor; no path_opened, nothing unattributed. Re-derived via the test's own sweep.
+  '2026-11-23': { forecast_garbage: 0, forecast_lineclear: 2, path_opened: 0, self_built: 350, reactive: 462, unattributed: 0 },
 };
 
 const PINNED_FLOORS: Record<string, Floors> = {
@@ -211,6 +214,7 @@ const PINNED_FLOORS: Record<string, Floors> = {
   '2026-11-05': { 'pre-existed': 604, 'arrived-later': 58, undetermined: 67 },
   '2026-11-17': { 'pre-existed': 187, 'arrived-later': 19, undetermined: 16 },
   '2026-11-19': { 'pre-existed': 359, 'arrived-later': 45, undetermined: 31 },
+  '2026-11-23': { 'pre-existed': 684, 'arrived-later': 67, undetermined: 63 },
 };
 
 // Population of "a T-spin trailing a C-Spin triple" per session — pinned alongside the verdict so a
@@ -221,7 +225,7 @@ const PINNED_CSPIN: Record<string, number> = {
   '2026-08-19': 80, '2026-08-25': 102, '2026-09-03': 57, '2026-09-10': 88,
   '2026-09-11': 61, '2026-09-17': 52, '2026-09-18': 146, '2026-09-19': 177,
   '2026-10-03': 176, '2026-10-09': 154, '2026-10-12': 73, '2026-10-20': 35,
-  '2026-10-22': 84, '2026-10-29': 82, '2026-11-01': 166, '2026-11-05': 92, '2026-11-17': 28, '2026-11-19': 53,
+  '2026-10-22': 84, '2026-10-29': 82, '2026-11-01': 166, '2026-11-05': 92, '2026-11-17': 28, '2026-11-19': 53, '2026-11-23': 108,
 };
 
 /** Reactive events on which the EXECUTION-TIME garbage counterfactual fires, per session.
@@ -396,6 +400,8 @@ const PINNED_FORECASTS: Record<string, string[]> = {
   '2026-11-17': ['pinglamb replay-2026-11-17-02.ttrm r4 lock 85 forecast_lineclear roof 81 0->1'],
   // ONE of two mechanism events: pinglamb's, verified (forecast-facts.json `forecast_total` 1, yachi's 0).
   '2026-11-19': ['pinglamb replay-2026-11-19-02.ttrm r1 lock 31 forecast_lineclear roof 23 0->2'],
+  // NONE of two mechanism events (both floors undetermined, pinglamb's 04 r6 and yachi's 04 r8).
+  '2026-11-23': [],
 };
 
 const PINNED_MECHANISM_ONLY: Record<string, string[]> = {
@@ -525,6 +531,11 @@ const PINNED_MECHANISM_ONLY: Record<string, string[]> = {
   '2026-11-19': [
     'pinglamb replay-2026-11-19-02.ttrm r1 lock 31 forecast_lineclear floor pre-existed from -1 roof 23',
     'yachi replay-2026-11-19-04.ttrm r17 lock 34 forecast_lineclear floor pre-existed from -1 roof 24',
+  ],
+  // Two, one each, both floors undetermined; neither is a verified forecast.
+  '2026-11-23': [
+    'pinglamb replay-2026-11-23-04.ttrm r6 lock 110 forecast_lineclear floor undetermined from -1 roof 106',
+    'yachi replay-2026-11-23-04.ttrm r8 lock 149 forecast_lineclear floor undetermined from -1 roof 145',
   ],
 };
 

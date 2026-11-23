@@ -1,0 +1,45 @@
+{
+  "eyebrow": "戰況直擊 · 七場",
+  "title": "七場 5 比 2",
+  "lede": "七場全部先贏七局，比數 6-7、7-5、7-6、6-7、2-7、6-7、2-7<span class=\"badge\" data-claim=\"G053\"></span><span class=\"badge\" data-claim=\"C001\"></span>。頭四場 2 比 2，局數 26 比 25，yachi 仲多一局<span class=\"badge\" data-claim=\"C010\"></span>；四場打到決勝局<span class=\"badge\" data-claim=\"G010\"></span>，yachi 贏一場。尾三場 10 比 21<span class=\"badge\" data-claim=\"C010\"></span>。",
+  "closer": "七場停喺 5 比 2<span class=\"badge\" data-claim=\"G001\"></span><span class=\"badge\" data-claim=\"C001\"></span>、46 比 36<span class=\"badge\" data-claim=\"G002\"></span><span class=\"badge\" data-claim=\"C010\"></span>。82 局入面 65 局係俾垃圾頂爆、17 局自己頂到頂<span class=\"badge\" data-claim=\"G062\"></span>：yachi 8 局、pinglamb 9 局<span class=\"badge\" data-claim=\"C006\"></span>。",
+  "hero_match": 3,
+  "score_claim": null,
+  "cards": {
+    "1": {
+      "title": "第一場——6 比 6，第十三局輸",
+      "flag": "pinglamb",
+      "body": "打到 6 比 6，第十三局輸，6 比 7<span class=\"badge\" data-claim=\"C011\"></span><span class=\"badge\" data-claim=\"G003\"></span>。決勝局 pinglamb VS 約169.1、APM 約72.2，yachi VS 約109.7<span class=\"badge\" data-claim=\"G056\"></span>。第五局 pinglamb 一行垃圾都冇食就贏，係全晚贏家食得最少嘅一局<span class=\"badge\" data-claim=\"G055\"></span>。"
+    },
+    "2": {
+      "title": "第二場——yachi 7 比 5",
+      "flag": "yachi",
+      "body": "yachi 7 比 5 贏<span class=\"badge\" data-claim=\"C012\"></span><span class=\"badge\" data-claim=\"G004\"></span>，以整場計佢打出全晚最高嘅 match APM 約58.5<span class=\"badge\" data-claim=\"G021\"></span>。呢場每粒方塊嘅攻擊都係 pinglamb 高<span class=\"badge\" data-claim=\"C018\"></span>，總攻擊 yachi 多<span class=\"badge\" data-claim=\"C019\"></span>。"
+    },
+    "3": {
+      "title": "第三場——6 比 3 俾人追平，第十三局贏返",
+      "flag": "yachi",
+      "body": "yachi 6 比 3 領先，俾 pinglamb 連贏三局追到 6 比 6，第十三局贏返，7 比 6<span class=\"badge\" data-claim=\"C013\"></span><span class=\"badge\" data-claim=\"G005\"></span>。<strong>七場入面淨係呢場係攻擊少嗰個贏</strong>：yachi 少 19 條<span class=\"badge\" data-claim=\"C019\"></span>。決勝局 yachi VS 約165.3、APM 約73.9<span class=\"badge\" data-claim=\"G057\"></span>；第一局係全晚最癲嗰局，yachi 贏<span class=\"badge\" data-claim=\"G060\"></span>，佢 VS 約164.6 係 60 秒以上嘅局入面最高<span class=\"badge\" data-claim=\"G013\"></span>。第九局 pinglamb 打出全晚最高嘅 7 combo<span class=\"badge\" data-claim=\"G015\"></span>。"
+    },
+    "4": {
+      "title": "第四場——又係 6 比 6，又輸",
+      "flag": "pinglamb",
+      "body": "又打到 6 比 6，第十三局又輸，6 比 7<span class=\"badge\" data-claim=\"C014\"></span><span class=\"badge\" data-claim=\"G006\"></span>。七場入面呢場兩邊每粒方塊嘅攻擊最接近，都係 pinglamb 高<span class=\"badge\" data-claim=\"C018\"></span>。第二局打咗約 250 秒，全晚最長，yachi 贏<span class=\"badge\" data-claim=\"G019\"></span>；pinglamb 喺嗰局清咗全晚單局最多嘅 223 行<span class=\"badge\" data-claim=\"G018\"></span>。第六局 pinglamb 打出全晚單局最多嘅 18 個 T-spin<span class=\"badge\" data-claim=\"G017\"></span>。"
+    },
+    "5": {
+      "title": "第五場——2 比 7",
+      "flag": "pinglamb",
+      "body": "2 比 7 輸<span class=\"badge\" data-claim=\"C015\"></span><span class=\"badge\" data-claim=\"G007\"></span>。第一局 pinglamb 打出全晚最大嘅 20 行 spike<span class=\"badge\" data-claim=\"G014\"></span>；第七局得約 12 秒，全晚最短<span class=\"badge\" data-claim=\"G020\"></span>。第九局 yachi 打出全晚最長嘅 9 段 B2B<span class=\"badge\" data-claim=\"G016\"></span>。pinglamb 由呢場連贏六局，一直去到第六場<span class=\"badge\" data-claim=\"G011\"></span>。"
+    },
+    "6": {
+      "title": "第六場——6 比 5 領先，最後兩局輸",
+      "flag": "pinglamb",
+      "body": "yachi 6 比 5 領先，最後兩局都輸，6 比 7<span class=\"badge\" data-claim=\"C016\"></span><span class=\"badge\" data-claim=\"G008\"></span>。決勝局 pinglamb VS 約129.0，yachi 約95.2<span class=\"badge\" data-claim=\"G059\"></span>。"
+    },
+    "7": {
+      "title": "第七場——頭四局連輸",
+      "flag": "pinglamb",
+      "body": "pinglamb 頭四局連贏，2 比 7 收<span class=\"badge\" data-claim=\"C017\"></span><span class=\"badge\" data-claim=\"G009\"></span>。七場入面呢場每粒方塊嘅攻擊差得最遠，都係 pinglamb 高<span class=\"badge\" data-claim=\"C018\"></span>。"
+    }
+  }
+}

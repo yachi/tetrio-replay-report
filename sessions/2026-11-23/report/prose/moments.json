@@ -1,0 +1,31 @@
+{
+  "eyebrow": "關鍵時刻 · 三件事",
+  "title": "三件事：決勝局、尾三場、同每粒方塊",
+  "cards": [
+    {
+      "accent": "g",
+      "label": "6 比 6 嘅決勝局",
+      "value": "1 / 4",
+      "body": "四場打到 6 比 6<span class=\"badge\" data-claim=\"G010\"></span>，yachi 淨係贏咗第三場<span class=\"badge\" data-claim=\"C013\"></span>；第一、四、六場都輸<span class=\"badge\" data-claim=\"C011\"></span><span class=\"badge\" data-claim=\"C014\"></span><span class=\"badge\" data-claim=\"C016\"></span>。決勝局輸嗰三場，對手 VS 都高過佢 40 以上<span class=\"badge\" data-claim=\"G056\"></span><span class=\"badge\" data-claim=\"G058\"></span><span class=\"badge\" data-claim=\"G059\"></span>。"
+    },
+    {
+      "accent": "p",
+      "label": "頭四場 / 尾三場",
+      "value": "26-25 / 10-21",
+      "body": "頭四場 match 2 比 2，局數 yachi 26 比 25 仲多一局；<strong>尾三場 pinglamb 全取，10 比 21</strong><span class=\"badge\" data-claim=\"C010\"></span>。成晚嘅局數差距全部喺尾三場。"
+    },
+    {
+      "accent": "y",
+      "label": "多疊、少打",
+      "value": "+193 粒 / −278 條",
+      "body": "yachi 多疊 193 粒，即係多 2.46%<span class=\"badge\" data-claim=\"C005\"></span><span class=\"badge\" data-claim=\"C009\"></span>，清行多 101 行<span class=\"badge\" data-claim=\"C020\"></span>——<strong>但總攻擊少 278 條</strong>，即係 pinglamb 總攻擊嘅 5.52%<span class=\"badge\" data-claim=\"C005\"></span>。粒數最多填返 2.46 個百分點，對住 8.45% 個窿<span class=\"badge\" data-claim=\"C004\"></span><span class=\"badge\" data-claim=\"C009\"></span>。"
+    }
+  ],
+  "trivia": [
+    "最癲嗰局係 m3 第一局，yachi 贏<span class=\"badge\" data-claim=\"G060\"></span>，四條攻擊軸淨係落速輸<span class=\"badge\" data-claim=\"G082\"></span>；每粒方塊嘅攻擊約 0.851 對約 0.677<span class=\"badge\" data-claim=\"G083\"></span>。",
+    "All Clear pinglamb 21 個、yachi 14 個<span class=\"badge\" data-claim=\"G035\"></span>。淨係 pinglamb 做到全消嘅 19 局，佢輸咗 9 局<span class=\"badge\" data-claim=\"G079\"></span>。",
+    "82 局每一局都係 VS 高嗰個贏，零例外<span class=\"badge\" data-claim=\"G022\"></span>。",
+    "m5 第七局 pinglamb APM 約112.8，但嗰局得 12 秒，唔計紀錄<span class=\"badge\" data-claim=\"G074\"></span>。",
+    "KPP 兩個人幾乎一樣：yachi 3.580 下、pinglamb 3.577 下<span class=\"badge\" data-claim=\"C008\"></span>。"
+  ]
+}

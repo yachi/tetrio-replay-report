@@ -56,7 +56,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23']);
 const ART_PATH = `${import.meta.dir}/../../analysis/shachikutrain-facts.json`;
 const TR = JSON.parse(readFileSync(SHACHIKUTRAIN.transcriptionPath, 'utf8'));
 const STMB_TR = JSON.parse(readFileSync(STMBCAVE.transcriptionPath, 'utf8'));
@@ -113,6 +113,13 @@ const SHACHIKUTRAIN_HITS: string[] = [
   "2026-11-17 m3r4 yachi lock 78 (mirrored)",
   "2026-11-19 m1r3 yachi lock 47", "2026-11-19 m3r2 yachi lock 33", "2026-11-19 m4r18 pinglamb lock 27",
   "2026-11-19 m4r21 yachi lock 169 (mirrored)",
+  "2026-11-23 m2r4 yachi lock 24 (mirrored)",
+  "2026-11-23 m2r10 yachi lock 48",
+  "2026-11-23 m3r1 pinglamb lock 43 (mirrored)",
+  "2026-11-23 m3r6 pinglamb lock 27 (mirrored)",
+  "2026-11-23 m4r7 yachi lock 117 (mirrored)",
+  "2026-11-23 m5r4 yachi lock 240",
+  "2026-11-23 m6r5 pinglamb lock 131 (mirrored)",
 ];
 const FOLLOWUP_NOT_FIRED: string[] = [
   "2026-07-22 m3r1 yachi lock 41 (t_in_slot_not_tsd at lock 46)",
@@ -183,6 +190,12 @@ const FOLLOWUP_NOT_FIRED: string[] = [
   "2026-11-05 m7r4 pinglamb lock 95 (slot_filled_before_t at lock 96)", "2026-11-05 m8r5 pinglamb lock 182 (slot_filled_before_t at lock 183)",
   "2026-11-17 m3r4 yachi lock 78 (next_t_elsewhere at lock 80)",
   "2026-11-19 m1r3 yachi lock 47 (slot_filled_before_t at lock 48)", "2026-11-19 m4r21 yachi lock 169 (t_in_slot_not_tsd at lock 170)",
+  "2026-11-23 m2r4 yachi lock 24 (next_t_elsewhere at lock 29)",
+  "2026-11-23 m3r1 pinglamb lock 43 (slot_filled_before_t at lock 44)",
+  "2026-11-23 m3r6 pinglamb lock 27 (slot_filled_before_t at lock 30)",
+  "2026-11-23 m4r7 yachi lock 117 (slot_filled_before_t at lock 118)",
+  "2026-11-23 m5r4 yachi lock 240 (t_in_slot_not_tsd at lock 247)",
+  "2026-11-23 m6r5 pinglamb lock 131 (next_t_elsewhere at lock 133)",
 ];
 const GARBAGE_IN_WINDOW: string[] = [
   "2026-07-22 m4r4 yachi lock 110", "2026-07-22 m9r2 yachi lock 24", "2026-07-22 m10r8 yachi lock 31",
@@ -209,6 +222,10 @@ const GARBAGE_IN_WINDOW: string[] = [
   "2026-11-01 m3r3 yachi lock 60", "2026-11-01 m6r6 yachi lock 102", "2026-11-01 m8r7 yachi lock 114",
   "2026-11-05 m7r4 pinglamb lock 95", "2026-11-05 m8r5 pinglamb lock 182",
   "2026-11-19 m4r21 yachi lock 169",
+  "2026-11-23 m3r1 pinglamb lock 43",
+  "2026-11-23 m4r7 yachi lock 117",
+  "2026-11-23 m5r4 yachi lock 240",
+  "2026-11-23 m6r5 pinglamb lock 131",
 ];
 const SHACHIKUTRAIN_IN_OPENER: string[] = [
   "2026-08-19 m10r5 yachi lock 16", "2026-08-25 m1r6 pinglamb lock 21", "2026-09-03 m5r3 yachi lock 20",
@@ -216,25 +233,23 @@ const SHACHIKUTRAIN_IN_OPENER: string[] = [
 ];
 const RECON_DROPPED_TSD: string[] = [];
 /** window_off_board, per player: a count with a property check, not a list (see the header). */
-const WINDOW_OFF_BOARD = { pinglamb: 1190, yachi: 985 };
+const WINDOW_OFF_BOARD = { pinglamb: 1249, yachi: 1033 };
 
 /** Per player: the opportunity (scored full TSDs), split at the 0-based opener window. */
-const TSD_DENOM = { pinglamb: { all: 6894, in_opener: 1348, mid_game: 5546 },
-                    yachi: { all: 6249, in_opener: 1598, mid_game: 4651 } };
+const TSD_DENOM = { pinglamb: { all: 7206, in_opener: 1408, mid_game: 5798 },
+                    yachi: { all: 6508, in_opener: 1663, mid_game: 4845 } };
 /** Per player: hits, their split, the mirrored ones, the ones with garbage in the window, the follow-ups. */
-const HITS = { pinglamb: { all: 46, in_opener: 2, mid_game: 44, mirrored: 26, garbage_in_window: 33 },
-               yachi: { all: 71, in_opener: 3, mid_game: 68, mirrored: 31, garbage_in_window: 33 } };
+const HITS = { pinglamb: { all: 49, in_opener: 2, mid_game: 47, mirrored: 29, garbage_in_window: 35 },
+               yachi: { all: 75, in_opener: 3, mid_game: 72, mirrored: 33, garbage_in_window: 35 } };
 const FOLLOWUP = {
-  pinglamb: { fired: 19, not_fired: { next_t_elsewhere: 1, slot_filled_before_t: 24, t_in_slot_not_tsd: 2 } },
-  yachi: { fired: 27, not_fired: { next_t_elsewhere: 7, round_ended: 3, slot_filled_before_t: 30, t_in_slot_not_tsd: 4 } },
+  pinglamb: { fired: 19, not_fired: { next_t_elsewhere: 2, slot_filled_before_t: 26, t_in_slot_not_tsd: 2 } },
+  yachi: { fired: 28, not_fired: { next_t_elsewhere: 8, round_ended: 3, slot_filled_before_t: 31, t_in_slot_not_tsd: 5 } },
 };
 /** The controls (the same window at other spins; the ablations; the orientation baseline). */
 const CONTROLS = {
-  under: { TSS: { pinglamb: 5, yachi: 2 }, TST: { pinglamb: 0, yachi: 0 },
-           mini_TSS: { pinglamb: 0, yachi: 0 }, mini_TSD: { pinglamb: 0, yachi: 0 } },
-  ablation: { no_must_empty: { pinglamb: 1135, yachi: 950 }, no_roof: { pinglamb: 417, yachi: 478 },
-              t_overlap: { pinglamb: 80, yachi: 89 } },
-  orientation_baseline: { pinglamb: 65, yachi: 91 },
+  under: { TSS: { pinglamb: 5, yachi: 2 }, TST: { pinglamb: 0, yachi: 0 }, mini_TSS: { pinglamb: 0, yachi: 0 }, mini_TSD: { pinglamb: 0, yachi: 0 } },
+  ablation: { no_must_empty: { pinglamb: 1190, yachi: 990 }, no_roof: { pinglamb: 440, yachi: 505 }, t_overlap: { pinglamb: 84, yachi: 94 } },
+  orientation_baseline: { pinglamb: 69, yachi: 93 },
 };
 /** What discriminates, measured: full TSDs (not only hits) whose anchored T meets ONE part of the window — the
  *  row above the T (the roof over its near end and the cell beyond it, the cell over its middle and the second
@@ -244,7 +259,7 @@ const CONTROLS = {
  *  the row below each cut that down — the row below by at least ten times, the row above by less (both asserted
  *  where PART_ONLY is checked) — and neither alone reaches the headline, so those two are what discriminate. The
  *  `no_roof` ablation (the window less the row above the T) is exactly `below`. */
-const PART_ONLY = { above: 1522, cleared: 11465, below: 895 };
+const PART_ONLY = { above: 1576, cleared: 11950, below: 945 };
 
 /** Measured byte-identical on this corpus, each for its reason; asserted to STAY identical. */
 const EQUIVALENT: Record<string, string> = {
@@ -326,7 +341,7 @@ test('quarantined: report_eligible false, no claim ids', () => {
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
   const n = checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT);
-  expect(n).toBe(18623);
+  expect(n).toBe(19461);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 
@@ -512,8 +527,8 @@ test('what discriminates: each part of the window alone, with the T anchored, ag
 
 test('the follow-up row map is verified against the engine at every step it uses', () => {
   const c = art().check;
-  expect(c.rowmap_unverified).toBe(33);
-  expect(c.rowmap_steps).toBe(327362);
+  expect(c.rowmap_unverified).toBe(34);
+  expect(c.rowmap_steps).toBe(343241);
   expect(art().hits.every((h: any) => h.followup.reason !== 'rowmap_unverified')).toBe(true);
 });
 
@@ -585,7 +600,7 @@ test('mutants: each rule turned off turns this red with its own symptom, or is n
 
 /** The hits that qualify (`shachikutrain-qualify.ts`): none. Every hit whose shape was built from whole pieces,
  *  with no garbage in its S and L and no Kaidan window at the same T, is a DPC (DPC_ONLY). */
-const QUALIFIED_HITS: string[] = [];
+const QUALIFIED_HITS: string[] = ['2026-11-23 m2r10 yachi lock 48'];
 /** Hits failing `dpc` and nothing else: fifteen emptied the board at lock 19 (the 20th piece) and fired the TSD
  *  eight to ten pieces later, the DPC setup; none reached its second Perfect Clear. DPC_AFTER are the two whose
  *  board is also emptied after the T (2026-11-01 m8r1: Perfect Clear at lock 19, TSD at 27, the next Perfect Clear
@@ -597,11 +612,11 @@ const DPC_ONLY = [
   '2026-09-19 m15r7 pinglamb lock 27', '2026-10-12 m7r2 yachi lock 27', '2026-10-20 m2r6 yachi lock 27',
   '2026-10-22 m7r6 pinglamb lock 27', '2026-10-29 m1r3 pinglamb lock 27', '2026-11-01 m8r1 pinglamb lock 27',
   '2026-11-01 m14r3 pinglamb lock 27', '2026-11-01 m16r9 yachi lock 27',
-  '2026-11-19 m4r18 pinglamb lock 27'];
+  '2026-11-19 m4r18 pinglamb lock 27', '2026-11-23 m3r6 pinglamb lock 27'];
 const DPC_AFTER = ['2026-09-11 m1r4 pinglamb lock 27', '2026-11-01 m8r1 pinglamb lock 27'];
 const QUALIFY_BY_PLAYER = {
-  pinglamb: { qualified: 0, not_qualified: { dpc: 12, fragment: 33, garbage_in_shape: 33, kaidan_window: 25 } },
-  yachi: { qualified: 0, not_qualified: { dpc: 7, fragment: 52, garbage_in_shape: 33, kaidan_window: 42 } },
+  pinglamb: { qualified: 0, not_qualified: { dpc: 13, fragment: 35, garbage_in_shape: 35, kaidan_window: 27 } },
+  yachi: { qualified: 1, not_qualified: { dpc: 7, fragment: 55, garbage_in_shape: 35, kaidan_window: 43 } },
 };
 const hitName = (h: any) => `${h.session} m${h.match}r${h.round} ${h.player} lock ${h.lock}`;
 
@@ -644,10 +659,14 @@ test('qualifies: each rule turned off qualifies exactly the hits failing that ru
                            ['noKaidan', 'kaidan_window'], ['noDpc', 'dpc']] as const) {
     const a = runQ({ [m]: true });
     expect(only(rule).length, m).toBeGreaterThan(0);
-    expect(a.lists.qualified_hits, m).toEqual(only(rule));
+    // the hits that already qualify stay; the hits failing only this rule join them, in artefact order
+    const want = b.hits.filter((h: any) => h.qualifies || only(rule).includes(hitName(h))).map(hitName);
+    expect(a.lists.qualified_hits, m).toEqual(want);
   }
-  // only a Perfect Clear AFTER the T: the fifteen built after one qualify again
-  expect(runQ({ dpcAfterOnly: true }).lists.qualified_hits).toEqual(DPC_ONLY.filter(n => !DPC_AFTER.includes(n)));
+  // only a Perfect Clear AFTER the T: the DPC-only hits built after one qualify again, beside those that already do
+  const back = DPC_ONLY.filter(n => !DPC_AFTER.includes(n));
+  expect(runQ({ dpcAfterOnly: true }).lists.qualified_hits)
+    .toEqual(b.hits.filter((h: any) => h.qualifies || back.includes(hitName(h))).map(hitName));
 }, 900_000);
 
 /** The page's own TSD → Z → TSD, as a three-lock digest: the board `basic.spin` draws (its U the lock, every other

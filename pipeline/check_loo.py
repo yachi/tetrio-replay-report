@@ -657,6 +657,11 @@ PUBLISHED = (
     #     app_gap_lost    +9.1563 pp   m4r6 -> +7.0095  rel 0.234  1.07x
     ("2026-11-19", "app_gap_won", "series"),
     ("2026-11-19", "app_gap_lost", "series"),
+    # 2026-11-23 takes NO `ANNOTATED` entry. Over 82 rounds:
+    #     app_gap_won     +6.8887 pp   m6r3 -> +5.2189  rel 0.242  1.02x the next of 82
+    #     app_gap_lost    +5.0536 pp   m4r2 -> +6.3218  rel 0.251  1.09x
+    ("2026-11-23", "app_gap_won", "series"),
+    ("2026-11-23", "app_gap_lost", "series"),
 )
 
 # The named exception list: every (session, figure) already investigated, with the reason it

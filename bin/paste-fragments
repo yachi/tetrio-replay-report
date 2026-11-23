@@ -25,9 +25,14 @@ WHAT IT REFUSES, writing nothing at all if any one of them fires:
   * a key in a document whose namespace has no renderer here at all;
   * two renderers, or two sections of one, printing different values for one key.
 
-Not pasted here: the leave-one-out annotations (`check_loo --render`), the intense-round
-CORPUS block (`check_intense_corpus --render`) and the equiv per-session tables — none of
-them is a marked fragment, and each gate has its own locator.  The run says so.
+Not pasted here: the leave-one-out annotations (`check_loo --render`) and the intense-round
+CORPUS block (`check_intense_corpus --render`) — neither is a marked fragment, and each gate
+has its own locator.  The run says so.
+
+The equiv per-session tables ARE pasted (`paste_tables`), though they are not fragments: when
+`equiv` is rendered, each document's block in that output replaces the table that starts at
+the block's own header line (README, ROADMAP), or the one line that starts with the block's
+first words (CLAUDE.md).  A header or line it cannot find exactly once is refused.
 """
 import argparse
 import concurrent.futures as cf
@@ -54,8 +59,7 @@ RENDERERS = {
     "stat": "pipeline.check_stat_sources",
 }
 NOT_PASTED = ("check_loo --render (leave-one-out annotations)",
-              "check_intense_corpus --render (the CORPUS block in pipeline/intense_round.py)",
-              "check_equiv_coverage --render's per-session tables (README/ROADMAP/CLAUDE)")
+              "check_intense_corpus --render (the CORPUS block in pipeline/intense_round.py)")
 
 FR = re.compile(r"<!--([a-z0-9-]+):([a-z0-9-]+)-->(.*?)<!--/\1:\2-->", re.S)
 
@@ -146,9 +150,52 @@ def write_atomic(path, text):
     os.replace(tmp, path)
 
 
+def paste_tables(texts, equiv_out):
+    """Pure: the equiv per-session tables pasted into {path: text}.  Returns (new, changes)."""
+    blocks = {}
+    parts = re.split(r"^=== (\S+) ===\n", equiv_out, flags=re.M)
+    for name, body in zip(parts[1::2], parts[2::2]):
+        blocks[name] = body.split("--- and the marked")[0].rstrip("\n").splitlines()
+    new, changes, errs = dict(texts), [], []
+    for path, text in texts.items():
+        lines = blocks.get(os.path.basename(path))
+        if not lines:
+            continue
+        doc = text.split("\n")
+        if lines[0].startswith("|"):                     # a table: replace from its header row
+            hits = [i for i, l in enumerate(doc) if l == lines[0]]
+            if len(hits) != 1:
+                errs.append(f"{path}: equiv table header found {len(hits)} times")
+                continue
+            i = hits[0]
+            j = i
+            while j < len(doc) and doc[j].startswith("|"):
+                j += 1
+            old = doc[i:j]
+            doc[i:j] = lines
+        else:                                            # one line: match on its first words
+            head = lines[0].split(":")[0] + ":"
+            hits = [i for i, l in enumerate(doc) if l.startswith(head)]
+            if len(hits) != 1 or len(lines) != 1:
+                errs.append(f"{path}: equiv line {head!r} found {len(hits)} times")
+                continue
+            old = [doc[hits[0]]]
+            doc[hits[0]] = lines[0]
+        if old != lines:
+            changes.append((path, "equiv per-session table", f"{len(old)} line(s)", f"{len(lines)} line(s)"))
+        new[path] = "\n".join(doc)
+    if errs:
+        raise Refused("\n".join(errs))
+    return new, changes
+
+
 def run(doc_paths, outputs, rendered_ns, check, out=print):
     docs = {p: Path(p).read_text(encoding="utf-8") for p in doc_paths}
     new, changes, checked = apply(docs, wanted(outputs), set(rendered_ns), set(RENDERERS))
+    eq = [t for src, t in outputs if "check_equiv_coverage" in src or src.endswith("equiv.txt")]
+    if "equiv" in rendered_ns and eq:
+        new, tchanges = paste_tables(new, eq[0])
+        changes += tchanges
     for p, k, a, b in changes:
         rel = os.path.relpath(p, REPO)
         out(f"  {p if rel.startswith('..') else rel}: {k}: {a!r} -> {b!r}")
@@ -232,6 +279,30 @@ def _selftest():
         ch, err, _ = attempt(paths, rend[:1], ns=("don",))
         expect("--only: an unrendered known namespace is carried over unread",
                err is None and [c[1] for c in ch] == ["don:a"])
+
+    # paste_tables: the equiv per-session tables, which are not fragments.
+    eqo = ("=== R.md ===\n| s | cov |\n|---|---|\n| a | 1 |\n| b | 2 |\n"
+           "--- and the marked fragments\n=== C.md ===\nPer-session: a 1, b 2\n")
+    docs = {"/x/R.md": "pre\n| s | cov |\n|---|---|\n| a | 1 |\npost\n",
+            "/x/C.md": "q\nPer-session: a 1\nr\n"}
+    new, ch = paste_tables(docs, eqo)
+    expect("paste_tables replaces the whole table and the one line, and nothing else",
+           new["/x/R.md"] == "pre\n| s | cov |\n|---|---|\n| a | 1 |\n| b | 2 |\npost\n"
+           and new["/x/C.md"] == "q\nPer-session: a 1, b 2\nr\n" and len(ch) == 2)
+    new2, ch2 = paste_tables(new, eqo)
+    expect("paste_tables a second time is a no-op", new2 == new and ch2 == [])
+    for label, bad in [
+        ("a table header found twice is refused",
+         {"/x/R.md": docs["/x/R.md"] + "| s | cov |\n"}),
+        ("a table header found nowhere is refused", {"/x/R.md": "pre\n| other |\n"}),
+        ("a CLAUDE line found twice is refused",
+         {"/x/C.md": docs["/x/C.md"] + "Per-session: old\n"}),
+    ]:
+        try:
+            paste_tables(bad, eqo)
+            expect(label, False)
+        except Refused as e:
+            expect(label, "found" in str(e))
     print("selftest: " + ("all planted refusals caught" if ok else "FAILED"))
     return 0 if ok else 1
 
