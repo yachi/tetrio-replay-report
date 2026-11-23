@@ -59,13 +59,14 @@ const SESSIONS = [
   { dir: '2026-11-05', rounds: 134, strict: 122, equal: 12, faults: 2151, perfect: 12912, pieces: 14152 },
   { dir: '2026-11-17', rounds:  48, strict:  39, equal:  9, faults:  638, perfect:  4292, pieces:  4675 },
   { dir: '2026-11-19', rounds:  88, strict: 67, equal: 21, faults: 1107, perfect: 7289, pieces: 7938 },
+  { dir: '2026-11-23', rounds: 164, strict: 138, equal: 26, faults: 2202, perfect: 14621, pieces: 15879 },
 ];
 
 // At module scope, not inside a test: a membership check that lives in a test can be skipped
 // by whatever skips the test, and the whole point is that it runs before any literal is read.
 assertCorpusIsEverySessionOnDisk(`${import.meta.dir}/../sessions`, SESSIONS.map(s => s.dir));
 
-const CORPUS = { rounds: 3480, strict: 2991, equal: 489, faults: 54688, perfect: 294177, pieces: 327362 };
+const CORPUS = { rounds: 3644, strict: 3129, equal: 515, faults: 56890, perfect: 308798, pieces: 343241 };
 
 interface Row {
   session: string; file: string; round: number; who: string;
@@ -197,8 +198,9 @@ test('a fault-free round is a round of nothing but perfect pieces', () => {
   // 2026-11-05 adds one on 134 player-rounds, 0.7%. Recorded, not read.
   // 2026-11-17 adds three on 48 player-rounds, 6.3%. Recorded, not read.
   // 2026-11-19 adds five on 88 player-rounds, 5.7%. Recorded, not read (94 -> 99).
+  // 2026-11-23 adds six on 164 player-rounds, 3.7%. Recorded, not read (99 -> 105).
   const clean = rows.filter(r => r.faults === 0);
-  expect(clean.length).toBe(99);
+  expect(clean.length).toBe(105);
   for (const r of clean) {
     expect(r.perfect).toBe(r.pieces);
     expect(r.combo).toBe(r.perfect);
@@ -255,15 +257,17 @@ test('the four finesse rates are four different numbers, so a rate must name its
   // share > event rate > the meaningless one > faulty share). A reader who took 17.16 away as
   // "the" fault rate would be wrong twice over: it is one corpus-state's reading of a quantity
   // that moves, and it is one of four defensible ones.
+  // Twenty-five-session figures (2026-11-23 added): 16.71 -> 16.57, 10.14 -> 10.03, 89.86 -> 89.97,
+  // 15.68 -> 15.56, 1.648 -> 1.652. 11-23 is 164 player-rounds (4.5% of the pool).
   // Twenty-four-session figures (2026-11-19 added): 16.77 -> 16.71, 10.19 -> 10.14, 89.81 -> 89.86,
   // 15.74 -> 15.68, 1.647 -> 1.648. 11-19 is 88 player-rounds (2.5% of the pool).
   // Twenty-three-session figures (2026-11-17 added): 16.82 -> 16.77, 10.22 -> 10.19, 89.78 -> 89.81,
   // 15.78 -> 15.74, 1.647 -> 1.647. 11-17 is 48 player-rounds (1.4% of the pool).
-  expect(pct(faults / pieces)).toBe(16.71);               // fault EVENTS per piece
-  expect(pct(1 - perfect / pieces)).toBe(10.14);          // share of pieces that were faulty
-  expect(pct(perfect / pieces)).toBe(89.86);              // TETR.IO's own displayed figure
-  expect(pct(faults / (faults + perfect))).toBe(15.68);    // on no meaningful denominator
+  expect(pct(faults / pieces)).toBe(16.57);               // fault EVENTS per piece
+  expect(pct(1 - perfect / pieces)).toBe(10.03);          // share of pieces that were faulty
+  expect(pct(perfect / pieces)).toBe(89.97);              // TETR.IO's own displayed figure
+  expect(pct(faults / (faults + perfect))).toBe(15.56);    // on no meaningful denominator
   // and the mechanism behind the gap: fault events per FAULTY piece, > 1 by construction
-  expect(Math.round(faults / (pieces - perfect) * 1000) / 1000).toBe(1.648);
+  expect(Math.round(faults / (pieces - perfect) * 1000) / 1000).toBe(1.652);
   expect(faults / (pieces - perfect)).toBeGreaterThan(1);
 });
