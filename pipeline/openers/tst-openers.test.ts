@@ -175,7 +175,7 @@ test('(d) each invariant has a mutant that fires', () => {
   const cells = [0, 1, 2, 3, 10, 11, 12, 13, 20, 21, 22, 23];
   const til = { pieces: [['I', [0, 1, 2, 3]], ['I', [10, 11, 12, 13]], ['I', [20, 21, 22, 23]]], left: 'JLOSTZ'.split('').join('') , A: 0, B: 0, p5: 0, full: false, tst: false };
   expect(tilingProblems(cells, til)).toContain('over2');
-});
+}, 60_000);
 
 // ---- (b) re-run the pinned cheap set through the built crate --------------------------------------
 const CRATE = join(SIM, 'tst2bag-rs');

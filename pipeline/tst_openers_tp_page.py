@@ -1,5 +1,8 @@
-"""TST 開局排名（T 先擺）: the T-placed bag-1 boards ranked by how likely a random deal builds ANY two-bag TST shape
-holding the board and then clears a bag-3 Perfect Clear: `docs/tst-openers.html`.
+"""TST 開局排名（T 先擺 / T 留 hold）: the bag-1 boards with the T placed AND the bag-1 boards with the T held, ranked
+TOGETHER by how likely a random deal builds ANY two-bag TST shape holding the board and then clears a bag-3 Perfect Clear:
+`docs/tst-openers.html`. A board is `kind` "placed" (six pieces, one of them the T, one other piece held) or "held" (the six
+pieces IJLOSZ, the T in hold: `held == "T"`); one competition rank per budget over both kinds, and the kind bar only hides
+cards, it never renumbers a rank.
 
     python3 -m pipeline.tst_openers_tp_page --out-dir /tmp/tst   # render it somewhere other than docs/
     python3 -m pipeline.tst_openers_tp_page --selftest           # the audit's mutants
@@ -63,6 +66,9 @@ TABLE_SHOWN = 15
 ORDER = "IJLOSTZ"
 SW = {"J": "L", "L": "J", "S": "Z", "Z": "S"}
 ID_OFFSET = 1000
+KINDS = ("placed", "held")
+_CARDKIND = re.compile(r'<article class="card[^"]*" data-pos="[^"]*" data-card="([^"]+)" data-rk="[^"]*" data-kind="(\w+)"')
+_KBTN = re.compile(r'<button aria-pressed="\w+" data-k="(\w+)">(.*?)</button>', re.S)
 _CARD = re.compile(r'<article class="card[^"]*" data-pos="[^"]*" data-card="([^"]+)" data-rk="([^"]*)"[^>]*>(.*?)</article>', re.S)
 _TROW = re.compile(r'<tr data-p3="([^"]+)">(.*?)</tr>', re.S)
 _IROW = re.compile(r'<tr data-inc="([^"]+)">(.*?)</tr>', re.S)
@@ -105,8 +111,8 @@ def load_inputs(repo=REPO):
     with open(os.path.join(repo, "analysis", "tst-openers-tp.json"), "rb") as f:
         raw = f.read()
     art = json.loads(raw)
-    _need(art["schema"] == "tst-openers-tp/1" and art["report_eligible"] is False and art["constructed"] is True,
-          "the artefact is not tst-openers-tp/1 marked report_eligible: false / constructed: true")
+    _need(art["schema"] == "tst-openers-tp/2" and art["report_eligible"] is False and art["constructed"] is True,
+          "the artefact is not tst-openers-tp/2 marked report_eligible: false / constructed: true")
     with open(os.path.join(repo, "analysis", "tst-openers.json"), "rb") as f:
         old_raw = f.read()
     _need(art["md5"]["tst_openers"] == hashlib.md5(old_raw).hexdigest(),
@@ -134,6 +140,7 @@ def load_inputs(repo=REPO):
     lib = bag1_library(repo)
     for b in art["boards"]:
         _need(all(s in cat for s in b["shapes"]), f"board {b['name']} names a shape outside the catalogue")
+        b["kind"] = "held" if b["held"] == "T" else "placed"
         b["b1"] = bag1_names(b, lib)
     return art, cat
 
@@ -279,9 +286,30 @@ def _b1_cat_name(n):
 
 
 def bag1_library(repo=REPO):
-    """[(name, source, by_letter, normalised drawing)] of every named opener's bag-1 board with the T placed (24 cells),
-    as drawn and mirrored: route pages and harddrop's fields by letter, Ivan's catalogue by occupancy only."""
+    """[(name, source, by_letter, normalised drawing, kind)] of every named opener's bag-1 board, as drawn and mirrored:
+    route pages and harddrop's fields by letter, Ivan's catalogue by occupancy only. A 24-cell drawing holding a T is a
+    `placed` board (the T is one of the six pieces); a 24-cell drawing with NO T, and a 28-cell drawing less its T cells,
+    is a `held` board (the six pieces IJLOSZ, the T in hold). A held entry is matched only to held boards."""
     lib = []
+
+    def add(nm, src, by_letter, c, cc_swap=True):
+        n = len(c)
+        has_t = "T" in c.values()
+        if n == 24 and has_t:
+            kinds = [("placed", c)]
+        elif n == 24:
+            kinds = [("held", c)]
+        elif n == 28 and has_t:
+            kinds = [("held", {p: v for p, v in c.items() if v != "T"})]
+        else:
+            return None
+        for kind, cc0 in kinds:
+            if len(cc0) != 24:
+                continue
+            for cc in (cc0, _b1_mirror(cc0, cc_swap)):
+                lib.append((nm, src, by_letter, _b1_norm(cc), kind))
+        return True
+
     for fn in sorted(glob.glob(os.path.join(repo, "pipeline", "openers", "*-routes.json"))):
         key = os.path.basename(fn)[:-len("-routes.json")]
         if key not in ROUTE:
@@ -292,28 +320,22 @@ def bag1_library(repo=REPO):
             if n.get("bag") != 1 or "rows" not in n:
                 continue
             c = _b1_cells(n["rows"])
-            if len(c) != 24 or "T" not in c.values():
-                continue
-            nm = ROUTE[key].replace("（harddrop）", "")
-            for cc in (c, _b1_mirror(c)):
-                lib.append((nm, "route", True, _b1_norm(cc)))
+            add(ROUTE[key].replace("（harddrop）", ""), "route", True, c)
     with open(os.path.join(repo, "pipeline", "openers", "wiki-openers.json"), encoding="utf-8") as f:
         w = json.load(f)
     for op in w["openers"]:
         for fd in op["fields"]:
-            c = _b1_cells(fd["rows"])
-            if len(c) != 24:
-                continue
-            for cc in (c, _b1_mirror(c)):
-                lib.append((B1_WIKI.get(op["jp"], op["jp"]), "harddrop", True, _b1_norm(cc)))
+            add(B1_WIKI.get(op["jp"], op["jp"]), "harddrop", True, _b1_cells(fd["rows"]))
     with open(os.path.join(repo, "pipeline", "openers", "opener-fields.json"), encoding="utf-8") as f:
         o = json.load(f)
     for pg in o["pages"]:
         c = _b1_cells(pg["rows"])
         if len(c) != 24 or any(v == 10 for v in collections.Counter(y for _, y in c).values()):
             continue
-        for cc in (c, _b1_mirror(c, False)):
-            lib.append((_b1_cat_name(pg["name"]), "catalogue", False, _b1_norm(cc)))
+        # the catalogue draws occupancy only (no letters), so a 24-cell page is the same shape for either kind
+        for kd in KINDS:
+            for cc in (c, _b1_mirror(c, False)):
+                lib.append((_b1_cat_name(pg["name"]), "catalogue", False, _b1_norm(cc), kd))
     return lib
 
 
@@ -326,7 +348,9 @@ def bag1_names(b, lib):
     f = _b1_norm(c)
     occ = frozenset(p for p, _ in f)
     ex, same = [], []
-    for nm, _src, by_letter, d in lib:
+    for nm, _src, by_letter, d, kd in lib:
+        if kd != b["kind"]:
+            continue
         if by_letter and d == f and nm not in ex:
             ex.append(nm)
         elif not by_letter and frozenset(p for p, _ in d) == occ and nm not in same:
@@ -529,9 +553,9 @@ def build_data(art, cat, R, PR, builds, pcxd):
             if ln not in px:
                 px[ln] = px_entry(cat[r["shapes"][si]]["rows"], left, pcxd.get(ln))
         cards[r["name"]] = dict(tst=s["tst"], f=strings(r), rk={k: rk[k][n] for k in BK}, o={k: od[k][n] for k in BK},
-                                t=card_rows(cat, r), n1=len(r["pieces"]), b=bb, x=xx,
+                                t=card_rows(cat, r), n1=len(r["pieces"]), b=bb, x=xx, kind=r["kind"],
                                 cnt={k: counts_line(r, k, PR["card"]) for k in BK})
-    return dict(labels=PR["labels"], bk=BK, filter_default=PR["pos_centre"], sd_default=BK_SHOWN, cards=cards, px=px,
+    return dict(labels=PR["labels"], bk=BK, filter_default=PR["pos_centre"], kind_default=KIND_DEFAULT, sd_default=BK_SHOWN, cards=cards, px=px,
                 cl={k: PR["card"][k] for k in CL_KEYS})
 
 
@@ -630,12 +654,13 @@ def card(rkt, r, m, cat, art, PR, pcxd, famh=""):
              f'<span>{C["pc3"]} <b class="num" data-f="pc3">{_esc(fs[1])}</b></span>'
              f'<span class="j">{C["joint"]} <b class="num" data-f="joint">{fs[2]}</b></span>')
     sdl = " · ".join(f'{_esc(C["bk_" + k])} <b class="num" data-f="sd{k}">{sd[k][2]}</b>' for k in ("0", "1", "2"))
-    return (f'<article class="card{" me" if me else ""}" data-pos="{pos}" data-card="{r["name"]}" data-rk="{rkt}" id="c{r["name"]}">'
+    b1t = C["b1_title_held"] if r["kind"] == "held" else C["b1_title"].format(held=r["held"])
+    return (f'<article class="card{" me" if me else ""}" data-pos="{pos}" data-card="{r["name"]}" data-rk="{rkt}" data-kind="{r["kind"]}" id="c{r["name"]}">'
             f'<div class="rk num">{rkt}</div>\n'
             f'<div class="bd">{svg2(cells, max(H, 8), 15, tst)}<div class="smalls">'
-            f'<div class="small"><div class="lab">{_esc(C["b1_title"].format(held=r["held"]))}</div>{OP.svg(b1, max(4, max(y for x, y in b1) + 1), 9)}</div>'
+            f'<div class="small"><div class="lab">{_esc(b1t)}</div>{OP.svg(b1, max(4, max(y for x, y in b1) + 1), 9)}</div>'
             f'<div class="small"><div class="lab">{_esc(C["left_title"])}</div>{OP.svg(res, max(4, len(rows)), 9)}</div></div></div>\n'
-            f'<div class="meta"><div class="src">{shown}</div>\n'
+            f'<div class="meta"><span class="kc kc-{r["kind"]}" data-kc="1">{_esc(C["kind_" + r["kind"]])}</span><div class="src">{shown}</div>\n'
             f'<div class="stats">{stats}</div>\n'
             f'<div class="muted sm sdl">{_esc(C["sd_line"])} {sdl}</div>\n'
             f'<div class="muted sm cnt" data-cnt="1">{_esc(cnt)}</div>\n'
@@ -722,13 +747,51 @@ def thr_text(art):
     return f"{float(threshold(art)) * 100:g}%"
 
 
+def kind_counts(R):
+    """kind -> how many ranked cards (mirror pairs) are of it."""
+    return {k: sum(1 for r, _ in R if r["kind"] == k) for k in KINDS}
+
+
+def pr_figs(art):
+    """The printed pruning figures by `data-pr` key, from the artefact: the totals and each kind's boards and kept."""
+    pr = art["prune"]
+    kd = pr["kinds"]
+    return {"boards_total": pr["boards_total"], "kept": pr["kept"],
+            "boards_placed": kd["placed"][0], "kept_placed": kd["placed"][1],
+            "boards_held": kd["held"][0], "kept_held": kd["held"][1]}
+
+
 def fmt_for(art, cat, R, U):
     pr = art["prune"]
     nsrc = sum(1 for k in cat if k < ID_OFFSET)
+    pf = pr_figs(art)
+    kc = kind_counts(R)
     return dict(boards=f'<b data-pr="boards_total">{pr["boards_total"]}</b>', kept=f'<b data-pr="kept">{pr["kept"]}</b>',
+                boards_placed=f'<b data-pr="boards_placed">{pf["boards_placed"]}</b>',
+                kept_placed=f'<b data-pr="kept_placed">{pf["kept_placed"]}</b>',
+                boards_held=f'<b data-pr="boards_held">{pf["boards_held"]}</b>',
+                kept_held=f'<b data-pr="kept_held">{pf["kept_held"]}</b>',
                 dropped=pr["boards_total"] - pr["kept"], thr=thr_text(art), nshapes=len(cat), nsrc=nsrc, nmir=len(cat) - nsrc,
                 nr=len(R), nu=len(U), npairs=len(R) + len(U), nc=sum(1 for r, _ in R if OP.dist(cat[r["shapes"][r["classes"][shown_class(r)][0]]]) >= WALL),
+                nr_placed=kc["placed"], nr_held=kc["held"],
                 wall=WALL, mirror_state=None)
+
+
+KIND_DEFAULT = "all"
+
+
+def kind_labels(R, PR):
+    """The kind bar's button texts by key: all, placed, held (the counts are the ranked cards of each kind)."""
+    kc = kind_counts(R)
+    return {"all": PR["kind_all"].format(n=len(R)), "placed": PR["kind_placed"].format(n=kc["placed"]),
+            "held": PR["kind_held"].format(n=kc["held"])}
+
+
+def kind_bar(R, PR):
+    lb = kind_labels(R, PR)
+    btn = "".join(f'<button aria-pressed="{"true" if k == KIND_DEFAULT else "false"}" data-k="{k}">{_esc(lb[k])}</button>'
+                  for k in ("all", "placed", "held"))
+    return f'<div class="bar" data-bar="kind">{btn}</div>'
 
 
 def render(art, cat, PR, pcxd, builds=None):
@@ -764,6 +827,7 @@ def render(art, cat, PR, pcxd, builds=None):
     out += ["</ul></details>",
             f'<div class="bar" data-bar="pos"><button aria-pressed="true" data-f="{PR["pos_centre"]}">{_esc(PR["filter_centre"].format(**fm))}</button>'
             f'<button aria-pressed="false" data-f="all">{_esc(PR["filter_all"])}</button></div>',
+            kind_bar(R, PR),
             f'<div class="bar" data-bar="sd"><span class="muted sm">{_esc(PR["sd_bar"])}</span>{sdb}</div>',
             f'<p class="muted sm">{_esc(PR["filter_note"].format(**fm))}</p>',
             *top_table(art, cat, R, PR),
@@ -859,6 +923,8 @@ def audit_builds(island, R, cat, pcxd):
         lv = live(r)
         if c.get("n1") != len(r["pieces"]):
             bad.append(f"island card {name}: the bag-1 piece count is not the board's")
+        if c.get("kind") != r["kind"]:
+            bad.append(f"island card {name}: the kind is not the board's")
         if len(c.get("b", [])) != len(lv) or len(c.get("x", [])) != len(lv):
             bad.append(f"island card {name}: not one build per live class")
             continue
@@ -872,6 +938,9 @@ def audit_builds(island, R, cat, pcxd):
             b1 = frozenset((k, tuple(sorted(cs))) for k, cs, _ in order[:c["n1"]])
             if b1 != piece_set(r["pieces"]):
                 bad.append(f"{tag}: the build does not place the bag-1 board first")
+            nT = sum(1 for k, _cs, _ in order[:c["n1"]] if k == "T")
+            if nT != (0 if r["kind"] == "held" else 1):
+                bad.append(f"{tag}: the bag-1 steps of a {r['kind']} board hold {nT} T")
             seen = set()
             for k, cs, _ in order:
                 if len(cs) != 4 or OP._norm([(q % 10, q // 10) for q in cs]) not in OP.SHAPE.get(k, ()):
@@ -946,8 +1015,8 @@ def _b1_grid_check(b, names, lib):
     flip = ["".join(B1_SW.get(ch, ch) for ch in row[::-1]) for row in mine]
     for nm in names:
         ok = False
-        for n2, _src, by_letter, d in lib:
-            if n2 == nm and by_letter and text(dict(d)) in (mine, flip):
+        for n2, _src, by_letter, d, kd in lib:
+            if kd == b["kind"] and n2 == nm and by_letter and text(dict(d)) in (mine, flip):
                 ok = True
         if not ok:
             return False
@@ -970,8 +1039,39 @@ def audit(page, art, cat, PR, pcxd=None, builds=None):
         return bad
     # the pruning numbers and the mirror sentence
     pr = {k: v for k, v in _PR.findall(page)}
-    if pr != {"boards_total": str(art["prune"]["boards_total"]), "kept": str(art["prune"]["kept"])}:
-        bad.append(f"the printed pruning numbers {pr} are not the artefact's {art['prune']['boards_total']}/{art['prune']['kept']}")
+    want_pr = {k: str(v) for k, v in pr_figs(art).items()}
+    if pr != want_pr:
+        bad.append(f"the printed pruning numbers {pr} are not the artefact's {want_pr}")
+    # the artefact's per-kind pruning numbers are its own boards': kept = the boards of that kind, placed ones first
+    kd = art["prune"]["kinds"]
+    for k in KINDS:
+        if sum(1 for b in art["boards"] if b["kind"] == k) != kd[k][1] or kd[k][1] > kd[k][0]:
+            bad.append(f"the artefact's pruning numbers for kind {k} {kd[k]} are not its boards'")
+    if kd["placed"][0] + kd["held"][0] != art["prune"]["boards_total"] or kd["placed"][1] + kd["held"][1] != art["prune"]["kept"]:
+        bad.append("the artefact's pruning totals are not the sum over its kinds")
+    kinds_seq = [b["kind"] for b in art["boards"]]
+    if kinds_seq != sorted(kinds_seq, key=KINDS.index):
+        bad.append("the artefact's boards are not the placed ones first")
+    for b in art["boards"]:
+        letters = sorted(k for k, _ in b["pieces"])
+        if b["kind"] == "held":
+            if letters != sorted("IJLOSZ") or b["held"] != "T" or not b["name"].startswith("h"):
+                bad.append(f"board {b['name']}: a held board is not the six pieces IJLOSZ with the T in hold")
+        elif letters.count("T") != 1 or b["held"] == "T" or not b["name"].startswith("t") or len(set(letters)) != len(letters):
+            bad.append(f"board {b['name']}: a placed board is not six distinct pieces with exactly one T")
+        if by[b["mirror"]]["kind"] != b["kind"]:
+            bad.append(f"board {b['name']}: its mirror is of the other kind")
+    # the kind attribute of every card and the kind bar's counts
+    ck = dict(_CARDKIND.findall(page))
+    if ck != {r["name"]: r["kind"] for r, _ in R}:
+        bad.append("a card's data-kind is not its board's kind in the artefact")
+    kb = {k: html.unescape(v) for k, v in _KBTN.findall(page)}
+    if kb != kind_labels(R, PR):
+        bad.append(f"the kind bar {kb} is not the recomputed {kind_labels(R, PR)}")
+    for name, body in ((n, b) for n, _rk, b in cards):
+        rr = next(r for r, _ in R if r["name"] == name)
+        if f'<span class="kc kc-{rr["kind"]}" data-kc="1">{_esc(PR["card"]["kind_" + rr["kind"]])}</span>' not in body:
+            bad.append(f"card {name}: the kind chip is missing or of the other kind")
     if PR["mirror_assumed" if art["mirror"]["assumed"] else "mirror_counted"] not in page:
         bad.append("the mirror sentence does not match the artefact's `mirror.assumed`")
     # the artefact's own invariants a page figure rests on
@@ -1204,6 +1304,28 @@ def selftest(repo=REPO):
             break
     expect("a wrong bag-1 name in the artefact", render(worse, cat, PR, pcxd), True)
     expect("a hold tag dropped from a title", sub(r'<div class="src">(.*?)</div>', lambda s: re.sub("（hold .）", "", s)), True)
+    flip = lambda k: "held" if k == "placed" else "placed"
+    expect("a card's data-kind flipped", sub(r'data-kind="(\w+)"', flip), True)
+    expect("a card's kind chip flipped", sub(r'class="kc kc-(\w+)"', flip), True)
+    expect("a kind-bar count edited", sub(r'data-k="held">[^<]*?(\d)', bump), True)
+    expect("a kind-bar count edited (T placed)", sub(r'data-k="placed">[^<]*?(\d)', bump), True)
+    expect("a held pruning number edited", sub(r'data-pr="kept_held">(\d)', bump), True)
+    expect("a held boards total edited", sub(r'data-pr="boards_held">(\d)', bump), True)
+    expect("a placed pruning number edited", sub(r'data-pr="kept_placed">(\d)', bump), True)
+    worse = copy.deepcopy(art)
+    hb = next(b for b in worse["boards"] if b["kind"] == "held")
+    hb["held"] = "S"
+    expect("a held board given held S", page, True, a=worse)
+    worse = copy.deepcopy(art)
+    pb = next(b for b in worse["boards"] if b["kind"] == "placed")
+    pb["held"] = "T"
+    expect("a placed board given held T", page, True, a=worse)
+    worse = copy.deepcopy(art)
+    worse["prune"]["kinds"]["held"][1] += 1
+    worse["prune"]["kept"] += 1
+    expect("the held pruning count edited in the artefact", page, True, a=worse)
+    expect("an island card's kind flipped", sub(r'"kind":"(\w+)"', flip), True)
+    expect("the kind bar deleted", re.sub(r'<div class="bar" data-bar="kind">.*?</div>', "", page, count=1, flags=re.S), True)
     expect("an island counts line edited", sub(r'"cnt":\{"0":"[^"]*?(\d)', bump), True)
     expect("a soft-drop line figure edited", sub(r'data-f="sd1">(\d)', bump), True)
     expect("a soft-drop line figure edited (budget 0)", sub(r'data-f="sd0">(\d)', bump), True)
@@ -1292,6 +1414,14 @@ def selftest(repo=REPO):
     z = next(i for i, st in enumerate(o) if not st[2])
     o[a][2], o[z][2] = 0, 1
     expect("a soft drop moved to another step, total unchanged", render(art, cat, PR, pcxd, bd), True, bd=bd)
+    hk = next((r for r, _ in ranked(art, cat) if r["kind"] == "held"), None)
+    if hk is None:
+        print("  skipped: a held build with a T in its first six steps (no ranked held card)")
+    else:
+        bd = copy.deepcopy(builds)
+        kh = f'{hk["name"]}#{live(hk)[0]}'
+        bd[kh]["order"][0][0] = "T"
+        expect("a held build with a T in its first six steps", render(art, cat, PR, pcxd, bd), True, bd=bd)
     bd = copy.deepcopy(builds)
     del bd[k0]
     expect("a build missing", render(art, cat, PR, pcxd, bd), True, bd=bd)

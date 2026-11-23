@@ -104,12 +104,13 @@ EXTRA = [
                   'not committed; run pipeline/sim/emit-tst-openers.py by hand (see its docstring); CI re-checks '
                   'it in pipeline/openers/tst-openers.test.ts'),
     # the T-placed ranking: the same Rust counter family (tst2bag-tp-rs), a recount of about an hour and a half on
-    # four cores (O1-O5 in its docstring), merged by a Python emitter; constructed, never re-emitted here.
+    # four cores (O1-O5 in its docstring) plus the held-T boards (six pieces placed, the T in hold; H1-H6 in its docstring,
+    # added to the placed boards kept verbatim), merged by a Python emitter; constructed, never re-emitted here.
     # pipeline/openers/tst-openers-tp.test.ts re-runs a pinned subset and checks every board.
     dict(name='tst-openers-tp', out='tst-openers-tp.json', argv=['emit-tst-openers-tp.py'],
          always_skip=True,
          skip_why='its raw inputs (the counter\'s outputs at four soft-drop budgets, about 1.5 hours on four cores) '
-                  'are not committed; run the O1-O5 commands in pipeline/sim/emit-tst-openers-tp.py\'s docstring '
+                  'are not committed; run the O1-O5 and H1-H6 commands in pipeline/sim/emit-tst-openers-tp.py\'s docstring '
                   'by hand; CI re-checks it in pipeline/openers/tst-openers-tp.test.ts'),
     # the self-play artefact rebuilds from the placements committed INSIDE it; re-running cold-clear
     # (--games <jsonl> --coach-seed <n>) needs the bot's JSONL, which is not committed, and is not done here

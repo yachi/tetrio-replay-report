@@ -2,8 +2,9 @@
 """Emit analysis/tst-openers-tp.json: the T-placed bag-1 ranking (constructed, quarantined).
 
 The counter is `pipeline/sim/tst2bag-tp-rs` (binary `tst2bag-tp`; a sibling of `tst2bag-rs`, which is left untouched so
-`analysis/tst-openers.json` and its pins stay current). A bag-1 board here is six pieces: the T placed, four more of
-IJLOSZ placed, and the sixth kind held. The ranking counts, for each board, the 5040^2 dealt orders of bags 1 and 2 that
+`analysis/tst-openers.json` and its pins stay current). A bag-1 board here is six pieces in one of two kinds: PLACED
+(the T placed, four more of IJLOSZ placed, the sixth kind held; names t<i>) or HELD (the six pieces IJLOSZ placed and the T in
+hold, `held == "T"`; names h<i>, listed after every placed board). Both kinds are counted by the same method and ranked together. The ranking counts, for each board, the 5040^2 dealt orders of bags 1 and 2 that
 finish on ANY of the 234 shapes (121 transcribed + 113 mirrors) holding that board, and the bag-3 Perfect Clear chance
 of the leftover (`p5`, out of 5040). Everything below is offline (about 1.5 h on 4 cores) and never runs in CI;
 `tst-openers-tp.test.ts` re-runs a pinned cheap subset and checks the artefact's invariants.
@@ -21,6 +22,16 @@ of the leftover (`p5`, out of 5040). Everything below is offline (about 1.5 h on
          --sd2 $W/sd2.out --inf $W/inf.out --out analysis/tst-openers-tp.json
   O6  python3 $E --compare-scratch <dir>                                        # one-off, against the earlier scratch run
       python3 $E --validate [analysis/tst-openers-tp.json]                      # Python-side invariants (the TS test is independent)
+
+HELD BOARDS (schema tst-openers-tp/2) are added on top of the committed placed boards, which are kept verbatim (`--reuse-placed`):
+
+  H1  python3 $E --tpl-input --mirror-out $W/mirror.out > $W/tpl.in             # same lines as O3
+  H2  FIXED=1 LASTONLY=1 JOBS=4 $B < $W/tpl.in > $W/lasth.out                   # no TPL: every six-kind board, built count per shape
+  H3  python3 $E --multi-input --held --mirror-art --last-held $W/lasth.out > $W/hmulti.in   # held prune (own or mirror ub), h<i> lines
+  H4  for n in 0 1 2; do MULTI=1 SDB=$n JOBS=4 $B < $W/hmulti.in > $W/hsd$n.out; done ; MULTI=1 JOBS=4 $B < $W/hmulti.in > $W/hinf.out
+  H5  python3 $E --merge --reuse-placed analysis/tst-openers-tp.json --last-held $W/lasth.out --hsd0 $W/hsd0.out --hsd1 $W/hsd1.out \
+         --hsd2 $W/hsd2.out --hinf $W/hinf.out --out analysis/tst-openers-tp.json
+  H6  python3 $E --validate ; python3 $E --compare-held $W/lasth.out            # compare-held: FIXED_BOARDS order vs tst-openers.json fixed.cums
 
 `--fallback <scratch dir>` writes the same artefact from the scratch outputs with the mirror shapes derived by symmetry
 (`mirror.assumed: true`); it exists so a page can be built while O2-O4 run.
@@ -49,7 +60,8 @@ SHAPES = ROOT / "pipeline" / "openers" / "tst-openers-shapes.json"
 OLD = ROOT / "analysis" / "tst-openers.json"
 OUT = ROOT / "analysis" / "tst-openers-tp.json"
 CRATES = ["tst2bag-tp-rs", "oracle-rs", "pc-solver-rs"]
-SCHEMA = "tst-openers-tp/1"
+SCHEMA = "tst-openers-tp/2"
+SCHEMA_V1 = "tst-openers-tp/1"
 B = 5040
 N2 = B * B
 THRESH = (9, 25)
@@ -265,6 +277,22 @@ def kept_boards(boards, cat):
     return keep, ub
 
 
+def kept_held(boards, cat):
+    """Held boards (six pieces IJLOSZ, T in hold): kept if the board's OR its mirror's upper bound exceeds the threshold, so a
+    mirror pair is kept together. Returns (keys in name order, ub)."""
+    ub = {k: upper_bound(L, cat) for k, L in boards.items()}
+    th = Fraction(*THRESH)
+    keep = []
+    for k in boards:
+        assert all(kk != "T" for kk, _ in k), "a T in a held board"
+        mk = mirror_board_key(k)
+        assert mk != k, "a held board equal to its own mirror"
+        if ub[k] > th or (mk in ub and ub[mk] > th):
+            keep.append(k)
+    keep.sort(key=lambda k: (-ub[k], k))
+    return keep, ub
+
+
 def board_classes(ids, cat):
     """Ranked classes of a board's shape list: [(si, left, p5)] by (-p5, si, left)."""
     cls = [(s["classes"][l], si, l) for si, sid in enumerate(ids) for s in [cat.by[sid]] for l in s["classes"]]
@@ -272,14 +300,14 @@ def board_classes(ids, cat):
     return [(si, l, p) for p, si, l in cls]
 
 
-def multi_lines(keep, boards, cat):
+def multi_lines(keep, boards, cat, prefix="t"):
     out = []
     for i, k in enumerate(keep):
         ids = sorted(boards[k])
         b1 = "/".join(f"{kind}:{','.join(map(str, cs))}" for kind, cs in k)
         sh = "#".join(f"{pt(cat.by[sid]['cells'])}|{pt(cat.by[sid]['tst'])}" for sid in ids)
         cl = ";".join(f"{si}:{l or '-'}" for si, l, _ in board_classes(ids, cat))
-        out.append(f"t{i}#{b1}#{sh}#{cl}")
+        out.append(f"{prefix}{i}#{b1}#{sh}#{cl}")
     return out
 
 
@@ -294,14 +322,16 @@ def assemble(old, shapes, mirror_shapes, assumed, boards, keep, multi):
     raise NotImplementedError
 
 
-def mk_artefact(old, shapes, mirror_shapes, assumed, plan, results, prune_total):
-    """plan: list of dict(key, ids, classes, built1); results: {bk: {i: {"ntil","cum"}}} by position i in plan."""
-    names = {k: f"t{i}" for i, k in enumerate(p["key"] for p in plan)}
+def board_records(plan, results, prefix="t"):
+    """Board dicts for `plan`; names `<prefix><i>`, mirrors resolved inside the list. A board with a T in its six pieces is a
+    placed board (`held` = the kind in hold); one without is a held board (`held` = "T")."""
+    names = {k: f"{prefix}{i}" for i, k in enumerate(p["key"] for p in plan)}
     bd = []
     for i, p in enumerate(plan):
         k = p["key"]
         mk = mirror_board_key(k)
-        held = [c for c in "IJLOSZ" if c not in {kk for kk, _ in k}]
+        kinds = {kk for kk, _ in k}
+        held = [c for c in "IJLOSZ" if c not in kinds] if "T" in kinds else ["T"]
         assert len(held) == 1
         ntils = {results[bk][i]["ntil"] for bk in BKEYS}
         assert len(ntils) == 1, f"board {i}: ntil differs between budgets"
@@ -316,6 +346,10 @@ def mk_artefact(old, shapes, mirror_shapes, assumed, plan, results, prune_total)
             "ntil": ntils.pop(),
             "cum": {bk: results[bk][i]["cum"] for bk in BKEYS},
         })
+    return bd
+
+
+def header(shapes, mirror_shapes, assumed, boards, prune):
     return {
         "schema": SCHEMA,
         "report_eligible": False,
@@ -323,11 +357,23 @@ def mk_artefact(old, shapes, mirror_shapes, assumed, plan, results, prune_total)
         "quarantine": QUARANTINE,
         "md5": {"crate": crate_md5(), "tst_openers": md5(OLD.read_bytes()), "shapes": md5(canon(shapes).encode())},
         "budgets": BUDGETS,
-        "prune": {"threshold": list(THRESH), "boards_total": prune_total, "kept": len(plan)},
+        "prune": prune,
         "mirror": {"id_offset": ID_OFFSET, "suffix": SUFFIX, "assumed": assumed},
         "mirror_shapes": mirror_shapes,
-        "boards": bd,
+        "boards": boards,
     }
+
+
+def prune_of(placed, held):
+    """placed / held: [boards_total, kept]."""
+    return {"threshold": list(THRESH), "boards_total": placed[0] + held[0], "kept": placed[1] + held[1],
+            "kinds": {"placed": list(placed), "held": list(held)}}
+
+
+def mk_artefact(old, shapes, mirror_shapes, assumed, plan, results, prune_total):
+    """plan: list of dict(key, ids, classes, built1); results: {bk: {i: {"ntil","cum"}}} by position i in plan."""
+    return header(shapes, mirror_shapes, assumed, board_records(plan, results),
+                  prune_of([prune_total, len(plan)], [0, 0]))
 
 
 def write_art(art, path):
@@ -422,7 +468,8 @@ def built_of(cum):
 
 def validate(art, cat_given=None, path="artefact"):
     """Python-side invariants. Raises AssertionError; the TS test re-checks them independently and more."""
-    assert art["schema"] == SCHEMA and art["report_eligible"] is False and art["constructed"] is True
+    assert art["schema"] == SCHEMA, f"{path}: schema {art['schema']} (need {SCHEMA})"
+    assert art["report_eligible"] is False and art["constructed"] is True
     old, shapes = load_inputs()
     cat = cat_given or Cat(old, shapes, art["mirror_shapes"])
     assert art["md5"]["tst_openers"] == md5(OLD.read_bytes()), "tst-openers.json changed"
@@ -433,13 +480,23 @@ def validate(art, cat_given=None, path="artefact"):
     bs = art["boards"]
     names = {b["name"]: b for b in bs}
     assert len(names) == len(bs) == art["prune"]["kept"]
+    nplaced = sum(1 for b in bs if b["held"] != "T")
+    pk = art["prune"]["kinds"]
+    assert pk["placed"][1] == nplaced and pk["held"][1] == len(bs) - nplaced, "prune.kinds kept counts"
+    assert art["prune"]["boards_total"] == pk["placed"][0] + pk["held"][0]
+    assert all(b["held"] != "T" for b in bs[:nplaced]) and all(b["held"] == "T" for b in bs[nplaced:]), "placed boards come first"
     seen_keys = set()
+    th = Fraction(*THRESH)
     for i, b in enumerate(bs):
-        assert b["name"] == f"t{i}"
+        is_held = b["held"] == "T"
+        assert b["name"] == (f"h{i - nplaced}" if is_held else f"t{i}")
         key = board_key(b["pieces"])
         assert key not in seen_keys
         seen_keys.add(key)
-        assert len(b["pieces"]) == 6 and sorted(k for k, _ in b["pieces"]) == sorted("T" + "IJLOSZ".replace(b["held"], ""))
+        if is_held:
+            assert sorted(k for k, _ in b["pieces"]) == sorted("IJLOSZ") and len(b["pieces"]) == 6
+        else:
+            assert len(b["pieces"]) == 6 and sorted(k for k, _ in b["pieces"]) == sorted("T" + "IJLOSZ".replace(b["held"], ""))
         cells = [c for _, cs in b["pieces"] for c in cs]
         assert len(cells) == 24 and len(set(cells)) == 24
         if b["mirror"] is not None:
@@ -461,7 +518,11 @@ def validate(art, cat_given=None, path="artefact"):
             prev_b = c
         assert max(b["built1"]) <= b["cum"]["inf"][-1] <= sum(b["built1"]), f"{b['name']}: built bounds"
         L = dict(zip(b["shapes"], b["built1"]))
-        assert upper_bound(L, cat) > Fraction(*THRESH)
+        ok = upper_bound(L, cat) > th
+        if is_held and not ok and b["mirror"] is not None:
+            o = names[b["mirror"]]
+            ok = upper_bound(dict(zip(o["shapes"], o["built1"])), cat) > th
+        assert ok, f"{b['name']}: upper bound under the threshold"
     return True
 
 
@@ -507,6 +568,65 @@ def pcx_lines(art=None):
             seen.add(line)
             out.append(line)
     return out
+
+
+def merge_held(args):
+    """Keep every placed board of --reuse-placed verbatim, append the held boards counted from the --h* outputs."""
+    old, shapes = load_inputs()
+    prev = json.loads(Path(args.reuse_placed).read_text())
+    assert prev["schema"] in (SCHEMA_V1, SCHEMA), prev["schema"]
+    assert prev["md5"]["crate"] == crate_md5() and prev["md5"]["tst_openers"] == md5(OLD.read_bytes()) \
+        and prev["md5"]["shapes"] == md5(canon(shapes).encode()), "the reused artefact is stale"
+    placed = [b for b in prev["boards"] if b["held"] != "T"]
+    ms = prev["mirror_shapes"]
+    cat = Cat(old, shapes, ms)
+    boards = boards_from_last(Path(args.last_held).read_text().splitlines())
+    keep, _ = kept_held(boards, cat)
+    names = {f"h{i}": k for i, k in enumerate(keep)}
+    res = {}
+    for bk, path in (("0", args.hsd0), ("1", args.hsd1), ("2", args.hsd2), ("inf", args.hinf)):
+        res[bk] = {}
+        for r in read_jsonl(path):
+            assert r["name"] in names and r.get("cum") is not None, f"{path}: bad record {r['name']}"
+            i = int(r["name"][1:])
+            assert i not in res[bk]
+            res[bk][i] = r
+        assert sorted(res[bk]) == list(range(len(keep))), f"{path}: does not cover the kept held boards"
+    plan = []
+    for k in keep:
+        ids = sorted(boards[k])
+        plan.append(dict(key=k, ids=ids, classes=board_classes(ids, cat), built1=boards[k]))
+    hb = board_records(plan, res, "h")
+    assert {board_key(b["pieces"]) for b in placed}.isdisjoint({board_key(b["pieces"]) for b in hb})
+    pk = prev["prune"].get("kinds", {"placed": [prev["prune"]["boards_total"], prev["prune"]["kept"]]})
+    art = header(shapes, ms, prev["mirror"]["assumed"], placed + hb, prune_of(pk["placed"], [len(boards), len(keep)]))
+    validate(art, cat_given=cat)
+    write_art(art, args.out)
+    print(f"wrote {args.out}: {len(placed)} placed + {len(hb)} held boards (of {len(boards)} held candidates)", file=sys.stderr)
+
+
+def compare_held(args):
+    """FIXED_BOARDS order of every original shape's held boards (the --last-held output) against the committed
+    analysis/tst-openers.json `fixed.cums[i][-1]`, which counted the same boards with the same engine."""
+    old = json.loads(OLD.read_text())
+    by = {o["id"]: o for o in old["shapes"]}
+    n = bad = 0
+    for l in Path(args.compare_held).read_text().splitlines():
+        if not l.strip():
+            continue
+        r = json.loads(l)
+        sid = int(r["name"][1:])
+        if sid >= ID_OFFSET:
+            continue
+        f = by[sid]["fixed"]
+        mine = [b["cum"][0] for b in r["b1"]]
+        theirs = [c[-1] for c in f["cums"]]
+        n += 1
+        if mine != theirs:
+            bad += 1
+            print(f"shape {sid}: differs ({len(mine)} vs {len(theirs)} boards)")
+    print(f"compared {n} original shapes, {bad} differ")
+    assert n and not bad
 
 
 def validate_cmd(args):
@@ -632,10 +752,23 @@ def main():
     ap.add_argument("--sd1")
     ap.add_argument("--sd2")
     ap.add_argument("--inf")
+    ap.add_argument("--mirror-art", action="store_true")
+    ap.add_argument("--held", action="store_true")
+    ap.add_argument("--last-held")
+    ap.add_argument("--reuse-placed")
+    ap.add_argument("--hsd0")
+    ap.add_argument("--hsd1")
+    ap.add_argument("--hsd2")
+    ap.add_argument("--hinf")
+    ap.add_argument("--compare-held")
     ap.add_argument("--out", default=str(OUT))
     a = ap.parse_args()
     if a.validate is not None:
         return validate_cmd(a)
+    if a.compare_held:
+        return compare_held(a)
+    if a.merge and a.reuse_placed:
+        return merge_held(a)
     if a.compare_scratch:
         return compare_scratch(a)
     if a.fallback:
@@ -646,10 +779,19 @@ def main():
         return
     if a.merge:
         return merge(a)
-    ms = build_mirror_shapes(old, shapes, Path(a.mirror_out).read_text().splitlines() if a.mirror_out else None)
+    if a.mirror_art and not a.mirror_out:
+        ms = json.loads(OUT.read_text())["mirror_shapes"]
+    else:
+        ms = build_mirror_shapes(old, shapes, Path(a.mirror_out).read_text().splitlines() if a.mirror_out else None)
     cat = Cat(old, shapes, ms)
     if a.tpl_input:
         print("\n".join(tpl_input_lines(cat)))
+        return
+    if a.multi_input and a.held:
+        boards = boards_from_last(Path(a.last_held).read_text().splitlines())
+        keep, _ = kept_held(boards, cat)
+        print("\n".join(multi_lines(keep, boards, cat, "h")))
+        print(f"{len(boards)} held boards, {len(keep)} kept", file=sys.stderr)
         return
     if a.multi_input:
         boards = boards_from_last(Path(a.last).read_text().splitlines())
