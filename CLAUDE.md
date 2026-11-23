@@ -6544,7 +6544,8 @@ Rules the page depends on, each of which a simplification would break:
   (key J*8192 + built; ties to the earlier board), where D_k is the count of second-bag completions solved from the
   identity cum_b[k] = sum_s n_s * D_k(b-s) (cum_inf[k] = n_feas * D_k(inf)), triangular, every division asserted exact.
   Figures: joint_F = pc3_n/5040^3, built_F = built_n/5040^2, PC given built = pc3_n/(built_n*5040). `families.complete` is
-  `false` while any layout lacks a variant (pruned boards are absent), so family figures are printed as lower bounds (最少);
+  `false` while any layout lacks a variant (pruned boards are absent), so the family JOINT is printed as a lower bound (最少);
+  built_F and the PC rate given built are not bounds either way (a pruned variant could raise or lower them);
   Stage 2 would be counting the pruned variants too. Bag 4 is removed from THIS page only (the worked PCs are bag 3;
   schema tst-openers-pc-examples/2 in tp mode); `docs/tst-openers-held.html` and its artefacts are untouched, and no rank moved.
 * **Page size is about 4 MB** (every card's tilings and the per-class rows ride in one island); the plan's cap was about 6 MB.
