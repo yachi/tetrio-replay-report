@@ -1164,6 +1164,30 @@ jobs:
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 bin/build-docs --check --out _site
 
+      # Drive the rendered site in a phone-sized browser (tools/site-check): every page at 390 px
+      # with no uncaught error, console error, failed or off-site request and no sideways scroll;
+      # every same-site link, fragment, replay round and 中盤 case it names; every ▶ 影片 link's
+      # form; the report's tier nav, a replay page's position hash and a tst-openers class tile,
+      # by clicking them. selftest.js plants one defect per check and needs every one reported.
+      # Playwright is pinned and installed beside the run, not into the repo; a machine that
+      # already resolves it (a local verify-repo) skips the install.
+      - name: Install Playwright for the site check
+        if: env.INPUTS_UNCHANGED != '1'
+        run: |
+          if node -e "require('playwright')" 2>/dev/null; then exit 0; fi
+          mkdir -p "$RUNNER_TEMP/pw"
+          npm install --prefix "$RUNNER_TEMP/pw" --no-save --no-audit --no-fund playwright@1.63.0
+          echo "NODE_PATH=$RUNNER_TEMP/pw/node_modules" >> "$GITHUB_ENV"
+          NODE_PATH="$RUNNER_TEMP/pw/node_modules" "$RUNNER_TEMP/pw/node_modules/.bin/playwright" install --with-deps chromium
+
+      - name: Check the site in a phone-sized browser
+        if: env.INPUTS_UNCHANGED != '1'
+        run: node tools/site-check/check.js _site
+
+      - name: Check the site check reports every planted defect
+        if: env.INPUTS_UNCHANGED != '1'
+        run: node tools/site-check/selftest.js _site
+
       - name: Upload the site for the deploy job
         if: env.INPUTS_UNCHANGED != '1' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
         uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b  # v4.0.0
