@@ -10,12 +10,12 @@
  },
  "setups": 10,
  "pc_anchor": {
-  "rounds": 3644,
-  "rounds_agree": 3644,
-  "pcs_replay": 462,
+  "rounds": 3788,
+  "rounds_agree": 3788,
+  "pcs_replay": 483,
   "disagree": []
  },
- "sessions": 25,
+ "sessions": 26,
  "inputs": {
   "sessions": [
    {
@@ -142,6 +142,11 @@
     "session": "2026-11-23",
     "replays_md5": "6443f8868544148a4488f99285809387",
     "replay_facts_md5": "29e18f7f2d2b590b40befdf756b29e90"
+   },
+   {
+    "session": "2026-11-24",
+    "replays_md5": "d45f5f1d57ce97e1f68d02f347ab5b88",
+    "replay_facts_md5": "9a89ade6a1b22dfe2ae887d41ce6b393"
    }
   ],
   "setups_md5": "9841c283b049ee578b653492c366cc05",
@@ -149,24 +154,24 @@
  },
  "by_player": {
   "pinglamb": {
-   "pc_points": 273,
-   "no_tspin": 79,
+   "pc_points": 285,
+   "no_tspin": 85,
    "rounds_rowmap_stops": 0,
    "cases": {
-    "all": 194,
-    "verified": 53
+    "all": 200,
+    "verified": 57
    },
    "matched": {
-    "all": 87,
-    "verified": 20
+    "all": 92,
+    "verified": 23
    },
    "base_only": {
     "all": 0,
     "verified": 0
    },
    "unmatched": {
-    "all": 107,
-    "verified": 33
+    "all": 108,
+    "verified": 34
    },
    "next_pc": {
     "all": 8,
@@ -174,12 +179,12 @@
    }
   },
   "yachi": {
-   "pc_points": 189,
-   "no_tspin": 80,
+   "pc_points": 198,
+   "no_tspin": 85,
    "rounds_rowmap_stops": 31,
    "cases": {
-    "all": 109,
-    "verified": 26
+    "all": 113,
+    "verified": 27
    },
    "matched": {
     "all": 20,
@@ -190,8 +195,8 @@
     "verified": 0
    },
    "unmatched": {
-    "all": 89,
-    "verified": 22
+    "all": 93,
+    "verified": 23
    },
    "next_pc": {
     "all": 1,
@@ -209,7 +214,7 @@
     "p10.000"
    ],
    "by_player": {
-    "pinglamb": 44,
+    "pinglamb": 46,
     "yachi": 18
    }
   },
@@ -219,7 +224,7 @@
     "p09.000"
    ],
    "by_player": {
-    "pinglamb": 43,
+    "pinglamb": 46,
     "yachi": 0
    }
   },
@@ -236,7 +241,7 @@
  "unmatched_shapes": [
   {"shape":["....xxx...","...xxxx..x","xxxxxx...x","xxxxxxx.xx"],"outcome":"unmatched","cases":10,"by_player":{"pinglamb":10,"yachi":0}},
   {"shape":["...x.xx..x","xxxxxx...x","xxxxxxx.xx"],"outcome":"unmatched","cases":10,"by_player":{"pinglamb":5,"yachi":5}},
-  {"shape":[".......x..","x..xx.xxxx","x...xxxxxx","xx.xxxxxxx"],"outcome":"unmatched","cases":6,"by_player":{"pinglamb":2,"yachi":4}},
+  {"shape":[".......x..","x..xx.xxxx","x...xxxxxx","xx.xxxxxxx"],"outcome":"unmatched","cases":8,"by_player":{"pinglamb":3,"yachi":5}},
   {"shape":["......x...","...xxxxx..","x..xxxxx..","x...xxxxxx","xx.xxxxxxx"],"outcome":"unmatched","cases":5,"by_player":{"pinglamb":4,"yachi":1}},
   {"shape":["......xxxx","x..x..xxxx","xxxx...xxx","xxxxxx.xxx","xxxxx..xxx","xxxxxx.xxx","xxxxx.xxxx"],"outcome":"unmatched","cases":4,"by_player":{"pinglamb":3,"yachi":1}},
   {"shape":["...xxx..xx","x..xxxx.xx","x...xxxxxx","xx.xxxxxxx"],"outcome":"unmatched","cases":4,"by_player":{"pinglamb":4,"yachi":0}},
@@ -258,6 +263,7 @@
   {"shape":[".........x",".........x",".........x","xx.......x","xxx.....xx","xxxx...xxx","xxxxx...xx","xxxxxx.xxx","xxxxxx.xxx","xxxxxx.xxx"],"outcome":"unmatched","cases":1,"by_player":{"pinglamb":0,"yachi":1}},
   {"shape":[".........x",".........x","........xx","........xx","x..xx.x.xx","x...xxxxxx","xx.xxxxxxx"],"outcome":"unmatched","cases":1,"by_player":{"pinglamb":1,"yachi":0}},
   {"shape":[".........x",".........x","........xx",".......xxx","..x..xxxxx","..xxxxxxxx","...xxxxxxx"],"outcome":"unmatched","cases":1,"by_player":{"pinglamb":1,"yachi":0}},
+  {"shape":[".........x",".........x","........xx",".....x..xx","...xxxxxxx","....xxxxxx","...xxxxxxx","x..xxxxxxx","x...xxxxxx","xx.xxxxxxx"],"outcome":"unmatched","cases":1,"by_player":{"pinglamb":0,"yachi":1}},
   {"shape":[".........x",".........x",".......xxx","......xxxx","....xxxxxx","....xxxxxx","x...xxxxxx","xx..xxxxxx","xx...xxxxx","xxx.xxxxxx"],"outcome":"unmatched","cases":1,"by_player":{"pinglamb":0,"yachi":1}},
   {"shape":[".........x",".........x",".......xxx","..x...xxxx","xxx..xxxxx","xx...xxxxx","xxx.xxxxxx"],"outcome":"unmatched","cases":1,"by_player":{"pinglamb":0,"yachi":1}},
   {"shape":[".........x",".........x",".......xxx","x..xx.xxxx","x...xxxxxx","xx.xxxxxxx"],"outcome":"unmatched","cases":1,"by_player":{"pinglamb":0,"yachi":1}},
@@ -334,7 +340,9 @@
   {"shape":["......xxx.","......xxx.","x..xx.xxx.","x...xxxxxx","xx.xxxxxxx"],"outcome":"unmatched","cases":1,"by_player":{"pinglamb":0,"yachi":1}},
   {"shape":["......xxx.","...xxxxxx.","x..xxxxxx.","x...xxxxxx","xx.xxxxxxx"],"outcome":"unmatched","cases":1,"by_player":{"pinglamb":1,"yachi":0}},
   {"shape":["......xxxx","..xx..xxxx","xxxx...xxx","xxxxxx.xxx","xxxxx..xxx","xxxxxx.xxx","xxxxx.xxxx"],"outcome":"unmatched","cases":1,"by_player":{"pinglamb":1,"yachi":0}},
+  {"shape":[".....x....",".....x....",".....x.x..","x..xxxxxxx","x...xxxxxx","xx.xxxxxxx"],"outcome":"unmatched","cases":1,"by_player":{"pinglamb":0,"yachi":1}},
   {"shape":[".....x....",".....x....","....xx....","xx...xxxxx","xxx.xxxxxx","xxx.xxxxx."],"outcome":"unmatched","cases":1,"by_player":{"pinglamb":1,"yachi":0}},
+  {"shape":[".....x....",".....x....","x...xxxxxx","xx...xxxxx"],"outcome":"unmatched","cases":1,"by_player":{"pinglamb":0,"yachi":1}},
   {"shape":[".....x....",".....x..x.","xxx..x..xx","xxxxxx...x"],"outcome":"unmatched","cases":1,"by_player":{"pinglamb":0,"yachi":1}},
   {"shape":[".....x....",".....xx.xx","...xxxxxxx","x..xxxxxxx","x...xxxxxx","xx.xxxxxxx"],"outcome":"unmatched","cases":1,"by_player":{"pinglamb":0,"yachi":1}},
   {"shape":[".....x....","....xx....","..xxxx....","xxxxxx....","xxxxxxx..x","xxxxxx...x",".xxxxxx.xx"],"outcome":"unmatched","cases":1,"by_player":{"pinglamb":1,"yachi":0}},
@@ -686,6 +694,16 @@
   {"session":"2026-11-23","file":"replay-2026-11-23-06.ttrm","round_index0":8,"match":6,"round":9,"player":"yachi","pc_lock":19,"pc_lines":8,"lock":26,"spin":"full","lines":2,"cleared_before":0,"garbage_rows":0,"garbage_in_board":false,"verified":false,"pc_verified":false,"outcome":"unmatched","setups":[],"mirrored":null,"shape":".......x../x..xx.xxxx/x...xxxxxx/xx.xxxxxxx","next_pc":null},
   {"session":"2026-11-23","file":"replay-2026-11-23-06.ttrm","round_index0":12,"match":6,"round":13,"player":"pinglamb","pc_lock":19,"pc_lines":8,"lock":27,"spin":"full","lines":2,"cleared_before":0,"garbage_rows":0,"garbage_in_board":false,"verified":false,"pc_verified":false,"outcome":"unmatched","setups":[],"mirrored":null,"shape":".......x../.......xx./.......xx./x..xx.xxxx/x...xxxxxx/xx.xxxxxxx","next_pc":null},
   {"session":"2026-11-23","file":"replay-2026-11-23-07.ttrm","round_index0":5,"match":7,"round":6,"player":"pinglamb","pc_lock":19,"pc_lines":8,"lock":27,"spin":"full","lines":2,"cleared_before":0,"garbage_rows":0,"garbage_in_board":false,"verified":false,"pc_verified":false,"outcome":"matched","setups":["p07.000","p09.000"],"mirrored":false,"shape":"......x.../.....xx..x/xxxxxx...x/xxxxxxx.xx/.xx.xxxxxx","next_pc":null},
-  {"session":"2026-11-23","file":"replay-2026-11-23-07.ttrm","round_index0":6,"match":7,"round":7,"player":"pinglamb","pc_lock":19,"pc_lines":8,"lock":34,"spin":"full","lines":2,"cleared_before":6,"garbage_rows":3,"garbage_in_board":false,"verified":false,"pc_verified":false,"outcome":"unmatched","setups":[],"mirrored":null,"shape":".........x/........xx/.......xxx/......xxxx/xx...xxxxx/xxx..xxxxx/xxx...xxxx","next_pc":null}
+  {"session":"2026-11-23","file":"replay-2026-11-23-07.ttrm","round_index0":6,"match":7,"round":7,"player":"pinglamb","pc_lock":19,"pc_lines":8,"lock":34,"spin":"full","lines":2,"cleared_before":6,"garbage_rows":3,"garbage_in_board":false,"verified":false,"pc_verified":false,"outcome":"unmatched","setups":[],"mirrored":null,"shape":".........x/........xx/.......xxx/......xxxx/xx...xxxxx/xxx..xxxxx/xxx...xxxx","next_pc":null},
+  {"session":"2026-11-24","file":"replay-2026-11-24-01.ttrm","round_index0":7,"match":1,"round":8,"player":"pinglamb","pc_lock":19,"pc_lines":8,"lock":27,"spin":"full","lines":2,"cleared_before":0,"garbage_rows":5,"garbage_in_board":false,"verified":true,"pc_verified":true,"outcome":"matched","setups":["p07.000","p09.000"],"mirrored":false,"shape":"......x.../.....xx..x/xxxxxx...x/xxxxxxx.xx/.xx.xxxxxx","next_pc":null},
+  {"session":"2026-11-24","file":"replay-2026-11-24-01.ttrm","round_index0":11,"match":1,"round":12,"player":"yachi","pc_lock":19,"pc_lines":8,"lock":26,"spin":"full","lines":2,"cleared_before":0,"garbage_rows":2,"garbage_in_board":false,"verified":false,"pc_verified":false,"outcome":"unmatched","setups":[],"mirrored":null,"shape":".......x../x..xx.xxxx/x...xxxxxx/xx.xxxxxxx","next_pc":null},
+  {"session":"2026-11-24","file":"replay-2026-11-24-02.ttrm","round_index0":8,"match":2,"round":9,"player":"pinglamb","pc_lock":19,"pc_lines":8,"lock":27,"spin":"full","lines":2,"cleared_before":0,"garbage_rows":3,"garbage_in_board":false,"verified":true,"pc_verified":true,"outcome":"matched","setups":["p07.000","p09.000"],"mirrored":false,"shape":"......x.../.....xx..x/xxxxxx...x/xxxxxxx.xx/.xx.xxxxxx","next_pc":null},
+  {"session":"2026-11-24","file":"replay-2026-11-24-03.ttrm","round_index0":11,"match":3,"round":12,"player":"pinglamb","pc_lock":19,"pc_lines":8,"lock":27,"spin":"full","lines":2,"cleared_before":0,"garbage_rows":0,"garbage_in_board":false,"verified":false,"pc_verified":false,"outcome":"matched","setups":["p07.000","p09.000"],"mirrored":false,"shape":"......x.../.....xx..x/xxxxxx...x/xxxxxxx.xx/.xx.xxxxxx","next_pc":null},
+  {"session":"2026-11-24","file":"replay-2026-11-24-04.ttrm","round_index0":1,"match":4,"round":2,"player":"yachi","pc_lock":19,"pc_lines":8,"lock":27,"spin":"full","lines":2,"cleared_before":0,"garbage_rows":1,"garbage_in_board":false,"verified":false,"pc_verified":false,"outcome":"unmatched","setups":[],"mirrored":null,"shape":".....x..../.....x..../.....x.x../x..xxxxxxx/x...xxxxxx/xx.xxxxxxx","next_pc":null},
+  {"session":"2026-11-24","file":"replay-2026-11-24-04.ttrm","round_index0":10,"match":4,"round":11,"player":"pinglamb","pc_lock":19,"pc_lines":8,"lock":27,"spin":"full","lines":2,"cleared_before":0,"garbage_rows":3,"garbage_in_board":false,"verified":true,"pc_verified":true,"outcome":"matched","setups":["p01.000","p02.000","p06.000","p08.000","p10.000"],"mirrored":false,"shape":".......x../.......xxx/xxxxx...xx/xxxxxx.xxx/.xxx.xxxxx","next_pc":null},
+  {"session":"2026-11-24","file":"replay-2026-11-24-05.ttrm","round_index0":1,"match":5,"round":2,"player":"pinglamb","pc_lock":19,"pc_lines":8,"lock":27,"spin":"full","lines":2,"cleared_before":0,"garbage_rows":3,"garbage_in_board":false,"verified":false,"pc_verified":false,"outcome":"matched","setups":["p01.000","p02.000","p06.000","p08.000","p10.000"],"mirrored":false,"shape":".......x../.......xxx/xxxxx...xx/xxxxxx.xxx/.xxx.xxxxx","next_pc":null},
+  {"session":"2026-11-24","file":"replay-2026-11-24-06.ttrm","round_index0":5,"match":6,"round":6,"player":"pinglamb","pc_lock":19,"pc_lines":8,"lock":26,"spin":"full","lines":2,"cleared_before":0,"garbage_rows":0,"garbage_in_board":false,"verified":true,"pc_verified":true,"outcome":"unmatched","setups":[],"mirrored":null,"shape":".......x../x..xx.xxxx/x...xxxxxx/xx.xxxxxxx","next_pc":null},
+  {"session":"2026-11-24","file":"replay-2026-11-24-06.ttrm","round_index0":7,"match":6,"round":8,"player":"yachi","pc_lock":19,"pc_lines":8,"lock":33,"spin":"full","lines":2,"cleared_before":1,"garbage_rows":4,"garbage_in_board":false,"verified":true,"pc_verified":true,"outcome":"unmatched","setups":[],"mirrored":null,"shape":".........x/.........x/........xx/.....x..xx/...xxxxxxx/....xxxxxx/...xxxxxxx/x..xxxxxxx/x...xxxxxx/xx.xxxxxxx","next_pc":null},
+  {"session":"2026-11-24","file":"replay-2026-11-24-06.ttrm","round_index0":10,"match":6,"round":11,"player":"yachi","pc_lock":19,"pc_lines":8,"lock":29,"spin":"full","lines":2,"cleared_before":2,"garbage_rows":7,"garbage_in_board":false,"verified":false,"pc_verified":true,"outcome":"unmatched","setups":[],"mirrored":null,"shape":".....x..../.....x..../x...xxxxxx/xx...xxxxx","next_pc":null}
  ]
 }
