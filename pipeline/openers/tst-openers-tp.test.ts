@@ -462,10 +462,13 @@ test('(h) every family figure is recomputed from the boards and the first-bag ve
   const ALL: any[] = [...ART.boards, ...X.boards];
   const kept = new Set<string>(ART.boards.map((b: any) => b.name));
   const byName = new Map<string, any>(ALL.map((b: any) => [b.name, b]));
-  const vec = new Map<string, number[]>(), tab = new Map<string, any>();
-  for (const b of ALL) {
-    const v = vecOf(b.name); vec.set(b.name, v);
-    const t = tables(b, v); tab.set(b.name, t.out);
+  // the vectors and tables are the module-level VEC / STAT over POOL (the same boards in the same order),
+  // computed once for this test and (j) rather than twice
+  expect(POOL.map((b: any) => b.name)).toEqual(ALL.map((b: any) => b.name));
+  const vec = new Map<string, Uint8Array>(), tab = new Map<string, any>();
+  for (const [i, b] of ALL.entries()) {
+    const v = VEC[i]!; vec.set(b.name, v);
+    const t = STAT[i]; tab.set(b.name, t.out);
     for (const bk of BKEYS) {   // a one-board family reproduces the board's own figures
       let bsum = 0, jsum = 0;
       for (const x of v) { bsum += t.out[bk][1][x]; jsum += t.out[bk][0][x]; }
@@ -498,18 +501,19 @@ test('(h) every family figure is recomputed from the boards and the first-bag ve
     for (const bk of BKEYS) {
       let bn = 0, pn = 0;
       const pick = names.map(() => 0);
+      const lim = bk === 'inf' ? INFEAS - 1 : Number(bk);
+      const vs = names.map((n) => vec.get(n)!), Js = names.map((n) => tab.get(n)[bk][0]), Bs = names.map((n) => tab.get(n)[bk][1]);
       for (let o = 0; o < B; o++) {
         let best = -1, arg = -1;
-        names.forEach((n, t) => {
-          const s = vec.get(n)![o];
-          const ok = bk === 'inf' ? s < INFEAS : s <= Number(bk);
-          if (!ok) return;
-          const key = tab.get(n)[bk][0][s] * 8192 + tab.get(n)[bk][1][s];
+        for (let t = 0; t < names.length; t++) {
+          const s = vs[t]![o]!;
+          if (s > lim) continue;
+          const key = Js[t][s] * 8192 + Bs[t][s];
           if (key > best) { best = key; arg = t; }
-        });
+        }
         if (arg < 0) continue;
-        const s = vec.get(names[arg])![o];
-        bn += tab.get(names[arg])[bk][1][s]; pn += tab.get(names[arg])[bk][0][s]; pick[arg]++;
+        const s = vs[arg]![o]!;
+        bn += Bs[arg][s]; pn += Js[arg][s]; pick[arg]++;
       }
       expect([bn, pn]).toEqual(num[bk]);
       expect(pick).toEqual(pk[bk]);
@@ -518,19 +522,21 @@ test('(h) every family figure is recomputed from the boards and the first-bag ve
   expect(lay.size).toBe(F.list.length);
   const listed = new Set(F.list.map((L: any) => bkey(L.pieces)));
   for (const k of lay.keys()) expect(listed.has(k)).toBe(true);
+  const order = new Map<string, number>(ALL.map((b: any, i: number) => [b.name, i]));
+  const keysAll = ALL.map((b: any) => [b.name, pieceKeys(b.pieces)] as [string, Set<string>]);
   for (const L of F.list) {
     const names: string[] = L.variants;
     expect(names.length).toBeGreaterThanOrEqual(2);
     // each variant is the layout less one piece, and every kept such board is listed
     const want = new Set<string>();
-    for (const b of ALL) { const ks = pieceKeys(b.pieces), all = pieceKeys(L.pieces); if (ks.size === 6 && [...ks].every((x) => all.has(x))) want.add(b.name); }
+    const all = pieceKeys(L.pieces);
+    for (const [n, ks] of keysAll) if (ks.size === 6 && [...ks].every((x) => all.has(x))) want.add(n);
     expect(names.some((n) => kept.has(n))).toBe(true);
     expect(new Set(names)).toEqual(want);
     check(names, L.num, L.pick);
     // `both`: the variants and every variant's mirror board (independently, by mirroring each variant's pieces)
     const both = new Set(names);
     for (const n of names) both.add(byKey.get(keyOf(mirrorPcs(byName.get(n).pieces)))!);
-    const order = new Map<string, number>(ALL.map((b: any, i: number) => [b.name, i]));
     expect(L.both.variants).toEqual([...both].sort((a, b) => order.get(a)! - order.get(b)!));
     check(L.both.variants, L.both.num, L.both.pick);
     for (const bk of BKEYS) expect(L.both.num[bk][1]).toBeGreaterThanOrEqual(L.num[bk][1]);
