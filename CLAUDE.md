@@ -6591,6 +6591,20 @@ Rules the page depends on, each of which a simplification would break:
   PC rate at the joint's size.
 * **Page size is about 4 MB** (every card's tilings and the per-class rows ride in one island); the plan's cap was about 6 MB.
 
+* **TST -> TSD -> PC (since 2026-11-23, yachi: with ガムシロ you pick T-spin or PC, so count the PC that holds a T-spin Double).**
+  `pipeline/sim/tst-tsd-rs` (binary `tst-tsd`, on `oracle-rs` and `pc-solver-rs`) re-runs the bag-3 Perfect Clear solver per live
+  (rows, leftover) line with one more state bit: the plan must contain a T placement that clears exactly two rows and that the
+  engine's own movegen credits as a FULL spin (code 2). `pt3` counts the 5040 orders whose first plan holds one (`pt3 <= p5`; `pt3u`
+  = orders the T-spin search could not decide, zero when exact); every plan is replayed and `bad_plans` must be 0. **Only bag-3 PCs
+  are counted; bag 4 is not**, and the page says so. `emit-tst-openers-tp.py --tsd-input` lists the lines, `--tsd <out>` merges to
+  `analysis/tst-openers-tp-tsd.json` (`tst-openers-tp-tsd/1`, constructed, md5s of both crates' sources and the input artefacts),
+  `--tsd-check` is CI's cheap check; the recount (about half an hour on four cores) is never run in CI and `bin/emit-corpus`
+  names the artefact and skips it. `tst-openers-tp.json` is byte-identical to before. The sets search runs under both objectives
+  (`analysis/tst-openers-tp-sets.json`, schema /4: the top level is the any-PC objective, `tsd` holds the same search with J counted
+  over pt3, and inside it the field named pc3 is that count); the 學邊幾個 section recommends by TST -> TSD -> PC and keeps the
+  any-PC sets in a folded block. The page audit recomputes both from the vectors and `--selftest` plants a pt3 above p5 and a
+  swapped objective. Counts are the artefacts', never typed here.
+
 What re-derives what: the page audit recomputes every figure, every rank and every class row from the artefact and the shapes, checks
 each class against the shape's tilings, replays every worked PC from the card's residue and requires the island to equal `build_data`
 (`--selftest`: 33 mutants, all killed). **What nothing re-runs in CI is the full recount** (hours of CPU), for the same reason as the

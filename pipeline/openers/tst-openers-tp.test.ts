@@ -462,10 +462,13 @@ test('(h) every family figure is recomputed from the boards and the first-bag ve
   const ALL: any[] = [...ART.boards, ...X.boards];
   const kept = new Set<string>(ART.boards.map((b: any) => b.name));
   const byName = new Map<string, any>(ALL.map((b: any) => [b.name, b]));
-  const vec = new Map<string, number[]>(), tab = new Map<string, any>();
-  for (const b of ALL) {
-    const v = vecOf(b.name); vec.set(b.name, v);
-    const t = tables(b, v); tab.set(b.name, t.out);
+  // the vectors and tables are the module-level VEC / STAT over POOL (the same boards in the same order),
+  // computed once for this test and (j) rather than twice
+  expect(POOL.map((b: any) => b.name)).toEqual(ALL.map((b: any) => b.name));
+  const vec = new Map<string, Uint8Array>(), tab = new Map<string, any>();
+  for (const [i, b] of ALL.entries()) {
+    const v = VEC[i]!; vec.set(b.name, v);
+    const t = STAT[i]; tab.set(b.name, t.out);
     for (const bk of BKEYS) {   // a one-board family reproduces the board's own figures
       let bsum = 0, jsum = 0;
       for (const x of v) { bsum += t.out[bk][1][x]; jsum += t.out[bk][0][x]; }
@@ -498,18 +501,19 @@ test('(h) every family figure is recomputed from the boards and the first-bag ve
     for (const bk of BKEYS) {
       let bn = 0, pn = 0;
       const pick = names.map(() => 0);
+      const lim = bk === 'inf' ? INFEAS - 1 : Number(bk);
+      const vs = names.map((n) => vec.get(n)!), Js = names.map((n) => tab.get(n)[bk][0]), Bs = names.map((n) => tab.get(n)[bk][1]);
       for (let o = 0; o < B; o++) {
         let best = -1, arg = -1;
-        names.forEach((n, t) => {
-          const s = vec.get(n)![o];
-          const ok = bk === 'inf' ? s < INFEAS : s <= Number(bk);
-          if (!ok) return;
-          const key = tab.get(n)[bk][0][s] * 8192 + tab.get(n)[bk][1][s];
+        for (let t = 0; t < names.length; t++) {
+          const s = vs[t]![o]!;
+          if (s > lim) continue;
+          const key = Js[t][s] * 8192 + Bs[t][s];
           if (key > best) { best = key; arg = t; }
-        });
+        }
         if (arg < 0) continue;
-        const s = vec.get(names[arg])![o];
-        bn += tab.get(names[arg])[bk][1][s]; pn += tab.get(names[arg])[bk][0][s]; pick[arg]++;
+        const s = vs[arg]![o]!;
+        bn += Bs[arg][s]; pn += Js[arg][s]; pick[arg]++;
       }
       expect([bn, pn]).toEqual(num[bk]);
       expect(pick).toEqual(pk[bk]);
@@ -518,19 +522,21 @@ test('(h) every family figure is recomputed from the boards and the first-bag ve
   expect(lay.size).toBe(F.list.length);
   const listed = new Set(F.list.map((L: any) => bkey(L.pieces)));
   for (const k of lay.keys()) expect(listed.has(k)).toBe(true);
+  const order = new Map<string, number>(ALL.map((b: any, i: number) => [b.name, i]));
+  const keysAll = ALL.map((b: any) => [b.name, pieceKeys(b.pieces)] as [string, Set<string>]);
   for (const L of F.list) {
     const names: string[] = L.variants;
     expect(names.length).toBeGreaterThanOrEqual(2);
     // each variant is the layout less one piece, and every kept such board is listed
     const want = new Set<string>();
-    for (const b of ALL) { const ks = pieceKeys(b.pieces), all = pieceKeys(L.pieces); if (ks.size === 6 && [...ks].every((x) => all.has(x))) want.add(b.name); }
+    const all = pieceKeys(L.pieces);
+    for (const [n, ks] of keysAll) if (ks.size === 6 && [...ks].every((x) => all.has(x))) want.add(n);
     expect(names.some((n) => kept.has(n))).toBe(true);
     expect(new Set(names)).toEqual(want);
     check(names, L.num, L.pick);
     // `both`: the variants and every variant's mirror board (independently, by mirroring each variant's pieces)
     const both = new Set(names);
     for (const n of names) both.add(byKey.get(keyOf(mirrorPcs(byName.get(n).pieces)))!);
-    const order = new Map<string, number>(ALL.map((b: any, i: number) => [b.name, i]));
     expect(L.both.variants).toEqual([...both].sort((a, b) => order.get(a)! - order.get(b)!));
     check(L.both.variants, L.both.num, L.both.pick);
     for (const bk of BKEYS) expect(L.both.num[bk][1]).toBeGreaterThanOrEqual(L.num[bk][1]);
@@ -567,3 +573,289 @@ test('(i) cross-crate: the pinned counter with B1ONLY counts 5040 x the orders e
     });
   }
 }, 300_000);
+
+// ---- (j) the learn-these-boards sets (analysis/tst-openers-tp-sets.json) ------------------------------------------------
+// Everything below is recomputed here, in TypeScript, from the section-(h) tables (J and built per first-bag cost code) and
+// the first-bag vectors: every set's value, the greedy steps and k=1 over all boards, k=2 optimality (bounded exhaustive),
+// the picks string and every rule tree. Triple optimality is NOT re-derived here (the numpy certificate and the crate's own unit
+// test against brute force carry it). The part that needs the tst-sets crate skips loudly without cargo.
+const SETS = JSON.parse(readFileSync(join(ROOT, 'analysis', 'tst-openers-tp-sets.json'), 'utf8'));
+const KINDS_J = 'IOTSZJL';
+const SETS_CRATE = join(SIM, 'tst-sets-rs');
+function setsCrateMd5(): string {
+  const files = ['tst-sets-rs/Cargo.lock', 'tst-sets-rs/Cargo.toml'];
+  for (const f of readdirSync(join(SETS_CRATE, 'src'), { recursive: true }) as string[]) if (f.endsWith('.rs')) files.push(`tst-sets-rs/src/${f}`);
+  files.sort();
+  const h = createHash('md5');
+  for (const f of files) h.update(`${f}\0${md5(readFileSync(join(SIM, f)))}\n`);
+  return h.digest('hex');
+}
+function permsJ(): string[] {
+  const out: string[] = [];
+  const r = (p: string[], rest: string[]) => {
+    if (!rest.length) { out.push(p.join('')); return; }
+    for (let i = 0; i < rest.length; i++) r([...p, rest[i]!], [...rest.slice(0, i), ...rest.slice(i + 1)]);
+  };
+  r([], [...KINDS_J]);
+  return out;
+}
+const PERMS = permsJ();
+const FEAT_NAMES: string[] = [];
+for (let i = 0; i < 7; i++) for (let j = i + 1; j < 7; j++) FEAT_NAMES.push(`${KINDS_J[i]}<${KINDS_J[j]}`);
+for (const k of KINDS_J) FEAT_NAMES.push(`first=${k}`);
+const FEAT: boolean[][] = FEAT_NAMES.map((nm) => PERMS.map((p) => nm.startsWith('first=') ? p[0] === nm[6] : p.indexOf(nm[0]!) < p.indexOf(nm[2]!)));
+const POOL: any[] = [...ART.boards, ...X.boards];
+/** A learned shape is a mirror pair (the board and its mirror); a self-mirror board, or one with no mirror in the pool, is a pair of one.
+ * Re-derived here from this file's own mirror function, never read from the artefact. */
+const pbkey = (b: any) => `${keyOf(b.pieces)}|${b.held ?? ''}`;
+const POSOF = new Map<string, number>(POOL.map((b: any, i: number) => [pbkey(b), i] as [string, number]));
+const MATE: number[] = POOL.map((b: any, i: number) => POSOF.get(`${keyOf(mirrorPcs(b.pieces))}|${mk(b.held ?? '')}`) ?? i);
+const CANDS: number[][] = [];
+POOL.forEach((_: any, i: number) => { const m = MATE[i]!; if (m >= i) CANDS.push(m === i ? [i] : [i, m]); });
+const CIDX = new Map<string, number>(CANDS.map((c, n) => [c.join(','), n] as [string, number]));
+const unionOf = (cs: number[][]) => [...new Set(cs.flat())].sort((a, b) => a - b);
+const VEC: Uint8Array[] = POOL.map((b: any) => Uint8Array.from(vecOf(b.name)));
+const STAT = POOL.map((b: any, i: number) => tables(b, [...VEC[i]!]));
+/** An entry answers, per first-bag order o: k(o) the key J*8192+built (-1 when not built in the budget), j(o) J, b(o) built.
+ * Computed on demand from the cost vector and the per-code tables, with this file's own cost rule, so nothing of size
+ * boards x orders is held: a materialised table per budget took several GB and stalled the sharded CI run. */
+type Ent = { k: (o: number) => number; j: (o: number) => number; b: (o: number) => number };
+function keysFor(bk: string): Ent[] {
+  const lim = bk === 'inf' ? INFEAS - 1 : Number(bk);
+  return POOL.map((_: any, i: number) => {
+    const v = VEC[i]!, [J, Bt] = STAT[i].out[bk];
+    return {
+      k: (o: number) => { const c = v[o]!; return c <= lim ? J[c] * 8192 + Bt[c] : -1; },
+      j: (o: number) => J[v[o]!],
+      b: (o: number) => Bt[v[o]!],
+    };
+  });
+}
+let KC: [string, Ent[]] | null = null;
+const keysOf = (bk: string): Ent[] => (KC && KC[0] === bk ? KC[1] : (KC = [bk, keysFor(bk)])[1]);
+/** a pair candidate: per order the best of its boards (key is J-major, so the pair's J is the winner's). */
+function candTable(K: Ent[]): Ent[] {
+  return CANDS.map((c) => {
+    const w = new Uint8Array(B).fill(255);
+    for (let o = 0; o < B; o++) {
+      let best = -1;
+      c.forEach((i, m) => { const kk = K[i]!.k(o); if (kk >= 0 && (best < 0 || kk > best)) { best = kk; w[o] = m; } });
+    }
+    return {
+      k: (o: number) => (w[o] === 255 ? -1 : K[c[w[o]!]!]!.k(o)),
+      j: (o: number) => K[c[w[o]!]!]!.j(o),
+      b: (o: number) => K[c[w[o]!]!]!.b(o),
+    };
+  });
+}
+function valOf(K: Ent[], set: number[]): [number, number] {
+  let p = 0, bu = 0;
+  for (let o = 0; o < B; o++) {
+    let best = -1, a = -1;
+    for (const i of set) { const kk = K[i]!.k(o); if (kk >= 0 && kk > best) { best = kk; a = i; } }
+    if (a >= 0) { p += K[a]!.j(o); bu += K[a]!.b(o); }
+  }
+  return [p, bu];
+}
+function picksOf(K: Ent[], set: number[]): number[] {
+  const out: number[] = [];
+  for (let o = 0; o < B; o++) {
+    let best = -1, a = -1;
+    set.forEach((i, m) => { const kk = K[i]!.k(o); if (kk >= 0 && kk > best) { best = kk; a = m; } });
+    out.push(a);
+  }
+  return out;
+}
+function walkTree(nd: any, idx: number[], K: Ent[], set: number[], mem: number[]) {
+  if ('m' in nd) {
+    const tot = set.map((i) => idx.reduce((s, o) => s + (K[i]!.k(o) >= 0 ? K[i]!.j(o) * 2 ** 26 + K[i]!.b(o) : 0), 0));
+    let bm = 0;
+    tot.forEach((t: number, m: number) => { if (t > tot[bm]!) bm = m; });
+    expect(nd.m).toBe(bm);
+    for (const o of idx) mem[o] = nd.m;
+    return;
+  }
+  const y = idx.filter((o) => FEAT[nd.f]![o]), n = idx.filter((o) => !FEAT[nd.f]![o]);
+  expect(y.length > 0 && n.length > 0).toBe(true);
+  expect(nd.feature).toBe(FEAT_NAMES[nd.f]);
+  walkTree(nd.y, y, K, set, mem); walkTree(nd.n, n, K, set, mem);
+}
+const depthOf = (nd: any): number => ('m' in nd ? 0 : 1 + Math.max(depthOf(nd.y), depthOf(nd.n)));
+
+test('(j) pins: the sets crate, the artefact and the b1 vectors it was built from are current; flags', () => {
+  expect(SETS.schema).toBe('tst-openers-tp-sets/4');
+  expect(SETS.md5.tsd).toBe(md5(readFileSync(join(ROOT, 'analysis', 'tst-openers-tp-tsd.json'))));
+  expect(SETS.constructed).toBe(true);
+  expect(SETS.report_eligible).toBe(false);
+  expect(SETS.complete).toBe(false);
+  expect(SETS.md5.crate).toBe(setsCrateMd5());
+  expect(SETS.md5.b1).toBe(md5(canon(B1)));
+  expect(SETS.md5.art).toBe(md5(canon(ART)));
+  expect(SETS.md5.x).toBe(md5(readFileSync(join(ROOT, 'analysis', 'tst-openers-tp-x.json'))));
+  expect(SETS.features).toEqual(FEAT_NAMES);
+  expect(SETS.cands).toBe(CANDS.length);
+  expect(SETS.selfmirror).toBe(CANDS.filter((c) => c.length === 1 && MATE[c[0]!] === c[0] && POSOF.has(`${keyOf(mirrorPcs(POOL[c[0]!].pieces))}|${mk(POOL[c[0]!].held ?? '')}`)).length);
+  expect(SETS.mirror_missing).toBe(CANDS.filter((c) => c.length === 1 && !POSOF.has(`${keyOf(mirrorPcs(POOL[c[0]!].pieces))}|${mk(POOL[c[0]!].held ?? '')}`)).length);
+  expect(SETS.den.pc3).toBe(B ** 3);
+  expect(SETS.den.built).toBe(B ** 2);
+  const m = clone(SETS); m.md5.crate = 'x';
+  expect(m.md5.crate === setsCrateMd5()).toBe(false);          // mutant: a stale crate pin is seen
+  expect(PERMS.length).toBe(B);
+  expect(PERMS[0]).toBe('IOTSZJL');
+  expect(PERMS[B - 1]).toBe('LJZSTOI');                         // order indexing fixture: identity first, reverse last
+  expect(new Set(PERMS).size).toBe(B);
+});
+
+test('(j) every set value, greedy step, k=1 optimum, k=2 optimum, pick string and rule tree is recomputed here', () => {
+  for (const bk of BKEYS) {
+    const K = keysOf(bk), r = SETS.budgets[bk], Kc = candTable(K);
+    const pos = (rec: any) => rec.boards.map((x: any) => x.pos);
+    const chk = (rec: any) => {
+      for (const x of rec.boards) {
+        expect(POOL[x.pos].name).toBe(x.name);
+        expect(keyOf(POOL[x.pos].pieces)).toBe(keyOf(x.pieces));
+      }
+      // k mirror pairs, each a candidate of this file's own derivation, whose union is the listed boards
+      for (const pr of rec.pairs) expect(CIDX.has([...pr].join(','))).toBe(true);
+      expect(pos(rec)).toEqual(unionOf(rec.pairs));
+      expect(valOf(K, pos(rec))).toEqual([rec.pc3, rec.built]);
+    };
+    for (const k of ['1', '2', '3']) { chk(r.exact[k]); expect(r.exact[k].pairs.length).toBe(Number(k)); }
+    for (const k of ['1', '2', '3', '4', '5']) { chk(r.greedy[k]); expect(r.greedy[k].pairs.length).toBe(Number(k)); }
+    for (const k of ['4', '5']) chk(r.from_exact3[k]);
+    // exact >= greedy
+    for (const k of ['1', '2', '3']) { const e = r.exact[k], g = r.greedy[k]; expect(e.pc3 > g.pc3 || (e.pc3 === g.pc3 && e.built >= g.built)).toBe(true); }
+    // k = 1 over all pair candidates
+    const f1 = Kc.map((x) => { let p = 0, b = 0; for (let o = 0; o < B; o++) if (x.k(o) >= 0) { p += x.j(o); b += x.b(o); } return [p, b]; });
+    let best = 0;
+    f1.forEach((v: number[], i: number) => { const bv = f1[best]!; if (v[0]! > bv[0]! || (v[0] === bv[0] && v[1]! > bv[1]!)) best = i; });
+    expect(r.exact['1'].pairs).toEqual([CANDS[best]]);
+    // k = 2: bounded exhaustive over pairs of candidates (f(ab) <= f(a) + f(b)), pc3 only
+    const order = f1.map((_: any, i: number) => i).sort((a: number, b: number) => f1[b]![0]! - f1[a]![0]!);
+    let top = 0;
+    for (let x = 0; x < order.length; x++) {
+      const a = order[x]!;
+      if (f1[a]![0]! * 2 < top) break;
+      for (let y = x + 1; y < order.length; y++) {
+        const b = order[y]!;
+        if (f1[a]![0]! + f1[b]![0]! < top) break;
+        let p = 0;
+        for (let o = 0; o < B; o++) {
+          const ka = Kc[a]!.k(o), kb = Kc[b]!.k(o);
+          if (ka < 0 && kb < 0) continue;
+          p += ka >= kb ? Kc[a]!.j(o) : Kc[b]!.j(o);
+        }
+        if (p > top) top = p;
+      }
+    }
+    expect(top).toBe(r.exact['2'].pc3);
+    // greedy step k = argmax over all pair candidates of the grown set (the union of boards)
+    for (const k of [2, 3, 4, 5]) {
+      const prev: number[][] = r.greedy[String(k - 1)].pairs;
+      let bp = -1, bb = -1;
+      for (let c = 0; c < CANDS.length; c++) {
+        if (prev.some((q: number[]) => q.join(',') === CANDS[c]!.join(','))) continue;
+        const [p, b] = valOf(K, unionOf([...prev, CANDS[c]!]));
+        if (p > bp || (p === bp && b > bb)) { bp = p; bb = b; }
+      }
+      expect([bp, bb]).toEqual([r.greedy[String(k)].pc3, r.greedy[String(k)].built]);
+    }
+    // picks and trees over the exact triple
+    const s3 = pos(r.exact['3']);
+    expect(r.picks).toBe(picksOf(K, s3).map((x) => (x < 0 ? 'x' : String(x))).join(''));
+    const pk = picksOf(K, s3);
+    for (const d of [1, 2, 3]) {
+      const rule = r.rule[String(d)], mem: number[] = new Array(B).fill(-1);
+      walkTree(rule.tree, [...Array(B).keys()], K, s3, mem);
+      let p = 0, b = 0, unb = 0, diff = 0;
+      for (let o = 0; o < B; o++) {
+        const i = s3[mem[o]!]!;
+        if (K[i]!.k(o) >= 0) { p += K[i]!.j(o); b += K[i]!.b(o); } else unb++;
+        if (pk[o]! >= 0 && pk[o] !== mem[o]) diff++;
+      }
+      expect([p, b, unb, diff]).toEqual([rule.pc3, rule.built, rule.unbuildable, rule.differs]);
+      expect(depthOf(rule.tree)).toBeLessThanOrEqual(d);
+      expect(rule.loss_pc3).toBe(r.exact['3'].pc3 - rule.pc3);
+      expect(rule.loss_built).toBe(r.exact['3'].built - rule.built);
+      // mutant: a wrong leaf label is caught by the walker
+      if (d === 1) {
+        const bad = clone(rule.tree); bad.m = (bad.m + 1) % 3;
+        if ('m' in bad) expect(() => walkTree(bad, [...Array(B).keys()], K, s3, mem.slice())).toThrow();
+      }
+    }
+    // mutants: a perturbed value and a flipped pick char are both unequal to the recomputation
+    expect(valOf(K, pos(r.exact['3']).slice(0, 2))).not.toEqual([r.exact['3'].pc3, r.exact['3'].built]);
+    expect(r.picks.replace(/./, (c: string) => (c === '0' ? '1' : '0'))).not.toBe(picksOf(K, s3).map((x) => (x < 0 ? 'x' : String(x))).join(''));
+  }
+}, 600_000);
+
+test('(j) the fixed set (budget 2 exact triple) is valued at every budget, and pinned by pieces', () => {
+  const fx = SETS.fixed, p = fx.boards.map((x: any) => x.pos);
+  expect(p).toEqual(SETS.budgets['2'].exact['3'].boards.map((x: any) => x.pos));
+  expect(fx.pairs).toEqual(SETS.budgets['2'].exact['3'].pairs);
+  const want = ['I:2,12,22,32/L:7,8,9,19/O:0,1,10,11/S:4,5,15,16/T:3,13,14,23/Z:18,28,29,39', 'I:7,17,27,37/J:0,1,2,10/O:8,9,18,19/S:11,20,21,30/T:6,15,16,26/Z:4,5,13,14', 'I:10,20,30,40/J:8,9,19,29/O:21,22,31,32/S:0,1,11,12/T:5,15,16,25/Z:7,17,18,28', 'I:19,29,39,49/L:0,1,10,20/O:27,28,37,38/S:2,11,12,21/T:4,13,14,24/Z:8,9,17,18', 'I:10,20,30,40/J:8,9,19,29/L:50,51,60,70/O:21,22,31,32/S:0,1,11,12/T:5,15,16,25', 'I:19,29,39,49/J:58,59,69,79/L:0,1,10,20/O:27,28,37,38/T:4,13,14,24/Z:8,9,17,18'];
+  expect(fx.boards.map((x: any) => keyOf(x.pieces))).toEqual(want);
+  for (const bk of BKEYS) expect(valOf(keysOf(bk), p)).toEqual([fx.values[bk].pc3, fx.values[bk].built]);
+  expect(valOf(keysOf('0'), p)).not.toEqual([fx.values['1'].pc3, fx.values['1'].built]);
+});
+
+test('(j) cross-crate: the tst-sets binary on input built here reproduces the artefact (skipped without cargo)', () => {
+  const r0 = Bun.spawnSync(['cargo', 'build', '--release', '--locked', '--quiet', '--manifest-path', join(SETS_CRATE, 'Cargo.toml')], { stderr: 'pipe' });
+  const bin = join(SETS_CRATE, 'target', 'release', 'tst-sets');
+  if (r0.exitCode !== 0 || !existsSync(bin)) { console.warn('SKIPPED (j): cargo is unavailable or tst-sets failed to build; the sets are NOT re-run through the crate'); return; }
+  const lines = POOL.map((b: any, i: number) => {
+    const raw = inflateSync(Buffer.from(B1.vectors[b.name] ?? X.vectors[b.name], 'base64')).toString();
+    const f = BKEYS.map((bk) => `${STAT[i].out[bk][0].slice(0, INFEAS).join(',')}/${STAT[i].out[bk][1].slice(0, INFEAS).join(',')}`);
+    return [b.name, raw, ...f, String(MATE[i])].join('|');
+  });
+  const r = Bun.spawnSync([bin], { stdin: Buffer.from(lines.join('\n') + '\n'), stderr: 'pipe' });
+  expect(r.exitCode).toBe(0);
+  const out = JSON.parse(r.stdout.toString());
+  for (const bk of BKEYS) {
+    const g = out.budgets[bk], a = SETS.budgets[bk];
+    expect(g.exact.map((s: any) => s.ub)).toEqual([1, 2, 3].map((k) => a.exact[String(k)].boards.map((x: any) => x.pos)));
+    expect(g.greedy.map((s: any) => s.ub)).toEqual([1, 2, 3, 4, 5].map((k) => a.greedy[String(k)].boards.map((x: any) => x.pos)));
+  }
+}, 300_000);
+
+// ---- (k) TST -> TSD -> PC (analysis/tst-openers-tp-tsd.json) -------------------------------------------------------------
+const TSD = JSON.parse(readFileSync(join(ROOT, 'analysis', 'tst-openers-tp-tsd.json'), 'utf8'));
+const TSD_CRATE = join(SIM, 'tst-tsd-rs');
+function tsdCrateMd5(): string {
+  const files = ['tst-tsd-rs/Cargo.lock', 'tst-tsd-rs/Cargo.toml'];
+  for (const c of ['tst-tsd-rs', 'oracle-rs', 'pc-solver-rs'])
+    for (const f of readdirSync(join(SIM, c, 'src'), { recursive: true }) as string[]) if (f.endsWith('.rs')) files.push(`${c}/src/${f}`);
+  const h = createHash('md5');
+  for (const f of [...new Set(files)].sort()) h.update(`${f}\0${md5(readFileSync(join(SIM, f)))}\n`);
+  return h.digest('hex');
+}
+
+test('(k) pins: the tsd artefact is current, flagged constructed, and pt3 <= p5 <= 5040 on every line', () => {
+  expect(TSD.schema).toBe('tst-openers-tp-tsd/1');
+  expect(TSD.constructed).toBe(true);
+  expect(TSD.report_eligible).toBe(false);
+  expect(TSD.den).toBe(B);
+  expect(TSD.bad_plans).toBe(0);
+  expect(TSD.md5.crate).toBe(tsdCrateMd5());
+  expect(TSD.md5.tst_openers_tp).toBe(md5(canon(JSON.parse(readFileSync(join(ROOT, 'analysis', 'tst-openers-tp.json'), 'utf8')))));
+  expect(TSD.md5.x).toBe(md5(readFileSync(join(ROOT, 'analysis', 'tst-openers-tp-x.json'))));
+  const ls = Object.values(TSD.lines) as any[];
+  expect(ls.length).toBeGreaterThan(0);
+  for (const r of ls) expect(0 <= r.pt3 && r.pt3 <= r.p5 && r.p5 <= B).toBe(true);
+});
+
+test('(k) pilot lines re-run through the tst-tsd binary reproduce the artefact (skipped without cargo)', () => {
+  const r0 = Bun.spawnSync(['cargo', 'build', '--release', '--locked', '--quiet', '--manifest-path', join(TSD_CRATE, 'Cargo.toml')], { stderr: 'pipe' });
+  const bin = join(TSD_CRATE, 'target', 'release', 'tst-tsd');
+  if (r0.exitCode !== 0 || !existsSync(bin)) { console.warn('SKIPPED (k): cargo is unavailable or tst-tsd failed to build; pt3 is NOT re-run'); return; }
+  // the cheapest lines: the fewest leftover pieces solve fastest
+  const keys = Object.keys(TSD.lines).sort((a, b) => Number(b.split('|')[1]!.length < a.split('|')[1]!.length) - Number(a.split('|')[1]!.length < b.split('|')[1]!.length)).slice(0, 3);
+  const r = Bun.spawnSync([bin], { stdin: Buffer.from(keys.join('\n') + '\n'), stderr: 'pipe' });
+  expect(r.exitCode).toBe(0);
+  const got = r.stdout.toString().trim().split('\n').map((l) => JSON.parse(l));
+  expect(got.length).toBe(keys.length);
+  for (const g of got) {
+    const a = TSD.lines[g.line];
+    expect([g.p5, g.p5u, g.pt3, g.pt3u]).toEqual([a.p5, a.p5u, a.pt3, a.pt3u]);
+  }
+}, 600_000);

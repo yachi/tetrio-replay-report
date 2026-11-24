@@ -1787,6 +1787,7 @@ jobs:
         run: |
           set -euo pipefail
           cargo build --release --locked --manifest-path pipeline/sim/tst2bag-tp-rs/Cargo.toml
+          cargo build --release --locked --manifest-path pipeline/sim/tst-tsd-rs/Cargo.toml
 
       - name: Re-run the TST opener T-placed worked PCs
         if: env.INPUTS_UNCHANGED != '1'
@@ -1800,6 +1801,25 @@ jobs:
       - name: Check the TST opener hold-swap families
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 pipeline/sim/emit-tst-openers-tp.py --check
+
+      # The boards worth learning (pipeline/sim/tst-sets-rs): per soft-drop budget the best k = 1..3 boards (exact, branch and
+      # bound; the crate's unit tests hold the bound to brute force on random boards), greedy 4..5 and a decision tree. The
+      # check builds the crate, re-runs it, byte-compares analysis/tst-openers-tp-sets.json and recomputes every figure in numpy
+      # from tst-openers-tp.json and the first-bag vectors (all pairs over every board, a certificate for the triples).
+      # TST -> TSD -> PC (pipeline/sim/tst-tsd-rs, about half an hour offline): the cheap check recomputes the artefact's
+      # md5s, that each live line's p5 equals the main artefact's class p5, and that pt3 <= p5; tst-openers-tp.test.ts re-runs a few lines.
+      - name: Check the TST opener TST-TSD-PC counts
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 pipeline/sim/emit-tst-openers-tp.py --tsd-check
+
+      - name: Check the TST opener learn-these-boards sets
+        if: env.INPUTS_UNCHANGED != '1'
+        run: |
+          set -euo pipefail
+          # the recount uses numpy, which the runner's python3 lacks; Ubuntu's own package, installed only when missing
+          python3 -c 'import numpy' 2>/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq python3-numpy; }
+          cargo test --release --locked --manifest-path pipeline/sim/tst-sets-rs/Cargo.toml
+          python3 pipeline/sim/emit-tst-openers-tp.py --sets-check
 
       - name: Re-run the TST opener T-placed builds
         if: env.INPUTS_UNCHANGED != '1'

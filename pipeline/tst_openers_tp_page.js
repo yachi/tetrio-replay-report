@@ -229,6 +229,8 @@ function apply() {
     card.querySelector('[data-f="two"]').textContent = c.f[sd][0];
     card.querySelector('[data-f="pc3"]').textContent = c.f[sd][1];
     card.querySelector('[data-f="joint"]').textContent = c.f[sd][2];
+    card.querySelector('[data-f="tsd"]').textContent = c.ft[sd][0];
+    card.querySelector('[data-f="tsdj"]').textContent = c.ft[sd][1];
   }
   for (const b of posBtns) b.setAttribute('aria-pressed', b.dataset.f === pos);
   for (const b of kindBtns) b.setAttribute('aria-pressed', b.dataset.k === kind);
