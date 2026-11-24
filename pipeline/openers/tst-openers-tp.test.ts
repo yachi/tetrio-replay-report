@@ -608,48 +608,61 @@ const CANDS: number[][] = [];
 POOL.forEach((_: any, i: number) => { const m = MATE[i]!; if (m >= i) CANDS.push(m === i ? [i] : [i, m]); });
 const CIDX = new Map<string, number>(CANDS.map((c, n) => [c.join(','), n] as [string, number]));
 const unionOf = (cs: number[][]) => [...new Set(cs.flat())].sort((a, b) => a - b);
-const STAT = POOL.map((b: any) => tables(b, vecOf(b.name)));
-/** per budget: key (J*8192+built) and availability per board and order, with this file's own cost rule. */
-function keysFor(bk: string) {
+const VEC: Uint8Array[] = POOL.map((b: any) => Uint8Array.from(vecOf(b.name)));
+const STAT = POOL.map((b: any, i: number) => tables(b, [...VEC[i]!]));
+/** An entry answers, per first-bag order o: k(o) the key J*8192+built (-1 when not built in the budget), j(o) J, b(o) built.
+ * Computed on demand from the cost vector and the per-code tables, with this file's own cost rule, so nothing of size
+ * boards x orders is held: a materialised table per budget took several GB and stalled the sharded CI run. */
+type Ent = { k: (o: number) => number; j: (o: number) => number; b: (o: number) => number };
+function keysFor(bk: string): Ent[] {
   const lim = bk === 'inf' ? INFEAS - 1 : Number(bk);
-  return POOL.map((b: any, i: number) => {
-    const v = vecOf(b.name), [J, Bt] = STAT[i].out[bk];
-    const key = new Float64Array(B), av = new Uint8Array(B), j = new Float64Array(B), bt = new Float64Array(B);
-    for (let o = 0; o < B; o++) if (v[o]! <= lim) { av[o] = 1; j[o] = J[v[o]!]; bt[o] = Bt[v[o]!]; key[o] = j[o]! * 8192 + bt[o]!; }
-    return { key, av, j, bt };
+  return POOL.map((_: any, i: number) => {
+    const v = VEC[i]!, [J, Bt] = STAT[i].out[bk];
+    return {
+      k: (o: number) => { const c = v[o]!; return c <= lim ? J[c] * 8192 + Bt[c] : -1; },
+      j: (o: number) => J[v[o]!],
+      b: (o: number) => Bt[v[o]!],
+    };
   });
 }
-const KEYS: Record<string, any[]> = {};
-for (const bk of BKEYS) KEYS[bk] = keysFor(bk);
+let KC: [string, Ent[]] | null = null;
+const keysOf = (bk: string): Ent[] => (KC && KC[0] === bk ? KC[1] : (KC = [bk, keysFor(bk)])[1]);
 /** a pair candidate: per order the best of its boards (key is J-major, so the pair's J is the winner's). */
-function candTable(K: any[]) {
+function candTable(K: Ent[]): Ent[] {
   return CANDS.map((c) => {
-    const key = new Float64Array(B), av = new Uint8Array(B), j = new Float64Array(B), bt = new Float64Array(B);
-    for (let o = 0; o < B; o++) for (const i of c) if (K[i].av[o] && (!av[o] || K[i].key[o] > key[o]!)) { av[o] = 1; key[o] = K[i].key[o]; j[o] = K[i].j[o]; bt[o] = K[i].bt[o]; }
-    return { key, av, j, bt };
+    const w = new Uint8Array(B).fill(255);
+    for (let o = 0; o < B; o++) {
+      let best = -1;
+      c.forEach((i, m) => { const kk = K[i]!.k(o); if (kk >= 0 && (best < 0 || kk > best)) { best = kk; w[o] = m; } });
+    }
+    return {
+      k: (o: number) => (w[o] === 255 ? -1 : K[c[w[o]!]!]!.k(o)),
+      j: (o: number) => K[c[w[o]!]!]!.j(o),
+      b: (o: number) => K[c[w[o]!]!]!.b(o),
+    };
   });
 }
-function valOf(K: any[], set: number[]): [number, number] {
+function valOf(K: Ent[], set: number[]): [number, number] {
   let p = 0, bu = 0;
   for (let o = 0; o < B; o++) {
     let best = -1, a = -1;
-    for (const i of set) if (K[i].av[o] && K[i].key[o] > best) { best = K[i].key[o]; a = i; }
-    if (a >= 0) { p += K[a].j[o]; bu += K[a].bt[o]; }
+    for (const i of set) { const kk = K[i]!.k(o); if (kk >= 0 && kk > best) { best = kk; a = i; } }
+    if (a >= 0) { p += K[a]!.j(o); bu += K[a]!.b(o); }
   }
   return [p, bu];
 }
-function picksOf(K: any[], set: number[]): number[] {
+function picksOf(K: Ent[], set: number[]): number[] {
   const out: number[] = [];
   for (let o = 0; o < B; o++) {
     let best = -1, a = -1;
-    set.forEach((i, m) => { if (K[i].av[o] && K[i].key[o] > best) { best = K[i].key[o]; a = m; } });
+    set.forEach((i, m) => { const kk = K[i]!.k(o); if (kk >= 0 && kk > best) { best = kk; a = m; } });
     out.push(a);
   }
   return out;
 }
-function walkTree(nd: any, idx: number[], K: any[], set: number[], mem: number[]) {
+function walkTree(nd: any, idx: number[], K: Ent[], set: number[], mem: number[]) {
   if ('m' in nd) {
-    const tot = set.map((i) => idx.reduce((s, o) => s + (K[i].av[o] ? K[i].j[o] * 2 ** 26 + K[i].bt[o] : 0), 0));
+    const tot = set.map((i) => idx.reduce((s, o) => s + (K[i]!.k(o) >= 0 ? K[i]!.j(o) * 2 ** 26 + K[i]!.b(o) : 0), 0));
     let bm = 0;
     tot.forEach((t: number, m: number) => { if (t > tot[bm]!) bm = m; });
     expect(nd.m).toBe(bm);
@@ -689,7 +702,7 @@ test('(j) pins: the sets crate, the artefact and the b1 vectors it was built fro
 
 test('(j) every set value, greedy step, k=1 optimum, k=2 optimum, pick string and rule tree is recomputed here', () => {
   for (const bk of BKEYS) {
-    const K = KEYS[bk]!, r = SETS.budgets[bk], Kc = candTable(K);
+    const K = keysOf(bk), r = SETS.budgets[bk], Kc = candTable(K);
     const pos = (rec: any) => rec.boards.map((x: any) => x.pos);
     const chk = (rec: any) => {
       for (const x of rec.boards) {
@@ -707,7 +720,7 @@ test('(j) every set value, greedy step, k=1 optimum, k=2 optimum, pick string an
     // exact >= greedy
     for (const k of ['1', '2', '3']) { const e = r.exact[k], g = r.greedy[k]; expect(e.pc3 > g.pc3 || (e.pc3 === g.pc3 && e.built >= g.built)).toBe(true); }
     // k = 1 over all pair candidates
-    const f1 = Kc.map((x: any) => { let p = 0, b = 0; for (let o = 0; o < B; o++) if (x.av[o]) { p += x.j[o]; b += x.bt[o]; } return [p, b]; });
+    const f1 = Kc.map((x) => { let p = 0, b = 0; for (let o = 0; o < B; o++) if (x.k(o) >= 0) { p += x.j(o); b += x.b(o); } return [p, b]; });
     let best = 0;
     f1.forEach((v: number[], i: number) => { const bv = f1[best]!; if (v[0]! > bv[0]! || (v[0] === bv[0] && v[1]! > bv[1]!)) best = i; });
     expect(r.exact['1'].pairs).toEqual([CANDS[best]]);
@@ -722,9 +735,9 @@ test('(j) every set value, greedy step, k=1 optimum, k=2 optimum, pick string an
         if (f1[a]![0]! + f1[b]![0]! < top) break;
         let p = 0;
         for (let o = 0; o < B; o++) {
-          const ka = Kc[a].av[o] ? Kc[a].key[o] : -1, kb = Kc[b].av[o] ? Kc[b].key[o] : -1;
+          const ka = Kc[a]!.k(o), kb = Kc[b]!.k(o);
           if (ka < 0 && kb < 0) continue;
-          p += ka >= kb ? Kc[a].j[o] : Kc[b].j[o];
+          p += ka >= kb ? Kc[a]!.j(o) : Kc[b]!.j(o);
         }
         if (p > top) top = p;
       }
@@ -751,7 +764,7 @@ test('(j) every set value, greedy step, k=1 optimum, k=2 optimum, pick string an
       let p = 0, b = 0, unb = 0, diff = 0;
       for (let o = 0; o < B; o++) {
         const i = s3[mem[o]!]!;
-        if (K[i].av[o]) { p += K[i].j[o]; b += K[i].bt[o]; } else unb++;
+        if (K[i]!.k(o) >= 0) { p += K[i]!.j(o); b += K[i]!.b(o); } else unb++;
         if (pk[o]! >= 0 && pk[o] !== mem[o]) diff++;
       }
       expect([p, b, unb, diff]).toEqual([rule.pc3, rule.built, rule.unbuildable, rule.differs]);
@@ -776,8 +789,8 @@ test('(j) the fixed set (budget 2 exact triple) is valued at every budget, and p
   expect(fx.pairs).toEqual(SETS.budgets['2'].exact['3'].pairs);
   const want = ['I:2,12,22,32/L:7,8,9,19/O:0,1,10,11/S:4,5,15,16/T:3,13,14,23/Z:18,28,29,39', 'I:7,17,27,37/J:0,1,2,10/O:8,9,18,19/S:11,20,21,30/T:6,15,16,26/Z:4,5,13,14', 'I:10,20,30,40/J:8,9,19,29/O:21,22,31,32/S:0,1,11,12/T:5,15,16,25/Z:7,17,18,28', 'I:19,29,39,49/L:0,1,10,20/O:27,28,37,38/S:2,11,12,21/T:4,13,14,24/Z:8,9,17,18', 'I:10,20,30,40/J:8,9,19,29/L:50,51,60,70/O:21,22,31,32/S:0,1,11,12/T:5,15,16,25', 'I:19,29,39,49/J:58,59,69,79/L:0,1,10,20/O:27,28,37,38/T:4,13,14,24/Z:8,9,17,18'];
   expect(fx.boards.map((x: any) => keyOf(x.pieces))).toEqual(want);
-  for (const bk of BKEYS) expect(valOf(KEYS[bk]!, p)).toEqual([fx.values[bk].pc3, fx.values[bk].built]);
-  expect(valOf(KEYS['0']!, p)).not.toEqual([fx.values['1'].pc3, fx.values['1'].built]);
+  for (const bk of BKEYS) expect(valOf(keysOf(bk), p)).toEqual([fx.values[bk].pc3, fx.values[bk].built]);
+  expect(valOf(keysOf('0'), p)).not.toEqual([fx.values['1'].pc3, fx.values['1'].built]);
 });
 
 test('(j) cross-crate: the tst-sets binary on input built here reproduces the artefact (skipped without cargo)', () => {
