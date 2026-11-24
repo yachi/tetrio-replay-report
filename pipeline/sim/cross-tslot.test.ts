@@ -170,7 +170,8 @@ realData('two methods, no shared code, disagree on nothing across the corpus', (
   // 2026-11-17: 274813 -> 278480 (3667 boards, 24 rounds), `unexplained` still EMPTY.
   // 2026-11-19: 278480 -> 285266 (6786 boards, 44 rounds), `unexplained` still EMPTY.
   // 2026-11-23: 285266 -> 298951 (13685 boards, 82 rounds), `unexplained` still EMPTY.
-  expect(both + oursOnly + ccOnly + neither).toBe(298951);
+  // 2026-11-24: 298951 -> 311770 (12819 boards, 72 rounds), `unexplained` still EMPTY.
+  expect(both + oursOnly + ccOnly + neither).toBe(311770);
 // Explicit timeout, following the slow corpus test in openers.test.ts. This walks every verified
 // board of every session — ~95 s at nine sessions — and bun's default per-test timeout is 5 s, so
 // without this it fails on elapsed time whatever the assertions say. Not a new cost: the same

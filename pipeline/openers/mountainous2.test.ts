@@ -185,20 +185,21 @@ const PC_GARBAGE_IN_WINDOW: string[] = [];
 const MULTI_COLOUR_RESOLVED_BY_GROUP: string[] = [];
 
 /** Both players mirror 山岳積み2号: pinned as a count per player, not a list. */
-const MIRRORED_BAG1 = { yachi: 176, pinglamb: 25 };
+const MIRRORED_BAG1 = { yachi: 182, pinglamb: 25 };
 
 /** Cases per measured node. No corpus round reaches the 4-line PCs, 2.normal#2/#3 or anything under
  *  2.compromise past its TST: those zeros are COMPARED (the classifier detects all three PC kinds and
  *  the bag-3 and bag-4 snapshot boards; the demos test reaches each one), never "not compared". */
 const NODE_CASES: Record<string, number> = {
-  'bag1.l_top': 407, 'bag1.l_hold': 101, 'bag1.l_placed_elsewhere': 1,
+  'bag1.l_top': 419, 'bag1.l_hold': 101, 'bag1.l_placed_elsewhere': 1,
   '2.pc4#1': 0, '2.pc4#2': 0, '2.pc4#3': 0,
-  '2.ideal': 258, '2.normal#1': 106, '2.normal#2': 0, '2.normal#3': 0, '2.compromise': 19,
+  '2.ideal': 264, '2.normal#1': 108, '2.normal#2': 0, '2.normal#3': 0, '2.compromise': 19,
   // 2026-11-17 adds one pc#2, yachi's m1r5, as drawn, at lock 19 past a prefix verified to 18 (`verified: false`).
   // 2026-11-01 adds two pc#3, both yachi's, at lock 19 past the verified prefix (`verified: false`):
   // m3r6 mirrored (prefix 15), m8r3 as drawn (prefix 14).
-  '2.ideal.pc#1': 5, '2.ideal.pc#2': 14, '2.ideal.pc#3': 21, '2.ideal.pc#4': 0, '2.ideal.pc#5': 0,
-  '2.ideal.pc#6': 0, '2.ideal.pc#7': 1, '2.ideal.pc#8': 0, '2.ideal.pc#9': 0, '2.ideal.pc#10': 0,
+  // 2026-11-24 adds one pc#3 and one pc#7 (both under 2.ideal).
+  '2.ideal.pc#1': 5, '2.ideal.pc#2': 14, '2.ideal.pc#3': 22, '2.ideal.pc#4': 0, '2.ideal.pc#5': 0,
+  '2.ideal.pc#6': 0, '2.ideal.pc#7': 2, '2.ideal.pc#8': 0, '2.ideal.pc#9': 0, '2.ideal.pc#10': 0,
   '2.ideal.pc#11': 0, '2.ideal.pc#12': 0, '2.ideal.pc#13': 0, '2.ideal.pc#14': 0,
   '2.normal.pc#1': 4, '2.normal.pc#2': 0, '2.normal.pc#3': 0, '2.normal.pc#4': 0, '2.normal.pc#5': 0,
   '2.normal.pc#6': 0, '2.normal.pc#7': 0, '2.normal.pc#8': 0,
@@ -223,9 +224,9 @@ const UNMEASURED: Record<string, string> = {
  *  trigger is a pair of early pairs with no threshold, so it never decides. A sizeable minority of
  *  2.ideal rounds dealt O before S, so the condition is a description of the page, not of the play. */
 const CONDITIONS = {
-  '2.ideal': { '2.compromise': 51, '2.ideal': 207 },
+  '2.ideal': { '2.compromise': 51, '2.ideal': 213 },
   '2.compromise': { '2.compromise': 19 },
-  '2.normal#1': { '2.compromise': 102, '2.ideal': 4 },
+  '2.normal#1': { '2.compromise': 104, '2.ideal': 4 },
 };
 
 /** The case object's key order is part of the artefact's bytes. */

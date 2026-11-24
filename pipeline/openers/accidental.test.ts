@@ -12,7 +12,7 @@
  * filled cell above the T before j belongs to a piece placed after i (ROOF; any number of roof pieces). Tightened
  * the same day (yachi: 「影片食完tst ,擺完頂就食得，唔洗點砌，啲examples 要砌好多，唔算」; chose 「收緊版(0 個)」): the
  * slot box (the T rows and the row under them, the T's columns and one each side) must be complete right after i's
- * clear, so only the roof is built between the two spins (SLOT BUILT). The corpus then holds NO hit; the twelve the
+ * clear, so only the roof is built between the two spins (SLOT BUILT). The corpus then holds NO hit; the thirteen the
  * relaxed rule found all had slot walls built after i, and are pinned here as `SLOT_BUILT_AFTER`, re-derived under the
  * `no_slot_built` ablation and run through the qualify hook as the LOOSE profile, so the rules stay exercised.
  *
@@ -67,6 +67,7 @@ const SLOT_BUILT_AFTER: string[] = [
   '2026-10-22 m8r5 yachi lock 39 tst',
   '2026-11-17 m2r6 pinglamb lock 29 tst',
   '2026-11-17 m3r2 pinglamb lock 308 tst',
+  '2026-11-24 m5r1 yachi lock 42 tst',
 ];
 /** Of the LOOSE hits, the two that are some opener route's own continuation (`opener_route`). */
 const LOOSE_NOT_QUALIFIED = ['2026-10-09 m4r4 pinglamb lock 24 tst', '2026-10-12 m1r2 pinglamb lock 24 tst'];
@@ -86,20 +87,21 @@ const RULE: Record<string, [number, number[]]> = {
   '2026-10-22 m8r5 yachi lock 39 tst': [33, [34, 35]],
   '2026-11-17 m2r6 pinglamb lock 29 tst': [15, [18]],
   '2026-11-17 m3r2 pinglamb lock 308 tst': [303, [304, 307]],
+  '2026-11-24 m5r1 yachi lock 42 tst': [30, [37, 38]],
 };
 
 const DENOM = {
-  pinglamb: { TST: { all: 1859, in_opener: 1813, mid_game: 46 } },
-  yachi: { TST: { all: 1144, in_opener: 1080, mid_game: 64 } },
+  pinglamb: { TST: { all: 1935, in_opener: 1889, mid_game: 46 } },
+  yachi: { TST: { all: 1198, in_opener: 1131, mid_game: 67 } },
 };
 const HITS = { pinglamb: { all: 0, in_opener: 0, mid_game: 0, garbage_in_window: 0 },
                yachi: { all: 0, in_opener: 0, mid_game: 0, garbage_in_window: 0 } };
 const QUALIFY = { pinglamb: { qualified: 0, not_qualified: {} }, yachi: { qualified: 0, not_qualified: {} } };
-/** each clause dropped, at the opportunity. Only no_slot_built admits anything (the twelve SLOT_BUILT_AFTER); the
+/** each clause dropped, at the opportunity. Only no_slot_built admits anything (the thirteen SLOT_BUILT_AFTER); the
  *  others equal the headline, 0, on this corpus, because every candidate they admit still fails slot-built */
 const ABLATION = { no_next_t: { pinglamb: 0, yachi: 0 }, no_exposed: { pinglamb: 0, yachi: 0 },
                    no_access: { pinglamb: 0, yachi: 0 }, no_new_roof: { pinglamb: 0, yachi: 0 },
-                   no_slot_built: { pinglamb: 5, yachi: 7 } };
+                   no_slot_built: { pinglamb: 5, yachi: 8 } };
 type Abl = '' | keyof typeof ABLATION;
 
 let DIGESTS: TechDigest[] | null = null;
@@ -230,7 +232,7 @@ test('quarantined: report_eligible false, no claim ids, one spin_rule variant wi
 });
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
-  expect(checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT)).toBe(19461);
+  expect(checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT)).toBe(20210);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 

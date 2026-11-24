@@ -122,7 +122,7 @@ const ADMISSION: Record<string, [number, number]> = {
   '2026-09-10': [130, 130], '2026-09-11': [102, 102], '2026-09-17': [98, 98],
   '2026-09-18': [254, 254], '2026-09-19': [300, 300], '2026-10-03': [292, 292],
   '2026-10-09': [204, 204], '2026-10-12': [110, 110], '2026-10-20': [60, 60],
-  '2026-10-22': [126, 126], '2026-10-29': [136, 136], '2026-11-01': [260, 260], '2026-11-05': [134, 134], '2026-11-17': [48, 48], '2026-11-19': [88, 88], '2026-11-23': [164, 164],
+  '2026-10-22': [126, 126], '2026-10-29': [136, 136], '2026-11-01': [260, 260], '2026-11-05': [134, 134], '2026-11-17': [48, 48], '2026-11-19': [88, 88], '2026-11-23': [164, 164], '2026-11-24': [144, 144],
 };
 
 /** Every player-round whose engine totals disagree with facts.json. EMPTY since 2026-10-31, and kept
@@ -208,7 +208,11 @@ test('admission counts are pinned per session, and the exceptions are exactly th
  *
  *  2026-11-23 adds TWO (`topout`, engine survives, lock null), the same class: yachi in
  *  replay-2026-11-23-04.ttrm r3 and pinglamb in replay-2026-11-23-06.ttrm r10; 11-23 admits 164 of
- *  164, so the list is 35. */
+ *  164, so the list is 35.
+ *
+ *  2026-11-24 adds TWO (`topout`, engine survives, lock null), the same class, both yachi's: round 2 of
+ *  replay-2026-11-24-02.ttrm and round 5 of replay-2026-11-24-04.ttrm; 11-24 admits 144 of 144, so
+ *  the list is 37. */
 const KNOCKOUT_EXCEPTIONS = [
   { session: '2026-07-22', file: 'replay-2026-07-22-2.ttrm', round: 1, user: 'yachi', ending: 'topout', lock: null },
   { session: '2026-07-22', file: 'replay-2026-07-22-7.ttrm', round: 5, user: 'pinglamb', ending: 'topout', lock: null },
@@ -245,6 +249,8 @@ const KNOCKOUT_EXCEPTIONS = [
   { session: '2026-11-19', file: 'replay-2026-11-19-02.ttrm', round: 1, user: 'pinglamb', ending: 'topout', lock: null },
   { session: '2026-11-23', file: 'replay-2026-11-23-04.ttrm', round: 3, user: 'yachi', ending: 'topout', lock: null },
   { session: '2026-11-23', file: 'replay-2026-11-23-06.ttrm', round: 10, user: 'pinglamb', ending: 'topout', lock: null },
+  { session: '2026-11-24', file: 'replay-2026-11-24-02.ttrm', round: 2, user: 'yachi', ending: 'topout', lock: null },
+  { session: '2026-11-24', file: 'replay-2026-11-24-04.ttrm', round: 5, user: 'yachi', ending: 'topout', lock: null },
 ];
 
 test('engine_knockout is consistent with its own definition, and its disagreements are exactly the named list', () => {
