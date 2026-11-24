@@ -1825,6 +1825,12 @@ jobs:
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 pipeline/sim/emit-tst-builds.py --check
 
+      # Which dealt orders of bag 2 build each class (tst-build-rs's ORDERS mode): re-run (under a minute) and
+      # byte-compared with analysis/tst-openers-tp-orders.json; the emitter re-derives every board's cum from it first.
+      - name: Re-run the TST opener bag-2 dealing orders
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 pipeline/sim/emit-tst-orders.py --check
+
       - name: Warm the oracle cache
         if: env.INPUTS_UNCHANGED != '1'
         run: bun pipeline/sim/oracle-cache.ts --warm --jobs 4

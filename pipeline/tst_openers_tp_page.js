@@ -8,9 +8,9 @@ const lab = {};
 for (const b of sdBtns) lab[b.dataset.b] = b.textContent;
 let sd = D.sd_default, pos = D.filter_default, kind = D.kind_default || 'all';
 // Bag-1 pieces are upper case and drawn solid; bag-2 pieces are lower case and drawn lighter.
-function mini(g) {
-  const H = g.length / 10, cs = 11, sv = document.createElementNS(NS, 'svg');
-  sv.setAttribute('width', 110); sv.setAttribute('height', H * cs); sv.classList.add('board');
+function mini(g, cs = 11) {
+  const H = g.length / 10, sv = document.createElementNS(NS, 'svg');
+  sv.setAttribute('width', 10 * cs); sv.setAttribute('height', H * cs); sv.classList.add('board');
   const r = (x, y, f, o) => {
     const e = document.createElementNS(NS, 'rect');
     e.setAttribute('x', x * cs + .5); e.setAttribute('y', y * cs + .5); e.setAttribute('width', cs - 1); e.setAttribute('height', cs - 1);
@@ -18,7 +18,7 @@ function mini(g) {
     if (o) for (const k in o) e.setAttribute(k, o[k]);
     sv.appendChild(e);
   };
-  r(0, 0, 'var(--well)', { width: 110, height: H * cs, x: 0, y: 0 });
+  r(0, 0, 'var(--well)', { width: 10 * cs, height: H * cs, x: 0, y: 0 });
   for (let i = 0; i < g.length; i++) {
     const k = g[i];
     if (k === '.') r(i % 10, Math.floor(i / 10), 'var(--grid)');
@@ -36,6 +36,7 @@ for (const d of document.querySelectorAll('details[data-s]')) d.addEventListener
   const panel = document.createElement('div'); panel.className = 'bo'; panel.hidden = true;
   box.after(panel);
   let open = -1;
+  panel._go = k => { const f = box.children[k]; toggle(k, f); f.scrollIntoView({ block: 'nearest' }); };
   const toggle = (j, f) => {
     for (const o of box.children) o.setAttribute('aria-expanded', 'false');
     if (panel._stop) panel._stop();
@@ -99,6 +100,95 @@ const SPEEDS = [1100, 650, 330];
 let speed = 1;
 // The build of one class and its worked PC as one animation: every piece of the build, the T into the TST slot and its
 // clear, then the solver's PC piece by piece until the board is empty (all precomputed by the renderer and audited).
+// One class's bag-2 dealing orders: how many of the 5040 build it, and the precedence rules that guarantee a build or a
+// failure (audited against the orders artefact). A piece letter is drawn in its colour; the text is the prose's.
+function fill(tpl, v) {
+  const out = []; let rest = tpl;
+  const re = /\{(\w+)\}/;
+  for (let m = re.exec(rest); m; m = re.exec(rest)) {
+    out.push(rest.slice(0, m.index));
+    const x = v[m[1]];
+    if (m[1] === 'a' || m[1] === 'b') { const k = el('b', 'od-k', x); k.style.color = COL[x]; out.push(k); } else out.push(el('b', null, String(x)));
+    rest = rest.slice(m.index + m[0].length);
+  }
+  out.push(rest);
+  return out;
+}
+// A rule's precedences read as few clauses as it can: pairs sharing the earlier piece first ("J 早過 O、T"), then pairs
+// sharing the later one ("O、T 早過 J"), then the rest one by one.
+function ruleText(cj) {
+  const kl = ks => { const s = el('span'); ks.forEach((k, i) => { if (i) s.append('、'); const b = el('b', 'od-k', k); b.style.color = COL[k]; s.append(b); }); return s; };
+  const group = (lst, at) => { const g = new Map(); for (const q of lst) { const k = q[at]; if (!g.has(k)) g.set(k, []); g.get(k).push(q); } return g; };
+  let rest = cj.slice();
+  const parts = [];
+  for (const [a, qs] of group(rest, 0)) if (qs.length > 1) { parts.push([[a], qs.map(q => q[1])]); rest = rest.filter(q => !qs.includes(q)); }
+  for (const [b, qs] of group(rest, 1)) parts.push([qs.map(q => q[0]), [b]]);
+  const span = el('span');
+  parts.forEach(([as, bs], i) => { if (i) span.append(D.cl.od_and); span.append(kl(as), ' ' + D.cl.od_before + ' ', kl(bs)); });
+  return span;
+}
+function ruleList(rs) {
+  const li = ([cj, n]) => { const x = el('li'); x.append(ruleText(cj), ' ', el('span', 'muted sm', D.cl.od_count.split('{n}').join(n))); return x; };
+  const ul = el('ul', 'od-l');
+  rs.slice(0, 3).forEach(r => ul.append(li(r)));
+  const frag = [ul];
+  if (rs.length > 3) {
+    const det = el('details', 'od-more'), ul2 = el('ul', 'od-l');
+    rs.slice(3).forEach(r => ul2.append(li(r)));
+    det.append(el('summary', 'muted sm', D.cl.od_rmore.split('{n}').join(rs.length - 3)), ul2);
+    frag.push(det);
+  }
+  return frag;
+}
+// The card's decision list: from the ending with the best PC down, the dealt orders that should build each one.
+// With or without the 180 rotation in bag 2 (bag 1 stands as before): one choice for every panel.
+let ROT180 = false;
+function planBlock(c, j, go) {
+  const box = el('div', 'od');
+  const draw = () => { box.replaceChildren(); planInto(box, c, j, go, draw); };
+  draw();
+  return box;
+}
+function planInto(box, c, j, go, redraw) {
+  box.append(el('h5', null, D.cl.pl_title));
+  const bar = el('div', 'od-rot');
+  [[false, D.cl.pl_n180], [true, D.cl.pl_r180]].forEach(([v, txt]) => {
+    const b = el('button', v === ROT180 ? 'on' : null, txt); b.type = 'button';
+    b.setAttribute('aria-pressed', String(v === ROT180));
+    b.addEventListener('click', () => { if (ROT180 !== v) { ROT180 = v; redraw(); } });
+    bar.append(b);
+  });
+  box.append(bar);
+  if (!ROT180) box.append(el('p', 'muted sm', D.cl.pl_n180_note));
+  const [n0, ni, held] = (ROT180 ? c.d : c.d1)[j], p = el('p');
+  if (ni) p.append(...fill(D.cl.od_n, { n: ni }), ...fill(D.cl.od_n0, { n: n0 }));
+  else p.append(D.cl.pl_n180_none);
+  box.append(p, el('p', 'muted sm', D.cl.od_held.split('{h}').join(held)));
+  const tile = k => {
+    const [g, name, left, p5] = c.t[k];
+    const b = el('button', 'pl-t' + (k === j ? ' pl-here' : ''));
+    b.append(mini(g, 8), el('span', null, D.cl.pl_tile.split('{name}').join(name).split('{left}').join(left).split('{p5}').join(p5)));
+    b.type = 'button';
+    if (k !== j) b.addEventListener('click', () => go(k)); else b.disabled = true;
+    return b;
+  };
+  const pl = ROT180 ? c.pl : c.pl1, ol = el('ol', 'pl');
+  const step = (head, n, k, rs) => {
+    const li = el('li', 'od-s' + (k === j ? ' od-yes' : '')), h = el('p', 'od-h');
+    h.append(head + ' ', el('span', 'muted sm', D.cl.od_count.split('{n}').join(n)), ' ' + D.cl.pl_then + ' ', tile(k));
+    li.append(h);
+    if (rs) li.append(...ruleList(rs));
+    ol.append(li);
+  };
+  pl.s.forEach(([k, rs, tot], i) => step(i ? D.cl.pl_or : D.cl.pl_if, tot, k, rs));
+  if (pl.e) step(pl.s.length ? D.cl.pl_else : D.cl.pl_always, pl.e[1], pl.e[0], null);
+  box.append(ol);
+  if (!pl.s.some(([k]) => k === j) && !(pl.e && pl.e[0] === j)) box.append(el('p', 'muted sm', D.cl.pl_here));
+  if (pl.o) box.append(el('p', 'muted sm', D.cl.pl_open.split('{n}').join(pl.o)));
+  if (pl.z) box.append(el('p', 'muted sm', D.cl.pl_none.split('{n}').join(pl.z)));
+  const how = el('details', 'od-how'); how.append(el('summary', 'muted sm', D.cl.od_how), el('p', 'muted sm', D.cl.od_note));
+  box.append(how);
+}
 function showBuild(panel, c, j) {
   panel.replaceChildren();
   if (!c.b[j]) { panel.append(el('p', 'muted sm', D.cl.bo_nobuild)); return; }
@@ -192,9 +282,11 @@ function showBuild(panel, c, j) {
   };
   const vbtns = vars.map(([t], k) => { const b = el('button', null, t); b.type = 'button'; b.onclick = () => { setVar(k); go(0); start(); }; vbar.append(b); return [b, k]; });
   if (vars.length < 2) vbar.hidden = true;
-  side.append(nav, seek, sp, list);
+  // On a phone the step chips go under the order notes, so the board and the order notes share one screen.
+  const narrow = !!(window.matchMedia && matchMedia('(max-width:520px)').matches);
+  side.append(nav, seek, sp); if (!narrow) side.append(list);
   wrap.append(el('div', 'an-l', null), side); wrap.firstChild.append(pic, cap);
-  panel.append(vbar, deal, wrap, el('p', 'muted sm', D.cl.bo_note));
+  panel.append(vbar, deal, wrap, planBlock(c, j, panel._go)); if (narrow) panel.append(list); panel.append(el('p', 'muted sm', D.cl.bo_note));
   if (!vars.length) panel.append(el('p', 'muted sm', D.cl.bo_none));
   else if (!e.b3) panel.append(el('p', 'muted sm', D.cl.pcx_none3));
   setVar(0);
@@ -214,7 +306,10 @@ function showBuild(panel, c, j) {
     det.append(pcx); panel.append(det);
   }
   go(0);
-  if (panel.scrollIntoView) requestAnimationFrame(() => panel.scrollIntoView({ block: 'nearest', behavior: REDUCE ? 'auto' : 'smooth' }));
+  // On a phone the tiles are one swipeable row: keep that row at the top so the next tile is one tap away.
+  const strip = panel.previousElementSibling;
+  const tgt = narrow && strip ? strip : panel;
+  if (tgt.scrollIntoView) requestAnimationFrame(() => tgt.scrollIntoView({ block: narrow ? 'start' : 'nearest', behavior: REDUCE ? 'auto' : 'smooth' }));
   if (!REDUCE) start();
   panel._stop = stop;
 }

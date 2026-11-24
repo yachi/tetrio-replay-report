@@ -33,6 +33,7 @@ import argparse
 import base64
 import copy
 import hashlib
+import itertools
 from decimal import Decimal
 import html
 import itertools
@@ -205,6 +206,69 @@ def load_builds(repo=REPO):
         _need(v.get("order") is not None, f"build {key}: the engine found no placement order")
         _need(v.get("tst") is True, f"build {key}: the engine did not confirm the T reaches the TST slot with a full spin")
     return bd["builds"]
+
+
+def load_orders(repo=REPO):
+    """Which dealt orders of bag 2 build each live class (`emit-tst-orders.py`), keyed `<card>#<class index>`; refuses an
+    artefact built from another analysis/tst-openers-tp.json."""
+    with open(os.path.join(repo, "analysis", "tst-openers-tp-orders.json"), encoding="utf-8") as f:
+        od = json.load(f)
+    _need(od.get("report_eligible") is False and od.get("constructed") is True,
+          "the orders artefact is not marked report_eligible: false / constructed: true")
+    with open(os.path.join(repo, "analysis", "tst-openers-tp.json"), "rb") as f:
+        _need(od["md5"]["tst_openers_tp"] == hashlib.md5(f.read()).hexdigest(),
+              "the orders artefact was built from another analysis/tst-openers-tp.json: re-run emit-tst-orders.py")
+    _need(od["pairs"] == ["".join(p) for p in itertools.combinations("IJLOSTZ", 2)], "the orders artefact's pair list")
+    _need(od.get("schema") == "tst-openers-tp-orders/4", "the orders artefact's schema: re-run emit-tst-orders.py")
+    _need(set(od.get("no180") or {}) == {"orders", "plans"}, "the orders artefact has no no180 section")
+    for tag, sec, pairs in (("", od, True), ("no180 ", od["no180"], False)):
+        if not pairs:
+            _need(set(sec["orders"]) == set(od["orders"]) and set(sec["plans"]) == set(od["plans"]),
+                  "the no180 section's keys are not the 180 section's")
+        for key, v in sec["orders"].items():
+            n = v["n"]
+            _need(len(n) == 4 and 0 <= n[0] <= n[1] <= n[2] <= n[3] <= BAG, f"{tag}orders {key}: n must be non-decreasing in 0..5040")
+            if pairs:
+                _need(n[3] > 0, f"orders {key}: a live class no order builds")
+                _need(len(v["pairs"]) == 21 and all(0 <= a <= n[3] for a in v["pairs"]), f"orders {key}: a pair count out of 0..n_inf")
+            else:
+                _need("pairs" not in v, f"{tag}orders {key}: pairs")
+        for card, pl in sec["plans"].items():
+            _need(set(pl) == {"steps", "else", "open", "none"}, f"{tag}plan {card}: keys")
+            for i, rs, tot in pl["steps"]:
+                _need(f"{card}#{i}" in sec["orders"] and rs and tot == sum(n for _c, n in rs), f"{tag}plan {card}: step {i}")
+            _need(pl["else"] is None or f'{card}#{pl["else"][0]}' in sec["orders"], f"{tag}plan {card}: the else class")
+    return od
+
+
+def card_plan(od, r):
+    """The card's decision list for the island: {s: [[tile j, rules, total], ...], e: [tile j, n] or None, o: open,
+    z: none}, a class index read as its tile's position among the live classes. `od` is a section of the orders artefact:
+    the artefact itself (180 allowed) or its `no180` part."""
+    lv = live(r)
+    pl = od["plans"][r["name"]]
+    return dict(s=[[lv.index(i), rs, tot] for i, rs, tot in pl["steps"]],
+                e=[lv.index(pl["else"][0]), pl["else"][1]] if pl["else"] else None, o=pl["open"], z=pl["none"])
+
+
+_PERMS = None
+
+
+def order_perms():
+    """IOTSZJL's permutations in the counter's order (remove the i-th of the rest, recurse): order i of `w`."""
+    global _PERMS
+    if _PERMS is None:
+        out = []
+
+        def r(pre, rest):
+            if not rest:
+                out.append(pre)
+                return
+            for i in range(len(rest)):
+                r(pre + rest[i], rest[:i] + rest[i + 1:])
+        r("", "IOTSZJL")
+        _PERMS = out
+    return _PERMS
 
 
 # ------------------------------------------------------------------ figures
@@ -595,7 +659,7 @@ def counts_line(b, k, C):
     return C["counts"].format(bk=C["bk_" + k], cum=f"{cum:,}", n2=f"{N2:,}", p3n=f"{n:,}", p3d=f"{cum * BAG:,}")
 
 
-CL_KEYS = ("pcx_b3", "pcx_left", "pcx_deal3", "pcx_hold", "pcx_none3",
+CL_KEYS = ("od_title", "od_n", "od_n0", "od_held", "od_how", "od_before", "od_and", "od_count", "od_rmore", "od_note", "pl_title", "pl_if", "pl_or", "pl_then", "pl_else", "pl_always", "pl_open", "pl_none", "pl_here", "pl_tile", "pl_r180", "pl_n180", "pl_n180_note", "pl_n180_none", "pcx_b3", "pcx_left", "pcx_deal3", "pcx_hold", "pcx_none3",
            "cl_hint", "bo_title", "bo_note", "bo_b1", "bo_rest", "bo_tst", "bo_sd", "bo_step", "bo_first", "bo_prev", "bo_next",
            "bo_last", "bo_pc", "bo_pc_note", "bo_none", "bo_nobuild", "an_v3", "an_play", "an_pause", "an_speed",
            "an_slow", "an_mid", "an_fast", "an_seek", "an_clear", "an_left", "an_pcg", "an_pc_step", "an_pc_done", "an_static")
@@ -617,23 +681,32 @@ def px_entry(rows, left, ex):
                 b3=one(b3["deal"], [b3["deal"]], b3["h"], b3["plan"]) if b3 else None)
 
 
-def build_data(art, cat, R, PR, builds, pcxd, pt=None):
+def build_data(art, cat, R, PR, builds, pcxd, orders, pt=None):
     rk, od = rank_data(art, R)
     cards, px = {}, {}
     for n, (r, _p) in enumerate(R):
         s = cat[r["shapes"][r["classes"][shown_class(r)][0]]]
         lv = live(r)
-        bb, xx = [], []
+        bb, xx, oo, o1 = [], [], [], []
         for i in lv:
             si, left, p5 = r["classes"][i]
             b = builds.get(f'{r["name"]}#{i}')
             bb.append([[[k, list(c), sd] for k, c, sd in b["order"]], b["sd"]] if b else None)
             ln = class_line(cat, r, i)
             xx.append([tst_cells(cat[r["shapes"][si]]), ln, int(p5 >= BAG)])
+            ky = f'{r["name"]}#{i}'
+            nv = orders["orders"].get(ky, {}).get("n")
+            if nv:
+                oo.append([nv[0], nv[3], r["held"]])
+            else:
+                oo.append(None)
+            n1 = orders["no180"]["orders"].get(ky, {}).get("n")
+            o1.append([n1[0], n1[3], r["held"]] if n1 else None)
             if ln not in px:
                 px[ln] = px_entry(cat[r["shapes"][si]]["rows"], left, pcxd.get(ln))
         cards[r["name"]] = dict(tst=s["tst"], f=strings(r), rk={k: rk[k][n] for k in BK}, o={k: od[k][n] for k in BK},
-                                t=card_rows(cat, r), n1=len(r["pieces"]), b=bb, x=xx, kind=r["kind"],
+                                t=card_rows(cat, r), n1=len(r["pieces"]), b=bb, x=xx, d=oo, pl=card_plan(orders, r),
+                                d1=o1, pl1=card_plan(orders["no180"], r), kind=r["kind"],
                                 cnt={k: counts_line(r, k, PR["card"]) for k in BK})
         if pt is not None:
             cards[r["name"]]["ft"] = tstrings(r, pt[r["name"]])
@@ -1401,9 +1474,10 @@ def rule_loss_html(SP, r, e3, den3, den2):
 
 
 
-def render(art, cat, PR, pcxd, builds=None, L=None):
+def render(art, cat, PR, pcxd, builds=None, L=None, orders=None):
     builds = builds if builds is not None else load_builds()
     L = L if L is not None else load_sets()
+    orders = orders if orders is not None else load_orders()
     R, U = ranked(art, cat), unranked(art, cat)
     fm = fmt_for(art, cat, R, U)
     fm["mirror_state"] = PR["mirror_assumed" if art["mirror"]["assumed"] else "mirror_counted"]
@@ -1413,7 +1487,7 @@ def render(art, cat, PR, pcxd, builds=None, L=None):
     cards = "\n".join(card(rk0[n], r, m, cat, art, PR, pcxd, fam_block(r, m, fam, rkmap, cat, art, PR), L["pt"][r["name"]])
                        for n, (r, m) in enumerate(R))
     title = PR["title"] + RS.TITLE_MARK
-    data = json.dumps(build_data(art, cat, R, PR, builds, pcxd, L["pt"]), separators=(",", ":"), ensure_ascii=False).replace("</", "<\\/")
+    data = json.dumps(build_data(art, cat, R, PR, builds, pcxd, orders, L["pt"]), separators=(",", ":"), ensure_ascii=False).replace("</", "<\\/")
     with open(OP.CSS_PATH, encoding="utf-8") as f:
         css = f.read().strip("\n")
     with open(CSS_PATH, encoding="utf-8") as f:
@@ -1695,9 +1769,109 @@ def audit_layouts(art, bad):
                 bad.append(f"{tag}: the family PC counts are not monotone from budget {a} to {b2}")
 
 
-def audit(page, art, cat, PR, pcxd=None, builds=None, L=None):
+def audit_orders(island, R, orders):
+    """Each card's decision list and each live class's order line, re-read from the orders artefact by a second route.
+    From `w` (the set of orders that build a class, read against this module's own permutation table): its size is n_inf
+    and positive, the 21 pair counts are the artefact's, the island line is (n0, n_inf, held). The plan is walked with U,
+    the orders not yet decided, starting as every order some live class builds: `none` is the rest of the 5040; the
+    steps name live classes in increasing order; every rule is non-empty, valid (every order of U it matches builds the
+    step's class), minimal (dropping any precedence breaks that) and matches exactly its recorded number of orders of U,
+    which it then decides; a step's total is its rules' sum; the else class comes after every step and builds all of U;
+    `open` is what is left; and the island plan is the artefact's with classes read as tile positions. The no-180 section
+    (island `d1`, `pl1`) is audited the same way, without pair counts, with a class allowed no order at all, and every
+    order it builds a class with must build that class with 180 too."""
+    bad = []
+    P = order_perms()
+    pos = [{c: i for i, c in enumerate(o)} for o in P]
+    pre = {a + b: sum(1 << k for k in range(BAG) if pos[k][a] < pos[k][b]) for a in "IJLOSTZ" for b in "IJLOSTZ" if a != b}
+    full = (1 << BAG) - 1
+
+    def conj(c):
+        m = full
+        for q in c:
+            m &= pre[q]
+        return m
+    pc = lambda x: bin(x).count("1")
+    for r, _ in R:
+        c = island["cards"].get(r["name"], {})
+        lv = live(r)
+        w180 = {}
+        for sec, dk, pk, sname in ((orders, "d", "pl", ""), (orders["no180"], "d1", "pl1", " (no 180)")):
+            main = sec is orders
+            if len(c.get(dk) or []) != len(lv):
+                bad.append(f"island card {r['name']}{sname}: one order line per live class")
+                continue
+            ws = {}
+            for i, d in zip(lv, c[dk]):
+                v = sec["orders"].get(f'{r["name"]}#{i}')
+                tag = f"island card {r['name']} class {i}{sname}"
+                if not d or not v or len(d) != 3:
+                    bad.append(f"{tag}: no order line")
+                    continue
+                w = int.from_bytes(base64.b64decode(v["w"]), "little")
+                ni = v["n"][3]
+                if pc(w) != ni or (main and ni <= 0) or w & ~full:
+                    bad.append(f"{tag}: w is not the n_inf orders")
+                    continue
+                ws[i] = w
+                if main:
+                    w180[i] = w
+                    if [pc(w & pre[q]) for q in orders["pairs"]] != v["pairs"]:
+                        bad.append(f"{tag}: the pair counts are not w's")
+                elif i in w180 and w & ~w180[i]:
+                    bad.append(f"{tag}: an order builds the class without 180 but not with it")
+                if d != [v["n"][0], ni, r["held"]]:
+                    bad.append(f"{tag}: the order line is not (n0, n_inf, held)")
+            tag = f"island card {r['name']} plan{sname}"
+            pl = sec["plans"].get(r["name"])
+            if pl is None or len(ws) != len(lv):
+                bad.append(f"{tag}: no plan")
+                continue
+            U = 0
+            for w in ws.values():
+                U |= w
+            if pl["none"] != pc(full & ~U):
+                bad.append(f"{tag}: the never-built count")
+            last = -1
+            for i, rs, tot in pl["steps"]:
+                if i not in ws or lv.index(i) <= last:
+                    bad.append(f"{tag}: step class {i} is not a live class after the last step")
+                    continue
+                last = lv.index(i)
+                w = ws[i]
+                if not rs or tot != sum(n for _c, n in rs):
+                    bad.append(f"{tag}: step {i}'s total")
+                for cj, n in rs:
+                    if not cj or len(set(cj)) != len(cj) or len(cj) > 3 or any(q not in pre for q in cj):
+                        bad.append(f"{tag}: step {i} rule {cj} is malformed")
+                        continue
+                    m = conj(cj)
+                    if m & U & ~w:
+                        bad.append(f"{tag}: step {i} rule {','.join(cj)} matches an order that does not build the class")
+                        continue
+                    for q in cj:
+                        if len(cj) > 1 and not conj([x for x in cj if x != q]) & U & ~w:
+                            bad.append(f"{tag}: step {i} rule {','.join(cj)} is not minimal")
+                    if pc(m & U) != n or n <= 0:
+                        bad.append(f"{tag}: step {i} rule {','.join(cj)}'s count")
+                    U &= ~m
+            if pl["else"] is not None:
+                i, n = pl["else"]
+                if i not in ws or lv.index(i) <= last or U & ~ws[i] or n != pc(U):
+                    bad.append(f"{tag}: the else class does not build every order left")
+                else:
+                    U = 0
+            if pl["open"] != pc(U):
+                bad.append(f"{tag}: the open count")
+            if c.get(pk) != card_plan(sec, r):
+                bad.append(f"{tag}: the island plan is not the artefact's")
+    return bad
+
+
+def audit(page, art, cat, PR, pcxd=None, builds=None, L=None, orders=None):
     builds = builds if builds is not None else load_builds()
     L = L if L is not None else load_sets()
+    orders = orders if orders is not None else load_orders()
     pcxd = pcxd if pcxd is not None else load_pcx()
     bad = RP.audit_quarantine(page, [RS.EYEBROW, RS.NO_CLAIM, PR["quarantine"]], DATA_ID)
     bad += audit_sets(page, art, cat, PR, L)
@@ -1705,6 +1879,10 @@ def audit(page, art, cat, PR, pcxd=None, builds=None, L=None):
         bad.append("the note or the link to the reference page is missing")
     if set(page) & SIMPLIFIED:
         bad.append(f"the page carries simplified glyph(s) {sorted(set(page) & SIMPLIFIED)}")
+    # every prose key the script reads from D.cl must be one the island carries
+    used = set(re.findall(r"D\.cl\.(\w+)", page))
+    if used - set(CL_KEYS):
+        bad.append(f"the script reads prose key(s) {sorted(used - set(CL_KEYS))} the island does not carry")
     R, U = ranked(art, cat), unranked(art, cat)
     b1lib = bag1_library()
     th = threshold(art)
@@ -1928,11 +2106,12 @@ def audit(page, art, cat, PR, pcxd=None, builds=None, L=None):
             island = json.loads(m.group(1).replace("<\\/", "</"))
         except ValueError:
             island = None
-        if island != build_data(art, cat, R, PR, builds, pcxd, L["pt"]):
+        if island != build_data(art, cat, R, PR, builds, pcxd, orders, L["pt"]):
             bad.append("the data island is not what the artefact builds")
         if island:
             bad += audit_builds(island, R, cat, pcxd)
-        if island == build_data(art, cat, R, PR, builds, pcxd, L["pt"]):
+            bad += audit_orders(island, R, orders)
+        if island == build_data(art, cat, R, PR, builds, pcxd, orders, L["pt"]):
             for n, (r, _) in enumerate(R):
                 c = island["cards"][r["name"]]
                 if c["cnt"] != {k: ex_counts(r, k, PR["card"]) for k in BK}:
@@ -2337,6 +2516,7 @@ def selftest(repo=REPO):
     expect("a claim badge planted", page.replace("</h1>", '<span data-claim="C001">✓</span></h1>', 1), True)
     expect("a simplified glyph", page.replace("</h1>", "<p>实</p></h1>", 1), True)
     expect("an external request planted", page.replace("<style>", '<link rel="stylesheet" href="https://x.example/a.css"><style>', 1), True)
+    expect("the script reads a prose key the island does not carry", page.replace("D.cl.pl_r180", "D.cl.pl_r180x", 1), True)
     # 學邊幾個
     sxp = page[page.index('<section class="sx"'):page.index("</section>", page.index('<section class="sx"'))]
     expect("a ladder joint figure edited", sub(r'data-r="2:2"><td>[^<]*</td><td data-c="j">(\d)', bump), True)
@@ -2570,6 +2750,192 @@ def selftest(repo=REPO):
         except Exception:
             killed += 1
             print(f"  killed: {label}")
+    # the orders artefact and the order lines
+    odj = os.path.join(repo, "analysis", "tst-openers-tp-orders.json")
+    try:
+        bad_o = json.load(open(odj))
+        bad_o["md5"]["tst_openers_tp"] = "0" * 32
+        tmp = os.path.join(tempfile.mkdtemp(), "analysis")
+        os.makedirs(tmp)
+        json.dump(bad_o, open(os.path.join(tmp, "tst-openers-tp-orders.json"), "w"))
+        shutil.copy(os.path.join(repo, "analysis", "tst-openers-tp.json"), tmp)
+        load_orders(os.path.dirname(tmp))
+        survived += 1
+        print("  SURVIVED: a stale orders artefact", file=sys.stderr)
+    except Exception:
+        killed += 1
+        print("  killed: a stale orders artefact")
+    orders = load_orders(repo)
+    R = ranked(art, cat)
+    good = build_data(art, cat, R, PR, builds, pcxd, orders)
+    if audit_orders(good, R, orders):
+        survived += 1
+        print("  SURVIVED (control fails): the order lines as built", file=sys.stderr)
+
+    def island_mut(label, edit):
+        nonlocal killed, survived
+        isl = copy.deepcopy(good)
+        if edit(isl) is False:
+            print(f"  NOT PLANTED: {label}", file=sys.stderr)
+            survived += 1
+            return
+        if audit_orders(isl, R, orders):
+            killed += 1
+            print(f"  killed: {label}")
+        else:
+            survived += 1
+            print(f"  SURVIVED: {label}", file=sys.stderr)
+
+    def first(pred):
+        for nm, c in isl_iter(good):
+            for j, d in enumerate(c["d"]):
+                if pred(d):
+                    return nm, j
+        return None
+
+    def isl_iter(isl):
+        return [(r["name"], isl["cards"][r["name"]]) for r, _ in R]
+
+    def at(pred, f):
+        hit = first(pred)
+        if not hit:
+            return lambda isl: False
+        nm, j = hit
+        return lambda isl: f(isl["cards"][nm]["d"][j])
+    island_mut("n_inf edited", at(lambda d: True, lambda d: d.__setitem__(1, d[1] - 1)))
+    island_mut("n0 edited", at(lambda d: d[0] > 0, lambda d: d.__setitem__(0, d[0] - 1)))
+    island_mut("the held kind edited", at(lambda d: True, lambda d: d.__setitem__(2, "I" if d[2] != "I" else "O")))
+    island_mut("a plan step's tile moved", lambda isl: next((c["pl"]["s"][0].__setitem__(0, c["pl"]["s"][0][0] + 1)
+                                                          for _n, c in isl_iter(isl) if c["pl"]["s"]), False))
+    island_mut("a plan's else dropped", lambda isl: next((c["pl"].__setitem__("e", None)
+                                                         for _n, c in isl_iter(isl) if c["pl"]["e"]), False))
+
+    def art_mut(label, edit, sec=False):
+        nonlocal killed, survived
+        od = copy.deepcopy(orders)
+        S = od["no180"] if sec else od
+        label = label + (" (no 180)" if sec else "")
+        for card, pl in S["plans"].items():
+            if edit(pl, S, card) is not False:
+                break
+        else:
+            print(f"  NOT PLANTED: {label}", file=sys.stderr)
+            survived += 1
+            return
+        if audit_orders(build_data(art, cat, R, PR, builds, pcxd, od), R, od):
+            killed += 1
+            print(f"  killed: {label}")
+        else:
+            survived += 1
+            print(f"  SURVIVED: {label}", file=sys.stderr)
+    ranked_names = {r["name"] for r, _ in R}
+
+    def w_flip(pl, od, card):
+        if card not in ranked_names or not pl["steps"]:
+            return False
+        v = od["orders"][f'{card}#{pl["steps"][0][0]}']
+        w = bytearray(base64.b64decode(v["w"]))
+        w[0] ^= 1
+        v["w"] = base64.b64encode(bytes(w)).decode()
+
+    def r_pair(pl, od, card):  # a rule's precedence reversed: then it is invalid or its count moves
+        if card not in ranked_names or not pl["steps"]:
+            return False
+        rl = pl["steps"][0][1][0]
+        rl[0][0] = rl[0][0][::-1]
+
+    def r_count(pl, od, card):
+        if card not in ranked_names or not pl["steps"]:
+            return False
+        st = pl["steps"][0]
+        st[1][0][1] -= 1
+        st[2] -= 1
+
+    def r_extra(pl, od, card):  # a precedence added that the rule already implies: not minimal
+        if card not in ranked_names:
+            return False
+        for st in pl["steps"]:
+            for rl in st[1]:
+                if len(rl[0]) < 3:
+                    a, b = rl[0][0]
+                    x = next(k for k in "IJLOSTZ" if k not in (a, b))
+                    if a + x not in rl[0] and x + b not in rl[0]:
+                        rl[0] = rl[0] + [a + x, x + b] if len(rl[0]) == 1 else rl[0] + [a + x]
+                        if len(rl[0]) > 3:
+                            return False
+                        return
+        return False
+
+    def s_swap(pl, od, card):
+        if card not in ranked_names or len(pl["steps"]) < 2:
+            return False
+        pl["steps"][0], pl["steps"][1] = pl["steps"][1], pl["steps"][0]
+
+    def s_drop(pl, od, card):  # a step dropped: the else no longer builds everything left
+        if card not in ranked_names or not pl["steps"] or not pl["else"]:
+            return False
+        pl["steps"].pop(0)
+
+    def e_count(pl, od, card):
+        if card not in ranked_names or not pl["else"]:
+            return False
+        pl["else"][1] += 1
+
+    def e_class(pl, od, card):  # the else moved to an earlier live class that does not build all of what is left
+        if card not in ranked_names or not pl["else"] or not pl["steps"]:
+            return False
+        pl["else"][0] = pl["steps"][-1][0]
+
+    def o_count(pl, od, card):
+        if card not in ranked_names:
+            return False
+        pl["open"] += 1
+
+    def z_count(pl, od, card):
+        if card not in ranked_names:
+            return False
+        pl["none"] += 1
+    for sec in (False, True):
+        art_mut("a w bit flipped", w_flip, sec)
+        art_mut("a rule's precedence reversed", r_pair, sec)
+        art_mut("a rule's count edited", r_count, sec)
+        art_mut("a non-minimal rule", r_extra, sec)
+        art_mut("two steps swapped", s_swap, sec)
+        art_mut("a step dropped", s_drop, sec)
+        art_mut("the else count edited", e_count, sec)
+        art_mut("the else moved to a step's class", e_class, sec)
+        art_mut("the open count edited", o_count, sec)
+        art_mut("the never-built count edited", z_count, sec)
+
+    def no180_gains(pl, od, card):  # the no-180 w gains an order the 180 w lacks
+        if card not in ranked_names or not pl["steps"]:
+            return False
+        k = f'{card}#{pl["steps"][0][0]}'
+        w = int.from_bytes(base64.b64decode(orders["orders"][k]["w"]), "little")
+        miss = next((i for i in range(BAG) if not w >> i & 1), None)
+        if miss is None:
+            return False
+        v = od["orders"][k]
+        w0 = int.from_bytes(base64.b64decode(v["w"]), "little") | 1 << miss
+        v["w"] = base64.b64encode(w0.to_bytes(BAG // 8, "little")).decode()
+        v["n"] = [x + 1 for x in v["n"]]
+    art_mut("an order built without 180 but not with it", no180_gains, True)
+
+    def swap_sec(isl):  # the two sections' lines and plans swapped on a card where they differ
+        for _n, c in isl_iter(isl):
+            if c["d"] != c["d1"] and c["pl"] != c["pl1"]:
+                c["d"], c["d1"], c["pl"], c["pl1"] = c["d1"], c["d"], c["pl1"], c["pl"]
+                return
+        return False
+    island_mut("the 180 and no-180 lines swapped", swap_sec)
+    island_mut("a no-180 plan step's tile moved", lambda isl: next((c["pl1"]["s"][0].__setitem__(0, c["pl1"]["s"][0][0] + 1)
+                                                                  for _n, c in isl_iter(isl) if c["pl1"]["s"]), False))
+    island_mut("a no-180 n_inf edited", lambda isl: next((c["d1"][0].__setitem__(1, c["d1"][0][1] + 1)
+                                                         for _n, c in isl_iter(isl) if c["d1"] and c["d1"][0]), False))
+    expect("an order line edited in the orders artefact",
+           render(art, cat, PR, pcxd, None, L=Lsets, orders={**orders, "orders": {**orders["orders"], next(iter(orders["orders"])):
+                                                                  {**next(iter(orders["orders"].values())), "n": [0, 0, 0, 1]}}}),
+           True)
     print(f"selftest: {killed} killed, {survived} survived")
     return 1 if survived else 0
 

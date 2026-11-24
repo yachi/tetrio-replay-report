@@ -85,6 +85,8 @@ EXCLUDED = {
                                '`emit-tst-openers-tp.py --tsd`; its md5s are rechecked by that emitter\'s `--tsd-check`',
     'tst-openers-tp-builds.json': 'written by `python3 pipeline/sim/emit-tst-builds.py` (Python over the tst-build-rs '
                                   'binary, not a bun emitter); re-run and byte-compared by its own `--check`',
+    'tst-openers-tp-orders.json': 'written by `python3 pipeline/sim/emit-tst-orders.py` (Python over the tst-build-rs '
+                                  'binary in ORDERS mode, not a bun emitter); re-run and byte-compared by its own `--check`',
     'tst-openers-tp-pc-examples.json': 'written by `python3 pipeline/sim/emit-tst-pc-examples.py --tp` (Python over '
                                        'the tst-pcex-rs binary, not a bun emitter); re-run and byte-compared by its '
                                        'own `--tp --check`',
