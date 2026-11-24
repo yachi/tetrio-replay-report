@@ -180,12 +180,20 @@ function planInto(box, c, j, go, redraw) {
     if (rs) li.append(...ruleList(rs));
     ol.append(li);
   };
-  pl.s.forEach(([k, rs, tot], i) => step(i ? D.cl.pl_or : D.cl.pl_if, tot, k, rs));
-  if (pl.e) step(pl.s.length ? D.cl.pl_else : D.cl.pl_always, pl.e[1], pl.e[0], null);
+  if (pl.r.length) {
+    const li = el('li', 'od-s od-no'), h = el('p', 'od-h');
+    h.append(D.cl.pl_if + ' ', el('span', 'muted sm', D.cl.od_count.split('{n}').join(pl.r.reduce((t, [, n]) => t + n, 0))),
+      ' ' + D.cl.pl_nr);
+    li.append(h, ...ruleList(pl.r));
+    ol.append(li);
+  }
+  pl.s.forEach(([k, rs, tot], i) => step(i || pl.r.length ? D.cl.pl_or : D.cl.pl_if, tot, k, rs));
+  if (pl.e) step(pl.s.length || pl.r.length ? D.cl.pl_else : D.cl.pl_always, pl.e[1], pl.e[0], null);
   box.append(ol);
   if (!pl.s.some(([k]) => k === j) && !(pl.e && pl.e[0] === j)) box.append(el('p', 'muted sm', D.cl.pl_here));
   if (pl.o) box.append(el('p', 'muted sm', D.cl.pl_open.split('{n}').join(pl.o)));
   if (pl.z) box.append(el('p', 'muted sm', D.cl.pl_none.split('{n}').join(pl.z)));
+  if (pl.y) box.append(el('p', 'muted sm', D.cl.pl_none_open.split('{n}').join(pl.y)));
   const how = el('details', 'od-how'); how.append(el('summary', 'muted sm', D.cl.od_how), el('p', 'muted sm', D.cl.od_note));
   box.append(how);
 }

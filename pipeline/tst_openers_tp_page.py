@@ -219,7 +219,7 @@ def load_orders(repo=REPO):
         _need(od["md5"]["tst_openers_tp"] == hashlib.md5(f.read()).hexdigest(),
               "the orders artefact was built from another analysis/tst-openers-tp.json: re-run emit-tst-orders.py")
     _need(od["pairs"] == ["".join(p) for p in itertools.combinations("IJLOSTZ", 2)], "the orders artefact's pair list")
-    _need(od.get("schema") == "tst-openers-tp-orders/4", "the orders artefact's schema: re-run emit-tst-orders.py")
+    _need(od.get("schema") == "tst-openers-tp-orders/5", "the orders artefact's schema: re-run emit-tst-orders.py")
     _need(set(od.get("no180") or {}) == {"orders", "plans"}, "the orders artefact has no no180 section")
     for tag, sec, pairs in (("", od, True), ("no180 ", od["no180"], False)):
         if not pairs:
@@ -234,7 +234,8 @@ def load_orders(repo=REPO):
             else:
                 _need("pairs" not in v, f"{tag}orders {key}: pairs")
         for card, pl in sec["plans"].items():
-            _need(set(pl) == {"steps", "else", "open", "none"}, f"{tag}plan {card}: keys")
+            _need(set(pl) == {"nr", "steps", "else", "open", "none", "none_open"}, f"{tag}plan {card}: keys")
+            _need(all(c and n > 0 for c, n in pl["nr"]), f"{tag}plan {card}: a never-built rule")
             for i, rs, tot in pl["steps"]:
                 _need(f"{card}#{i}" in sec["orders"] and rs and tot == sum(n for _c, n in rs), f"{tag}plan {card}: step {i}")
             _need(pl["else"] is None or f'{card}#{pl["else"][0]}' in sec["orders"], f"{tag}plan {card}: the else class")
@@ -242,13 +243,15 @@ def load_orders(repo=REPO):
 
 
 def card_plan(od, r):
-    """The card's decision list for the island: {s: [[tile j, rules, total], ...], e: [tile j, n] or None, o: open,
-    z: none}, a class index read as its tile's position among the live classes. `od` is a section of the orders artefact:
+    """The card's decision list for the island: {r: never-built rules, s: [[tile j, rules, total], ...], e: [tile j, n]
+    or None, o: open, z: none, y: never-built orders no rule decides}, a class index read as its tile's position among
+    the live classes. `od` is a section of the orders artefact:
     the artefact itself (180 allowed) or its `no180` part."""
     lv = live(r)
     pl = od["plans"][r["name"]]
-    return dict(s=[[lv.index(i), rs, tot] for i, rs, tot in pl["steps"]],
-                e=[lv.index(pl["else"][0]), pl["else"][1]] if pl["else"] else None, o=pl["open"], z=pl["none"])
+    return dict(r=pl["nr"], s=[[lv.index(i), rs, tot] for i, rs, tot in pl["steps"]],
+                e=[lv.index(pl["else"][0]), pl["else"][1]] if pl["else"] else None, o=pl["open"], z=pl["none"],
+                y=pl["none_open"])
 
 
 _PERMS = None
@@ -659,7 +662,7 @@ def counts_line(b, k, C):
     return C["counts"].format(bk=C["bk_" + k], cum=f"{cum:,}", n2=f"{N2:,}", p3n=f"{n:,}", p3d=f"{cum * BAG:,}")
 
 
-CL_KEYS = ("od_title", "od_n", "od_n0", "od_held", "od_how", "od_before", "od_and", "od_count", "od_rmore", "od_note", "pl_title", "pl_if", "pl_or", "pl_then", "pl_else", "pl_always", "pl_open", "pl_none", "pl_here", "pl_tile", "pl_r180", "pl_n180", "pl_n180_note", "pl_n180_none", "pcx_b3", "pcx_left", "pcx_deal3", "pcx_hold", "pcx_none3",
+CL_KEYS = ("od_title", "od_n", "od_n0", "od_held", "od_how", "od_before", "od_and", "od_count", "od_rmore", "od_note", "pl_title", "pl_if", "pl_or", "pl_then", "pl_else", "pl_always", "pl_open", "pl_none", "pl_nr", "pl_none_open", "pl_here", "pl_tile", "pl_r180", "pl_n180", "pl_n180_note", "pl_n180_none", "pcx_b3", "pcx_left", "pcx_deal3", "pcx_hold", "pcx_none3",
            "cl_hint", "bo_title", "bo_note", "bo_b1", "bo_rest", "bo_tst", "bo_sd", "bo_step", "bo_first", "bo_prev", "bo_next",
            "bo_last", "bo_pc", "bo_pc_note", "bo_none", "bo_nobuild", "an_v3", "an_play", "an_pause", "an_speed",
            "an_slow", "an_mid", "an_fast", "an_seek", "an_clear", "an_left", "an_pcg", "an_pc_step", "an_pc_done", "an_static")
@@ -1773,11 +1776,13 @@ def audit_orders(island, R, orders):
     """Each card's decision list and each live class's order line, re-read from the orders artefact by a second route.
     From `w` (the set of orders that build a class, read against this module's own permutation table): its size is n_inf
     and positive, the 21 pair counts are the artefact's, the island line is (n0, n_inf, held). The plan is walked with U,
-    the orders not yet decided, starting as every order some live class builds: `none` is the rest of the 5040; the
-    steps name live classes in increasing order; every rule is non-empty, valid (every order of U it matches builds the
-    step's class), minimal (dropping any precedence breaks that) and matches exactly its recorded number of orders of U,
-    which it then decides; a step's total is its rules' sum; the else class comes after every step and builds all of U;
-    `open` is what is left; and the island plan is the artefact's with classes read as tile positions. The no-180 section
+    the orders not yet decided, starting as ALL 5040 (since 2026-11-24: a rule checked only against the buildable orders
+    handed orders no class builds to a class, and the else step said 「任何次序」 over them): `none` counts the orders no
+    live class builds; the never-built rules come first and each matches only such orders of U; the steps name live
+    classes in increasing order; every rule is non-empty, valid (every order of U it matches builds the step's class, or
+    for a never-built rule builds nothing), minimal (dropping any precedence breaks that) and matches exactly its recorded
+    number of orders of U, which it then decides; a step's total is its rules' sum; the else class comes after every step
+    and builds all of U; `open` is the buildable orders left, `none_open` the never-built ones left; and the island plan is the artefact's with classes read as tile positions. The no-180 section
     (island `d1`, `pl1`) is audited the same way, without pair counts, with a class allowed no order at all, and every
     order it builds a class with must build that class with 180 too."""
     bad = []
@@ -1827,11 +1832,27 @@ def audit_orders(island, R, orders):
             if pl is None or len(ws) != len(lv):
                 bad.append(f"{tag}: no plan")
                 continue
-            U = 0
+            B = 0
             for w in ws.values():
-                U |= w
-            if pl["none"] != pc(full & ~U):
+                B |= w
+            nb = full & ~B
+            if pl["none"] != pc(nb):
                 bad.append(f"{tag}: the never-built count")
+            U = full  # every order is undecided; no rule may hand an order to anything it does not build
+            for cj, n in pl["nr"]:
+                if not cj or len(set(cj)) != len(cj) or len(cj) > 3 or any(q not in pre for q in cj):
+                    bad.append(f"{tag}: never-built rule {cj} is malformed")
+                    continue
+                m = conj(cj)
+                if m & U & ~nb:
+                    bad.append(f"{tag}: never-built rule {','.join(cj)} matches an order some class builds")
+                    continue
+                for q in cj:
+                    if len(cj) > 1 and not conj([x for x in cj if x != q]) & U & ~nb:
+                        bad.append(f"{tag}: never-built rule {','.join(cj)} is not minimal")
+                if pc(m & U) != n or n <= 0:
+                    bad.append(f"{tag}: never-built rule {','.join(cj)}'s count")
+                U &= ~m
             last = -1
             for i, rs, tot in pl["steps"]:
                 if i not in ws or lv.index(i) <= last:
@@ -1861,8 +1882,10 @@ def audit_orders(island, R, orders):
                     bad.append(f"{tag}: the else class does not build every order left")
                 else:
                     U = 0
-            if pl["open"] != pc(U):
+            if pl["open"] != pc(U & B):
                 bad.append(f"{tag}: the open count")
+            if pl["none_open"] != pc(U & nb):
+                bad.append(f"{tag}: the never-built orders no rule decides")
             if c.get(pk) != card_plan(sec, r):
                 bad.append(f"{tag}: the island plan is not the artefact's")
     return bad
@@ -2895,7 +2918,33 @@ def selftest(repo=REPO):
         if card not in ranked_names:
             return False
         pl["none"] += 1
+    def nr_count(pl, od, card):
+        if card not in ranked_names or not pl["nr"]:
+            return False
+        pl["nr"][0][1] += 1
+
+    def nr_to_step(pl, od, card):  # the 2026-11-24 bug: a never-built rule handed to a class
+        if card not in ranked_names or not pl["nr"] or not pl["steps"]:
+            return False
+        rl = pl["nr"].pop(0)
+        pl["steps"][0][1].insert(0, rl)
+        pl["steps"][0][2] += rl[1]
+
+    def nr_drop(pl, od, card):  # a never-built rule dropped: its orders fall to the else, which said 任何次序 over them
+        if card not in ranked_names or not pl["nr"] or not pl["else"]:
+            return False
+        rl = pl["nr"].pop(0)
+        pl["else"][1] += rl[1]
+
+    def y_count(pl, od, card):
+        if card not in ranked_names:
+            return False
+        pl["none_open"] += 1
     for sec in (False, True):
+        art_mut("a never-built rule's count edited", nr_count, sec)
+        art_mut("a never-built rule moved into a class step", nr_to_step, sec)
+        art_mut("a never-built rule dropped into the else", nr_drop, sec)
+        art_mut("the undecided never-built count edited", y_count, sec)
         art_mut("a w bit flipped", w_flip, sec)
         art_mut("a rule's precedence reversed", r_pair, sec)
         art_mut("a rule's count edited", r_count, sec)

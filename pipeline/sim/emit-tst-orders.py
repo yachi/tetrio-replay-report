@@ -23,7 +23,10 @@ other side is n_inf minus it) and `w` (the set itself: bit i is order i, little-
 holds a decision list (yachi 2026-11-23: 「呢個組合先就砌呢個形，其他組合就砌另個形」): which class to build for which
 dealt orders, read best PC rate first; see `plan()`. A rule is a conjunction of at most RULE_MAX precedences "A dealt
 before B", minimal (no precedence can be dropped and it still hand only orders that build the class), picked by a greedy
-cover; the list is exact where `open` is 0. `no180` repeats `n`, `w` and `plans` with the binary run under `NO180=1`
+cover. Since 2026-11-24 (schema /5, yachi: 「make sure 其他地方都冇呢個bug class」) a rule is checked against EVERY order
+not yet decided, the ones no class builds included, and those orders are decided first by `nr` rules (→ 砌唔到): before,
+rules were checked only against the buildable orders, so a rule or the else step could cover orders that build nothing.
+The list is exact where `open` and `none_open` are 0. `no180` repeats `n`, `w` and `plans` with the binary run under `NO180=1`
 (the engine's search without the 180 rotation, for every bag-2 piece; bag 1 stands on the board as before), checked to be
 a subset of the 180 orders and never cheaper; the cum check does not apply to it. Nothing here is a corpus figure. `--check` re-runs it and fails unless the committed
 artefact is byte-identical.
@@ -189,50 +192,59 @@ def pc(x):
     return bin(x).count("1")
 
 
+def cover(pre, terms, R, ok, tgt):
+    """Greedy rules over R, the orders not yet decided: each a conjunction of at most RULE_MAX precedences every order of
+    R it matches is in `ok` (no exception, buildable or not), the one taking the most orders of `tgt` (fewest precedences,
+    then first, on a tie), cut to a minimal conjunction, until none takes any. Returns (rules, R left)."""
+    rs = []
+    while tgt:
+        best, bn = None, 0
+        for c, m in terms:
+            if m & R & ~ok:
+                continue
+            g = pc(m & tgt)
+            if g > bn or (g == bn and g and len(c) < len(best[0])):
+                best, bn = (c, m), g
+        if not best:
+            break
+        c = list(best[0])
+        for p in list(c):
+            d = [q for q in c if q != p]
+            if d and not conj(pre, d) & R & ~ok:
+                c = d
+        m = conj(pre, c)
+        rs.append([sorted(c), pc(m & tgt)])
+        R &= ~m
+        tgt &= ~m
+    return rs, R
+
+
 def plan(pre, terms, ws):
     """The card's decision list over its live classes `ws` = [(class index, w), ...] in the artefact's class order (best
-    PC rate first). U is the orders some class builds that no earlier step has decided (an order no class builds is lost
-    whatever is chosen, so a rule may take it). For each class in turn: when every order in U builds it, it is the last
-    step ("else") and the list ends; otherwise rules are picked greedily, each a conjunction of at most RULE_MAX
-    precedences whose orders in U all build the class, the one taking the most orders of U that build it (fewest
-    precedences, then first, on a tie), cut to a minimal conjunction (no precedence can be dropped and it stay one), until
-    none takes any. A rule is [precedences, how many orders of U it hands the class]; a step is [class index, rules, its
-    total]. open is the orders of U left when no class is the else; none is the orders no class builds."""
-    U = 0
+    PC rate first), read top to bottom over R, the orders no earlier step has decided (all 5040 at the start). First the
+    orders no class builds: rules (`nr`) every order of R they match builds nothing. Then each class in turn: when every
+    order in R builds it, it is the last step ("else") and the list ends; otherwise rules every order of R they match
+    builds the class. A rule never matches an order of R that does not do what it says, buildable or not (until
+    2026-11-24 a rule was checked only against the buildable orders, so it could match orders nothing builds). A rule is
+    [precedences, how many orders of R it decides]; a step is [class index, rules, its total]. open is the buildable
+    orders no step decides, none the orders no class builds, none_open those of them no `nr` rule decides."""
+    B = 0
     for _i, w in ws:
-        U |= w
-    none = pc(FULL & ~U)
+        B |= w
+    nb = FULL & ~B
+    nr, R = cover(pre, terms, FULL, nb, nb)
     steps, els = [], None
     for i, w in ws:
-        if not U:
+        if not R & B:
             break
-        if not U & ~w:
-            els = [i, pc(U)]
-            U = 0
+        if not R & ~w:
+            els = [i, pc(R)]
+            R = 0
             break
-        tgt, rs = w & U, []
-        while tgt:
-            best, bn = None, 0
-            for c, m in terms:
-                if m & U & ~w:
-                    continue
-                g = pc(m & tgt)
-                if g > bn or (g == bn and g and len(c) < len(best[0])):
-                    best, bn = (c, m), g
-            if not best:
-                break
-            c = list(best[0])
-            for p in list(c):
-                d = [q for q in c if q != p]
-                if d and not conj(pre, d) & U & ~w:
-                    c = d
-            m = conj(pre, c)
-            rs.append([sorted(c), pc(m & tgt)])
-            U &= ~m
-            tgt &= ~m
+        rs, R = cover(pre, terms, R, w, w & R)
         if rs:
             steps.append([i, rs, sum(n for _c, n in rs)])
-    return {"steps": steps, "else": els, "open": pc(U), "none": none}
+    return {"nr": nr, "steps": steps, "else": els, "open": pc(R & B), "none": pc(nb), "none_open": pc(R & nb)}
 
 
 def build():
@@ -278,7 +290,7 @@ def build():
     with open(ROOT / "analysis" / "tst-openers-tp.json", "rb") as f:
         tp = md5(f.read())
     return {
-        "schema": "tst-openers-tp-orders/4",
+        "schema": "tst-openers-tp-orders/5",
         "report_eligible": False,
         "constructed": True,
         "about": ("Per ranked card and live class of docs/tst-openers.html: of the 5040 dealt orders of bag 2 (bag 1 on the "
