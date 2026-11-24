@@ -15,7 +15,9 @@
         "<strong>守住領先。</strong>第三場開頭 5 比 0、之後 6 比 4，最後三局都輸<span class=\"badge\" data-claim=\"C013\"></span>；第二場 6 比 5 領先，最後兩局都輸<span class=\"badge\" data-claim=\"C012\"></span>。",
         "<strong>每粒要重啲。</strong>六場有五場每粒方塊嘅攻擊低過對手，你贏嗰第四場係例外<span class=\"badge\" data-claim=\"C017\"></span>。"
       ],
-      "sim_recs": []
+      "sim_recs": [
+        "<strong>基本的なドネイト（TSD）7 次接到 Tetris 1 次</strong>；有 4 次條井俾 I 以外嘅棋填咗——捐完個窿，留條井俾 I。迷走砲 36 局有 18 局行到第二巡。（<a href=\"basicdonating.html\">基本的なドネイト頁</a>有圖）"
+      ]
     },
     "pinglamb": {
       "tagline": "每粒重 · 最後幾局執",
@@ -28,7 +30,9 @@
         "<strong>第四場 4 比 7 輸</strong><span class=\"badge\" data-claim=\"C014\"></span>，係六場入面唯一一場每粒方塊嘅攻擊低過對手<span class=\"badge\" data-claim=\"C017\"></span>。",
         "<strong>第三場開頭 0 比 5</strong><span class=\"badge\" data-claim=\"C013\"></span>，靠尾段追返；嗰場總攻擊少 15 條都贏<span class=\"badge\" data-claim=\"C018\"></span>。"
       ],
-      "sim_recs": []
+      "sim_recs": [
+        "<strong>基本的なドネイト（TSD）7 次接到 Tetris 1 次</strong>；冇接到嗰 6 次全部係條井俾 I 以外嘅棋填咗。迷走砲 48 局有 40 局行到第二巡。（<a href=\"basicdonating.html\">基本的なドネイト頁</a>有圖）"
+      ]
     }
   },
   "versus_note": "逐場計，六場有五場係總攻擊多嗰個贏，例外係第三場<span class=\"badge\" data-claim=\"C018\"></span>。每粒方塊嘅攻擊，六場有五場 pinglamb 高，例外係 yachi 贏嘅第四場<span class=\"badge\" data-claim=\"C017\"></span>。"
