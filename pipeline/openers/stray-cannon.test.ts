@@ -26,7 +26,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
    '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22',
-   '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24']);
+   '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25']);
 
 /** Bag 1 matched the 6-lock field, the lock-7 piece was NOT the (mirror-aware) bag-1 Z: a hold. */
 const Z_HOLD_BAG1 = [
@@ -68,6 +68,8 @@ const TST_DONATE_CASES = [
   '2026-11-17 m2r1 yachi',      // mirrored; 2.normal_OS at lock 12, the TST donate at 19, prefix 30
   '2026-11-17 m2r2 pinglamb',   // 2.normal_OS at lock 12, the TST donate at 19, prefix 90
   '2026-11-17 m2r5 pinglamb',   // 2.normal_OS at lock 12, the TST donate at 19, prefix 137
+  '2026-11-25 m2r2 pinglamb',
+  '2026-11-25 m2r8 pinglamb',
 ];
 /** 8-line PCs that are not on the page, named with the node they stop under. */
 const PC_OFF_PAGE = [
@@ -115,9 +117,9 @@ const PC_GARBAGE_IN_WINDOW: string[] = [];
 // 2.normal_OS (all under its own) and 1 to 2.normal_SO (under its own), three entries to
 // TST_DONATE_CASES (m2r1, m2r2, m2r5) and one to PC_OFF_PAGE (m1r3).
 const CONDITIONS = {
-  '2.ideal': { '2.ideal': 523, '2.normal_OS': 76, '2.normal_SO': 22 },
-  '2.normal_OS': { '2.ideal': 1, '2.normal_OS': 179, '2.normal_SO': 28 },
-  '2.normal_SO': { '2.ideal': 15, '2.normal_OS': 1, '2.normal_SO': 57 },
+  '2.ideal': { '2.ideal': 553, '2.normal_OS': 76, '2.normal_SO': 23 },
+  '2.normal_OS': { '2.ideal': 1, '2.normal_OS': 184, '2.normal_SO': 31 },
+  '2.normal_SO': { '2.ideal': 16, '2.normal_OS': 1, '2.normal_SO': 58 },
   '2.i_early': { '2.normal_OS': 1 },
 };
 

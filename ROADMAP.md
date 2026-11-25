@@ -194,12 +194,13 @@ generated claim's truth is impossible without it, and both are falsifiable somew
 | 2026-11-19 | 11/15 testable = **73%** | 9/15 = **60%** | 9/15 = **60%** | 3 |
 | 2026-11-23 | 14/18 testable = **78%** | 12/18 = **67%** | 12/18 = **67%** | 3 |
 | 2026-11-24 | 13/17 testable = **76%** | 11/17 = **65%** | 11/17 = **65%** | 3 |
+| 2026-11-25 | 12/16 testable = **75%** | 10/16 = **62%** | 10/16 = **62%** | 3 |
 
 Every cell is measured, and gated on push — see "Gating equiv.py coverage" below for what
 that replaced. Claims no mutation can falsify are reported separately rather than counted
 as covered.
 
-**The ≥85% acceptance gate this phase set is not met by <!--equiv:gate-count-->nineteen of the 26<!--/equiv:gate-count--> sessions**, and
+**The ≥85% acceptance gate this phase set is not met by <!--equiv:gate-count-->twenty of the 27<!--/equiv:gate-count--> sessions**, and
 2026-07-22 — the session it was declared on — is one of them, at 81% rather than the 85%
 recorded here for three weeks. That figure was a seeded draw; enumerating every
 perturbation kind settles it lower. The gate is therefore restated as a measurement rather
@@ -210,8 +211,8 @@ the fragment two lines above it moved every time. Re-derive it from the corpus, 
 
 2026-07-28 is the session where the two families' distinction bites: 10/10 = 100% on single
 values, 6/10 = 60% under `--two-site`, because all four of its windowed claims survive every
-single-value change. It is not an isolated artefact — <!--equiv:sf-match-->21 of the 26<!--/equiv:sf-match--> sessions lose
-coverage under the second family at `match` granularity (and <!--equiv:sf-round-->22 of the 26<!--/equiv:sf-round-->
+single-value change. It is not an isolated artefact — <!--equiv:sf-match-->22 of the 27<!--/equiv:sf-match--> sessions lose
+coverage under the second family at `match` granularity (and <!--equiv:sf-round-->23 of the 27<!--/equiv:sf-round-->
 at `round`), and every claim that drops is a windowed or per-match one. See README's "Where this metric breaks down".
 
 **Bugs this phase's own gates caught**

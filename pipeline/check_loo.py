@@ -667,12 +667,23 @@ PUBLISHED = (
     #     app_gap_lost    +1.8026 pp   m1r7 -> +3.4311  rel 0.903  1.01x
     ("2026-11-24", "app_gap_won", "series"),
     ("2026-11-24", "app_gap_lost", "series"),
+    # 2026-11-25 takes ONE `ANNOTATED` entry, the won-regime gap. Over 62 rounds:
+    #     app_gap_won     +2.7400 pp   m3r2 -> +0.5659  rel 0.793  1.23x the next of 62
+    #     app_gap_lost    +8.6071 pp  m1r13 -> +6.0113  rel 0.302  1.46x
+    ("2026-11-25", "app_gap_won", "series"),
+    ("2026-11-25", "app_gap_lost", "series"),
 )
 
 # The named exception list: every (session, figure) already investigated, with the reason it
 # crosses. Named, not a raised threshold — a sixth case must be looked at, and a case that
 # stops crossing must be taken off the list and out of the prose.
 ANNOTATED = {
+    ("2026-11-25", "app_gap_won"): (
+        "the won-regime gap is +2.7400 pp and m3r2 alone takes it to +0.5659 — NARROWER, by "
+        "2.1741, the sign surviving. m3r2 is the night's longest round (about 226 s, 208 lines), "
+        "a round yachi won at .5433 attack per piece over 335 pieces, 10.5% of his 3193-piece "
+        "winning-round pool; without that low-efficiency long win his winning rounds sit almost "
+        "level with pinglamb's. `rel` 0.793, the next round 1.23x below it."),
     ("2026-11-24", "app_gap_lost"): (
         "the lost-regime gap is +1.8026 pp and m1r7 alone takes it to +3.4311 — WIDER, by "
         "1.6285, the 08-14 / 09-10 direction. m1r7 is a round yachi lost at .6700 attack per "
