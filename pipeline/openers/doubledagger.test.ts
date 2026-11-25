@@ -39,7 +39,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24']);
 const ART_PATH = `${import.meta.dir}/../../analysis/doubledagger-facts.json`;
 const TR = JSON.parse(readFileSync(DOUBLEDAGGER.transcriptionPath, 'utf8'));
 const H = 40;
@@ -91,7 +91,7 @@ const GARBAGE_IN_WINDOW: string[] = [
 const DOUBLEDAGGER_IN_OPENER: string[] = [];
 const RECON_DROPPED_TSD: string[] = [];
 /** window_off_board, per player: a count with a property check, not a list (see the header). */
-const WINDOW_OFF_BOARD = { pinglamb: 1791, yachi: 1784 };
+const WINDOW_OFF_BOARD = { pinglamb: 1858, yachi: 1848 };
 
 /** The one SDPC Spin round that reached the second C-Spin build (`3.second`), measured over the bag harddrop
  *  draws the Double Dagger boards in. */
@@ -100,8 +100,8 @@ const SDPC_SECOND_ROUNDS: string[] = [
 ];
 
 /** Per player: the opportunity (scored full TSDs), split at the 0-based opener window. */
-const TSD_DENOM = { pinglamb: { all: 7206, in_opener: 1408, mid_game: 5798 },
-                    yachi: { all: 6508, in_opener: 1663, mid_game: 4845 } };
+const TSD_DENOM = { pinglamb: { all: 7471, in_opener: 1456, mid_game: 6015 },
+                    yachi: { all: 6765, in_opener: 1715, mid_game: 5050 } };
 /** Per player: hits, their split, the mirrored ones, the follow-ups that fired. */
 const HITS = { pinglamb: { all: 33, in_opener: 0, mid_game: 33, mirrored: 20, garbage_in_window: 7 },
                yachi: { all: 19, in_opener: 0, mid_game: 19, mirrored: 14, garbage_in_window: 4 } };
@@ -110,16 +110,16 @@ const FOLLOWUP_FIRED = { pinglamb: 29, yachi: 12 };
 const CONTROLS = {
   under: { TSS: { pinglamb: 3, yachi: 2 }, TST: { pinglamb: 0, yachi: 0 },
            mini_TSS: { pinglamb: 0, yachi: 0 }, mini_TSD: { pinglamb: 0, yachi: 0 } },
-  ablation: { no_must_empty: { pinglamb: 4341, yachi: 3745 }, no_roof: { pinglamb: 33, yachi: 19 },
+  ablation: { no_must_empty: { pinglamb: 4507, yachi: 3901 }, no_roof: { pinglamb: 33, yachi: 19 },
               t_overlap: { pinglamb: 46, yachi: 20 } },
-  orientation_baseline: { pinglamb: 69, yachi: 93 },
+  orientation_baseline: { pinglamb: 70, yachi: 97 },
 };
 /** What discriminates, measured: full TSDs (not only hits) whose anchored T meets ONE part of the window —
  *  the two cleared rows, the overhang row above them, or the lower slot under them. The lower slot alone gives
  *  exactly the headline's hits; the cleared rows (entailed by the clear) and the overhang row (which a TSD slot
  *  nearly always has) admit almost every full TSD. The overhang still has work to do: it is what tells the two
  *  hands apart (the `noRoof` mutant makes a lock match both, and the matcher refuses it). */
-const PART_ONLY = { cleared: 13552, overhang: 13548, lower: 52 };
+const PART_ONLY = { cleared: 14069, overhang: 14065, lower: 52 };
 
 /** Measured byte-identical on this corpus, each for its reason; asserted to STAY identical. */
 const EQUIVALENT: Record<string, string> = {
@@ -178,7 +178,7 @@ test('quarantined: report_eligible false, no claim ids', () => {
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
   const n = checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT);
-  expect(n).toBe(19461);
+  expect(n).toBe(20210);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 
@@ -342,7 +342,7 @@ test('cross-check: the SDPC Spin round that reached the second C-Spin build, ove
 test('the follow-up row map is verified against the engine at every step it uses', () => {
   const c = art().check;
   expect(c.rowmap_unverified).toBe(34);
-  expect(c.rowmap_steps).toBe(343241);
+  expect(c.rowmap_steps).toBe(357822);
   expect(art().hits.every((h: any) => h.followup.reason !== 'rowmap_unverified')).toBe(true);
 });
 

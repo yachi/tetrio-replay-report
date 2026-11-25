@@ -138,6 +138,11 @@
     "session": "2026-11-23",
     "replays_md5": "6443f8868544148a4488f99285809387",
     "replay_facts_md5": "29e18f7f2d2b590b40befdf756b29e90"
+   },
+   {
+    "session": "2026-11-24",
+    "replays_md5": "d45f5f1d57ce97e1f68d02f347ab5b88",
+    "replay_facts_md5": "9a89ade6a1b22dfe2ae887d41ce6b393"
    }
   ],
   "transcription_md5": "7c9656d3a527eda70995c8054fa9ebed",
@@ -168,7 +173,8 @@
   "2026-11-05",
   "2026-11-17",
   "2026-11-19",
-  "2026-11-23"
+  "2026-11-23",
+  "2026-11-24"
  ],
  "window_pieces": 21,
  "window_rule": "0-based lock index <= 21 is in_opener (emit-opener-facts.ts's convention; emit-attack-facts.ts counts from 1)",
@@ -176,24 +182,24 @@
  "denominators": {
   "pinglamb": {
    "TSD": {
-    "all": 7206,
-    "in_opener": 1408,
-    "mid_game": 5798
+    "all": 7471,
+    "in_opener": 1456,
+    "mid_game": 6015
    },
    "TSS": {
-    "all": 835,
-    "in_opener": 113,
-    "mid_game": 722
+    "all": 860,
+    "in_opener": 117,
+    "mid_game": 743
    },
    "TST": {
-    "all": 1859,
-    "in_opener": 1813,
+    "all": 1935,
+    "in_opener": 1889,
     "mid_game": 46
    },
    "mini_TSS": {
-    "all": 432,
-    "in_opener": 16,
-    "mid_game": 416
+    "all": 457,
+    "in_opener": 17,
+    "mid_game": 440
    },
    "mini_TSD": {
     "all": 0,
@@ -202,28 +208,28 @@
    },
    "other_scored": 0,
    "recon_disagreed": 0,
-   "unscored_past_prefix": 918
+   "unscored_past_prefix": 952
   },
   "yachi": {
    "TSD": {
-    "all": 6508,
-    "in_opener": 1663,
-    "mid_game": 4845
+    "all": 6765,
+    "in_opener": 1715,
+    "mid_game": 5050
    },
    "TSS": {
-    "all": 1370,
-    "in_opener": 320,
-    "mid_game": 1050
+    "all": 1407,
+    "in_opener": 335,
+    "mid_game": 1072
    },
    "TST": {
-    "all": 1144,
-    "in_opener": 1080,
-    "mid_game": 64
+    "all": 1198,
+    "in_opener": 1131,
+    "mid_game": 67
    },
    "mini_TSS": {
-    "all": 107,
-    "in_opener": 10,
-    "mid_game": 97
+    "all": 117,
+    "in_opener": 12,
+    "mid_game": 105
    },
    "mini_TSD": {
     "all": 0,
@@ -232,14 +238,14 @@
    },
    "other_scored": 0,
    "recon_disagreed": 0,
-   "unscored_past_prefix": 627
+   "unscored_past_prefix": 647
   }
  },
  "check": {
-  "tspin_clears_scored": 19461,
-  "reconstruction_agreed": 19461,
+  "tspin_clears_scored": 20210,
+  "reconstruction_agreed": 20210,
   "reconstruction_disagreed": 0,
-  "rowmap_steps": 343241,
+  "rowmap_steps": 357822,
   "rowmap_unverified": 34,
   "by_session": {
    "2026-07-22": {
@@ -441,6 +447,14 @@
      "pinglamb": 449,
      "yachi": 389
     }
+   },
+   "2026-11-24": {
+    "tspin_clears": 749,
+    "reconstruction_disagreed": 0,
+    "players": {
+     "pinglamb": 391,
+     "yachi": 358
+    }
    }
   }
  },
@@ -448,18 +462,18 @@
   "shachikutrain": {
    "hits_by_player": {
     "pinglamb": {
-     "all": 49,
+     "all": 50,
      "in_opener": 2,
-     "mid_game": 47,
-     "mirrored": 29,
+     "mid_game": 48,
+     "mirrored": 30,
      "garbage_in_window": 35
     },
     "yachi": {
-     "all": 75,
+     "all": 78,
      "in_opener": 3,
-     "mid_game": 72,
-     "mirrored": 33,
-     "garbage_in_window": 35
+     "mid_game": 75,
+     "mirrored": 35,
+     "garbage_in_window": 38
     }
    },
    "followup_by_player": {
@@ -467,16 +481,16 @@
      "fired": 19,
      "not_fired": {
       "next_t_elsewhere": 2,
-      "slot_filled_before_t": 26,
+      "slot_filled_before_t": 27,
       "t_in_slot_not_tsd": 2
      }
     },
     "yachi": {
-     "fired": 28,
+     "fired": 29,
      "not_fired": {
       "next_t_elsewhere": 8,
       "round_ended": 3,
-      "slot_filled_before_t": 31,
+      "slot_filled_before_t": 33,
       "t_in_slot_not_tsd": 5
      }
     }
@@ -502,21 +516,21 @@
     },
     "ablation": {
      "no_must_empty": {
-      "pinglamb": 1190,
-      "yachi": 990
+      "pinglamb": 1232,
+      "yachi": 1038
      },
      "no_roof": {
-      "pinglamb": 440,
-      "yachi": 505
+      "pinglamb": 453,
+      "yachi": 527
      },
      "t_overlap": {
-      "pinglamb": 84,
-      "yachi": 94
+      "pinglamb": 86,
+      "yachi": 97
      }
     },
     "orientation_baseline": {
-     "pinglamb": 69,
-     "yachi": 93
+     "pinglamb": 70,
+     "yachi": 97
     }
    }
   }
@@ -536,7 +550,7 @@
    "pinglamb": {
     "qualified": 0,
     "not_qualified": {
-     "dpc": 13,
+     "dpc": 14,
      "fragment": 35,
      "garbage_in_shape": 35,
      "kaidan_window": 27
@@ -546,9 +560,9 @@
     "qualified": 1,
     "not_qualified": {
      "dpc": 7,
-     "fragment": 55,
-     "garbage_in_shape": 35,
-     "kaidan_window": 43
+     "fragment": 58,
+     "garbage_in_shape": 38,
+     "kaidan_window": 45
     }
    }
   }
@@ -678,7 +692,11 @@
    "2026-11-23 m3r6 pinglamb lock 27 (mirrored)",
    "2026-11-23 m4r7 yachi lock 117 (mirrored)",
    "2026-11-23 m5r4 yachi lock 240",
-   "2026-11-23 m6r5 pinglamb lock 131 (mirrored)"
+   "2026-11-23 m6r5 pinglamb lock 131 (mirrored)",
+   "2026-11-24 m1r7 yachi lock 78",
+   "2026-11-24 m2r4 yachi lock 89 (mirrored)",
+   "2026-11-24 m4r11 pinglamb lock 27 (mirrored)",
+   "2026-11-24 m5r8 yachi lock 85 (mirrored)"
   ],
   "followup_not_fired": [
    "2026-07-22 m3r1 yachi lock 41 (t_in_slot_not_tsd at lock 46)",
@@ -757,7 +775,10 @@
    "2026-11-23 m3r6 pinglamb lock 27 (slot_filled_before_t at lock 30)",
    "2026-11-23 m4r7 yachi lock 117 (slot_filled_before_t at lock 118)",
    "2026-11-23 m5r4 yachi lock 240 (t_in_slot_not_tsd at lock 247)",
-   "2026-11-23 m6r5 pinglamb lock 131 (next_t_elsewhere at lock 133)"
+   "2026-11-23 m6r5 pinglamb lock 131 (next_t_elsewhere at lock 133)",
+   "2026-11-24 m1r7 yachi lock 78 (slot_filled_before_t at lock 79)",
+   "2026-11-24 m2r4 yachi lock 89 (slot_filled_before_t at lock 90)",
+   "2026-11-24 m4r11 pinglamb lock 27 (slot_filled_before_t at lock 29)"
   ],
   "garbage_in_window": [
    "2026-07-22 m4r4 yachi lock 110",
@@ -829,7 +850,10 @@
    "2026-11-23 m3r1 pinglamb lock 43",
    "2026-11-23 m4r7 yachi lock 117",
    "2026-11-23 m5r4 yachi lock 240",
-   "2026-11-23 m6r5 pinglamb lock 131"
+   "2026-11-23 m6r5 pinglamb lock 131",
+   "2026-11-24 m1r7 yachi lock 78",
+   "2026-11-24 m2r4 yachi lock 89",
+   "2026-11-24 m5r8 yachi lock 85"
   ],
   "shachikutrain_in_opener": [
    "2026-08-19 m10r5 yachi lock 16",
@@ -964,7 +988,11 @@
    "2026-11-23 m3r6 pinglamb lock 27 (dpc)",
    "2026-11-23 m4r7 yachi lock 117 (fragment, garbage_in_shape, kaidan_window)",
    "2026-11-23 m5r4 yachi lock 240 (fragment, garbage_in_shape)",
-   "2026-11-23 m6r5 pinglamb lock 131 (fragment, garbage_in_shape, kaidan_window)"
+   "2026-11-23 m6r5 pinglamb lock 131 (fragment, garbage_in_shape, kaidan_window)",
+   "2026-11-24 m1r7 yachi lock 78 (fragment, garbage_in_shape)",
+   "2026-11-24 m2r4 yachi lock 89 (fragment, garbage_in_shape, kaidan_window)",
+   "2026-11-24 m4r11 pinglamb lock 27 (dpc)",
+   "2026-11-24 m5r8 yachi lock 85 (fragment, garbage_in_shape, kaidan_window)"
   ],
   "window_off_board": [
    "2026-07-22 m1r2 yachi lock 88",
@@ -3248,7 +3276,94 @@
    "2026-11-23 m7r1 yachi lock 75",
    "2026-11-23 m7r9 pinglamb lock 80",
    "2026-11-23 m7r9 pinglamb lock 166",
-   "2026-11-23 m7r9 yachi lock 25"
+   "2026-11-23 m7r9 yachi lock 25",
+   "2026-11-24 m1r1 pinglamb lock 78",
+   "2026-11-24 m1r1 yachi lock 12",
+   "2026-11-24 m1r5 pinglamb lock 59",
+   "2026-11-24 m1r5 pinglamb lock 108",
+   "2026-11-24 m1r5 yachi lock 50",
+   "2026-11-24 m1r7 pinglamb lock 149",
+   "2026-11-24 m1r7 pinglamb lock 243",
+   "2026-11-24 m1r7 pinglamb lock 293",
+   "2026-11-24 m1r7 yachi lock 289",
+   "2026-11-24 m1r8 pinglamb lock 114",
+   "2026-11-24 m1r8 pinglamb lock 170",
+   "2026-11-24 m1r8 yachi lock 148",
+   "2026-11-24 m1r9 yachi lock 108",
+   "2026-11-24 m1r9 pinglamb lock 60",
+   "2026-11-24 m1r9 pinglamb lock 114",
+   "2026-11-24 m1r9 pinglamb lock 123",
+   "2026-11-24 m1r10 pinglamb lock 54",
+   "2026-11-24 m2r3 pinglamb lock 23",
+   "2026-11-24 m2r4 pinglamb lock 37",
+   "2026-11-24 m2r4 pinglamb lock 82",
+   "2026-11-24 m2r5 yachi lock 25",
+   "2026-11-24 m2r6 pinglamb lock 111",
+   "2026-11-24 m2r6 yachi lock 147",
+   "2026-11-24 m2r7 yachi lock 42",
+   "2026-11-24 m2r7 pinglamb lock 68",
+   "2026-11-24 m2r7 pinglamb lock 81",
+   "2026-11-24 m2r7 pinglamb lock 103",
+   "2026-11-24 m2r7 pinglamb lock 109",
+   "2026-11-24 m2r12 pinglamb lock 40",
+   "2026-11-24 m2r12 yachi lock 30",
+   "2026-11-24 m3r1 pinglamb lock 51",
+   "2026-11-24 m3r1 pinglamb lock 68",
+   "2026-11-24 m3r3 yachi lock 40",
+   "2026-11-24 m3r3 yachi lock 72",
+   "2026-11-24 m3r3 yachi lock 137",
+   "2026-11-24 m3r3 yachi lock 156",
+   "2026-11-24 m3r3 yachi lock 193",
+   "2026-11-24 m3r3 yachi lock 197",
+   "2026-11-24 m3r4 yachi lock 13",
+   "2026-11-24 m3r4 yachi lock 60",
+   "2026-11-24 m3r6 pinglamb lock 14",
+   "2026-11-24 m3r6 pinglamb lock 22",
+   "2026-11-24 m3r8 pinglamb lock 25",
+   "2026-11-24 m3r11 pinglamb lock 134",
+   "2026-11-24 m4r1 pinglamb lock 44",
+   "2026-11-24 m4r2 pinglamb lock 36",
+   "2026-11-24 m4r3 pinglamb lock 166",
+   "2026-11-24 m4r4 yachi lock 32",
+   "2026-11-24 m4r7 yachi lock 13",
+   "2026-11-24 m4r7 yachi lock 33",
+   "2026-11-24 m4r7 yachi lock 39",
+   "2026-11-24 m4r7 yachi lock 50",
+   "2026-11-24 m4r7 pinglamb lock 45",
+   "2026-11-24 m4r8 pinglamb lock 44",
+   "2026-11-24 m4r8 pinglamb lock 66",
+   "2026-11-24 m4r9 pinglamb lock 30",
+   "2026-11-24 m4r9 pinglamb lock 79",
+   "2026-11-24 m4r9 pinglamb lock 144",
+   "2026-11-24 m4r9 yachi lock 88",
+   "2026-11-24 m4r10 yachi lock 77",
+   "2026-11-24 m4r11 yachi lock 177",
+   "2026-11-24 m4r11 pinglamb lock 49",
+   "2026-11-24 m4r11 pinglamb lock 58",
+   "2026-11-24 m5r1 yachi lock 30",
+   "2026-11-24 m5r2 yachi lock 52",
+   "2026-11-24 m5r3 pinglamb lock 64",
+   "2026-11-24 m5r3 pinglamb lock 113",
+   "2026-11-24 m5r3 pinglamb lock 187",
+   "2026-11-24 m5r3 yachi lock 133",
+   "2026-11-24 m5r3 yachi lock 183",
+   "2026-11-24 m5r4 pinglamb lock 82",
+   "2026-11-24 m5r5 yachi lock 48",
+   "2026-11-24 m5r8 yachi lock 90",
+   "2026-11-24 m6r1 pinglamb lock 39",
+   "2026-11-24 m6r3 yachi lock 80",
+   "2026-11-24 m6r4 pinglamb lock 45",
+   "2026-11-24 m6r4 pinglamb lock 54",
+   "2026-11-24 m6r6 pinglamb lock 33",
+   "2026-11-24 m6r7 yachi lock 154",
+   "2026-11-24 m6r9 pinglamb lock 60",
+   "2026-11-24 m6r10 yachi lock 39",
+   "2026-11-24 m6r12 pinglamb lock 45",
+   "2026-11-24 m6r12 pinglamb lock 73",
+   "2026-11-24 m6r13 pinglamb lock 207",
+   "2026-11-24 m6r13 yachi lock 32",
+   "2026-11-24 m6r13 yachi lock 39",
+   "2026-11-24 m6r13 yachi lock 207"
   ],
   "recon_dropped_tsd": []
  },
@@ -3376,6 +3491,10 @@
   {"session":"2026-11-23","file":"replay-2026-11-23-03.ttrm","round_index0":5,"match":3,"round":6,"player":"pinglamb","variant":"shachikutrain","lock":27,"in_opener":false,"mirrored":true,"garbage_in_window":false,"window_letters":["....SS","JJ...S","JZZ.OO","J.ZZOO"],"verified_to":53,"followup":{"lock":30,"fired":false,"reason":"slot_filled_before_t"},"qualifies":false,"not_qualified":["dpc"]},
   {"session":"2026-11-23","file":"replay-2026-11-23-04.ttrm","round_index0":6,"match":4,"round":7,"player":"yachi","variant":"shachikutrain","lock":117,"in_opener":false,"mirrored":true,"garbage_in_window":true,"window_letters":["....SS","ZZ...S","ZZZ.LL","G.GGGG"],"verified_to":158,"followup":{"lock":118,"fired":false,"reason":"slot_filled_before_t"},"qualifies":false,"not_qualified":["fragment","garbage_in_shape","kaidan_window"]},
   {"session":"2026-11-23","file":"replay-2026-11-23-05.ttrm","round_index0":3,"match":5,"round":4,"player":"yachi","variant":"shachikutrain","lock":240,"in_opener":false,"mirrored":false,"garbage_in_window":true,"window_letters":["SS....","S...LL","GG.GGG","GGGG.G"],"verified_to":268,"followup":{"lock":247,"fired":false,"reason":"t_in_slot_not_tsd"},"qualifies":false,"not_qualified":["fragment","garbage_in_shape"]},
-  {"session":"2026-11-23","file":"replay-2026-11-23-06.ttrm","round_index0":4,"match":6,"round":5,"player":"pinglamb","variant":"shachikutrain","lock":131,"in_opener":false,"mirrored":true,"garbage_in_window":true,"window_letters":["....SS","ZZ...S","GGG.GG","G.GGGG"],"verified_to":261,"followup":{"lock":133,"fired":false,"reason":"next_t_elsewhere"},"qualifies":false,"not_qualified":["fragment","garbage_in_shape","kaidan_window"]}
+  {"session":"2026-11-23","file":"replay-2026-11-23-06.ttrm","round_index0":4,"match":6,"round":5,"player":"pinglamb","variant":"shachikutrain","lock":131,"in_opener":false,"mirrored":true,"garbage_in_window":true,"window_letters":["....SS","ZZ...S","GGG.GG","G.GGGG"],"verified_to":261,"followup":{"lock":133,"fired":false,"reason":"next_t_elsewhere"},"qualifies":false,"not_qualified":["fragment","garbage_in_shape","kaidan_window"]},
+  {"session":"2026-11-24","file":"replay-2026-11-24-01.ttrm","round_index0":6,"match":1,"round":7,"player":"yachi","variant":"shachikutrain","lock":78,"in_opener":false,"mirrored":false,"garbage_in_window":true,"window_letters":["ZZ....","Z...LO","OO.JJJ","GGGG.G"],"verified_to":289,"followup":{"lock":79,"fired":false,"reason":"slot_filled_before_t"},"qualifies":false,"not_qualified":["fragment","garbage_in_shape"]},
+  {"session":"2026-11-24","file":"replay-2026-11-24-02.ttrm","round_index0":3,"match":2,"round":4,"player":"yachi","variant":"shachikutrain","lock":89,"in_opener":false,"mirrored":true,"garbage_in_window":true,"window_letters":["....ZZ","LL...Z","SST.JJ","G.GGGG"],"verified_to":115,"followup":{"lock":90,"fired":false,"reason":"slot_filled_before_t"},"qualifies":false,"not_qualified":["fragment","garbage_in_shape","kaidan_window"]},
+  {"session":"2026-11-24","file":"replay-2026-11-24-04.ttrm","round_index0":10,"match":4,"round":11,"player":"pinglamb","variant":"shachikutrain","lock":27,"in_opener":false,"mirrored":true,"garbage_in_window":false,"window_letters":["....SS","JJ...S","JZZ.OO","J.ZZOO"],"verified_to":178,"followup":{"lock":29,"fired":false,"reason":"slot_filled_before_t"},"qualifies":false,"not_qualified":["dpc"]},
+  {"session":"2026-11-24","file":"replay-2026-11-24-05.ttrm","round_index0":7,"match":5,"round":8,"player":"yachi","variant":"shachikutrain","lock":85,"in_opener":false,"mirrored":true,"garbage_in_window":true,"window_letters":["....JJ","ST...S","STT.SS","G.GGGG"],"verified_to":94,"followup":{"lock":90,"fired":true,"reason":null},"qualifies":false,"not_qualified":["fragment","garbage_in_shape","kaidan_window"]}
  ]
 }

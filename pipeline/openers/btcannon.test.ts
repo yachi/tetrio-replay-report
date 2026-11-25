@@ -44,7 +44,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24']);
 const ART_PATH = `${import.meta.dir}/../../analysis/btcannon-facts.json`;
 const TR = JSON.parse(readFileSync(BTCANNON.transcriptionPath, 'utf8'));
 const H = 40;
@@ -56,27 +56,27 @@ const GARBAGE_IN_WINDOW: string[] = [];
 const BTCANNON_IN_OPENER: string[] = [];
 const RECON_DROPPED_TSD: string[] = [];
 /** window_off_board, per player: a count with a property check, not a list (see the header). */
-const WINDOW_OFF_BOARD = { pinglamb: 935, yachi: 667 };
+const WINDOW_OFF_BOARD = { pinglamb: 968, yachi: 693 };
 
 /** Per player: the opportunity (scored full TSDs), split at the 0-based opener window. */
-const TSD_DENOM = { pinglamb: { all: 7206, in_opener: 1408, mid_game: 5798 },
-                    yachi: { all: 6508, in_opener: 1663, mid_game: 4845 } };
+const TSD_DENOM = { pinglamb: { all: 7471, in_opener: 1456, mid_game: 6015 },
+                    yachi: { all: 6765, in_opener: 1715, mid_game: 5050 } };
 const HITS = { pinglamb: { all: 0, in_opener: 0, mid_game: 0, mirrored: 0, garbage_in_window: 0 },
                yachi: { all: 0, in_opener: 0, mid_game: 0, mirrored: 0, garbage_in_window: 0 } };
 /** The controls (the same window at other spins; the ablations; the orientation baseline). */
 const CONTROLS = {
   under: { TSS: { pinglamb: 0, yachi: 0 }, TST: { pinglamb: 0, yachi: 0 },
            mini_TSS: { pinglamb: 0, yachi: 0 }, mini_TSD: { pinglamb: 0, yachi: 0 } },
-  ablation: { no_must_empty: { pinglamb: 0, yachi: 0 }, no_roof: { pinglamb: 671, yachi: 528 },
+  ablation: { no_must_empty: { pinglamb: 0, yachi: 0 }, no_roof: { pinglamb: 698, yachi: 546 },
               t_overlap: { pinglamb: 0, yachi: 34 } },
-  orientation_baseline: { pinglamb: 69, yachi: 93 },
+  orientation_baseline: { pinglamb: 70, yachi: 97 },
 };
 /** What discriminates, measured: full TSDs whose anchored T meets ONE part of the window. `above` is rows 0-3
  *  (the TST's overhang, the cell over the slot, the TST slot beside the cell over the T's middle, the roof), of
  *  which `overhang` is rows 0-1 and `tst_side` rows 2-3; `cleared` the two rows the TSD clears; `below` the TST
  *  slot's bottom cell and its two walls. No full TSD of the corpus has the rows above the T as the page draws
  *  them, and that alone is the headline's zero: the `no_roof` ablation (the window less those rows) is `below`. */
-const PART_ONLY = { above: 0, overhang: 79, tst_side: 0, cleared: 13552, below: 1199 };
+const PART_ONLY = { above: 0, overhang: 85, tst_side: 0, cleared: 14069, below: 1244 };
 
 /** Measured byte-identical on this corpus, each for its reason; asserted to STAY identical. */
 const EQUIVALENT: Record<string, string> = {
@@ -160,7 +160,7 @@ test('quarantined: report_eligible false, no claim ids', () => {
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
   const n = checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT);
-  expect(n).toBe(19461);
+  expect(n).toBe(20210);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 
@@ -301,7 +301,7 @@ test('STMB Cave and Double Dagger are not this: anchored on the same flat T, the
 test('the follow-up row map is verified against the engine at every step it uses', () => {
   const c = art().check;
   expect(c.rowmap_unverified).toBe(34);
-  expect(c.rowmap_steps).toBe(343241);
+  expect(c.rowmap_steps).toBe(357822);
 });
 
 test('mutants: each rule turned off turns this red with its own symptom, or is named equivalent', () => {

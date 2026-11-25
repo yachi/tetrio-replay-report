@@ -28,7 +28,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
    '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22',
-   '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23']);
+   '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24']);
 const H = 40, W = 10;
 
 let DIGESTS: TechDigest[] | null = null;
@@ -146,6 +146,11 @@ const MATCHED: [string, string, boolean, boolean][] = [
   ['2026-11-23 m3r7 pinglamb @27', 'p07.000', false, false],
   ['2026-11-23 m5r4 pinglamb @27', 'p07.000', false, true],
   ['2026-11-23 m7r6 pinglamb @27', 'p07.000', false, false],
+  ['2026-11-24 m1r8 pinglamb @27', 'p07.000', false, true],
+  ['2026-11-24 m2r9 pinglamb @27', 'p07.000', false, true],
+  ['2026-11-24 m3r12 pinglamb @27', 'p07.000', false, false],
+  ['2026-11-24 m4r11 pinglamb @27', 'p01.000', false, true],
+  ['2026-11-24 m5r2 pinglamb @27', 'p01.000', false, false],
 ];
 
 /** 社畜トレイン hits its qualifier calls `dpc` that are NOT a case here, with the reason */

@@ -1,0 +1,142 @@
+{
+  "schema": "forecast-facts/10",
+  "report_eligible": false,
+  "not_eligible_because": [
+    "simulator-derived: no second independent implementation (dual-extractor rule unmet)",
+    "the simulator fails its own full gate; only verified prefixes are used",
+    "no effect at any unit: round AUC p=1.000, player-level p=0.449"
+  ],
+  "unit": "player-aggregate (all rounds pooled); per-round is unreliable by measurement, not by assumption",
+  "gate": "frame+amount+row (ige row oracle must agree)",
+  "board_source": "triangle-oracle (vendored @haelp/teto, byte-identical)",
+  "simulator_configs_for_range": [
+    "triangle-oracle"
+  ],
+  "players": [
+    {
+      "user": "pinglamb",
+      "tspin_triples_game_stats": 77,
+      "tspin_doubles_game_stats": 288,
+      "rounds_played": 72,
+      "verified_tspins": 367,
+      "admitted_lineclearing_tspins": 391,
+      "tspins_excluded_untucked": 24,
+      "tspins_excluded_no_snapshot": 0,
+      "tspins_excluded_zero_clear": 5,
+      "forecast_garbage": 0,
+      "forecast_lineclear": 0,
+      "path_opened": 0,
+      "self_built": 165,
+      "unattributed": 0,
+      "mechanism_established": 0,
+      "forecast_total": 0,
+      "clause2_undecided": 0,
+      "rejected_by": {
+        "counted": 0,
+        "floor_arrived_later": 0,
+        "closing_clear_was_spin": 0,
+        "floor_arrived_later_and_closing_clear_was_spin": 0,
+        "floor_undecidable": 0,
+        "floor_undecidable_and_closing_clear_was_spin": 0
+      },
+      "floor_pre_existed": 317,
+      "floor_arrived_later": 30,
+      "floor_undetermined": 20,
+      "reactive": 202,
+      "forecast_rate_x1000": 0,
+      "sampling_ci95_lo_x1000": 0,
+      "sampling_ci95_hi_x1000": 11,
+      "simulator_range_lo_x1000": 0,
+      "simulator_range_hi_x1000": 0,
+      "verified_placements": 6223,
+      "total_placements": 7148
+    },
+    {
+      "user": "yachi",
+      "tspin_triples_game_stats": 54,
+      "tspin_doubles_game_stats": 271,
+      "rounds_played": 72,
+      "verified_tspins": 349,
+      "admitted_lineclearing_tspins": 358,
+      "tspins_excluded_untucked": 9,
+      "tspins_excluded_no_snapshot": 0,
+      "tspins_excluded_zero_clear": 10,
+      "forecast_garbage": 0,
+      "forecast_lineclear": 1,
+      "path_opened": 0,
+      "self_built": 145,
+      "unattributed": 0,
+      "mechanism_established": 1,
+      "forecast_total": 1,
+      "clause2_undecided": 0,
+      "rejected_by": {
+        "counted": 1,
+        "floor_arrived_later": 0,
+        "closing_clear_was_spin": 0,
+        "floor_arrived_later_and_closing_clear_was_spin": 0,
+        "floor_undecidable": 0,
+        "floor_undecidable_and_closing_clear_was_spin": 0
+      },
+      "floor_pre_existed": 298,
+      "floor_arrived_later": 21,
+      "floor_undetermined": 30,
+      "reactive": 203,
+      "forecast_rate_x1000": 2,
+      "sampling_ci95_lo_x1000": 0,
+      "sampling_ci95_hi_x1000": 16,
+      "simulator_range_lo_x1000": 2,
+      "simulator_range_hi_x1000": 3,
+      "verified_placements": 6596,
+      "total_placements": 7433
+    }
+  ],
+  "session": {
+    "player_rounds": 144,
+    "verified_placements": 12819,
+    "total_placements": 14581,
+    "coverage_x1000": 879
+  },
+  "statistics": {
+    "round": {
+      "metric": "forecast rate",
+      "auc_x1000": 490,
+      "wins": 0,
+      "losses": 1,
+      "ties": 49,
+      "decided": 1,
+      "exact_p_x1000": 1000
+    },
+    "event": {
+      "forecast_n": 1,
+      "reactive_n": 302,
+      "attack": null,
+      "lines": null,
+      "balance": {
+        "stack_height": null,
+        "garbage_pressure": null
+      },
+      "negative_control": null
+    },
+    "player": {
+      "user": "pinglamb",
+      "k": 0,
+      "n": 1,
+      "expected_x1000": 551,
+      "exact_p_x1000": 449
+    },
+    "reliability": {
+      "split_half_r_x1000": {
+        "pinglamb": null,
+        "yachi": null
+      },
+      "scorable_rounds": {
+        "pinglamb": 66,
+        "yachi": 56
+      },
+      "rounds_for_r70": {
+        "pinglamb": null,
+        "yachi": null
+      }
+    }
+  }
+}

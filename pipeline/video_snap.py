@@ -102,10 +102,20 @@ def signal(video):
 
 
 def gos(sig):
-    """Video times (s) of every GO: both queues jump after QUIET_S of both standing still."""
+    """Video times (s) of every GO: both queues jump after QUIET_S of both standing still.
+
+    One queue may jump one sample after the other (2026-11-24 m5r2: the left NEXT box moved a
+    quarter second after the right one); the GO is the first sample either queue moved.
+    """
     q = round(QUIET_S * FPS)
-    return [i * STEP for i in range(q, len(sig))
-            if min(sig[i]) >= HI and all(max(s) < LO for s in sig[i - q:i])]
+    out = []
+    for i in range(q, len(sig)):
+        if max(sig[i]) < HI or not all(max(s) < LO for s in sig[i - q:i]):
+            continue
+        nxt = sig[i + 1] if i + 1 < len(sig) else sig[i]
+        if all(max(a, b) >= HI for a, b in zip(sig[i], nxt)):
+            out.append(i * STEP)
+    return out
 
 
 def _nearest(events, t, tol):
@@ -281,6 +291,16 @@ def selftest():
         noisy[i] = (noisy[i][0], 0.5)   # one queue box sees nothing: wrong layout
     if gos(noisy):
         bad.append("a GO was found with one NEXT box never moving")
+    stag = _synthetic(starts, lengths)
+    i0 = round(starts[3] * FPS)
+    stag[i0] = (0.5, 20.0)              # the left queue moves one sample late
+    stag[i0 + 1] = (20.0, 0.5)
+    if i0 * STEP not in gos(stag):
+        bad.append("a GO with the two queues one sample apart was not found")
+    stag[i0 + 1] = (0.5, 0.5)           # ... but never at all: no GO
+    stag[i0 + 2] = (0.5, 0.5)
+    if i0 * STEP in gos(stag):
+        bad.append("a GO was found where only one queue moved")
     for b in bad:
         print("FAIL", b)
     print(f"{'ok ' if not bad else 'FAIL'} video_snap selftest: 11-17 rebuilt from a synthetic "

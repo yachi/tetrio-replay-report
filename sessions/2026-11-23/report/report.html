@@ -2054,7 +2054,7 @@
   <div class="wrap">
     <div class="eyebrow">最癲一局 · THE ROUND BOTH SWUNG HARDEST</div>
     <h2 class="section-title">全晚打得最癲嘅一局：第 3 場第 1 局</h2>
-    <p class="section-lede">呢一局係成晚<strong>兩邊 VS 加埋最高</strong>嗰局（淨係計打足一分鐘以上嘅局）。25 個 session 以來都係咁：<strong>局打得越癲，越係清走（清垃圾）快嗰個贏，攻擊多唔多反而冇咁準</strong>。將 1822 局按「兩邊 VS 加埋」由低到高分三份，睇每粒棋清走邊個多就估邊個贏，準確度由 65.3% 升到 70.7% 再升到 74.2%，攻擊同 APM 冇呢個升勢。下面呢一局係個例子，唔係證據；點計摺埋喺最尾。</p>
+    <p class="section-lede">呢一局係成晚<strong>兩邊 VS 加埋最高</strong>嗰局（淨係計打足一分鐘以上嘅局）。26 個 session 以來都係咁：<strong>局打得越癲，越係清走（清垃圾）快嗰個贏，攻擊多唔多反而冇咁準</strong>。將 1894 局按「兩邊 VS 加埋」由低到高分三份，睇每粒棋清走邊個多就估邊個贏，準確度由 65.6% 升到 70.8% 再升到 73.8%，攻擊同 APM 冇呢個升勢。下面呢一局係個例子，唔係證據；點計摺埋喺最尾。</p>
 <style>
 #intense-round .rc-fig { margin: 1.2rem 0 0; }
 #intense-round .rc-svg { display: block; width: 100%; height: auto; overflow: visible; }
@@ -2105,9 +2105,9 @@
     <p class="ir-split"><strong>每粒棋攻擊</strong>：yachi 約 0.851、pinglamb 約 0.677；<strong>每粒棋清走</strong>：yachi 約 0.308、pinglamb 約 0.291。</p>
     <p class="ir-split">yachi 嘅 VS ＝ 攻 約 120.8 ＋ 清垃圾 約 43.8；pinglamb 嘅 VS ＝ 攻 約 98.5 ＋ 清垃圾 約 42.4。VS 唔淨係攻擊——<strong>清走幾多垃圾都計埋落去</strong>，所以一個攻少啲但清得快好多嘅人，VS 可以高過對面。呢個拆法係<strong>喺呢批數據度睇返出嚟</strong>嘅，唔係邊度公佈過嘅公式，所以 claim 證嘅係「兩邊加埋同實際 VS 相差唔超過幾多」，<strong>唔係「等於」</strong>。</p>
     <details class="ir-method"><summary>點計（撳開）</summary>
-    <p class="ir-note">個升勢嘅 Spearman rho ＋0.144。個發現係「一路升」同埋佢自己個控制唔跟住升，唔係個 p 值：啲局係喺同一場、同一晚、同兩個人身上打出嚟，唔係獨立嘅，所以呢度每個 p 都偏細。（旁證：raw p 0.0001，成個 family 26 個測試，Bonferroni 校正後 0.0001；Bonferroni 係 m × p，兩個數都印咗，驗得返。）表入面每個數都係由 claim 本身證嗰條式度攞返嚟，唔係喺呢度重新計一次；每粒嘅兩個率係用「乘返上去」嘅方式證嘅——claim 裏面冇除數，所以比較係 <code>甲×乙嘅粒數</code> 對 <code>乙×甲嘅粒數</code>，印出嚟嗰三個位就係個界證住嘅數。</p>
+    <p class="ir-note">個升勢嘅 Spearman rho ＋0.138。個發現係「一路升」同埋佢自己個控制唔跟住升，唔係個 p 值：啲局係喺同一場、同一晚、同兩個人身上打出嚟，唔係獨立嘅，所以呢度每個 p 都偏細。（旁證：raw p 0.0001，成個 family 26 個測試，Bonferroni 校正後 0.0001；Bonferroni 係 m × p，兩個數都印咗，驗得返。）表入面每個數都係由 claim 本身證嗰條式度攞返嚟，唔係喺呢度重新計一次；每粒嘅兩個率係用「乘返上去」嘅方式證嘅——claim 裏面冇除數，所以比較係 <code>甲×乙嘅粒數</code> 對 <code>乙×甲嘅粒數</code>，印出嚟嗰三個位就係個界證住嘅數。</p>
     <p class="ir-note">讀呢節要記住：<strong>呢度得一局</strong>。一局可以話畀你聽「有件事發生咗」，<strong>話唔到你聽「呢個人一向係咁」</strong>。開頭嗰個清走升勢係成個 corpus 嘅結果，<strong>唔係呢一局證出嚟</strong>；呢一局淨係做個例子，話畀你睇件事點樣發生。兩者邊個都唔證明到對方——成晚嘅走勢喺「數據對決」嗰節，逐局嘅原始數字喺「逐局全數據」。另外，表入面呢兩欄係<strong>一出一入</strong>，唔好溝埋：<strong>送出</strong>係佢掟出去嗰啲，<strong>食</strong>係抵銷完之後真係跌落佢塊板嗰啲。「逐局全數據」嗰邊仲有個<strong>射埋</strong>，嗰個係對面掟過嚟、排緊隊未 cancel 嗰啲——呢張表冇呢一欄。</p>
-    <p class="ir-note">個升勢查咗兩樣嘢先敢寫：一，<strong>唔係局長效應</strong>——同一個測試改成對住局嘅長度，rho 得 ＋0.039（raw p 0.0998，校正後 1.0000），即係乜都冇；反而 APM 同攻擊嗰種「越癲越唔準」嘅樣，先至係局長效應（rho −0.163 同 −0.168，校正後 0.0001 同 0.0001）——所以呢節以前用攻擊做主打嗰句，其實撐唔住。二，<strong>唔係「垃圾掟多咗、輸嗰個死咗冇得清」</strong>——除返收到幾多垃圾之後個升勢仲強（rho ＋0.263），而「食」呢個帶住同一個死亡偏差、但唔帶技術嘅數，冇升勢（rho ＋0.110，raw p 0.0001，校正後 0.0001）。不過個偏差本身係真嘅，唔好當佢唔存在：<strong>清走同食對輸嗰個嚟講係有偏差嘅</strong>，因為佢死嗰陣塊板上面嗰啲垃圾，按定義就係冇清到。呢啲數全部由 <code>analysis/corpus_stats.py</code> 度返嚟、<code>pipeline/check_intense_corpus.py</code> 睇住，唔係打上去嘅。</p>
+    <p class="ir-note">個升勢查咗兩樣嘢先敢寫：一，<strong>唔係局長效應</strong>——同一個測試改成對住局嘅長度，rho 得 ＋0.036（raw p 0.1171，校正後 1.0000），即係乜都冇；反而 APM 同攻擊嗰種「越癲越唔準」嘅樣，先至係局長效應（rho −0.165 同 −0.170，校正後 0.0001 同 0.0001）——所以呢節以前用攻擊做主打嗰句，其實撐唔住。二，<strong>唔係「垃圾掟多咗、輸嗰個死咗冇得清」</strong>——除返收到幾多垃圾之後個升勢仲強（rho ＋0.263），而「食」呢個帶住同一個死亡偏差、但唔帶技術嘅數，冇升勢（rho ＋0.108，raw p 0.0001，校正後 0.0001）。不過個偏差本身係真嘅，唔好當佢唔存在：<strong>清走同食對輸嗰個嚟講係有偏差嘅</strong>，因為佢死嗰陣塊板上面嗰啲垃圾，按定義就係冇清到。呢啲數全部由 <code>analysis/corpus_stats.py</code> 度返嚟、<code>pipeline/check_intense_corpus.py</code> 睇住，唔係打上去嘅。</p>
     </details>
     <p class="ir-note">Claim：G080 · G081 · G082 · G083 · G084 · G085 · G086 ✓</p>
   </div>
@@ -2983,7 +2983,7 @@
         <div class="sr-cid">G015 · ✓ Dafny 已證</div>
       </div>
     </div>
-    <p class="sr-foot">APM／VS 呢類 <strong>速率</strong>紀錄只計打足 60 秒嘅局。速率係「攻擊 ÷ 時間」，局數愈短分母愈細，個數就愈飄——25個 session 夾埋 3644 個 player-round 度量過：VS 嘅標準差由 63.0（約 17 秒嗰批）跌到 14.4（約 155 秒嗰批），足足細咗 4.3 倍；同一段路平均數反而由 97 升到 119，即係短局唔止唔係打得好啲，仲要係量得唔準好多。未設限之前，25個 session 嗰 75 項速率紀錄入面，有 70 項落喺該場 session 最短嗰四分一嘅局度。<strong>清行數、spike、combo、B2B、T-spin 呢類「計數」紀錄照計全部局</strong>——短局入面塞得落更多，係難咗唔係易咗。分析喺 <code>analysis/rate_records.R</code>。</p>
+    <p class="sr-foot">APM／VS 呢類 <strong>速率</strong>紀錄只計打足 60 秒嘅局。速率係「攻擊 ÷ 時間」，局數愈短分母愈細，個數就愈飄——26個 session 夾埋 3788 個 player-round 度量過：VS 嘅標準差由 63.0（約 17 秒嗰批）跌到 14.5（約 155 秒嗰批），足足細咗 4.3 倍；同一段路平均數反而由 97 升到 120，即係短局唔止唔係打得好啲，仲要係量得唔準好多。未設限之前，26個 session 嗰 78 項速率紀錄入面，有 73 項落喺該場 session 最短嗰四分一嘅局度。<strong>清行數、spike、combo、B2B、T-spin 呢類「計數」紀錄照計全部局</strong>——短局入面塞得落更多，係難咗唔係易咗。分析喺 <code>analysis/rate_records.R</code>。</p>
     <p class="sr-foot">另外有 1 條紀錄類 claim（G021）嘅講法唔係「某一局某個數係幾多」，冇做成格仔，要睇就去下面嘅證明附錄。</p>
   </div>
 </section>
