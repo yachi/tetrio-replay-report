@@ -179,6 +179,10 @@
  * NOT RE-MEASURED 2026-11-19 either: the twenty-fourth session adds ONE candidate (clearAlone
  * 60 -> 61, `formed`) and no member; ACCESS_CLASS is unchanged.
  *
+ * NOT RE-MEASURED 2026-11-25, and the SET moved again: the twenty-seventh session adds ONE
+ * candidate (clearAlone 64 -> 65, `access`), the class's NINTH member (replay-2026-11-25-05.ttrm r4
+ * lock 17). Every count measured against the eight-member list is void until re-run, as above.
+ *
  * NOT RE-MEASURED 2026-11-17 either. The twenty-third session adds TWO candidates (clearAlone
  * 58 -> 60, both `formed`) and no member; ACCESS_CLASS still holds the eight entries of 2026-11-05
  * and the set test passed unchanged with the new session on disk.
@@ -403,6 +407,16 @@ const ACCESS_CLASS: Member[] = [
   // events is still too few to call any of it anything.
   { session: '2026-11-05', file: 'replay-2026-11-05-08.ttrm', round: 6, user: 'yachi',
     lock: 28, step: 27, mechanism: 'access', kind: 'path_opened' },
+  // THE NINTH, from 2026-11-25 — the twenty-seventh session in date order AND in arrival, after
+  // three sessions (11-17 through 11-24) that added candidates and no member. Found by the sweep:
+  // the engine calls it `access` and this file's replica agrees (the disagreements test passes with
+  // it on disk). Unlike the eight above, it was NOT measured by the scratch counterfactual probe on
+  // this pass — no causing-piece / control-row table — so nothing here says which piece raised
+  // availability or whether the row-deletion controls rule out the artefact. Read against what held
+  // at eight: yachi (now 8 of 9). Its lock, 17, is inside the opener window (0-based locks 0-21),
+  // the first member there; whether that matters is not measured either.
+  { session: '2026-11-25', file: 'replay-2026-11-25-05.ttrm', round: 4, user: 'yachi',
+    lock: 17, step: 15, mechanism: 'access', kind: 'path_opened' },
 ];
 
 const key = (m: Member) =>
@@ -526,7 +540,7 @@ test('the class does not exist beyond the verified prefixes either', () => {
  *  which is `finesse-counters.test.ts`'s lesson arriving here: a test name cannot fail, so a name
  *  carrying figures is a 冇第二份 figure with a green build next to it. Derived from the same
  *  constants the assertions use, it moves when they do. */
-const DECOMP = { clearAlone: 64, formed: 36, overdetermined: 20, access: 8 };
+const DECOMP = { clearAlone: 65, formed: 36, overdetermined: 20, access: 9 };
 
 test(`the ${DECOMP.clearAlone} candidates decompose ${DECOMP.formed} formed / `
    + `${DECOMP.overdetermined} overdetermined / ${DECOMP.access} access, and nothing else`, () => {
@@ -631,6 +645,7 @@ test(`the ${DECOMP.clearAlone} candidates decompose ${DECOMP.formed} formed / `
   // 2026-11-19 adds 1 `formed` (clearAlone 60 -> 61, formed 35 -> 36); no access member.
   // 2026-11-23 adds 1 `overdetermined` (clearAlone 61 -> 62, overdetermined 17 -> 18); no access member.
   // 2026-11-24 adds 2 `overdetermined` (clearAlone 62 -> 64, overdetermined 18 -> 20); no access member.
+  // 2026-11-25 adds 1 `access` (clearAlone 64 -> 65, access 8 -> 9): ACCESS_CLASS's ninth member.
   expect(result.clearAlone).toBe(DECOMP.clearAlone);
   expect(result.formed).toBe(DECOMP.formed);
   expect(result.overdetermined).toBe(DECOMP.overdetermined);
@@ -660,6 +675,6 @@ test('the sweep reached the corpus it claims to have swept', () => {
   // count against a pin rather than one literal against another — a session arriving fails here,
   // which is the whole job. `localised` is the second half: discovery finding 7 directories says
   // nothing about the sweep having replayed them.
-  expect(SESSIONS.length).toBe(26);
-  expect(result.localised).toBe(8924);   // 8057 + 204 with 2026-11-19, + 352 with 2026-11-23, + 311 with 2026-11-24
+  expect(SESSIONS.length).toBe(27);
+  expect(result.localised).toBe(9236);   // 8057 + 204 with 2026-11-19, + 352 with 2026-11-23, + 311 with 2026-11-24, + 312 with 2026-11-25
 });
