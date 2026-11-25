@@ -1,0 +1,39 @@
+{
+  "eyebrow": "教練分析 · 兩邊",
+  "title": "俾兩位嘅建議",
+  "lede": "<strong>粒數同決勝局。</strong>五場每粒方塊嘅攻擊都係 pinglamb 高<span class=\"badge\" data-claim=\"C016\"></span>，但 yachi 粒數多到填晒個窿<span class=\"badge\" data-claim=\"C009\"></span>；三場打到第十三局，yachi 贏兩場<span class=\"badge\" data-claim=\"G008\"></span><span class=\"badge\" data-claim=\"C011\"></span><span class=\"badge\" data-claim=\"C014\"></span><span class=\"badge\" data-claim=\"C015\"></span>。",
+  "columns": {
+    "yachi": {
+      "tagline": "快、清得多 · 粒數填窿",
+      "profile": [
+        "贏嗰啲局每粒方塊嘅攻擊高過自己輸嗰啲局 18.46%<span class=\"badge\" data-claim=\"C003\"></span><span class=\"badge\" data-claim=\"G065\"></span>，闊過對手嘅 12.06%<span class=\"badge\" data-claim=\"C003\"></span>。",
+        "場場都落得快過對手<span class=\"badge\" data-claim=\"G047\"></span>，清行多 137 行<span class=\"badge\" data-claim=\"C018\"></span>；每粒按掣同對手差唔多<span class=\"badge\" data-claim=\"C008\"></span>。",
+        "條路係加粒數：多疊 469 粒<span class=\"badge\" data-claim=\"C005\"></span>，即係多 7.51%<span class=\"badge\" data-claim=\"C009\"></span>，對住 6.36% 嘅窿<span class=\"badge\" data-claim=\"C004\"></span>——填晒，總攻擊多 44 條<span class=\"badge\" data-claim=\"C005\"></span>。"
+      ],
+      "recs": [
+        "<strong>守住第四場嗰種領先。</strong>5 比 4 領先，最後打到 6 比 6，第十三局輸<span class=\"badge\" data-claim=\"C014\"></span>；嗰局對手 VS 約 136.5，你得約 106.0<span class=\"badge\" data-claim=\"G057\"></span>。",
+        "<strong>第二場 4 比 4 之後連輸三局</strong><span class=\"badge\" data-claim=\"C012\"></span><span class=\"badge\" data-claim=\"G009\"></span>。",
+        "<strong>每粒要重啲。</strong>五場全部每粒方塊嘅攻擊低過對手，你贏嗰三場都係<span class=\"badge\" data-claim=\"C016\"></span>；今晚靠粒數補返，粒數唔夠嗰晚就補唔返。"
+      ],
+      "sim_recs": [
+        "<strong>STSD 4 次，4 次都接到第二個 T-spin</strong>；基本的なドネイト（TSD）7 次淨係接到 Tetris 1 次，有 6 次條井俾 I 以外嘅棋填咗——捐完個窿，留條井俾 I。（<a href=\"basicdonating.html\">基本的なドネイト頁</a>有圖）"
+      ]
+    },
+    "pinglamb": {
+      "tagline": "每粒重 · 粒數唔夠",
+      "profile": [
+        "贏局每粒方塊嘅攻擊高過對手 2.74%，輸局高 8.60%<span class=\"badge\" data-claim=\"C002\"></span>。",
+        "自己贏局對輸局差 12.06%<span class=\"badge\" data-claim=\"C003\"></span><span class=\"badge\" data-claim=\"G066\"></span>。",
+        "T-spin triple 73 對 48<span class=\"badge\" data-claim=\"G032\"></span>、劈到 12 行以上嘅局 16 對 14<span class=\"badge\" data-claim=\"G051\"></span>、All Clear 5 對 4<span class=\"badge\" data-claim=\"G033\"></span>。"
+      ],
+      "recs": [
+        "<strong>五場每粒都重過對手</strong><span class=\"badge\" data-claim=\"C016\"></span>，但總攻擊少 44 條<span class=\"badge\" data-claim=\"C005\"></span>：對手多疊 469 粒<span class=\"badge\" data-claim=\"C005\"></span>，PPS 場場高過你<span class=\"badge\" data-claim=\"G047\"></span>。",
+        "<strong>第一、五場決勝局都輸</strong><span class=\"badge\" data-claim=\"C011\"></span><span class=\"badge\" data-claim=\"C015\"></span>；第五場你 6 比 5 領先，最後兩局都輸<span class=\"badge\" data-claim=\"C015\"></span>。"
+      ],
+      "sim_recs": [
+        "<strong>基本的なドネイト（TSD）5 次，2 次喺開局</strong>，接到 Tetris 得 1 次，3 次條井俾 I 以外嘅棋填咗。迷走砲 38 局有 29 局行到第二巡。（<a href=\"basicdonating.html\">基本的なドネイト頁</a>有圖）"
+      ]
+    }
+  },
+  "versus_note": "逐場計，五場全部都係總攻擊多嗰個贏<span class=\"badge\" data-claim=\"C017\"></span>。每粒方塊嘅攻擊，五場全部都係 pinglamb 高，yachi 贏嗰三場都係<span class=\"badge\" data-claim=\"C016\"></span>。"
+}

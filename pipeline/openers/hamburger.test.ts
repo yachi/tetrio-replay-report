@@ -34,7 +34,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25']);
 const ART_PATH = `${import.meta.dir}/../../analysis/hamburger-facts.json`;
 const TR = JSON.parse(readFileSync(HAMBURGER.transcriptionPath, 'utf8'));
 const H = 40;
@@ -143,6 +143,7 @@ const OPENER_ROUTE_HITS: string[] = [
   '2026-11-19 m4r14 yachi lock 6 (sdpcspin+stickspin)',
   '2026-11-24 m1r4 yachi lock 6 (sdpcspin+stickspin)',
   '2026-11-24 m1r13 yachi lock 6 (sdpcspin+stickspin)',
+  '2026-11-25 m3r6 yachi lock 6 (sdpcspin+stickspin)',
 ];
 const OPENER_OTHER_HITS: string[] = [
   '2026-08-09 m6r7 yachi lock 19',
@@ -163,6 +164,7 @@ const QUALIFIED_MID_GAME: string[] = [
   '2026-11-01 m14r3 yachi lock 54',
   '2026-11-01 m14r4 pinglamb lock 91',
   '2026-11-23 m4r3 yachi lock 87',
+  '2026-11-25 m2r1 yachi lock 259',
 ];
 const COVER_NOT_ONE_SZ_OR_NULL: string[] = [
   '2026-08-19 m9r4 yachi lock 35 (null)',
@@ -170,6 +172,7 @@ const COVER_NOT_ONE_SZ_OR_NULL: string[] = [
   '2026-09-03 m3r6 yachi lock 136 (null)',
   '2026-09-18 m11r1 yachi lock 207 (complete_pieces)',
   '2026-11-01 m14r4 pinglamb lock 91 (complete_pieces)',
+  '2026-11-25 m2r1 yachi lock 259 (complete_pieces)',
 ];
 /** The hits whose T is the LAST verified lock of its round (lock == verified_to). The shared scoring loop scores a lock
  *  up to and including the verified index; the coordinator's scratch probe (ownership at the lock before the T, over the
@@ -185,31 +188,32 @@ const AT_VERIFIED_EDGE: string[] = [
   '2026-10-03 m17r4 yachi lock 6 (one_sz)',
   '2026-10-09 m2r3 yachi lock 6 (one_sz)',
   '2026-10-12 m7r5 yachi lock 84 (not_complete)',
+  '2026-11-25 m2r1 yachi lock 259 (complete_pieces)',
 ];
 const QUALIFIED_PAYOFF_FIRED: string[] = [
   '2026-11-01 m14r4 pinglamb lock 91',
   '2026-11-23 m4r3 yachi lock 87',
 ];
 
-const OPP_DENOM = { pinglamb: { all: 860, in_opener: 117, mid_game: 743 }, yachi: { all: 1407, in_opener: 335, mid_game: 1072 } };
-const HITS = { pinglamb: { all: 43, in_opener: 5, mid_game: 38, mirrored: 13, garbage_in_window: 33 },
-               yachi: { all: 192, in_opener: 103, mid_game: 89, mirrored: 147, garbage_in_window: 71 } };
+const OPP_DENOM = { pinglamb: { all: 878, in_opener: 120, mid_game: 758 }, yachi: { all: 1453, in_opener: 345, mid_game: 1108 } };
+const HITS = { pinglamb: { all: 46, in_opener: 5, mid_game: 41, mirrored: 15, garbage_in_window: 36 },
+               yachi: { all: 196, in_opener: 104, mid_game: 92, mirrored: 150, garbage_in_window: 73 } };
 /** the payoff: `well_covered` / `well_filled_not_i` are another layer of the stacking (the page's Repeat) */
-const PAYOFF = { pinglamb: { fired: 24, not_fired: { i_in_well_not_quad: 5, well_covered: 3, well_filled_not_i: 11 } },
-                 yachi: { fired: 36, not_fired: { i_in_well_not_quad: 15, past_verified: 7, round_ended: 1, well_covered: 18, well_filled_not_i: 115 } } };
-const QUALIFY = { pinglamb: { qualified: 3, not_qualified: { dpc: 1, fragment: 29, garbage_in_shape: 6, in_opener: 5 } },
-                  yachi: { qualified: 6, not_qualified: { dpc: 2, fragment: 73, garbage_in_shape: 11, in_opener: 103, ownership_unverified: 2 } } };
+const PAYOFF = { pinglamb: { fired: 25, not_fired: { i_in_well_not_quad: 5, well_covered: 5, well_filled_not_i: 11 } },
+                 yachi: { fired: 37, not_fired: { i_in_well_not_quad: 16, past_verified: 8, round_ended: 1, well_covered: 18, well_filled_not_i: 116 } } };
+const QUALIFY = { pinglamb: { qualified: 3, not_qualified: { dpc: 1, fragment: 30, garbage_in_shape: 8, in_opener: 5 } },
+                  yachi: { qualified: 7, not_qualified: { dpc: 2, fragment: 75, garbage_in_shape: 11, in_opener: 104, ownership_unverified: 2 } } };
 /** cover kind per player, over every hit and over the qualifying ones */
 const COVER: Record<string, any> = {
-  pinglamb: { all: { complete_pieces: 2, not_complete: 34, one_sz: 7 }, qualified: { complete_pieces: 2, one_sz: 1 } },
-  yachi: { all: { complete_pieces: 1, not_complete: 84, null: 2, one_sz: 105 }, qualified: { complete_pieces: 1, one_sz: 5 } },
+  pinglamb: { all: { complete_pieces: 2, not_complete: 37, one_sz: 7 }, qualified: { complete_pieces: 2, one_sz: 1 } },
+  yachi: { all: { complete_pieces: 2, not_complete: 86, null: 2, one_sz: 106 }, qualified: { complete_pieces: 2, one_sz: 5 } },
 };
-const CONTROLS = {under: {TSD: {pinglamb: 0, yachi: 0}, TST: {pinglamb: 0, yachi: 0}, mini_TSS: {pinglamb: 0, yachi: 0}, mini_TSD: {pinglamb: 0, yachi: 0}}, ablation: {no_must_empty: {pinglamb: 365, yachi: 526}, no_roof: {pinglamb: 43, yachi: 193}, t_overlap: {pinglamb: 47, yachi: 196}}, orientation_baseline: {pinglamb: 195, yachi: 573}};
+const CONTROLS = {under: {TSD: {pinglamb: 0, yachi: 0}, TST: {pinglamb: 0, yachi: 0}, mini_TSS: {pinglamb: 0, yachi: 0}, mini_TSD: {pinglamb: 0, yachi: 0}}, ablation: {no_must_empty: {pinglamb: 373, yachi: 537}, no_roof: {pinglamb: 46, yachi: 197}, t_overlap: {pinglamb: 50, yachi: 200}}, orientation_baseline: {pinglamb: 201, yachi: 593}};
 /** full TSSs whose anchored T meets ONE row of the window: `above` the row over the arms, `arms` the T's arm row,
  *  `cleared` the row the TSS clears (the cover and the nub), `below` the hole row under it */
-const PART_ONLY: Record<string, number> = { above: 919, arms: 558, cleared: 1336, below: 302 };
+const PART_ONLY: Record<string, number> = { above: 938, arms: 567, cleared: 1366, below: 311 };
 /** [this page's hits that are hits there, this page's hits], per other technique artefact that shares any */
-const COMMON: Record<string, number> = { basicdonating: 114 };
+const COMMON: Record<string, number> = { basicdonating: 116 };
 
 const EQUIVALENT: Record<string, string> = {
   noRecon: 'the corpus has no reconstruction disagreement (check.reconstruction_disagreed is 0)',
@@ -276,7 +280,7 @@ test('quarantined: report_eligible false, no claim ids, one variant, a payoff an
 });
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
-  expect(checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT)).toBe(20210);
+  expect(checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT)).toBe(20947);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 

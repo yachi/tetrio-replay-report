@@ -1,0 +1,31 @@
+{
+ "eyebrow": "關鍵時刻 · 三件事",
+ "title": "三件事：決勝局、局數打和、同粒數",
+ "cards": [
+  {
+   "accent": "g",
+   "label": "6 比 6 嘅決勝局",
+   "value": "2 / 3",
+   "body": "三場打到第十三局<span class=\"badge\" data-claim=\"G008\"></span>，yachi 贏第一同第五場，兩場都係由落後追返<span class=\"badge\" data-claim=\"C011\"></span><span class=\"badge\" data-claim=\"C015\"></span>；第四場佢 5 比 4 領先，決勝局輸<span class=\"badge\" data-claim=\"C014\"></span>。"
+  },
+  {
+   "accent": "p",
+   "label": "局數",
+   "value": "31-31",
+   "body": "逐局打和，頭三場 18 比 18、尾兩場 13 比 13<span class=\"badge\" data-claim=\"C010\"></span>。<strong>局數一樣，系列 yachi 3 比 2</strong>，因為三個決勝局佢贏兩個<span class=\"badge\" data-claim=\"G001\"></span><span class=\"badge\" data-claim=\"G008\"></span>。"
+  },
+  {
+   "accent": "y",
+   "label": "多疊、多打",
+   "value": "+469 粒 / +44 條",
+   "body": "yachi 多疊 469 粒，即係多 7.51%<span class=\"badge\" data-claim=\"C005\"></span><span class=\"badge\" data-claim=\"C009\"></span>，對住 6.36% 個窿<span class=\"badge\" data-claim=\"C004\"></span>——<strong>填晒，總攻擊仲多 44 條</strong>，即係 pinglamb 總攻擊嘅 1.08%<span class=\"badge\" data-claim=\"C005\"></span>。清行亦多 137 行<span class=\"badge\" data-claim=\"C018\"></span>。"
+  }
+ ],
+ "trivia": [
+  "最癲嗰局係 m2 第八局，yachi 贏<span class=\"badge\" data-claim=\"G059\"></span>，四條攻擊軸淨係行數輸<span class=\"badge\" data-claim=\"G081\"></span>；每粒方塊嘅攻擊約 0.970 對約 0.720<span class=\"badge\" data-claim=\"G082\"></span>。",
+  "All Clear pinglamb 5 個、yachi 4 個<span class=\"badge\" data-claim=\"G033\"></span>。淨係 pinglamb 做到全消嘅 5 局，佢輸咗 2 局<span class=\"badge\" data-claim=\"G078\"></span>。",
+  "62 局每一局都係 VS 高嗰個贏，零例外<span class=\"badge\" data-claim=\"G020\"></span>。",
+  "m2 第十局 pinglamb APM 約104.2，但嗰局得 13 秒，唔計紀錄<span class=\"badge\" data-claim=\"G073\"></span>。",
+  "KPP 兩個人差唔多：yachi 3.579 下、pinglamb 3.581 下<span class=\"badge\" data-claim=\"C008\"></span>。"
+ ]
+}

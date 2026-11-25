@@ -125,16 +125,21 @@ and both are established rather than hypothetical:
    control +0.039 → +0.036, the two attack/duration controls -0.163 → -0.165 and -0.168 → -0.170
    and 食/intensity +0.110 → +0.108 — and left the cleared-per-received ratio (+0.263) where it
    was. It is 72 rounds, and it moved the headline by 0.006.
+   2026-11-25 took it to twenty-seven and 1956 rounds and moved six of the seven a TWENTY-FIRST
+   time — the headline +0.138 → +0.139, the two attack/duration controls -0.165 → -0.162 and
+   -0.170 → -0.166, the cleared-per-received ratio +0.263 → +0.267 and 食/intensity +0.108 → +0.111
+   — and left raw 清走 (+0.134) and the duration control (+0.036) where they were. It is 62 rounds,
+   and it moved the headline by 0.001.
    Seventeen increments; the headline's run of five inward moves (10-12, 10-20, 10-22, 10-29,
    11-01) ended in a step too small to print and 11-17 turns it outward, and the sign and ordering unmoved
    throughout: that is what a corpus statistic over a growing corpus looks like, and it is the
    reason none of these digits is a finding. That is the other half of the
-   same lesson, now twenty times over:
+   same lesson, now twenty-one times over:
    invariance to a re-source is not invariance to data, which is why the guard downstream
-   re-derives rather than counting sessions. As of the current corpus they read **+0.138**
+   re-derives rather than counting sessions. As of the current corpus they read **+0.139**
    (cleared_pp/intensity), **+0.134** (cleared/intensity), **+0.036** (cleared_pp/duration),
-   **-0.165** (apm/duration), **-0.170** (attack/duration), **+0.263**
-   (cleared_per_received/intensity) and **+0.108** (received/intensity). Nothing else in this
+   **-0.162** (apm/duration), **-0.166** (attack/duration), **+0.267**
+   (cleared_per_received/intensity) and **+0.111** (received/intensity). Nothing else in this
    repo needs them typed out again, and they are typed out here only because
    `pipeline/check_intense_corpus.DOCSTRING_OWES` names this file — a module that derives a
    figure and then quotes a DIFFERENT one is the state that gate exists to make impossible.
