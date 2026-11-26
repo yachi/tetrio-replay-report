@@ -115,7 +115,7 @@ def piece_set(ps):
 
 def load_inputs(repo=REPO):
     """(artefact, catalogue): `catalogue[sid]` = dict(names, cells, tst, rows, til=[dict(pieces, left, B, p5, set)]) for the
-    121 transcribed shapes and the mirror shapes the artefact lists (id 1000 + the original's), the mirror's tilings in the
+    127 transcribed shapes and the mirror shapes the artefact lists (id 1000 + the original's), the mirror's tilings in the
     original's order with the counter's own B and p5. Refuses an artefact built from other inputs."""
     with open(os.path.join(repo, "analysis", "tst-openers-tp.json"), "rb") as f:
         raw = f.read()

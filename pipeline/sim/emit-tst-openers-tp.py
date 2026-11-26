@@ -5,13 +5,13 @@ The counter is `pipeline/sim/tst2bag-tp-rs` (binary `tst2bag-tp`; a sibling of `
 `analysis/tst-openers.json` and its pins stay current). A bag-1 board here is six pieces in one of two kinds: PLACED
 (the T placed, four more of IJLOSZ placed, the sixth kind held; names t<i>) or HELD (the six pieces IJLOSZ placed and the T in
 hold, `held == "T"`; names h<i>, listed after every placed board). Both kinds are counted by the same method and ranked together. The ranking counts, for each board, the 5040^2 dealt orders of bags 1 and 2 that
-finish on ANY of the 234 shapes (121 transcribed + 113 mirrors) holding that board, and the bag-3 Perfect Clear chance
+finish on ANY of the 246 shapes (127 transcribed + 119 mirrors) holding that board, and the bag-3 Perfect Clear chance
 of the leftover (`p5`, out of 5040). Everything below is offline (about 1.5 h on 4 cores) and never runs in CI;
 `tst-openers-tp.test.ts` re-runs a pinned cheap subset and checks the artefact's invariants.
 
   B=pipeline/sim/tst2bag-tp-rs/target/release/tst2bag-tp ; E=pipeline/sim/emit-tst-openers-tp.py ; W=/tmp/tp3
 
-  O1  python3 $E --shape-input > $W/mirror.in                                   # s<1000+id>|cells|tst, the 113 mirror shapes
+  O1  python3 $E --shape-input > $W/mirror.in                                   # s<1000+id>|cells|tst, the 119 mirror shapes
   O2  JOBS=4 $B < $W/mirror.in > $W/mirror.out                                  # true A/B/p5 of every mirror tiling (default mode)
   O3  python3 $E --tpl-input --mirror-out $W/mirror.out > $W/tpl.in             # FIXED lines for all shapes with a class
       FIXED=1 TPL=1 LASTONLY=1 JOBS=4 $B < $W/tpl.in > $W/last.out               # per shape and T-placed board: built count
