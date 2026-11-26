@@ -552,7 +552,7 @@
   "cross_source": {
     "kind": "routes",
     "label_pattern": "dagger",
-    "note": "the window, by the gate's predicate (technique_transcription.window_fires), over every U-slot board of every committed *-routes.json, with the U cells as the T. `fires` is the independent drawer (harddrop's SDPC Spin page, another author): the T in the slot its second C-Spin build makes, directly on top of the C-Spin's residue slot, the build's Z or S the overhang. No routes board is labelled as this technique. The same author's インペリアルクロス page is checked in `technique_pages`.",
+    "note": "the window, by the gate's predicate (technique_transcription.window_fires), over every U-slot board of every committed *-routes.json, with the U cells as the T. `fires` is the independent drawer (harddrop's SDPC Spin page, another author): the T in the slot its second C-Spin build makes, directly on top of the C-Spin's residue slot, the build's Z or S the overhang. No routes board is labelled as this technique. The same author's インペリアルクロス page is checked in `technique_pages`. The same author's 合掌TSD donation drawings also fire the window; they are `also`, not independence.",
     "fires": [
       {
         "file": "sdpcspin-routes.json",
@@ -587,7 +587,24 @@
         "note": "the same, L before O, the I at column 6 (mirrored)"
       }
     ],
-    "also": [],
+    "also": [
+      {
+        "file": "gasshotsd-routes.json",
+        "node": "2.donate.a",
+        "variant": "doubledagger",
+        "mirrored": false,
+        "page": "https://shiwehi.com/tetris/template/gasshotsd.php",
+        "note": "the same author's 合掌TSD donation TSD: the flat T over the residue slot. Same author, so not independent"
+      },
+      {
+        "file": "gasshotsd-routes.json",
+        "node": "2.donate.b",
+        "variant": "doubledagger",
+        "mirrored": false,
+        "page": "https://shiwehi.com/tetris/template/gasshotsd.php",
+        "note": "the second donation drawing, the same window, as drawn"
+      }
+    ],
     "labelled_not_fired": [],
     "technique_pages": {
       "file": "imperialcross-technique.json",

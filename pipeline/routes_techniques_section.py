@@ -55,7 +55,8 @@ REQUIRED = (
 )
 
 SHORT = {"迷走砲": "迷走", "はちみつ砲": "はちみつ", "山岳積み2號": "山岳2", "山岳積み2号": "山岳2",
-         "stick spin（SDパフェ）": "stick", "ガムシロ積み": "ガムシロ", "SDPC Spin": "SDPC"}
+         "stick spin（SDパフェ）": "stick", "ガムシロ積み": "ガムシロ", "SDPC Spin": "SDPC",
+         "合掌TSDパフェ": "合掌"}
 
 # Each follow-up reason the technique artefacts emit, in the cell's words. An unknown reason is a
 # build error: a new code must be worded here, never printed raw.

@@ -1,0 +1,892 @@
+{
+ "schema": "gasshotsd-facts/1",
+ "report_eligible": false,
+ "means": "for every corpus round whose first seven pieces are shiwehi.com's 合掌TSDパフェ bag 1 cell for cell (as drawn or mirrored, the T stacked and the 3-wide hole empty), the deepest node of that page's route tree the round reaches. A reference opener: the corpus does not play it",
+ "not_eligible_because": "every board is the vendored Triangle engine's; which later shape was built has no second implementation. The Perfect Clear COUNT is anchored by perfect_clear_timing, the shape is not.",
+ "caveat": "bag-1 opportunities count rounds that reached 7 locks clean (inside the verified prefix, no clear, no garbage before it). bag 2 is sampled after 10 locks; complete garbage rows are stripped from the bottom first. ZJO and SLO are one occupancy (group 2.preplace), and the two donation drawings are one occupancy. The 4-line PC is a 2-row body after the TSD (cumulative 4); the 6-line PCs are 4-row bodies (cumulative 6). The 9-row 63-stack board and the 10-row REN-after board are not compared. There is no harddrop field, so no flag. bag2_near is measured against the board before the first TSD, never a match.",
+ "rules": {
+  "bag1_locks": 7,
+  "bag2_lock_index": 9,
+  "bag2_garbage": "strip complete garbage rows from the bottom",
+  "event_locks": 40,
+  "snapshot_locks": 46,
+  "pc_kinds": [
+   {
+    "lists": [
+     "2.pc4"
+    ],
+    "frame_after": "the first TSD",
+    "lines": 4,
+    "rows": 6
+   },
+   {
+    "lists": [
+     "2.zjo.pc",
+     "2.slo.pc",
+     "2.holdi.pc",
+     "2.oz.pc"
+    ],
+    "frame_after": "the first TSD",
+    "lines": 6,
+    "rows": 6
+   }
+  ],
+  "condition_handedness": "a mirrored round's bag-2 order is read with J<->L and S<->Z swapped",
+  "group_scope": "ZJO and SLO share one occupancy, so their PC lists are scoped by the group 2.preplace; the two donation drawings likewise",
+  "bag2_near": "a bag-1 round with no bag-2 match: the board before its first TSD, by occupancy, against every bag-2 board: a strict subset, that board plus exactly four cells, or that board with one piece's four cells moved elsewhere"
+ },
+ "inputs": {
+  "sessions": [
+   {
+    "session": "2026-07-22",
+    "replays_md5": "5c365d5a42189e1a2138cfaacab85061",
+    "replay_facts_md5": "add7f7683d7d7da3f615f941869df74d"
+   },
+   {
+    "session": "2026-07-24",
+    "replays_md5": "036bda8130fd25676db3f56946791fe6",
+    "replay_facts_md5": "5ae71ce3745b690f30a8cbc1b098464a"
+   },
+   {
+    "session": "2026-07-28",
+    "replays_md5": "97d318eaf2faa588bf90fc1abfc6f2d7",
+    "replay_facts_md5": "879a7017fbe62698fd96beaf65511078"
+   },
+   {
+    "session": "2026-08-01",
+    "replays_md5": "01bd0b9d96be7e3a1423f5c6b20d14a0",
+    "replay_facts_md5": "4677b48ff08b91deeb973b77c146c5d0"
+   },
+   {
+    "session": "2026-08-09",
+    "replays_md5": "b2b6556ffcd2922f39eb3e4e7c9454a0",
+    "replay_facts_md5": "469e7aa0d395c9a6af7c692c9caa87d9"
+   },
+   {
+    "session": "2026-08-14",
+    "replays_md5": "464875cb25a2d382122d884045b60b79",
+    "replay_facts_md5": "2f3bce3f7021317376df476a691508ef"
+   },
+   {
+    "session": "2026-08-19",
+    "replays_md5": "0ec61c3c2360e2e7ce049ec1d5043b43",
+    "replay_facts_md5": "bddfeb730a12b0b0104071ce2c1a6b1f"
+   },
+   {
+    "session": "2026-08-25",
+    "replays_md5": "93043bcb37cd7ffcd77ad5eb8672fb7e",
+    "replay_facts_md5": "348cfffff99be2a60dbaa14ff8243e80"
+   },
+   {
+    "session": "2026-09-03",
+    "replays_md5": "59da0c51a5e29be634f6b7ae060b4a9b",
+    "replay_facts_md5": "84f0fffaea0abd26ae2bf44d804b5341"
+   },
+   {
+    "session": "2026-09-10",
+    "replays_md5": "ceedee793ea16b6d95bd286741e1aae9",
+    "replay_facts_md5": "e9c11123f568a9b08f0ac97de8f09b5c"
+   },
+   {
+    "session": "2026-09-11",
+    "replays_md5": "bd9f59da273fd97f3af582b467862c7b",
+    "replay_facts_md5": "8d1724617c0e85bf5612efee1f89786b"
+   },
+   {
+    "session": "2026-09-17",
+    "replays_md5": "e3085e9b641941214f387e88fc15164a",
+    "replay_facts_md5": "faec48d7edcc699c63d25a2d4fe576c7"
+   },
+   {
+    "session": "2026-09-18",
+    "replays_md5": "fae311db6292ed6ab5d21062bc500d93",
+    "replay_facts_md5": "fb2a5a2b6d4e1819caa7847679b2ded6"
+   },
+   {
+    "session": "2026-09-19",
+    "replays_md5": "74a0fa2bc83c2520870eb35b1edb82e7",
+    "replay_facts_md5": "4fca52a70a7b9b0e8e4508319d015bc9"
+   },
+   {
+    "session": "2026-10-03",
+    "replays_md5": "6870375613354ec9605bd366a0d32a32",
+    "replay_facts_md5": "5ac48c57f049ade7d971ba3a00839027"
+   },
+   {
+    "session": "2026-10-09",
+    "replays_md5": "ec6f52e26f431dd95fe2c1bf8fa53b1a",
+    "replay_facts_md5": "3e92bd99c9bdac4169653d38600aa42a"
+   },
+   {
+    "session": "2026-10-12",
+    "replays_md5": "53f6278126ea28cd1d97f43950dfb7f4",
+    "replay_facts_md5": "ac2ea4617a613b1aa3ae049e0adc7a8d"
+   },
+   {
+    "session": "2026-10-20",
+    "replays_md5": "54aad262054f2e92c85f7bf94462eb2c",
+    "replay_facts_md5": "4505c50f34a94541c2c0ee0c30f6c9f4"
+   },
+   {
+    "session": "2026-10-22",
+    "replays_md5": "22418badae4a4fbef9e5d9d7300b1589",
+    "replay_facts_md5": "54a9156c3c150bf9c72bf1a581508616"
+   },
+   {
+    "session": "2026-10-29",
+    "replays_md5": "60de4a9780cdfa347f062169ba095aa4",
+    "replay_facts_md5": "9f01f0143d094cab7eba6d73c4c72874"
+   },
+   {
+    "session": "2026-11-01",
+    "replays_md5": "ab7b44916f602e699f4271fa78d2f519",
+    "replay_facts_md5": "2957aa454c78787ee02e47ba557c71b7"
+   },
+   {
+    "session": "2026-11-05",
+    "replays_md5": "1307e915c6c9bfe54936492f537a9620",
+    "replay_facts_md5": "aba536fe004d66aa95de053f32c06999"
+   },
+   {
+    "session": "2026-11-17",
+    "replays_md5": "84960506bede5c970ecc3bc0f411c310",
+    "replay_facts_md5": "b87100b06a514bc89e4fb74f28057c2f"
+   },
+   {
+    "session": "2026-11-19",
+    "replays_md5": "5ee7d68b7805869cf845718cb69a3cb2",
+    "replay_facts_md5": "270e2de4312471ec54cbedb095bde585"
+   },
+   {
+    "session": "2026-11-23",
+    "replays_md5": "6443f8868544148a4488f99285809387",
+    "replay_facts_md5": "29e18f7f2d2b590b40befdf756b29e90"
+   },
+   {
+    "session": "2026-11-24",
+    "replays_md5": "d45f5f1d57ce97e1f68d02f347ab5b88",
+    "replay_facts_md5": "9a89ade6a1b22dfe2ae887d41ce6b393"
+   },
+   {
+    "session": "2026-11-25",
+    "replays_md5": "548cb68a5dd9684ee84a6f36f231d4a5",
+    "replay_facts_md5": "77e54fa9080e17584458dfbe8e119ee0"
+   }
+  ],
+  "routes_md5": "b5f8218f119ed62fb5f92e2af40cc754",
+  "emitter_md5": "56bdf84667a5e497e08811da2f047b22"
+ },
+ "sessions": [
+  "2026-07-22",
+  "2026-07-24",
+  "2026-07-28",
+  "2026-08-01",
+  "2026-08-09",
+  "2026-08-14",
+  "2026-08-19",
+  "2026-08-25",
+  "2026-09-03",
+  "2026-09-10",
+  "2026-09-11",
+  "2026-09-17",
+  "2026-09-18",
+  "2026-09-19",
+  "2026-10-03",
+  "2026-10-09",
+  "2026-10-12",
+  "2026-10-20",
+  "2026-10-22",
+  "2026-10-29",
+  "2026-11-01",
+  "2026-11-05",
+  "2026-11-17",
+  "2026-11-19",
+  "2026-11-23",
+  "2026-11-24",
+  "2026-11-25"
+ ],
+ "outcomes": [],
+ "nodes": [
+  {
+   "id": "bag1.left",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 3238,
+   "opportunities_by_player": {
+    "pinglamb": 1792,
+    "yachi": 1446
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "bag1.right",
+   "measured": false,
+   "why": "mirror_of: bag1.left"
+  },
+  {
+   "id": "bag1.i_early",
+   "measured": false,
+   "why": "same_shape"
+  },
+  {
+   "id": "2.tsd",
+   "measured": false,
+   "why": "illustration"
+  },
+  {
+   "id": "2.pc4#1",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.pc4.follow",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.pc4.next",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.zjo",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.zjo.pc#1",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.zjo.pc#2",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.zjo.pc#3",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.zjo.pc#4",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.zjo.pc#5",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.zjo.pc#6",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.zjo.pc#7",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.oz.pc#1",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.slo",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.slo.pc#1",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.slo.pc#2",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.slo.pc#3",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.slo.pc#4",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.slo.pc#5",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.holdi.pc#1",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.holdi.pc#2",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.holdi.pc#3",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.holdi.pc#4",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.donate.a",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.donate.b",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.donate.after",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.flat",
+   "measured": false,
+   "why": "unmatchable: 9 rows: taller than the classifier's 8, so the 63-stack pre-TSD board is not compared"
+  },
+  {
+   "id": "2.flat.after",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.stsd",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.stsd.after",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.ren",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.ren.after",
+   "measured": false,
+   "why": "unmatchable: 10 rows: taller than the classifier's 8, so the REN-after board is not compared"
+  },
+  {
+   "id": "overview.diagram",
+   "measured": false,
+   "why": "image_only"
+  },
+  {
+   "id": "refs.commented",
+   "measured": false,
+   "why": "text_only"
+  },
+  {
+   "id": "2.oz",
+   "measured": false,
+   "why": "text_only"
+  },
+  {
+   "id": "2.holdi",
+   "measured": false,
+   "why": "text_only"
+  },
+  {
+   "id": "2.tsd.after",
+   "measured": false,
+   "why": "illustration"
+  },
+  {
+   "id": "2.zjo.after",
+   "measured": false,
+   "why": "illustration"
+  },
+  {
+   "id": "2.slo.after",
+   "measured": false,
+   "why": "illustration"
+  },
+  {
+   "id": "2.oz.after",
+   "measured": false,
+   "why": "illustration"
+  }
+ ],
+ "conditions": {},
+ "lists": {
+  "bag2_garbage_stripped": [],
+  "bag2_none_tsd_before_complete": [],
+  "bag2_none_extra_piece": [],
+  "bag2_none_moved_piece": [],
+  "bag2_none_unexplained": [],
+  "pc_off_page": [],
+  "bag2_handedness_mismatch": [],
+  "multi_colour_resolved_by_branch": [],
+  "colour_disagree": [],
+  "pc_garbage_in_window": []
+ },
+ "cases": [
+
+ ]
+}

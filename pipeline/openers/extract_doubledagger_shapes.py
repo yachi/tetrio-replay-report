@@ -51,6 +51,7 @@ CROSS-SOURCES (both measured, both named):
     bag-5 boards put the T "in the slot the build makes" directly on top of the C-Spin's own residue slot,
     the build's Z (or S) the overhang — the window fires on all four (one as drawn, three mirrored). No
     routes board is LABELLED ダブルダガー (the label pattern finds nothing), so `labelled_not_fired` is empty.
+    The same author's 合掌TSD page draws two donation TSDs the window fires on (`also`, not an independent source).
   * shiwehi.com's own インペリアルクロス page (the same author, `imperialcross-technique.json`): it draws this
     technique as its `dagger` board (a miss of its own window) and this page draws インペリアルクロス as its
     `cross.imperial` board. `extra_checks` measures both ways: this window fires once, mirrored, on that
@@ -277,7 +278,8 @@ CROSS_SOURCE = {
             'of every committed *-routes.json, with the U cells as the T. `fires` is the independent drawer '
             '(harddrop\'s SDPC Spin page, another author): the T in the slot its second C-Spin build makes, '
             'directly on top of the C-Spin\'s residue slot, the build\'s Z or S the overhang. No routes board is '
-            'labelled as this technique. The same author\'s インペリアルクロス page is checked in `technique_pages`.',
+            'labelled as this technique. The same author\'s インペリアルクロス page is checked in `technique_pages`. '
+            'The same author\'s 合掌TSD donation drawings also fire the window; they are `also`, not independence.',
     'fires': [
         {'file': 'sdpcspin-routes.json', 'node': '3.second.cspin.first#2', 'variant': 'doubledagger', 'mirrored': False,
          'page': 'https://harddrop.com/wiki/SDPC_Spin',
@@ -293,7 +295,14 @@ CROSS_SOURCE = {
          'page': 'https://harddrop.com/wiki/SDPC_Spin',
          'note': 'the same, L before O, the I at column 6 (mirrored)'},
     ],
-    'also': [],
+    'also': [
+        {'file': 'gasshotsd-routes.json', 'node': '2.donate.a', 'variant': 'doubledagger', 'mirrored': False,
+         'page': 'https://shiwehi.com/tetris/template/gasshotsd.php',
+         'note': 'the same author\'s 合掌TSD donation TSD: the flat T over the residue slot. Same author, so not independent'},
+        {'file': 'gasshotsd-routes.json', 'node': '2.donate.b', 'variant': 'doubledagger', 'mirrored': False,
+         'page': 'https://shiwehi.com/tetris/template/gasshotsd.php',
+         'note': 'the second donation drawing, the same window, as drawn'},
+    ],
     'labelled_not_fired': [],
     'technique_pages': {
         'file': 'imperialcross-technique.json',

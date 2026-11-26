@@ -1341,7 +1341,10 @@ class RouteSite:
         ov = pages[self.OVERVIEW]
         T = self.p.selftest_targets
         by_id = {n["id"]: n for n in routes0["nodes"]}
-        ideal = f"{self.p.prefix}-{T['node_page']}.html"
+        # a reference opener the corpus has not reached has no node page: the shared renderer refuses
+        # an empty one (`render_node_page` requires cases). Those mutants stay for every site that has one.
+        node_page = T.get("node_page")
+        ideal = f"{self.p.prefix}-{node_page}.html" if node_page else None
         held = self.p.hold_piece
         elsewhere = T["elsewhere_node"]
         nohold = T["demo_never_holds"]
@@ -1354,28 +1357,39 @@ class RouteSite:
         m("a dropped route node", self.OVERVIEW, _drop_line(ov, f'data-node="{T["empty_node"]}"'), "missing from the overview")
         m("a dropped text_only node", self.OVERVIEW, _drop_line(ov, f'data-node="{T["text_only"]}"'), f'{T["text_only"]} is missing')
         m("a dropped unmatchable node", self.OVERVIEW, _drop_line(ov, f'data-node="{T["unmatchable"]}"'), f'{T["unmatchable"]} is missing')
-        m("a dropped node on a node page", ideal, _drop_line(pages[ideal], f'data-node="{T["node_page_node"]}"'),
-          f"missing from {T['node_page']}")
-        first = art["cases"][0]
-        m("a dropped case row on a node page", f"{self.p.prefix}-{self.page_of(first)}.html",
-          _drop_line(pages[f"{self.p.prefix}-{self.page_of(first)}.html"], f'data-case="{case_key(first)}"'), "exactly once")
-        m("a dropped case in the overview index", self.OVERVIEW, _drop_line(ov, f'data-case="{case_key(first)}"'), "every case exactly once")
+        if ideal:
+            m("a dropped node on a node page", ideal, _drop_line(pages[ideal], f'data-node="{T["node_page_node"]}"'),
+              f"missing from {node_page}")
+        if art["cases"]:
+            first = art["cases"][0]
+            m("a dropped case row on a node page", f"{self.p.prefix}-{self.page_of(first)}.html",
+              _drop_line(pages[f"{self.p.prefix}-{self.page_of(first)}.html"], f'data-case="{case_key(first)}"'), "exactly once")
+            m("a dropped case in the overview index", self.OVERVIEW, _drop_line(ov, f'data-case="{case_key(first)}"'), "every case exactly once")
         m("a claim badge", self.OVERVIEW, ov.replace(RS.TITLE_MARK, RS.TITLE_MARK + '<span class="claim-badge">✓</span>', 1), "claim badge")
-        m("a data-claim on a node page", ideal, pages[ideal].replace('class="scp-cases"', 'class="scp-cases" data-claim="C001"', 1), "claim badge")
-        m("an external src=", ideal, pages[ideal].replace("<script>", '<script src="x.js"></script><script>', 1), "external request")
-        m("an innerHTML assignment", ideal, pages[ideal].replace('"use strict";', '"use strict"; document.body.innerHTML = "";', 1), "assigns markup")
+        if ideal:
+            m("a data-claim on a node page", ideal, pages[ideal].replace('class="scp-cases"', 'class="scp-cases" data-claim="C001"', 1), "claim badge")
+            m("an external src=", ideal, pages[ideal].replace("<script>", '<script src="x.js"></script><script>', 1), "external request")
+            m("an innerHTML assignment", ideal, pages[ideal].replace('"use strict";', '"use strict"; document.body.innerHTML = "";', 1), "assigns markup")
         m("a simplified glyph", self.OVERVIEW, ov.replace("第一巡</h2>", "第一巡这</h2>", 1), "simplified glyph")
         m("a second data island", self.OVERVIEW, ov.replace("</body>", f'<script type="application/json" id="{DATA_ID}">{{}}</script></body>', 1), "data island")
-        m("a computed percentage", self.OVERVIEW, re.sub(r'(<p class="scp-count">\d+ / \d+)', r"\1（12.5%）", ov, count=1), "a % outside quoted")
-        m("an unguarded writeHash(p) on a node page", ideal, pages[ideal].replace("if (!playing) writeHash(p)", "writeHash(p)", 1), "while playing")
-        m("QUIET_BEFORE_DESTROY reordered", ideal, pages[ideal].replace(
-            RP.QUIET_BEFORE_DESTROY, "if (handle) { handle.destroy(); handle = null; }\n    quiet = true;", 1), "OLD round")
+        # a site whose every measured node has 0 cases prints the empty-node sentence, whose N / M is
+        # not at the start of the paragraph; the count form is tried first so every other site's mutant
+        # stays the one it has always planted
+        pct = re.sub(r'(<p class="scp-count">\d+ / \d+)', r"\1（12.5%）", ov, count=1)
+        if pct == ov:
+            pct = re.sub(r'(<p class="scp-count">[^<]*?\d+ / \d+)', r"\1（12.5%）", ov, count=1)
+        m("a computed percentage", self.OVERVIEW, pct, "a % outside quoted")
+        if ideal:
+            m("an unguarded writeHash(p) on a node page", ideal, pages[ideal].replace("if (!playing) writeHash(p)", "writeHash(p)", 1), "while playing")
+            m("QUIET_BEFORE_DESTROY reordered", ideal, pages[ideal].replace(
+                RP.QUIET_BEFORE_DESTROY, "if (handle) { handle.destroy(); handle = null; }\n    quiet = true;", 1), "OLD round")
         m(f"「hold」 added to the {elsewhere.split('.')[-1]} row", self.OVERVIEW, re.sub(
             r'(data-node="' + re.escape(elsewhere) + r'".*?<p class="scp-count">)', r"\1hold 咗 " + held + " · ",
             ov, count=1),
           "「hold」 outside")
-        m("a node page missing BOUNDARY_SENTENCE", ideal, pages[ideal].replace(RS.BOUNDARY_SENTENCE, ""), "quarantine sentence")
-        m("a node page missing a PAGE_SENTENCE", ideal, pages[ideal].replace(self.PS["mirror"], ""), "quarantine sentence")
+        if ideal:
+            m("a node page missing BOUNDARY_SENTENCE", ideal, pages[ideal].replace(RS.BOUNDARY_SENTENCE, ""), "quarantine sentence")
+            m("a node page missing a PAGE_SENTENCE", ideal, pages[ideal].replace(self.PS["mirror"], ""), "quarantine sentence")
         m("a status that disagrees with the artefact", self.OVERVIEW, ov.replace(
             f'data-node="{T["empty_node"]}" data-status="empty"', f'data-node="{T["empty_node"]}" data-status="count"', 1),
           "the artefact says")
@@ -1496,7 +1510,11 @@ class RouteSite:
         # count instead, its demos must fail — the per-list rule is not decorative
         # (a list whose own count equals the profile's — stick spin's 8 — makes that mutant equivalent, so
         # only the lists whose count DIFFERS are planted)
-        own = [li["id"] for li in routes0["lists"] if ("total_lines" in li or "pc_lines" in li)
+        # a list whose line count differs from the profile's is only a demo-page mutant when a demo of
+        # it was built: demo_problems never sees an unbuilt list, so planting it there cannot fire
+        built_lists = {by_id[d["node"]].get("list") for d in demos["demos"] if by_id.get(d["node"], {}).get("list")}
+        own = [li["id"] for li in routes0["lists"] if li["id"] in built_lists
+               and ("total_lines" in li or "pc_lines" in li)
                and self.pc_lines_of(li["id"]) != self.p.pc_lines]
         if own:
             keep = self.pc_lines_of

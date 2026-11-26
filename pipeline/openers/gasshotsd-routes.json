@@ -1,0 +1,1101 @@
+{
+  "schema": "gasshotsd-routes/1",
+  "source": {
+    "url": "https://shiwehi.com/tetris/template/gasshotsd.php",
+    "title": "合掌TSDパフェ(Gassho TSD Opener)",
+    "updated": "2026-08-10",
+    "created": "2021-02-04",
+    "fetched": "2026-11-26",
+    "fetch_method": "curl through the session proxy, TLS verification ON, with --cacert naming a bundle that adds the Let's Encrypt YE2 intermediate (shiwehi.com omits it from its chain), the method 山岳積み2号 used. The snapshot is the page's raw HTML, byte for byte; every board is plain text in it, 36 ten-wide boards in page order. No fumen codes.",
+    "snapshot_file": "gasshotsd.html",
+    "snapshot_sha256": "9a6082ed37415dc74e979b17e77ce14ab30cf9386fe4116e3eb57dd900e86229",
+    "snapshot_bytes": 33283,
+    "snapshot_note": "sha256 of the raw HTML this transcription was checked against. Not re-verifiable in CI: the page is not committed and cannot be fetched there. Re-check with --html-dir after any refetch; an HTML hash moves with ANY byte of the page.",
+    "video": "https://www.youtube.com/watch?v=w-9uFdHtm7s",
+    "renderer": {
+      "url": "https://shiwehi.com/tetris/mutual/column-exp.js?date=20210408",
+      "read": "2026-11-26",
+      "sha256": "95c431a4147f9c30fc0e1bae935e6af6f5669c3d2fa1edfc388848e69ab62570",
+      "sha256_note": "the same bytes 山岳積み2号 recorded on 2026-10-12, re-fetched for this page",
+      "colorMap_used": {
+        "c": "#a3a3a3",
+        "C": "#cccccc",
+        "U": "#c8a6ff with a #8400ff radial dot",
+        "h n k m r y u": "second shade of I O J L S Z T (#b0e7ff #ffffcc #a6bbff #ffcea6 #a6ffa6 #ffa6a6 #c8a6ff)",
+        "-": "#000000"
+      },
+      "rows": "textContent split on whitespace, one row per token; .ttt is drawn, one row per line",
+      "mirror_button": "body.reversed swaps j<->l, s<->z, k<->m, r<->y (and upper case)"
+    },
+    "decorative_images": [
+      "合掌TSDパフェ(Gassho TSD Opener)タイトル画像",
+      "合掌TSDパフェの派生概要図"
+    ],
+    "related_pages": [
+      "./tsdopener.php",
+      "./antifatetsd.php",
+      "./stsd.php",
+      "./biginnertemplate.php"
+    ],
+    "references_commented": "the 参考ページ block is inside an HTML comment and names にはち砲 / Hachispin, not this opener; not used as a source"
+  },
+  "terms": {
+    "url": "https://shiwehi.com/tetris/explanation/terms.php",
+    "dated": "2023-05-12",
+    "read": "2026-10-11, for 迷走砲: the same terms page, linked from this page's footer; not re-read for this page",
+    "allows": "non-commercial HP/blog use without contacting the admin",
+    "excludes": "営利目的 sites (e.g. Google AdSense)",
+    "requests": "URL credit or a heads-up",
+    "how_met": "source link in every page header; no ads on GitHub Pages"
+  },
+  "legend": {
+    "orientation": "rows top to bottom as drawn; 10 columns, column 0 the left wall; heights differ, align at the BOTTOM row",
+    "-": "empty",
+    "i o t s z j l": "a cell of that piece",
+    "c": "a cell filled before this diagram (earlier bags), grey",
+    "C": "the same, in a row the TSD clears, drawn in the renderer's muted grey (OUR READING, checked: every C row is a row the U slot clears)",
+    "U": "the TSD slot (the 3-wide hole). Not the bag-1 T, which is already stacked as t",
+    "h n k m r y u": "the renderer's second shade of I O J L S Z T: a later piece of that letter",
+    "%X": "the X piece; '%T>%J' means T before J; '%O・%S>%L' means both O and S before L"
+  },
+  "quotes": [
+    {
+      "id": "overview.intro",
+      "figure": null,
+      "verbatim": "ここでは、合掌TSDパフェ(Gassho TSD PC Opener)というTSDから6ラインパフェを狙う開幕テンプレについて紹介していきます。"
+    },
+    {
+      "id": "basic.mirror",
+      "figure": null,
+      "verbatim": "形は上の通りで、左右反転できます。ここでは左図で統一して説明していきますが、右下にある反転ボタンを押すことで左右反転の図を見ることができます。"
+    },
+    {
+      "id": "bag1.i_early",
+      "figure": null,
+      "verbatim": "一応下記のように同形を組むこともできますが、%Iが早い時には開幕TSDを打つ人が多いのでは無いでしょうか。"
+    },
+    {
+      "id": "bag1.requires",
+      "figure": null,
+      "verbatim": "1巡目の組み方は上図の通りで、%O%S%Zや%T%S%Zが早い時に組むと良いでしょう。"
+    },
+    {
+      "id": "bag1.no_hold",
+      "figure": null,
+      "verbatim": "ホールド無しで組める条件は以下の通りです。"
+    },
+    {
+      "id": "bag1.no_hold.os_l",
+      "figure": null,
+      "verbatim": "%O・%S>%L"
+    },
+    {
+      "id": "bag1.no_hold.t_j",
+      "figure": null,
+      "verbatim": "%T>%J"
+    },
+    {
+      "id": "2.pc4",
+      "figure": "5.71%",
+      "verbatim": "2巡目の%T%J%Lが早い場合にはTSDを打ってから4ラインパフェを取ることができます(5.71%)。",
+      "fraction": "288/5040",
+      "fraction_note": "OUR READING of the printed 5.71%: 288/5040 = 5.714…%, the share of 7! orders. The page prints neither 288 nor 5040, and draws one 2-row solution, not 288"
+    },
+    {
+      "id": "2.zjo",
+      "figure": "95.24%",
+      "verbatim": "3ミノ先置きの場合、%Z%J%Oの3ミノであれば高いパフェ率(95.24%)を維持することができます。",
+      "fraction": "20/21",
+      "fraction_note": "OUR READING of the printed 95.24%: 20/21 = 95.238…%. The page prints neither 20 nor 21"
+    },
+    {
+      "id": "2.zjo.typo",
+      "figure": "95.24%",
+      "verbatim": "%S%L%Oを先置きした場合、パフェの取り方は以下の通りです。(95.24%)",
+      "note": "under the ZJO heading. The setup board is O, J and Z. SLO is the page's typo; the real SLO sentence is 2.slo.patterns"
+    },
+    {
+      "id": "2.oz",
+      "figure": "100%",
+      "verbatim": "%O%Zの2ミノ先置きの場合、2巡目の初め2ミノが「%L>%S」や「%J>%S」の場合にも対応でき100%でパフェを取ることができます。"
+    },
+    {
+      "id": "2.slo",
+      "figure": null,
+      "verbatim": "%Z%Jが遅い場合には、パフェ率は下がりますが%S%Lを先置きすることができます。",
+      "note": "the page states no percentage for the SLO pre-place"
+    },
+    {
+      "id": "2.slo.patterns",
+      "figure": null,
+      "verbatim": "%S%L%Oを先置きした場合パフェパターンは多いですが、実戦で使用できそうなものは以下の5パターンでしょう。"
+    },
+    {
+      "id": "2.holdi",
+      "figure": null,
+      "verbatim": "また、2巡目の%Iが遅く、3巡目の%T%J%Lが早い場合には%Iをホールドしたまま下図のようなパフェを狙うことができることも一応覚えておくと良いでしょう。"
+    },
+    {
+      "id": "2.donate",
+      "figure": null,
+      "verbatim": "ILJが早い場合には、下記のように積んでドネイトTSDを打つことができます。"
+    },
+    {
+      "id": "2.flat",
+      "figure": null,
+      "verbatim": "ミノ順が合わない場合などは、下図などのように積んで63積みに移行します。"
+    },
+    {
+      "id": "2.stsd",
+      "figure": null,
+      "verbatim": "もしくは、STSDに派生することができます。"
+    },
+    {
+      "id": "2.ren",
+      "figure": "100%",
+      "verbatim": "2巡目は%Jをホールドしておけば、%O%S%Z循環で100%組むことができます。"
+    }
+  ],
+  "bag1": {
+    "locks": 7,
+    "requires_verbatim": "1巡目の組み方は上図の通りで、%O%S%Zや%T%S%Zが早い時に組むと良いでしょう。",
+    "requires": {
+      "early_pairs": [
+        [
+          "O",
+          "S",
+          "Z"
+        ],
+        [
+          "T",
+          "S",
+          "Z"
+        ]
+      ],
+      "illustrative": true
+    },
+    "requires_note": "「%O%S%Zや%T%S%Zが早い」: the page gives no threshold. Not a trigger the classifier decides",
+    "no_hold_verbatim": "ホールド無しで組める条件は以下の通りです。",
+    "no_hold": {
+      "all": [
+        {
+          "before": [
+            "O",
+            "L"
+          ]
+        },
+        {
+          "before": [
+            "S",
+            "L"
+          ]
+        },
+        {
+          "before": [
+            "T",
+            "J"
+          ]
+        }
+      ],
+      "node": "bag1.left"
+    },
+    "no_hold_items_verbatim": [
+      "%O・%S>%L",
+      "%T>%J"
+    ],
+    "no_hold_note": "the left pattern without hold. %O・%S>%L is both O and S before L (L rests on each); %T>%J is T before J. Checked by support on bag1.left",
+    "side_verbatim": "形は上の通りで、左右反転できます。ここでは左図で統一して説明していきますが、右下にある反転ボタンを押すことで左右反転の図を見ることができます。",
+    "side": null,
+    "side_note": "the page says the diagram mirrors and to follow the left one; it names no piece that picks the side",
+    "i_early_verbatim": "一応下記のように同形を組むこともできますが、%Iが早い時には開幕TSDを打つ人が多いのでは無いでしょうか。",
+    "i_early_note": "the I-early drawing is the same occupancy as bag1.left (同形), coloured differently. Not a second bag-1 node of the matcher and not a catalogue field"
+  },
+  "basic_form": [
+    {
+      "id": "basic.1",
+      "same_as": "bag1.left",
+      "rows": [
+        "----------",
+        "ijj------l",
+        "ij---zslll",
+        "ijt-zzssoo",
+        "itttz--soo"
+      ],
+      "note": "the 1巡目 diagram is the 基本形 again, the same cells"
+    }
+  ],
+  "groups": [
+    {
+      "id": "2.preplace",
+      "drawn": 2,
+      "note": "ZJO and SLO fill the same cells; J/Z versus L/S tells them apart"
+    },
+    {
+      "id": "2.donate",
+      "drawn": 2,
+      "note": "the two donation drawings fill the same cells; colour tells them apart"
+    }
+  ],
+  "lists": [
+    {
+      "id": "2.pc4",
+      "parent": "2.tsd",
+      "base": "2.tsd.after",
+      "bag": 2,
+      "pc_lines": 2,
+      "total_lines": 4,
+      "total_lines_quote": "2.pc4",
+      "pc_lines_note": "the 2-row body plus the opening TSD; the page's 4ライン is re-derived along the base chain",
+      "rest_stated": 0,
+      "stated_pattern_count": null,
+      "complete": false,
+      "heading": "理想形(TSD→4ラインパフェ)",
+      "note": "one 2-row body. The page's 4ライン counts the TSD's 2 as well (2+2). Rate 5.71% = 288/5040, our reading; the page draws one solution",
+      "drawn": 1,
+      "shown": 1
+    },
+    {
+      "id": "2.zjo.pc",
+      "parent": "2.preplace",
+      "base": "2.zjo.after",
+      "bag": 2,
+      "pc_lines": 4,
+      "total_lines": 6,
+      "total_lines_quote": "overview.intro",
+      "pc_lines_note": "the 4-row body plus the opening TSD; the page's 6ライン is re-derived along the base chain",
+      "rest_stated": 0,
+      "stated_pattern_count": null,
+      "complete": false,
+      "heading": "3ミノ先置き(ZJO)",
+      "note": "seven 4-row bodies. The page's 6ライン is 2+4. Rate 95.24% = 20/21, our reading. The heading's next sentence says SLO; that is the typo",
+      "drawn": 7,
+      "shown": 7
+    },
+    {
+      "id": "2.slo.pc",
+      "parent": "2.preplace",
+      "base": "2.slo.after",
+      "bag": 2,
+      "pc_lines": 4,
+      "total_lines": 6,
+      "total_lines_quote": "overview.intro",
+      "pc_lines_note": "the 4-row body plus the opening TSD; the page's 6ライン is re-derived along the base chain",
+      "rest_stated": 0,
+      "stated_pattern_count": null,
+      "complete": false,
+      "heading": "3ミノ先置き(SLO)",
+      "note": "five 4-row bodies the page calls the practical ones of a larger set. No percentage is stated for this pre-place",
+      "drawn": 5,
+      "shown": 5
+    },
+    {
+      "id": "2.holdi.pc",
+      "parent": "2.holdi",
+      "base": "2.slo.after",
+      "bag": 2,
+      "pc_lines": 4,
+      "total_lines": 6,
+      "total_lines_quote": "overview.intro",
+      "pc_lines_note": "the 4-row body plus the opening TSD the SLO residue already fired; the page's 6ライン is that same total",
+      "rest_stated": 0,
+      "stated_pattern_count": null,
+      "complete": false,
+      "heading": "hold I, on the SLO residue",
+      "note": "four 4-row examples (「のような」). Same residue as the SLO list. No percentage",
+      "drawn": 4,
+      "shown": 4
+    },
+    {
+      "id": "2.oz.pc",
+      "parent": "2.oz",
+      "base": "2.oz.after",
+      "bag": 2,
+      "pc_lines": 4,
+      "total_lines": 6,
+      "total_lines_quote": "overview.intro",
+      "pc_lines_note": "the 4-row body plus the opening TSD. The page draws no OZ setup, so the 2 lines are the drawn TSD's, the same clear the other lists walk",
+      "rest_stated": 0,
+      "stated_pattern_count": 1,
+      "complete": true,
+      "heading": "2ミノ先置き(OZ)",
+      "note": "the one drawn 4-row shape. The page says 100% and draws one board, not a partial catalogue",
+      "drawn": 1,
+      "shown": 1
+    }
+  ],
+  "known_discrepancies": [
+    {
+      "id": "bag1.right:mirror",
+      "what": "the right 基本形 is the left one mirrored (J<->L, S<->Z), so bag 1 is one shape"
+    },
+    {
+      "id": "bag1.i_early:same_occupancy",
+      "what": "the I-early board fills exactly the cells bag1.left fills (the page says 同形) and is not a second bag-1 occupancy"
+    },
+    {
+      "id": "2.pc4:non_exhaustive",
+      "what": "the 4-line PC rate is 5.71% and the page draws one 2-row solution"
+    },
+    {
+      "id": "2.zjo.pc:non_exhaustive",
+      "what": "seven ZJO solutions are drawn; the stated rate is 95.24% (20/21), not a count of seven"
+    },
+    {
+      "id": "2.zjo.pc:slo_typo",
+      "what": "under the ZJO heading the page says 「%S%L%Oを先置き」. The setup board is O, J and Z. Not copied as the setup"
+    },
+    {
+      "id": "2.slo.pc:non_exhaustive",
+      "what": "the page says the SLO PC patterns are many and draws the five it calls practical. No rate is stated"
+    },
+    {
+      "id": "2.holdi.pc:non_exhaustive",
+      "what": "the hold-I PCs are introduced as examples (のような) and four are drawn"
+    },
+    {
+      "id": "refs.commented:hachispin",
+      "what": "the 参考ページ block is inside an HTML comment and names にはち砲 / Hachispin, a different opener"
+    },
+    {
+      "id": "2.oz.pc#1:colour",
+      "what": "the OZ solution draws two S pieces in the same letter (8 s cells). The second shade is what the other PC lists use to separate them; this drawing does not"
+    },
+    {
+      "id": "2.flat:colour",
+      "what": "the 63-stack drawing has two J pieces in the same letter (8 j cells), on a board the classifier does not compare (9 rows)"
+    }
+  ],
+  "page_order": [
+    "bag1.left",
+    "bag1.right",
+    "bag1.i_early",
+    "basic.1",
+    "2.tsd",
+    "2.pc4#1",
+    "2.pc4.follow",
+    "2.pc4.next",
+    "2.zjo",
+    "2.zjo.pc#1",
+    "2.zjo.pc#2",
+    "2.zjo.pc#3",
+    "2.zjo.pc#4",
+    "2.zjo.pc#5",
+    "2.zjo.pc#6",
+    "2.zjo.pc#7",
+    "2.oz.pc#1",
+    "2.slo",
+    "2.slo.pc#1",
+    "2.slo.pc#2",
+    "2.slo.pc#3",
+    "2.slo.pc#4",
+    "2.slo.pc#5",
+    "2.holdi.pc#1",
+    "2.holdi.pc#2",
+    "2.holdi.pc#3",
+    "2.holdi.pc#4",
+    "2.donate.a",
+    "2.donate.b",
+    "2.donate.after",
+    "2.flat",
+    "2.flat.after",
+    "2.stsd",
+    "2.stsd.after",
+    "2.ren",
+    "2.ren.after"
+  ],
+  "nodes": [
+    {
+      "id": "bag1.left",
+      "bag": 1,
+      "parent": null,
+      "rows": [
+        "----------",
+        "ijj------l",
+        "ij---zslll",
+        "ijt-zzssoo",
+        "itttz--soo"
+      ],
+      "label": "bag 1, the hole-empty 基本形 (T stacked, no U)"
+    },
+    {
+      "id": "bag1.right",
+      "bag": 1,
+      "parent": null,
+      "rows": [
+        "----------",
+        "j------lli",
+        "jjjzs---li",
+        "oozzss-tli",
+        "ooz--sttti"
+      ],
+      "label": "bag 1 mirrored (J<->L, S<->Z)",
+      "mirror_of": "bag1.left"
+    },
+    {
+      "id": "bag1.i_early",
+      "bag": 1,
+      "parent": "bag1.left",
+      "rows": [
+        "----------",
+        "ttt------l",
+        "jt---zslll",
+        "jjj-zzssoo",
+        "iiiiz--soo"
+      ],
+      "label": "I early: the same occupancy as bag1.left, coloured differently",
+      "node_kind": "same_shape"
+    },
+    {
+      "id": "2.tsd",
+      "bag": 2,
+      "parent": "bag1.left",
+      "rows": [
+        "----------",
+        "ccc------c",
+        "CCUUUCCCCC",
+        "CCCUCCCCCC",
+        "ccccc--ccc"
+      ],
+      "label": "the TSD slot drawn on the 基本形 (U in the hole; not a second shape)",
+      "node_kind": "illustration",
+      "spin": "TSD"
+    },
+    {
+      "id": "2.pc4#1",
+      "bag": 2,
+      "parent": "2.tsd",
+      "list": "2.pc4",
+      "index": 1,
+      "base": "2.tsd.after",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "CCCjjjlllC",
+        "CCCCCjlCCC"
+      ],
+      "listed_under": "shown",
+      "label": "2.pc4 #1"
+    },
+    {
+      "id": "2.pc4.follow",
+      "bag": 3,
+      "parent": "2.tsd",
+      "rows": [
+        "----------",
+        "----------",
+        "---zz-s---",
+        "----zzssoo",
+        "---iiiisoo"
+      ],
+      "label": "after the 4-line PC: I O S Z, then wait for L"
+    },
+    {
+      "id": "2.pc4.next",
+      "bag": 3,
+      "parent": "2.tsd",
+      "rows": [
+        "----------",
+        "----------",
+        "l--cc-c---",
+        "lUUUcccccc",
+        "llUccccccc"
+      ],
+      "label": "the next TSD, L in the well",
+      "spin": "TSD"
+    },
+    {
+      "id": "2.zjo",
+      "bag": 2,
+      "parent": "bag1.left",
+      "rows": [
+        "----------",
+        "oo-----jjz",
+        "oo-----jzz",
+        "ccc----jzc",
+        "CCUUUCCCCC",
+        "CCCUCCCCCC",
+        "ccccc--ccc"
+      ],
+      "label": "ZJO pre-place, then the TSD",
+      "group": "2.preplace",
+      "spin": "TSD"
+    },
+    {
+      "id": "2.zjo.pc#1",
+      "bag": 2,
+      "parent": "2.preplace",
+      "list": "2.zjo.pc",
+      "index": 1,
+      "base": "2.zjo.after",
+      "rows": [
+        "----------",
+        "ccsllihccc",
+        "ccsslihccc",
+        "cccslihccc",
+        "cccccihccc"
+      ],
+      "listed_under": "shown",
+      "label": "2.zjo.pc #1"
+    },
+    {
+      "id": "2.zjo.pc#2",
+      "bag": 2,
+      "parent": "2.preplace",
+      "list": "2.zjo.pc",
+      "index": 2,
+      "base": "2.zjo.after",
+      "rows": [
+        "----------",
+        "ccsiiiiccc",
+        "ccsslllccc",
+        "cccslnnccc",
+        "cccccnnccc"
+      ],
+      "listed_under": "shown",
+      "label": "2.zjo.pc #2"
+    },
+    {
+      "id": "2.zjo.pc#3",
+      "bag": 2,
+      "parent": "2.preplace",
+      "list": "2.zjo.pc",
+      "index": 3,
+      "base": "2.zjo.after",
+      "rows": [
+        "----------",
+        "ccsuuuiccc",
+        "ccsslliccc",
+        "cccsuliccc",
+        "cccccliccc"
+      ],
+      "listed_under": "shown",
+      "label": "2.zjo.pc #3"
+    },
+    {
+      "id": "2.zjo.pc#4",
+      "bag": 2,
+      "parent": "2.preplace",
+      "list": "2.zjo.pc",
+      "index": 4,
+      "base": "2.zjo.after",
+      "rows": [
+        "----------",
+        "ccsiiiiccc",
+        "ccssyylccc",
+        "cccslllccc",
+        "cccccyyccc"
+      ],
+      "listed_under": "shown",
+      "label": "2.zjo.pc #4"
+    },
+    {
+      "id": "2.zjo.pc#5",
+      "bag": 2,
+      "parent": "2.preplace",
+      "list": "2.zjo.pc",
+      "index": 5,
+      "base": "2.zjo.after",
+      "rows": [
+        "----------",
+        "ccsllmmccc",
+        "ccsslkkccc",
+        "cccslkmccc",
+        "ccccckmccc"
+      ],
+      "listed_under": "shown",
+      "label": "2.zjo.pc #5"
+    },
+    {
+      "id": "2.zjo.pc#6",
+      "bag": 2,
+      "parent": "2.preplace",
+      "list": "2.zjo.pc",
+      "index": 6,
+      "base": "2.zjo.after",
+      "rows": [
+        "----------",
+        "ccsllkkccc",
+        "ccsslmmccc",
+        "cccslkmccc",
+        "ccccckmccc"
+      ],
+      "listed_under": "shown",
+      "label": "2.zjo.pc #6"
+    },
+    {
+      "id": "2.zjo.pc#7",
+      "bag": 2,
+      "parent": "2.preplace",
+      "list": "2.zjo.pc",
+      "index": 7,
+      "base": "2.zjo.after",
+      "rows": [
+        "----------",
+        "ccsiiiiccc",
+        "ccssrllccc",
+        "cccsrrlccc",
+        "cccccrlccc"
+      ],
+      "listed_under": "shown",
+      "label": "2.zjo.pc #7"
+    },
+    {
+      "id": "2.oz.pc#1",
+      "bag": 2,
+      "parent": "2.oz",
+      "list": "2.oz.pc",
+      "index": 1,
+      "base": "2.oz.after",
+      "rows": [
+        "----------",
+        "ccslliiiic",
+        "ccssljsscc",
+        "cccsljjjcc",
+        "cccccssccc"
+      ],
+      "listed_under": "shown",
+      "label": "2.oz.pc #1"
+    },
+    {
+      "id": "2.slo",
+      "bag": 2,
+      "parent": "bag1.left",
+      "rows": [
+        "----------",
+        "oo-----lll",
+        "oo-----lss",
+        "ccc----ssc",
+        "CCUUUCCCCC",
+        "CCCUCCCCCC",
+        "ccccc--ccc"
+      ],
+      "label": "SLO pre-place, then the TSD",
+      "group": "2.preplace",
+      "spin": "TSD"
+    },
+    {
+      "id": "2.slo.pc#1",
+      "bag": 2,
+      "parent": "2.preplace",
+      "list": "2.slo.pc",
+      "index": 1,
+      "base": "2.slo.after",
+      "rows": [
+        "----------",
+        "ccjjjihccc",
+        "cczzjihccc",
+        "ccczzihccc",
+        "cccccihccc"
+      ],
+      "listed_under": "shown",
+      "label": "2.slo.pc #1"
+    },
+    {
+      "id": "2.slo.pc#2",
+      "bag": 2,
+      "parent": "2.preplace",
+      "list": "2.slo.pc",
+      "index": 2,
+      "base": "2.slo.after",
+      "rows": [
+        "----------",
+        "ccnnjjjccc",
+        "ccnnzzjccc",
+        "ccciiiiccc",
+        "ccccczzccc"
+      ],
+      "listed_under": "shown",
+      "label": "2.slo.pc #2"
+    },
+    {
+      "id": "2.slo.pc#3",
+      "bag": 2,
+      "parent": "2.preplace",
+      "list": "2.slo.pc",
+      "index": 3,
+      "base": "2.slo.after",
+      "rows": [
+        "----------",
+        "cczzuuuccc",
+        "cciiiijccc",
+        "ccczzujccc",
+        "cccccjjccc"
+      ],
+      "listed_under": "shown",
+      "label": "2.slo.pc #3"
+    },
+    {
+      "id": "2.slo.pc#4",
+      "bag": 2,
+      "parent": "2.preplace",
+      "list": "2.slo.pc",
+      "index": 4,
+      "base": "2.slo.after",
+      "rows": [
+        "----------",
+        "ccyyjjjccc",
+        "cciiiizccc",
+        "cccyyzzccc",
+        "ccccczjccc"
+      ],
+      "listed_under": "shown",
+      "label": "2.slo.pc #4"
+    },
+    {
+      "id": "2.slo.pc#5",
+      "bag": 2,
+      "parent": "2.preplace",
+      "list": "2.slo.pc",
+      "index": 5,
+      "base": "2.slo.after",
+      "rows": [
+        "----------",
+        "ccriiiiccc",
+        "ccrrjjjccc",
+        "cccrzzjccc",
+        "ccccczzccc"
+      ],
+      "listed_under": "shown",
+      "label": "2.slo.pc #5"
+    },
+    {
+      "id": "2.holdi.pc#1",
+      "bag": 2,
+      "parent": "2.holdi",
+      "list": "2.holdi.pc",
+      "index": 1,
+      "base": "2.slo.after",
+      "rows": [
+        "----------",
+        "ccjjjkkccc",
+        "cczzjkuccc",
+        "ccczzuuccc",
+        "ccccckuccc"
+      ],
+      "listed_under": "shown",
+      "label": "2.holdi.pc #1"
+    },
+    {
+      "id": "2.holdi.pc#2",
+      "bag": 2,
+      "parent": "2.holdi",
+      "list": "2.holdi.pc",
+      "index": 2,
+      "base": "2.slo.after",
+      "rows": [
+        "----------",
+        "ccjjjmmccc",
+        "cczzjumccc",
+        "ccczzuuccc",
+        "cccccumccc"
+      ],
+      "listed_under": "shown",
+      "label": "2.holdi.pc #2"
+    },
+    {
+      "id": "2.holdi.pc#3",
+      "bag": 2,
+      "parent": "2.holdi",
+      "list": "2.holdi.pc",
+      "index": 3,
+      "base": "2.slo.after",
+      "rows": [
+        "----------",
+        "ccjjjmmccc",
+        "cczzjkkccc",
+        "ccczzkmccc",
+        "ccccckmccc"
+      ],
+      "listed_under": "shown",
+      "label": "2.holdi.pc #3"
+    },
+    {
+      "id": "2.holdi.pc#4",
+      "bag": 2,
+      "parent": "2.holdi",
+      "list": "2.holdi.pc",
+      "index": 4,
+      "base": "2.slo.after",
+      "rows": [
+        "----------",
+        "ccjjjkkccc",
+        "cczzjmmccc",
+        "ccczzkmccc",
+        "ccccckmccc"
+      ],
+      "listed_under": "shown",
+      "label": "2.holdi.pc #4"
+    },
+    {
+      "id": "2.donate.a",
+      "bag": 2,
+      "parent": "bag1.left",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "loo-------",
+        "loo----j-z",
+        "llUUUssjzz",
+        "cccUssjjzc",
+        "cc---ccccc",
+        "ccc-cccccc",
+        "ccccc--ccc"
+      ],
+      "label": "donation TSD, first drawing",
+      "group": "2.donate",
+      "spin": "TSD"
+    },
+    {
+      "id": "2.donate.b",
+      "bag": 2,
+      "parent": "bag1.left",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "jjj-------",
+        "ooj----l-z",
+        "ooUUUlllzz",
+        "cccUiiiizc",
+        "cc---ccccc",
+        "ccc-cccccc",
+        "ccccc--ccc"
+      ],
+      "label": "donation TSD, second drawing",
+      "group": "2.donate",
+      "spin": "TSD"
+    },
+    {
+      "id": "2.donate.after",
+      "bag": 3,
+      "parent": "2.donate",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "ccc-------",
+        "ccc----c-c",
+        "cc---ccccc",
+        "ccc-cccccc",
+        "ccccc--ccc"
+      ],
+      "label": "what both donation drawings leave after the TSD",
+      "after_of": "2.donate.a"
+    },
+    {
+      "id": "2.flat",
+      "bag": 2,
+      "parent": "bag1.left",
+      "rows": [
+        "----------",
+        "-------jjj",
+        "-------zzj",
+        "--------zz",
+        "-------lll",
+        "j------lss",
+        "jjj----ssc",
+        "CCUUUCCCCC",
+        "CCCUCCCCCC",
+        "ccccc--ccc"
+      ],
+      "label": "flat stack into 63-stack, before the TSD",
+      "unmatchable": "9 rows: taller than the classifier's 8, so the 63-stack pre-TSD board is not compared",
+      "spin": "TSD"
+    },
+    {
+      "id": "2.flat.after",
+      "bag": 3,
+      "parent": "2.flat",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "-------jjj",
+        "CCCCC--zzj",
+        "CCCCC---zz",
+        "CCCCCi-lll",
+        "CCCooi-lss",
+        "cccooi-ssc",
+        "ccccci-ccc"
+      ],
+      "label": "63-stack after more pieces (not the bare TSD residue)"
+    },
+    {
+      "id": "2.stsd",
+      "bag": 2,
+      "parent": "bag1.left",
+      "rows": [
+        "----------",
+        "----------",
+        "---------i",
+        "------zz-i",
+        "j------zzi",
+        "jjj----ooi",
+        "ccc----ooc",
+        "CCUUUCCCCC",
+        "CCCUCCCCCC",
+        "ccccc--ccc"
+      ],
+      "label": "STSD branch, the TSD still open",
+      "spin": "TSD"
+    },
+    {
+      "id": "2.stsd.after",
+      "bag": 3,
+      "parent": "2.stsd",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "---------i",
+        "------zz-i",
+        "j------zzi",
+        "jjj-ss-ooi",
+        "cccss--ooc",
+        "ccccc--ccc"
+      ],
+      "label": "STSD continuation (S placed; not the bare TSD residue)"
+    },
+    {
+      "id": "2.ren",
+      "bag": 2,
+      "parent": "bag1.left",
+      "rows": [
+        "----------",
+        "----------",
+        "i------jjj",
+        "il-----ooj",
+        "il----sooz",
+        "ill---sszz",
+        "ccc----szc",
+        "CCUUUCCCCC",
+        "CCCUCCCCCC",
+        "ccccc--ccc"
+      ],
+      "label": "center-well REN branch, the TSD still open",
+      "spin": "TSD"
+    },
+    {
+      "id": "2.ren.after",
+      "bag": 3,
+      "parent": "2.ren",
+      "rows": [
+        "i------lll",
+        "i------loo",
+        "i------joo",
+        "is-----jjj",
+        "css----ccc",
+        "ccs----ccc",
+        "ccUUUzcccc",
+        "cccUzzcccc",
+        "ccc-z--ccc",
+        "ccccc--ccc"
+      ],
+      "label": "REN after the second TSD",
+      "unmatchable": "10 rows: taller than the classifier's 8, so the REN-after board is not compared",
+      "spin": "TSD"
+    },
+    {
+      "id": "overview.diagram",
+      "bag": 1,
+      "parent": null,
+      "node_kind": "image_only",
+      "page_text": "合掌TSDパフェの派生概要図",
+      "label": "the route diagram, an image, no board"
+    },
+    {
+      "id": "refs.commented",
+      "bag": 1,
+      "parent": null,
+      "node_kind": "text_only",
+      "page_text": "にはち砲 - テトリス開幕テンプレWiki",
+      "label": "the 参考ページ block, inside an HTML comment, names Hachispin"
+    },
+    {
+      "id": "2.oz",
+      "bag": 2,
+      "parent": "bag1.left",
+      "node_kind": "text_only",
+      "page_text": "%O%Zの2ミノ先置きの場合、2巡目の初め2ミノが「%L>%S」や「%J>%S」の場合にも対応でき100%でパフェを取ることができます。",
+      "label": "OZ pre-place: the page draws the PC, not a separate setup board"
+    },
+    {
+      "id": "2.holdi",
+      "bag": 2,
+      "parent": "2.preplace",
+      "node_kind": "text_only",
+      "page_text": "また、2巡目の%Iが遅く、3巡目の%T%J%Lが早い場合には%Iをホールドしたまま下図のようなパフェを狙うことができることも一応覚えておくと良いでしょう。",
+      "label": "hold the I and chase the PC the SLO residue leaves"
+    },
+    {
+      "id": "2.tsd.after",
+      "bag": 2,
+      "parent": "2.tsd",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "ccc------c",
+        "ccccc--ccc"
+      ],
+      "derived": true,
+      "node_kind": "illustration",
+      "label": "what 2.tsd leaves after the TSD (derived; the 4-line PC's grey cells)",
+      "after_of": "2.tsd"
+    },
+    {
+      "id": "2.zjo.after",
+      "bag": 2,
+      "parent": "2.zjo",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "oo-----jjz",
+        "oo-----jzz",
+        "ccc----jzc",
+        "ccccc--ccc"
+      ],
+      "derived": true,
+      "node_kind": "illustration",
+      "label": "what 2.zjo leaves after the TSD (derived; the ZJO PC's grey cells)",
+      "after_of": "2.zjo"
+    },
+    {
+      "id": "2.slo.after",
+      "bag": 2,
+      "parent": "2.slo",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "oo-----lll",
+        "oo-----lss",
+        "ccc----ssc",
+        "ccccc--ccc"
+      ],
+      "derived": true,
+      "node_kind": "illustration",
+      "label": "what 2.slo leaves after the TSD (derived; the SLO and hold-I PCs' grey cells)",
+      "after_of": "2.slo"
+    },
+    {
+      "id": "2.oz.after",
+      "bag": 2,
+      "parent": "2.oz",
+      "rows": [
+        "----------",
+        "cc-------c",
+        "cc------cc",
+        "ccc-----cc",
+        "ccccc--ccc"
+      ],
+      "derived": true,
+      "node_kind": "illustration",
+      "label": "the OZ PC's grey cells, derived (the page draws no OZ setup)"
+    }
+  ]
+}

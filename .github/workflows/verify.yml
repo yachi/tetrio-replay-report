@@ -948,6 +948,14 @@ jobs:
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_sdpcspin_routes
 
+      # 合掌TSDパフェ (Gassho TSD), shiwehi.com's template/gasshotsd.php, through the same shared gate.
+      # A bag-1 opening: the catalogue node is the hole-empty 基本形 (opener-fields.json), not the U
+      # overlay. The snapshot is raw HTML and is not committed. Its corpus artefact and demos are
+      # checked by gasshotsd.test.ts and gasshotsd-demos.test.ts in the typescript job.
+      - name: Check the Gassho TSD route transcription
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_gasshotsd_routes
+
       # The first mid-game technique page, STSD (shiwehi.com's template/stsd.php): a local-shape
       # transcription gated by the shared pipeline/openers/technique_transcription.py (its window
       # predicate's Python twin runs over every committed *-routes.json board), and its two pages,
@@ -1256,6 +1264,10 @@ jobs:
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.openers.extract_sdpcspin_routes --selftest
 
+      - name: Check the Gassho TSD route transcription gate catches its mutants
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.openers.extract_gasshotsd_routes --selftest
+
       # The SDPC Spin pages are pinned by revision (oldid, revision_sha1, snapshot_sha256) and are
       # refetched and re-checked weekly by wikitext-sources.yml, which needs the network. Its offline
       # half runs here on every push: the refetch gate's mutants against a fake MediaWiki API (wrong
@@ -1443,6 +1455,13 @@ jobs:
       - name: Check the SDPC Spin page audit catches its corruptions
         if: env.INPUTS_UNCHANGED != '1'
         run: python3 -m pipeline.sdpcspin_page --selftest
+
+      # 合掌TSDパフェ, the same shared renderer bound to pipeline/gasshotsd_page.py. No corpus round
+      # reaches bag 1, so there is no node page (an empty one is refused); the overview and the demo
+      # page are the site. build-docs --check re-renders them.
+      - name: Check the Gassho TSD page audit catches its corruptions
+        if: env.INPUTS_UNCHANGED != '1'
+        run: python3 -m pipeline.gasshotsd_page --selftest
 
       - name: Check the STSD technique page audit catches its corruptions
         if: env.INPUTS_UNCHANGED != '1'

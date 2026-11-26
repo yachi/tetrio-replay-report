@@ -42,7 +42,7 @@
   "routes_md5": "38e59e4d5850468fcc9f8760d3376e04",
   "planner_md5": "2d5030b3a789c384857ebb0232c8c1da",
   "emit_replay_md5": "2acf99b059380595cc3fa14df268e8bb",
-  "classifier_md5": "3a992c4fc24637e9c45ffe62b930dccd"
+  "classifier_md5": "cf1702b082017356b758656eec62bf06"
  },
  "board": {
   "width": 10,
