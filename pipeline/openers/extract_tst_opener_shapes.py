@@ -15,8 +15,9 @@ kinds of source, recorded in the file's `sources` block:
   * the committed route pages' boards (`*-routes.json`), whose T slot is not drawn but found: every
     upright T placement on the filled cells that completes three rows. A shape's name is
     `<routes file prefix> <node id>`.
-  * two boards recorded by hand: johnbeak's Gamushiro bag-2 fumens (rows recorded in the file) and
-    one board a user drew.
+  * boards recorded by hand: johnbeak's Gamushiro bag-2 fumens (rows recorded in the file), one
+    board a user drew whose drawing was not kept, and six Tsar Cannon finishes whose rows are
+    recorded in the file (the same way the fumens are).
 
 The survey filter (every source): a whole number of tetrominoes (cells divisible by four), 36 to 52
 cells, at most eight rows tall, no row already full without the T.
@@ -24,10 +25,12 @@ cells, at most eight rows tall, no row already full without the T.
 WHAT THE DEFAULT RUN CAN AND CANNOT RE-READ. The committed routes files are re-read here, and every
 shape carrying one of their names must equal what they give. harddrop's wikitext is NOT committed
 and the revisions were NOT pinned when it was fetched, so those shapes are named by id in
-`HARDDROP_ONLY` and checked only with `--wikitext-dir`; the johnbeak and user-drawn boards have no
-re-readable source and are named in `OFFSITE`. Each pinned list is compared with what the names
-imply, both ways, so a shape that gains or loses a re-readable source makes the run fail until the
-list is edited. Nothing here is a claim that the unpinned wikitext is still what was fetched.
+`HARDDROP_ONLY` and checked only with `--wikitext-dir`; a shape with neither a harddrop name nor a
+routes name is named in `OFFSITE` (johnbeak-only fumens, the user-drawn boards). The fumens and the
+six Tsar Cannon finishes are re-read from the rows recorded in this file; the one user board whose
+drawing was not kept is not. Each pinned list is compared with what the names imply, both ways, so
+a shape that gains or loses a re-readable source makes the run fail until the list is edited.
+Nothing here is a claim that the unpinned wikitext is still what was fetched.
 """
 from __future__ import annotations
 
@@ -59,9 +62,12 @@ HARDDROP_ONLY = (
     55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 71, 72, 73, 74, 75, 76, 77, 78, 79,
     80, 81, 82, 83, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103,
     104, 105, 106, 107, 108, 109, 110, 111)
-#: Shapes with no source this repo can re-read at all (johnbeak fumens, a user-drawn board).
-OFFSITE = (118, 119, 120)
-OFFSITE_NAMES = ('yachi ',)  # the one name of a board a user drew
+#: Shapes with no harddrop name and no routes name (johnbeak-only fumens, user-drawn boards).
+OFFSITE = (118, 119, 120, 121, 122, 123, 124, 125, 126)
+#: User-drawn boards are named `yachi ...`. This one name has no recorded rows (the drawing was not kept);
+#: every other such name is re-read from `sources.user.boards`.
+USER_PREFIX = 'yachi '
+USER_UNRECOVERED = ('yachi ',)
 
 PINNED = dict(partial=PARTIAL_IDS, harddrop_only=HARDDROP_ONLY, offsite=OFFSITE)
 
@@ -213,7 +219,7 @@ def name_kind(name, sources):
         return 'routes', prefix
     if name.startswith(JOHNBEAK_PREFIX):
         return 'johnbeak', name
-    if name in OFFSITE_NAMES:
+    if name.startswith(USER_PREFIX):
         return 'user', name
     return None, name
 
@@ -227,6 +233,13 @@ def decode_fumen_rows(rows):
     """johnbeak's recorded rows: the T is the `T` letter, every other letter or `G` is filled."""
     cells = occupancy(rows, lambda c: c not in '.T')
     slot = occupancy(rows, lambda c: c == 'T')
+    return sorted(cells), sorted(slot)
+
+
+def decode_user_rows(rows):
+    """A hand-recorded board: `+` is the TST slot, every other character other than `.` is filled."""
+    cells = occupancy(rows, lambda c: c not in '.+')
+    slot = occupancy(rows, lambda c: c == '+')
     return sorted(cells), sorted(slot)
 
 
@@ -327,6 +340,25 @@ def verify(data, wikitext_dir=None, routes_dir=HERE, pinned=PINNED):
     for n in sorted(jb_names - set(jb)):
         bad('derive', f'johnbeak name {n!r} has no recorded fumen')
     rep['johnbeak'] = len(jb)
+
+    # user-drawn rows recorded in the file (the one unrecovered name has none)
+    ub = src['user']['boards']
+    for n, rows in ub.items():
+        cells, slot = decode_user_rows(rows)
+        sh = [s for s in byname.get(n, []) if key(s['cells'], s['tst']) == key(cells, slot)]
+        if not sh:
+            bad('derive', f'user {n!r}: its recorded rows are not the shape under that name')
+    user_names = {n for s in shapes for n in s['names'] if name_kind(n, src)[0] == 'user'}
+    for n in sorted(user_names - set(ub) - set(USER_UNRECOVERED)):
+        bad('derive', f'user name {n!r} has no recorded rows')
+    for n in sorted(set(ub) - user_names):
+        bad('derive', f'recorded user rows {n!r} name no shape')
+    for n in USER_UNRECOVERED:
+        if n not in user_names:
+            bad('derive', f'unrecovered user name {n!r} names no shape')
+        if n in ub:
+            bad('derive', f'unrecovered user name {n!r} also has recorded rows')
+    rep['user'] = len(ub)
 
     # pinned lists, both ways
     want_h, want_off = set(), set()
@@ -444,7 +476,10 @@ def selftest():
     def dup_id(d):
         d['shapes'][1]['id'] = d['shapes'][0]['id']
 
+    user_id = next(s['id'] for s in data['shapes']
+                   if any(n.startswith(USER_PREFIX) and n not in USER_UNRECOVERED for n in s['names']))
     mutant('a: a cell moved (routes-derived shape)', move_cell(route_id), 'derive')
+    mutant('a: a cell moved (user-recorded shape)', move_cell(user_id), 'derive')
     mutant('a: a cell moved (harddrop shape, wikitext re-read)', move_cell(hd_id), 'derive', wikitext=True)
     mutant('a: a cell dropped (harddrop shape, wikitext re-read)', drop_cell(hd_id), 'derive', wikitext=True)
     mutant('b: the T slot does not clear three rows', shift_slot, 'clear3')
@@ -484,7 +519,7 @@ def main(argv=None):
     print(f'shapes: {len(data["shapes"])}, ids unique, every slot a stood T clearing three rows; '
           f'partial (named) {rep["partial"]}')
     print(f'routes files re-read: {rep["route_boards"]} shape boards found, all names agree; '
-          f'johnbeak recorded fumens agree: {rep["johnbeak"]}')
+          f'johnbeak recorded fumens agree: {rep["johnbeak"]}; user recorded rows agree: {rep["user"]}')
     print(f'pinned, not re-readable offline: harddrop-only {rep["harddrop_only"]}, offsite {rep["offsite"]}')
     if a.wikitext_dir:
         print(f'harddrop wikitext re-read ({a.wikitext_dir}): {rep.get("harddrop_boards", 0)} shape boards, all names agree')

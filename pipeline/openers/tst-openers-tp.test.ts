@@ -76,7 +76,7 @@ const shapeKey = (s: { cells: number[][]; tst: number[][] }) => JSON.stringify([
 interface Til { pieces: Pc[]; left: string; A: number; B: number; p5: number }
 interface Cat { id: number; cells: number[][]; tst: number[][]; til: Til[]; classes: Map<string, number> }
 
-/** The 234-shape catalogue: the 121 transcribed shapes (tilings from the old artefact) and the mirrors of those whose mirror is absent. */
+/** The 246-shape catalogue: the 127 transcribed shapes (tilings from the old artefact) and the mirrors of those whose mirror is absent. */
 function catalogue(art: any): Map<number, Cat> {
   const by = new Map<number, Cat>();
   const add = (id: number, cells: number[][], tst: number[][], til: Til[]) => {
