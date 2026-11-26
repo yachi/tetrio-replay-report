@@ -503,6 +503,14 @@ bun pipeline/sim/emit-route-demos.ts --opener sdpcspin \
   --out analysis/sdpcspin-demos.json                            # the constructed SDPC Spin demos (quarantined, not corpus data); emit AFTER the facts
 bun test pipeline/openers/sdpcspin.test.ts pipeline/openers/sdpcspin-demos.test.ts  # its two tests
 python3 -m pipeline.sdpcspin_page --selftest    # the docs/sdpcspin*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_gasshotsd_routes            # CI gate: the 合掌TSDパフェ route transcription
+python3 -m pipeline.openers.extract_gasshotsd_routes --selftest #   its mutants; --html-dir <dir> re-checks gasshotsd.html
+bun pipeline/sim/emit-route-facts.ts --opener gasshotsd \
+  --out analysis/gasshotsd-facts.json                           # 合掌TSD's corpus route artefact (quarantined)
+bun pipeline/sim/emit-route-demos.ts --opener gasshotsd \
+  --out analysis/gasshotsd-demos.json                           # its constructed demos (quarantined, not corpus data); emit AFTER the facts
+bun test pipeline/openers/gasshotsd.test.ts pipeline/openers/gasshotsd-demos.test.ts  # its two tests
+python3 -m pipeline.gasshotsd_page --selftest   # the docs/gasshotsd*.html audit's mutants (--out-dir <dir> renders)
 python3 -m pipeline.openers.extract_stsd_shapes            # CI gate: the STSD technique transcription
 python3 -m pipeline.openers.extract_stsd_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch
 bun pipeline/sim/emit-technique-facts.ts --technique stsd \
@@ -3564,7 +3572,10 @@ metric's Double-first rounds instead (see 「定式路線頁」 and 「C-Spin �
 corpus barely plays; its test cross-checks against the ordering metric's Triple-first rounds. A
 sixth, SDPC Spin (`docs/sdpcspin.html`), has no column either (`wiki-openers.json` draws no SDPC
 field), and is the opener yachi's Double-first rounds actually are: its test cross-checks against the
-ordering metric's Double-first rounds both ways and against stick spin's bag-1 cases.
+ordering metric's Double-first rounds both ways and against stick spin's bag-1 cases. A seventh,
+合掌TSDパフェ (`docs/gasshotsd.html`), has no column either: the catalogue entry is the hole-empty
+基本形, not a harddrop field, and the corpus does not play it (`gasshotsd.test.ts` pins an empty
+case list).
 
 The repertoires split, reproduced independently in all twenty-three sessions (pinned in `openers.test.ts`):
 **pinglamb opens Honey Cup** more than yachi does, **yachi opens Mountainous Stacking** more than
@@ -5429,6 +5440,25 @@ false 「staircase over several locks」 example); that file is hashed, so all n
 demos' `classifier_md5` moved, and `git diff` shows those lines and nothing else. One shared TEST module was added too:
 `pipeline/openers/technique-donation-checks.ts` (`H`, `W`, `scored`, `donationVerdict`) is `parapet.test.ts`'s donation helper
 moved verbatim so `kaidan.test.ts` can import it, and `parapet.test.ts` imports it now; no artefact hashes it.
+
+### 合掌TSDパフェ（Gassho TSD）
+
+The seventh card under 定式路線, after SDPC Spin: `pipeline/openers/gasshotsd-routes.json` (gated by
+`extract_gasshotsd_routes.py` through the shared gate), `analysis/gasshotsd-facts.json`
+(`gasshotsd.test.ts`), `analysis/gasshotsd-demos.json` (`gasshotsd-demos.test.ts`), and
+`docs/gasshotsd.html` plus `gasshotsd-demos.html`. There is no node page: no corpus round reaches
+bag 1, and the shared renderer refuses a page with no case. Counts are read off the artefacts and
+tests, never typed here.
+
+It is a bag-1 opening, not a TST opener and not a mid-game technique. The catalogue node is
+`bag1.left`, the hole-empty 基本形 (Ivan's `Gassho TSD PC`); the TSD-overlay board is that shape
+with the hole drawn `U` and is an illustration, and the I-early board is the same occupancy coloured
+differently. The page's 「4ライン」 and 「6ライン」 count the TSD's two lines; the drawn bodies are
+2 rows and 4 rows. Under the ZJO heading the page says 「SLOを先置き」; that is named as the page's
+typo (`2.zjo.pc:slo_typo`), and the setup board stays O, J and Z. The 63-stack board is 9 rows and
+the REN-after board is 10, both `unmatchable`. Second-shade letters `h n k m r y u` are a later
+I O J L S Z T, read that way when a PC pattern is compared. The only built demo is the bag-1 基本形;
+every other drawing is named unbuilt with the reason.
 
 ### STMB Cave
 

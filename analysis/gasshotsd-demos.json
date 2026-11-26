@@ -1,0 +1,577 @@
+{
+ "schema": "gasshotsd-demos/1",
+ "report_eligible": false,
+ "constructed": true,
+ "means": "Constructed replays, one per drawn node of shiwehi.com's 合掌TSDパフェ route page that the planner can build from an empty board: the bag-1 基本形. The other drawings are named unbuilt, with the reason. Not a game anyone played and not corpus data.",
+ "not_eligible_because": [
+  "not a game anyone played; not corpus data",
+  "one engine, no second implementation of the boards"
+ ],
+ "caveat": {
+  "order": "Bag 1 places O and S before L, and T before J, which is the page's no-hold condition for the left pattern, then the remaining pieces IOTSZJL with those constraints. order_reading records it.",
+  "hold": "No demo holds. The page's bag 1 is built without a held piece under its stated conditions.",
+  "chain": "Only the bag-1 基本形 is built, from an empty board. Later drawings are continuations, second-shade solutions, or taller than eight rows, and are named rather than built.",
+  "spin": "The bag-1 demo places no T-spin: the bag-1 T is stacked in the stack, and the opening TSD is the next bag's T."
+ },
+ "engine": {
+  "options": {
+   "g": 0,
+   "gincrease": 0,
+   "gmargin": 0,
+   "seed": 0,
+   "handling": {
+    "das": 8,
+    "arr": 2,
+    "sdf": 20,
+    "dcd": 0,
+    "safelock": false,
+    "cancel": false,
+    "irs": "off",
+    "ihs": "off",
+    "may20g": false
+   }
+  },
+  "kickset": "SRS+",
+  "allow180": true,
+  "date": "2026-11-26T00:00:00.000Z",
+  "frames_per_input": 4
+ },
+ "inputs": {
+  "routes_md5": "fddacc351837b5ce4efbc62df680e4c8",
+  "planner_md5": "a232242386755ddbf2434ee7d0ee8c60",
+  "emit_replay_md5": "2acf99b059380595cc3fa14df268e8bb",
+  "classifier_md5": "56bdf84667a5e497e08811da2f047b22"
+ },
+ "board": {
+  "width": 10,
+  "rows": 40,
+  "visible_rows": 20,
+  "coords": "y-UP: row 0 is the bottom row",
+  "cell": "yUp * width + x"
+ },
+ "lock_fields": [
+  "dframe",
+  "place",
+  "lines",
+  "spin",
+  "garbage",
+  "held",
+  "attack",
+  "sent"
+ ],
+ "shapes": {
+  "I": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     3,
+     0
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     0,
+     3
+    ]
+   ]
+  ],
+  "O": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ]
+   ]
+  ],
+  "T": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     1,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ],
+  "S": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ]
+  ],
+  "Z": [
+   [
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ],
+  "J": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     0,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     1,
+     2
+    ]
+   ],
+   [
+    [
+     2,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ],
+  "L": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ]
+ },
+ "unbuilt": [
+  {
+   "node": "bag1.right",
+   "reason": "係原頁左邊基本形左右反轉（J↔L、S↔Z），逐格對過；用頁面嘅反轉掣睇"
+  },
+  {
+   "node": "bag1.i_early",
+   "reason": "同基本形佔同一格，只係 I 同上色唔同（原頁話同形）；唔當第二個第一巡形"
+  },
+  {
+   "node": "2.tsd",
+   "reason": "示意圖：基本形個三格窿畫成 TSD 位，U 當空嘅話同基本形同一格"
+  },
+  {
+   "node": "2.tsd.after",
+   "reason": "由上一幅打完 TSD 推導出嚟嘅灰格，原頁冇另畫"
+  },
+  {
+   "node": "2.pc4#1",
+   "reason": "消行走嘅格畫成淺灰 C，示範器唔讀呢個字母做已經砌好嘅格"
+  },
+  {
+   "node": "2.pc4.follow",
+   "reason": "打完 TSD 之後先砌嘅延續，唔係由空盤一個袋砌得完嘅圖"
+  },
+  {
+   "node": "2.pc4.next",
+   "reason": "打完 TSD 之後先砌嘅延續，唔係由空盤一個袋砌得完嘅圖"
+  },
+  {
+   "node": "2.zjo",
+   "reason": "消行走嘅格畫成淺灰 C，示範器唔讀呢個字母做已經砌好嘅格"
+  },
+  {
+   "node": "2.zjo.after",
+   "reason": "由上一幅打完 TSD 推導出嚟嘅灰格，原頁冇另畫"
+  },
+  {
+   "node": "2.slo",
+   "reason": "消行走嘅格畫成淺灰 C，示範器唔讀呢個字母做已經砌好嘅格"
+  },
+  {
+   "node": "2.slo.after",
+   "reason": "由上一幅打完 TSD 推導出嚟嘅灰格，原頁冇另畫"
+  },
+  {
+   "node": "2.oz.after",
+   "reason": "OZ 嗰幅 PC 嘅灰格，原頁冇畫設置圖，由幅圖入面嘅 c 格推導"
+  },
+  {
+   "node": "2.oz.pc#1",
+   "reason": "兩粒 S 畫成同一個字母（八格 s），一個袋得一粒 S"
+  },
+  {
+   "node": "2.donate.a",
+   "reason": "打完 TSD 之後先砌嘅延續，唔係由空盤一個袋砌得完嘅圖"
+  },
+  {
+   "node": "2.donate.b",
+   "reason": "打完 TSD 之後先砌嘅延續，唔係由空盤一個袋砌得完嘅圖"
+  },
+  {
+   "node": "2.donate.after",
+   "reason": "示意圖：兩幅捐贈圖打完 TSD 之後嘅盤面"
+  },
+  {
+   "node": "2.flat",
+   "reason": "高過分類器嘅八行，冇比對"
+  },
+  {
+   "node": "2.flat.after",
+   "reason": "消行走嘅格畫成淺灰 C，示範器唔讀呢個字母做已經砌好嘅格"
+  },
+  {
+   "node": "2.stsd",
+   "reason": "消行走嘅格畫成淺灰 C，示範器唔讀呢個字母做已經砌好嘅格"
+  },
+  {
+   "node": "2.stsd.after",
+   "reason": "打完 TSD 之後先砌嘅延續，唔係由空盤一個袋砌得完嘅圖"
+  },
+  {
+   "node": "2.ren",
+   "reason": "消行走嘅格畫成淺灰 C，示範器唔讀呢個字母做已經砌好嘅格"
+  },
+  {
+   "node": "2.ren.after",
+   "reason": "高過分類器嘅八行，冇比對"
+  },
+  {
+   "node": "2.zjo.pc#1",
+   "reason": "用第二色（h n k m r y u）畫後一袋嘅方塊；一個袋每款得一粒，示範器砌唔到兩粒一樣嘅"
+  },
+  {
+   "node": "2.zjo.pc#2",
+   "reason": "用第二色（h n k m r y u）畫後一袋嘅方塊；一個袋每款得一粒，示範器砌唔到兩粒一樣嘅"
+  },
+  {
+   "node": "2.zjo.pc#3",
+   "reason": "用第二色（h n k m r y u）畫後一袋嘅方塊；一個袋每款得一粒，示範器砌唔到兩粒一樣嘅"
+  },
+  {
+   "node": "2.zjo.pc#4",
+   "reason": "用第二色（h n k m r y u）畫後一袋嘅方塊；一個袋每款得一粒，示範器砌唔到兩粒一樣嘅"
+  },
+  {
+   "node": "2.zjo.pc#5",
+   "reason": "用第二色（h n k m r y u）畫後一袋嘅方塊；一個袋每款得一粒，示範器砌唔到兩粒一樣嘅"
+  },
+  {
+   "node": "2.zjo.pc#6",
+   "reason": "用第二色（h n k m r y u）畫後一袋嘅方塊；一個袋每款得一粒，示範器砌唔到兩粒一樣嘅"
+  },
+  {
+   "node": "2.zjo.pc#7",
+   "reason": "用第二色（h n k m r y u）畫後一袋嘅方塊；一個袋每款得一粒，示範器砌唔到兩粒一樣嘅"
+  },
+  {
+   "node": "2.slo.pc#1",
+   "reason": "用第二色（h n k m r y u）畫後一袋嘅方塊；一個袋每款得一粒，示範器砌唔到兩粒一樣嘅"
+  },
+  {
+   "node": "2.slo.pc#2",
+   "reason": "用第二色（h n k m r y u）畫後一袋嘅方塊；一個袋每款得一粒，示範器砌唔到兩粒一樣嘅"
+  },
+  {
+   "node": "2.slo.pc#3",
+   "reason": "用第二色（h n k m r y u）畫後一袋嘅方塊；一個袋每款得一粒，示範器砌唔到兩粒一樣嘅"
+  },
+  {
+   "node": "2.slo.pc#4",
+   "reason": "用第二色（h n k m r y u）畫後一袋嘅方塊；一個袋每款得一粒，示範器砌唔到兩粒一樣嘅"
+  },
+  {
+   "node": "2.slo.pc#5",
+   "reason": "用第二色（h n k m r y u）畫後一袋嘅方塊；一個袋每款得一粒，示範器砌唔到兩粒一樣嘅"
+  },
+  {
+   "node": "2.holdi.pc#1",
+   "reason": "用第二色（h n k m r y u）畫後一袋嘅方塊；一個袋每款得一粒，示範器砌唔到兩粒一樣嘅"
+  },
+  {
+   "node": "2.holdi.pc#2",
+   "reason": "用第二色（h n k m r y u）畫後一袋嘅方塊；一個袋每款得一粒，示範器砌唔到兩粒一樣嘅"
+  },
+  {
+   "node": "2.holdi.pc#3",
+   "reason": "用第二色（h n k m r y u）畫後一袋嘅方塊；一個袋每款得一粒，示範器砌唔到兩粒一樣嘅"
+  },
+  {
+   "node": "2.holdi.pc#4",
+   "reason": "用第二色（h n k m r y u）畫後一袋嘅方塊；一個袋每款得一粒，示範器砌唔到兩粒一樣嘅"
+  }
+ ],
+ "demos": [
+  {"node":"bag1.left","parent":null,"chain":["bag1.left"],"also":["basic.1"],"seq":"STOIZJLIJLOSTZ","letters":"stoizjl","bags":[{"node":"bag1.left","queue":"STOIZJL","placed":"STOIZJL","unused":"","holds":0,"condition":null,"met":null,"order_reading":["before:OL","before:SL","before:TJ"]}],"inputs":[[4,"keydown","moveRight"],[5,"keyup","moveRight"],[8,"keydown","moveRight"],[9,"keyup","moveRight"],[12,"keydown","softDrop"],[32,"keyup","softDrop"],[36,"keydown","rotateCW"],[37,"keyup","rotateCW"],[40,"keydown","hardDrop"],[41,"keyup","hardDrop"],[44,"keydown","moveLeft"],[45,"keyup","moveLeft"],[48,"keydown","moveLeft"],[49,"keyup","moveLeft"],[52,"keydown","softDrop"],[73,"keyup","softDrop"],[77,"keydown","hardDrop"],[78,"keyup","hardDrop"],[81,"keydown","moveRight"],[82,"keyup","moveRight"],[85,"keydown","moveRight"],[86,"keyup","moveRight"],[89,"keydown","moveRight"],[90,"keyup","moveRight"],[93,"keydown","moveRight"],[94,"keyup","moveRight"],[97,"keydown","softDrop"],[118,"keyup","softDrop"],[122,"keydown","hardDrop"],[123,"keyup","hardDrop"],[126,"keydown","moveLeft"],[127,"keyup","moveLeft"],[130,"keydown","moveLeft"],[131,"keyup","moveLeft"],[134,"keydown","moveLeft"],[135,"keyup","moveLeft"],[138,"keydown","softDrop"],[157,"keyup","softDrop"],[161,"keydown","rotateCW"],[162,"keyup","rotateCW"],[165,"keydown","hardDrop"],[166,"keyup","hardDrop"],[169,"keydown","softDrop"],[189,"keyup","softDrop"],[193,"keydown","rotateCW"],[194,"keyup","rotateCW"],[197,"keydown","hardDrop"],[198,"keyup","hardDrop"],[201,"keydown","moveLeft"],[202,"keyup","moveLeft"],[205,"keydown","moveLeft"],[206,"keyup","moveLeft"],[209,"keydown","softDrop"],[228,"keyup","softDrop"],[232,"keydown","rotateCW"],[233,"keyup","rotateCW"],[236,"keydown","hardDrop"],[237,"keyup","hardDrop"],[240,"keydown","moveRight"],[241,"keyup","moveRight"],[244,"keydown","moveRight"],[245,"keyup","moveRight"],[248,"keydown","moveRight"],[249,"keyup","moveRight"],[252,"keydown","moveRight"],[253,"keyup","moveRight"],[256,"keydown","softDrop"],[275,"keyup","softDrop"],[279,"keydown","hardDrop"],[280,"keyup","hardDrop"]],"frames":283,"locks":[[40,406,0,0,[],0,0,0],[37,1,0,0,[],0,0,0],[45,8,0,0,[],0,0,0],[43,400,0,0,[],0,0,0],[32,404,0,0,[],0,0,0],[39,411,0,0,[],0,0,0],[43,27,0,0,[],0,0,0]],"events":[],"piece_readings":[],"end":{"lock":6,"check":"board"}}
+ ]
+}

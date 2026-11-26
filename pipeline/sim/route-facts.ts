@@ -587,10 +587,16 @@ export function advanceRowmap(rowmap: number[], cleared: number[]): number[] {
   return keep;
 }
 
+/** shiwehi.com's second shade: a later piece of the same letter, so two of one kind can be told apart
+ *  on one drawing (合掌TSD's PC solutions). Read as that piece. No other committed route draws these
+ *  letters, so a pattern without them is unchanged. */
+const SECOND_SHADE: Record<string, string> = { h: 'i', n: 'o', k: 'j', m: 'l', r: 's', y: 'z', u: 't' };
+
 /** A PC pattern against the frame: `U` is the T, `c` a pre-TST cell, a letter that piece (placed
- *  before or after the TST). With `colour` off, only occupancy and the `c` cells are compared. */
+ *  before or after the TST), a second-shade letter that same piece. With `colour` off, only occupancy
+ *  and the `c` cells are compared. */
 export function patternMatches(comp: string[], rows: string[], mirrored: boolean, colour: boolean, pcRows: number): boolean {
-  let pr = rows.map(x => x.toUpperCase().replace(/U/g, 'T'));
+  let pr = rows.map(row => [...row].map(c => SECOND_SHADE[c] ?? c).join('').toUpperCase().replace(/U/g, 'T'));
   if (mirrored) pr = mirrorRows(pr);
   if (pr.length > pcRows) return false;
   const pad = [...Array(pcRows - pr.length).fill('----------'), ...pr];

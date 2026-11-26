@@ -150,7 +150,7 @@
    }
   ],
   "transcription_md5": "e2e8d6deb255dc18c0e6713526503d94",
-  "emitter_md5": "83376b0a81288f9adfbcca25d31c77b2"
+  "emitter_md5": "d8c6d9e8867ce4a777e3fb461748fb43"
  },
  "sessions": [
   "2026-07-22",
@@ -551,7 +551,7 @@
   "rules": [
    "in_opener: the T locks inside the opener window (0-based lock <= WINDOW_PIECES); the page is mid-game only",
    "other_page: another technique page's window (stsd, stmbcave, imperialcross, doubledagger, btcannon, cutcopy, shachikutrain, parapet, kaidan, dtcannon, kingcrimson, cavetsstst, hamburger; any variant clearing the same rows, either hand) fires at the same T, so the T is that page's; 基本的なドネイト is not read",
-   "opener_route: the round is a case of an opener route page (stray-cannon, honey-cup, mountainous2, stickspin, gamushiro, sdpcspin) that matched a bag-2 board, and the T locks within 14 locks after that match, so the T is the route's own continuation",
+   "opener_route: the round is a case of an opener route page (stray-cannon, honey-cup, mountainous2, stickspin, gamushiro, sdpcspin, gasshotsd) that matched a bag-2 board, and the T locks within 14 locks after that match, so the T is the route's own continuation",
    "opener_spin: the T is the bag-1 T-spin an opener route page draws (bag1.spin of a case in the same artefacts)",
    "qualifies iff none applies; the spin happened at every hit either way"
   ],

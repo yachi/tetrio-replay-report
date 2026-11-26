@@ -33,7 +33,8 @@ export const OTHER_PAGES = ['stsd', 'stmbcave', 'imperialcross', 'doubledagger',
                             'parapet', 'kaidan', 'dtcannon', 'hamburger'];
 
 /** The opener route artefacts `opener_route` reads, under `analysis/`. */
-export const ROUTE_ARTEFACTS = ['stray-cannon', 'honey-cup', 'mountainous2', 'stickspin', 'gamushiro', 'sdpcspin'];
+export const ROUTE_ARTEFACTS = ['stray-cannon', 'honey-cup', 'mountainous2', 'stickspin', 'gamushiro', 'sdpcspin',
+                                'gasshotsd'];
 /** Two bags after the bag-2 match. */
 export const ROUTE_LOCKS = 14;
 

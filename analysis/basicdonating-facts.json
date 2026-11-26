@@ -151,7 +151,7 @@
    }
   ],
   "transcription_md5": "5766d6624e65eacac4593f8a117852d0",
-  "emitter_md5": "c33b68f220b9e7c37e15df42a874c4c3"
+  "emitter_md5": "9a44f9db33424a30310520472cb17f0d"
  },
  "sessions": [
   "2026-07-22",
@@ -642,7 +642,7 @@
  "qualify": {
   "rules": [
    "other_page: another technique page's window (stsd, stmbcave, imperialcross, doubledagger, btcannon, cutcopy, shachikutrain, parapet, kaidan, dtcannon, hamburger; any variant of the same spin, either hand) fires at the same T, so the T is that page's",
-   "opener_route: the round is a case of an opener route page (stray-cannon, honey-cup, mountainous2, stickspin, gamushiro, sdpcspin) that matched a bag-2 board, and the T locks within 14 locks after that match, so the T is the route's own continuation",
+   "opener_route: the round is a case of an opener route page (stray-cannon, honey-cup, mountainous2, stickspin, gamushiro, sdpcspin, gasshotsd) that matched a bag-2 board, and the T locks within 14 locks after that match, so the T is the route's own continuation",
    "opener_spin: the T is the bag-1 T-spin an opener route page draws (bag1.spin of a case in the same artefacts), so the spin is the opener's own, not a mid-game donation",
    "qualifies iff none applies; the donation happened at every hit either way"
   ],
