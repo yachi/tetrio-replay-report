@@ -243,6 +243,9 @@
       "base": "2.tsd.after",
       "bag": 2,
       "pc_lines": 2,
+      "total_lines": 4,
+      "total_lines_quote": "2.pc4",
+      "pc_lines_note": "the 2-row body plus the opening TSD; the page's 4ライン is re-derived along the base chain",
       "rest_stated": 0,
       "stated_pattern_count": null,
       "complete": false,
@@ -257,6 +260,9 @@
       "base": "2.zjo.after",
       "bag": 2,
       "pc_lines": 4,
+      "total_lines": 6,
+      "total_lines_quote": "overview.intro",
+      "pc_lines_note": "the 4-row body plus the opening TSD; the page's 6ライン is re-derived along the base chain",
       "rest_stated": 0,
       "stated_pattern_count": null,
       "complete": false,
@@ -271,6 +277,9 @@
       "base": "2.slo.after",
       "bag": 2,
       "pc_lines": 4,
+      "total_lines": 6,
+      "total_lines_quote": "overview.intro",
+      "pc_lines_note": "the 4-row body plus the opening TSD; the page's 6ライン is re-derived along the base chain",
       "rest_stated": 0,
       "stated_pattern_count": null,
       "complete": false,
@@ -285,6 +294,9 @@
       "base": "2.slo.after",
       "bag": 2,
       "pc_lines": 4,
+      "total_lines": 6,
+      "total_lines_quote": "overview.intro",
+      "pc_lines_note": "the 4-row body plus the opening TSD the SLO residue already fired; the page's 6ライン is that same total",
       "rest_stated": 0,
       "stated_pattern_count": null,
       "complete": false,
@@ -299,6 +311,9 @@
       "base": "2.oz.after",
       "bag": 2,
       "pc_lines": 4,
+      "total_lines": 6,
+      "total_lines_quote": "overview.intro",
+      "pc_lines_note": "the 4-row body plus the opening TSD. The page draws no OZ setup, so the 2 lines are the drawn TSD's, the same clear the other lists walk",
       "rest_stated": 0,
       "stated_pattern_count": 1,
       "complete": true,
@@ -1028,7 +1043,8 @@
       ],
       "derived": true,
       "node_kind": "illustration",
-      "label": "what 2.tsd leaves after the TSD (derived; the 4-line PC's grey cells)"
+      "label": "what 2.tsd leaves after the TSD (derived; the 4-line PC's grey cells)",
+      "after_of": "2.tsd"
     },
     {
       "id": "2.zjo.after",
@@ -1045,7 +1061,8 @@
       ],
       "derived": true,
       "node_kind": "illustration",
-      "label": "what 2.zjo leaves after the TSD (derived; the ZJO PC's grey cells)"
+      "label": "what 2.zjo leaves after the TSD (derived; the ZJO PC's grey cells)",
+      "after_of": "2.zjo"
     },
     {
       "id": "2.slo.after",
@@ -1062,7 +1079,8 @@
       ],
       "derived": true,
       "node_kind": "illustration",
-      "label": "what 2.slo leaves after the TSD (derived; the SLO and hold-I PCs' grey cells)"
+      "label": "what 2.slo leaves after the TSD (derived; the SLO and hold-I PCs' grey cells)",
+      "after_of": "2.slo"
     },
     {
       "id": "2.oz.after",

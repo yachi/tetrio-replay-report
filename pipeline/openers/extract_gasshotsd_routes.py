@@ -24,7 +24,8 @@ WHAT IS AN INFERENCE, flagged in the JSON rather than in prose only:
   * the I-early board is the same occupancy coloured differently (the page says 同形). It is not a
     second bag-1 shape and not a catalogue field.
   * 「4ラインパフェ」 and 「6ラインパフェ」 count the TSD's two lines. The drawn PC bodies are 2 rows
-    and 4 rows (`pc_lines` 2 and 4). A list checked at 6 fails rule 3.
+    and 4 rows (`pc_lines` 2 and 4). `total_lines` is what a demo clears, TSD included: 4 and 6,
+    re-derived along the base chain the way ガムシロ積み's is. A list checked at 6 fails rule 3.
   * upper-case `C` is a cell of an earlier bag in a row the TSD clears (the renderer's muted grey).
     `h n k m r y u` are the renderer's second shade of I O J L S Z T.
   * under the ZJO heading the page says 「SLOを先置き」. That is the page's typo; the board is Z, J
@@ -316,23 +317,33 @@ BASIC_FORM = [
 
 LISTS = [
     {'id': '2.pc4', 'parent': '2.tsd', 'base': '2.tsd.after', 'bag': 2,
-     'pc_lines': 2, 'rest_stated': 0, 'stated_pattern_count': None, 'complete': False,
+     'pc_lines': 2, 'total_lines': 4, 'total_lines_quote': '2.pc4',
+     'pc_lines_note': 'the 2-row body plus the opening TSD; the page\'s 4ライン is re-derived along the base chain',
+     'rest_stated': 0, 'stated_pattern_count': None, 'complete': False,
      'heading': '理想形(TSD→4ラインパフェ)',
      'note': 'one 2-row body. The page\'s 4ライン counts the TSD\'s 2 as well (2+2). Rate 5.71% = 288/5040, our reading; the page draws one solution'},
     {'id': '2.zjo.pc', 'parent': '2.preplace', 'base': '2.zjo.after', 'bag': 2,
-     'pc_lines': 4, 'rest_stated': 0, 'stated_pattern_count': None, 'complete': False,
+     'pc_lines': 4, 'total_lines': 6, 'total_lines_quote': 'overview.intro',
+     'pc_lines_note': 'the 4-row body plus the opening TSD; the page\'s 6ライン is re-derived along the base chain',
+     'rest_stated': 0, 'stated_pattern_count': None, 'complete': False,
      'heading': '3ミノ先置き(ZJO)',
      'note': 'seven 4-row bodies. The page\'s 6ライン is 2+4. Rate 95.24% = 20/21, our reading. The heading\'s next sentence says SLO; that is the typo'},
     {'id': '2.slo.pc', 'parent': '2.preplace', 'base': '2.slo.after', 'bag': 2,
-     'pc_lines': 4, 'rest_stated': 0, 'stated_pattern_count': None, 'complete': False,
+     'pc_lines': 4, 'total_lines': 6, 'total_lines_quote': 'overview.intro',
+     'pc_lines_note': 'the 4-row body plus the opening TSD; the page\'s 6ライン is re-derived along the base chain',
+     'rest_stated': 0, 'stated_pattern_count': None, 'complete': False,
      'heading': '3ミノ先置き(SLO)',
      'note': 'five 4-row bodies the page calls the practical ones of a larger set. No percentage is stated for this pre-place'},
     {'id': '2.holdi.pc', 'parent': '2.holdi', 'base': '2.slo.after', 'bag': 2,
-     'pc_lines': 4, 'rest_stated': 0, 'stated_pattern_count': None, 'complete': False,
+     'pc_lines': 4, 'total_lines': 6, 'total_lines_quote': 'overview.intro',
+     'pc_lines_note': 'the 4-row body plus the opening TSD the SLO residue already fired; the page\'s 6ライン is that same total',
+     'rest_stated': 0, 'stated_pattern_count': None, 'complete': False,
      'heading': 'hold I, on the SLO residue',
      'note': 'four 4-row examples (「のような」). Same residue as the SLO list. No percentage'},
     {'id': '2.oz.pc', 'parent': '2.oz', 'base': '2.oz.after', 'bag': 2,
-     'pc_lines': 4, 'rest_stated': 0, 'stated_pattern_count': 1, 'complete': True,
+     'pc_lines': 4, 'total_lines': 6, 'total_lines_quote': 'overview.intro',
+     'pc_lines_note': 'the 4-row body plus the opening TSD. The page draws no OZ setup, so the 2 lines are the drawn TSD\'s, the same clear the other lists walk',
+     'rest_stated': 0, 'stated_pattern_count': 1, 'complete': True,
      'heading': '2ミノ先置き(OZ)',
      'note': 'the one drawn 4-row shape. The page says 100% and draws one board, not a partial catalogue'},
 ]
@@ -377,9 +388,14 @@ def _c_skeleton(rows: list[str]) -> list[str]:
     return [''.join(ch if ch == 'c' else EMPTY for ch in r) for r in rows]
 
 
-def _derived(nid, parent, rows, label):
-    return {'id': nid, 'bag': 2, 'parent': parent, 'rows': rows, 'derived': True,
-            'node_kind': 'illustration', 'label': label}
+def _derived(nid, parent, rows, label, after_of=None):
+    row = {'id': nid, 'bag': 2, 'parent': parent, 'rows': rows, 'derived': True,
+           'node_kind': 'illustration', 'label': label}
+    # the residue of a drawn TSD, so the line-count walk can add that spin the way ガムシロ積み's
+    # `after_of` residues do. The OZ residue has no drawn setup, so it carries none.
+    if after_of:
+        row['after_of'] = after_of
+    return row
 
 
 def build() -> dict:
@@ -387,11 +403,14 @@ def build() -> dict:
     by = {n['id']: n for n in nodes}
     nodes += [
         _derived('2.tsd.after', '2.tsd', after_spin(by['2.tsd']['rows'])[0],
-                 'what 2.tsd leaves after the TSD (derived; the 4-line PC\'s grey cells)'),
+                 'what 2.tsd leaves after the TSD (derived; the 4-line PC\'s grey cells)',
+                 after_of='2.tsd'),
         _derived('2.zjo.after', '2.zjo', after_spin(by['2.zjo']['rows'])[0],
-                 'what 2.zjo leaves after the TSD (derived; the ZJO PC\'s grey cells)'),
+                 'what 2.zjo leaves after the TSD (derived; the ZJO PC\'s grey cells)',
+                 after_of='2.zjo'),
         _derived('2.slo.after', '2.slo', after_spin(by['2.slo']['rows'])[0],
-                 'what 2.slo leaves after the TSD (derived; the SLO and hold-I PCs\' grey cells)'),
+                 'what 2.slo leaves after the TSD (derived; the SLO and hold-I PCs\' grey cells)',
+                 after_of='2.slo'),
         _derived('2.oz.after', '2.oz', _c_skeleton(by['2.oz.pc#1']['rows']),
                  'the OZ PC\'s grey cells, derived (the page draws no OZ setup)'),
     ]
@@ -566,6 +585,31 @@ def _gassho_checks(data: dict, ctx: dict) -> tuple[list[str], set[str]]:
     for lst in data.get('lists', []):
         if lst.get('pc_lines') == 6:
             bad.append(f'pc: {lst["id"]} is checked at 6 lines; the drawn body is not 6 (the TSD\'s 2 are not in the drawing)')
+
+    # a list's stated total is the body plus every spin back along its base, ガムシロ積み's walk.
+    # The OZ residue has no drawn setup: its 2 lines are the opening TSD's, measured off that board.
+    for lst in data.get('lists', []):
+        pats = [n for n in nodes if n.get('list') == lst['id']]
+        if lst.get('total_lines') is None or not pats:
+            continue
+        total, cur, seen = len(bottom(pats[0]['rows'], 0)), lst.get('base'), set()
+        while cur in by_id and cur not in seen:
+            seen.add(cur)
+            b = by_id[cur]
+            if b.get('after_of') in boards:
+                total += after_spin(boards[b['after_of']])[1]
+                cur = by_id[b['after_of']].get('base')
+            elif b.get('id') == '2.oz.after' and '2.tsd' in boards:
+                total += after_spin(boards['2.tsd'])[1]
+                cur = None
+            else:
+                cur = b.get('base')
+        if total != lst['total_lines']:
+            bad.append(f'lines: {lst["id"]} clears {total} lines over its line, the page says {lst["total_lines"]}')
+        qv = quotes.get(lst.get('total_lines_quote'), {}).get('verbatim', '')
+        if f'{lst["total_lines"]}ライン' not in qv:
+            bad.append(f'lines: quote {lst.get("total_lines_quote")!r} does not state {lst["total_lines"]}ライン '
+                       f'for {lst["id"]}')
     return bad, found
 
 
@@ -595,6 +639,9 @@ def selftest() -> int:
 
     def pc_at_6(d):
         next(x for x in d['lists'] if x['id'] == '2.zjo.pc')['pc_lines'] = 6
+
+    def total_lines(d):
+        next(x for x in d['lists'] if x['id'] == '2.pc4')['total_lines'] = 5
 
     def drop_typo(d):
         next(q for q in d['quotes'] if q['id'] == '2.zjo.typo')['verbatim'] = 'ZJOを先置きした場合。'
@@ -637,6 +684,7 @@ def selftest() -> int:
         (i_early_off, 'I-early no longer the same occupancy', 'discrepancy:'),
         (overlay_matched, 'the U overlay treated as its own shape', 'tsd-overlay:'),
         (pc_at_6, 'a 4-row PC list checked at 6 lines', 'pc:'),
+        (total_lines, 'the 4ライン total misstated', 'lines:'),
         (drop_typo, 'the ZJO section no longer saying SLO', 'typo:'),
         (drop_discrepancy, 'the SLO-typo discrepancy dropped', 'discrepancy:'),
         (basic_off, 'the 1巡目 diagram off the 基本形', 'basic-form:'),
