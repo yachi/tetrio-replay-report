@@ -38,6 +38,7 @@ import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { loadTranscription, prepare } from './technique-facts.ts';
+import { minNeedNative } from './cutcopy-native.ts';
 import { decodeTimeline, placeCells, queueStates, SHAPES, ROWS, WIDTH, type Lock } from './emit-replay.ts';
 
 const SIM = import.meta.dir;
@@ -388,7 +389,7 @@ const buildable = (b: any[][]) => windowCanStand(b) && !!E.findBuild(b);
 /** breadth first over placements of every piece (hold allowed): the depth at which a build first stands, or
  *  `{ beyond: d, cut }` when none within `cap` (cut: a frontier before `cap` passed MIN_FRONTIER and the search
  *  stopped there, so it is not exhaustive; the last level is always searched whole) */
-export function minNeed(pz: any, cap: number): number | { beyond: number; cut: boolean } {
+export function minNeedTs(pz: any, cap: number): number | { beyond: number; cut: boolean } {
   let lvl = [{ run: E.newRun(pz), qi: 0 }];
   if (buildable(lvl[0]!.run.board)) return 0;
   for (let d = 1; d <= cap; d++) {
@@ -404,6 +405,14 @@ export function minNeed(pz: any, cap: number): number | { beyond: number; cut: b
     if (d < cap && lvl.length > MIN_FRONTIER) return { beyond: d, cut: true };
   }
   return { beyond: cap, cut: false };
+}
+
+/** `minNeedTs`, answered by the Rust port (`cutcopy-native.ts`) unless `CUTCOPY_NATIVE=off`; `cutcopy-native.test.ts`
+ *  holds the two equal. */
+export function minNeed(pz: any, cap: number): number | { beyond: number; cut: boolean } {
+  if (process.env.CUTCOPY_NATIVE === 'off') return minNeedTs(pz, cap);
+  const run = E.newRun(pz);
+  return minNeedNative(pz, run.board, run.hold, E.windows(), cap, MIN_FRONTIER);
 }
 
 export function difficulty(d: any) {

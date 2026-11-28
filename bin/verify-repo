@@ -459,7 +459,7 @@ PLAN = {
     # are exactly what a local run should confirm before a push.
     "workflow-plan": Entry(FAST, never_skip="it checks the gates themselves; a skip would let a "
                                             "workflow edit that broke them go green"),
-    # Sharded over two runners (`--shard=k/2`); each shard is a matrix entry with its own hash,
+    # Sharded over four runners (`--shard=k/4`); each shard is a matrix entry with its own hash,
     # and both hash the same closure.
     "typescript": Entry(DEFAULT, needs=["bun"], matrix="shard",
                         roots=CORPUS + ("spec/", "tools/", "nix/")),

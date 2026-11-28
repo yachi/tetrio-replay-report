@@ -284,19 +284,25 @@ test('(c) each invariant has a mutant that fires', () => {
 
 // ---- the crate ----------------------------------------------------------------------------------------------------
 const CRATE = join(SIM, 'tst2bag-tp-rs');
+let CRATE_BIN: string | null | undefined;   // built once (synchronously, before any test awaits), shared by every test
 function crateBin(): string | null {
+  if (CRATE_BIN !== undefined) return CRATE_BIN;
   const bin = join(CRATE, 'target', 'release', 'tst2bag-tp');
   const r = Bun.spawnSync(['cargo', 'build', '--release', '--manifest-path', join(CRATE, 'Cargo.toml')], { stderr: 'pipe' });
-  return r.exitCode === 0 && existsSync(bin) ? bin : null;
+  return (CRATE_BIN = r.exitCode === 0 && existsSync(bin) ? bin : null);
 }
-const run = (bin: string, lines: string[], env: Record<string, string>) => {
-  const r = Bun.spawnSync([bin], { stdin: Buffer.from(lines.join('\n') + '\n'), stderr: 'pipe', env: { ...process.env, JOBS: '2', ...env } });
-  expect(r.exitCode).toBe(0);
-  return r.stdout.toString().trim().split('\n').map((l) => JSON.parse(l));
+/** Runs the binary asynchronously, so the tests that call it can run concurrently (each is a separate Rust process). */
+const spawnLines = async (bin: string, input: string, env: Record<string, string>) => {
+  const pr = Bun.spawn([bin], { stdin: Buffer.from(input), stdout: 'pipe', stderr: 'pipe', env: { ...process.env, ...env } });
+  const [out, , code] = await Promise.all([new Response(pr.stdout).text(), new Response(pr.stderr).text(), pr.exited]);
+  expect(code).toBe(0);
+  return out;
 };
+const run = async (bin: string, lines: string[], env: Record<string, string>) =>
+  (await spawnLines(bin, lines.join('\n') + '\n', { JOBS: '2', ...env })).trim().split('\n').map((l) => JSON.parse(l));
 const CAT = catalogue(ART);
 
-test('(d) pinned boards re-run as MULTI lines equal cum at every soft-drop budget', () => {
+test.concurrent('(d) pinned boards re-run as MULTI lines equal cum at every soft-drop budget', async () => {
   const bin = crateBin();
   if (!bin) { console.warn('SKIPPED (d): cargo is unavailable or the crate failed to build; the recount is NOT re-checked'); return; }
   const boards = [...PINNED_BOARDS, ...PINNED_HELD].map((k) => ART.boards.find((b: any) => keyOf(b.pieces) === k));
@@ -308,8 +314,9 @@ test('(d) pinned boards re-run as MULTI lines equal cum at every soft-drop budge
     const cl = b.classes.map(([si, l]: [number, string]) => `${si}:${l || '-'}`).join(';');
     return `p${i}#${b1}#${sh}#${cl}`;
   });
-  for (const [bk, env] of [['0', { SDB: '0' }], ['1', { SDB: '1' }], ['2', { SDB: '2' }], ['inf', {}]] as [string, Record<string, string>][]) {
-    const got = run(bin, lines, { MULTI: '1', ...env });
+  const runs = ([['0', { SDB: '0' }], ['1', { SDB: '1' }], ['2', { SDB: '2' }], ['inf', {}]] as [string, Record<string, string>][])
+    .map(([bk, env]) => run(bin, lines, { MULTI: '1', ...env }).then((got) => [bk, got] as [string, any[]]));
+  for (const [bk, got] of await Promise.all(runs)) {
     boards.forEach((b: any, i: number) => {
       const g = got.find((x: any) => x.name === `p${i}`);
       expect({ ntil: g.ntil, cum: g.cum }).toEqual({ ntil: b.ntil, cum: b.cum[bk] });
@@ -317,7 +324,7 @@ test('(d) pinned boards re-run as MULTI lines equal cum at every soft-drop budge
   }
 }, 300_000);
 
-test('(e) TPL+LASTONLY of two cheap original shapes equals built1 on every board listing them', () => {
+test.concurrent('(e) TPL+LASTONLY of two cheap original shapes equals built1 on every board listing them', async () => {
   const bin = crateBin();
   if (!bin) { console.warn('SKIPPED (e): cargo is unavailable or the crate failed to build; built1 is NOT re-checked'); return; }
   const lines = PINNED_E.map((id) => {
@@ -325,7 +332,7 @@ test('(e) TPL+LASTONLY of two cheap original shapes equals built1 on every board
     const cl = [...c.classes].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1)).map(([l]) => l || '-');
     return `s${id}|${pts(c.cells)}|${pts(c.tst)}|${cl.join(';')}`;
   });
-  const got = run(bin, lines, { FIXED: '1', TPL: '1', LASTONLY: '1' });
+  const got = await run(bin, lines, { FIXED: '1', TPL: '1', LASTONLY: '1' });
   let checked = 0;
   for (const id of PINNED_E) {
     const g = got.find((x: any) => x.name === `s${id}`);
@@ -340,7 +347,7 @@ test('(e) TPL+LASTONLY of two cheap original shapes equals built1 on every board
   expect(checked).toBeGreaterThan(0);
 }, 300_000);
 
-test('(g) held boards: FIXED+LASTONLY of cheap shapes equals built1, and every held built1 is a count tst-openers.json holds', () => {
+test.concurrent('(g) held boards: FIXED+LASTONLY of cheap shapes equals built1, and every held built1 is a count tst-openers.json holds', async () => {
   const held = ART.boards.filter((b: any) => b.held === 'T');
   expect(held.length).toBeGreaterThan(0);
   // cargo-free: a held board of an original shape is one of that shape's FIXED boards, whose last cum is built1
@@ -359,7 +366,7 @@ test('(g) held boards: FIXED+LASTONLY of cheap shapes equals built1, and every h
     const cl = [...c.classes].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1)).map(([l]) => l || '-');
     return `s${id}|${pts(c.cells)}|${pts(c.tst)}|${cl.join(';')}`;
   });
-  const got = run(bin, lines, { FIXED: '1', LASTONLY: '1' });
+  const got = await run(bin, lines, { FIXED: '1', LASTONLY: '1' });
   let checked = 0;
   for (const id of PINNED_G) {
     const g = got.find((x: any) => x.name === `s${id}`);
@@ -374,13 +381,13 @@ test('(g) held boards: FIXED+LASTONLY of cheap shapes equals built1, and every h
   expect(checked).toBeGreaterThan(0);
 }, 300_000);
 
-test('(f) symmetry probe: the mirrors of five cheap shapes re-run in default mode equal mirror_shapes', () => {
+test.concurrent('(f) symmetry probe: the mirrors of five cheap shapes re-run in default mode equal mirror_shapes', async () => {
   const bin = crateBin();
   if (!bin) { console.warn('SKIPPED (f): cargo is unavailable or the crate failed to build; the mirrors are NOT re-checked'); return; }
   const recs = PINNED_F.map((id) => ART.mirror_shapes.find((m: any) => m.mirror_of === id)).filter((m: any) => m);
   expect(recs.length).toBeGreaterThan(0);
   const lines = recs.map((m: any) => { const c = CAT.get(m.id)!; return `s${m.id}|${pts(c.cells)}|${pts(c.tst)}`; });
-  const got = run(bin, lines, {});
+  const got = await run(bin, lines, {});
   for (const m of recs) {
     const g = got.find((x: any) => x.name === `s${m.id}`);
     const c = CAT.get(m.id)!;
@@ -408,12 +415,16 @@ test('the pinned boards exist', () => {
 import { inflateSync } from 'node:zlib';
 const INFEAS = 10;
 const BKEYS = ['0', '1', '2', 'inf'];
-const vecOf = (name: string): number[] => {
-  const s = inflateSync(Buffer.from(B1.vectors[name] ?? X.vectors[name], 'base64')).toString();
+/** one board's first-bag cost vector: the inflated string, '.' (infeasible) -> INFEAS, else the digit. */
+const vecU8 = (name: string, into?: Uint8Array): Uint8Array => {
+  const s = inflateSync(Buffer.from(B1.vectors[name] ?? X.vectors[name], 'base64'));
   expect(s.length).toBe(B);
-  return [...s].map((c) => (c === '.' ? INFEAS : c.charCodeAt(0) - 48));
+  const o = into ?? new Uint8Array(B);
+  for (let i = 0; i < B; i++) { const c = s[i]!; o[i] = c === 46 ? INFEAS : c - 48; }
+  return o;
 };
-function tables(b: any, v: number[]) {
+const vecOf = (name: string): number[] => Array.from(vecU8(name));
+function tables(b: any, v: Uint8Array) {
   const n = new Array(INFEAS + 1).fill(0);
   for (const x of v) n[x]++;
   const nfeas = B - n[INFEAS];
@@ -471,7 +482,8 @@ test('(h) every family figure is recomputed from the boards and the first-bag ve
     const t = STAT[i]; tab.set(b.name, t.out);
     for (const bk of BKEYS) {   // a one-board family reproduces the board's own figures
       let bsum = 0, jsum = 0;
-      for (const x of v) { bsum += t.out[bk][1][x]; jsum += t.out[bk][0][x]; }
+      const Jo = t.out[bk][0], Bo = t.out[bk][1];
+      for (let o = 0; o < B; o++) { const x = v[o]!; bsum += Bo[x]; jsum += Jo[x]; }
       expect(bsum).toBe(b.cum[bk][b.cum[bk].length - 1]);
       let n = 0, prev = 0;
       b.cum[bk].forEach((c: number, i: number) => { n += (c - prev) * b.classes[i][2]; prev = c; });
@@ -497,23 +509,22 @@ test('(h) every family figure is recomputed from the boards and the first-bag ve
     (lay.get(bkey(all)) ?? lay.set(bkey(all), new Set()).get(bkey(all))!);
   }
   const byKey = new Map<string, string>(ALL.map((b: any) => [keyOf(b.pieces), b.name]));
+  const idxOf = new Map<string, number>(ALL.map((b: any, i: number) => [b.name, i] as [string, number]));
   const check = (names: string[], num: any, pk: any) => {
+    const ids = names.map((n) => idxOf.get(n)!);
     for (const bk of BKEYS) {
       let bn = 0, pn = 0;
       const pick = names.map(() => 0);
-      const lim = bk === 'inf' ? INFEAS - 1 : Number(bk);
-      const vs = names.map((n) => vec.get(n)!), Js = names.map((n) => tab.get(n)[bk][0]), Bs = names.map((n) => tab.get(n)[bk][1]);
+      const T = keysOf(bk);
       for (let o = 0; o < B; o++) {
-        let best = -1, arg = -1;
-        for (let t = 0; t < names.length; t++) {
-          const s = vs[t]![o]!;
-          if (s > lim) continue;
-          const key = Js[t][s] * 8192 + Bs[t][s];
-          if (key > best) { best = key; arg = t; }
+        let best = -1, arg = -1, ax = 0;
+        for (let t = 0; t < ids.length; t++) {
+          const ix = ids[t]! * W11 + V[ids[t]! * B + o]!;
+          const key = T.KT[ix]!;      // -1 when the cost exceeds the budget
+          if (key > best) { best = key; arg = t; ax = ix; }
         }
         if (arg < 0) continue;
-        const s = vs[arg]![o]!;
-        bn += Bs[arg][s]; pn += Js[arg][s]; pick[arg]++;
+        bn += T.BT[ax]!; pn += T.JT[ax]!; pick[arg]++;
       }
       expect([bn, pn]).toEqual(num[bk]);
       expect(pick).toEqual(pk[bk]);
@@ -523,14 +534,20 @@ test('(h) every family figure is recomputed from the boards and the first-bag ve
   const listed = new Set(F.list.map((L: any) => bkey(L.pieces)));
   for (const k of lay.keys()) expect(listed.has(k)).toBe(true);
   const order = new Map<string, number>(ALL.map((b: any, i: number) => [b.name, i]));
-  const keysAll = ALL.map((b: any) => [b.name, pieceKeys(b.pieces)] as [string, Set<string>]);
+  // boards by their set of six pieces (a board's pieces are distinct), to find the boards equal to a layout less one piece
+  const bySet = new Map<string, string[]>();
+  for (const b of ALL) { const ks = pieceKeys(b.pieces); if (ks.size === 6) { const k = [...ks].sort().join('/'); (bySet.get(k) ?? bySet.set(k, []).get(k)!).push(b.name); } }
   for (const L of F.list) {
     const names: string[] = L.variants;
     expect(names.length).toBeGreaterThanOrEqual(2);
     // each variant is the layout less one piece, and every kept such board is listed
     const want = new Set<string>();
     const all = pieceKeys(L.pieces);
-    for (const [n, ks] of keysAll) if (ks.size === 6 && [...ks].every((x) => all.has(x))) want.add(n);
+    expect(all.size).toBeLessThanOrEqual(7);
+    const alls = [...all];
+    // the six-piece subsets of the layout: itself when it has six pieces, each drop-one when it has seven
+    const subsets = all.size === 6 ? [alls] : alls.map((_, d) => alls.filter((_2, q) => q !== d));
+    if (all.size >= 6) for (const sub of subsets) for (const n of bySet.get([...sub].sort().join('/')) ?? []) want.add(n);
     expect(names.some((n) => kept.has(n))).toBe(true);
     expect(new Set(names)).toEqual(want);
     check(names, L.num, L.pick);
@@ -553,7 +570,7 @@ test('(h) every family figure is recomputed from the boards and the first-bag ve
   expect(seen.size).toBe(ART.boards.length);
 }, 300_000);
 
-test('(i) cross-crate: the pinned counter with B1ONLY counts 5040 x the orders each vector says build the board', () => {
+test.concurrent('(i) cross-crate: the pinned counter with B1ONLY counts 5040 x the orders each vector says build the board', async () => {
   const bin = crateBin();
   if (!bin) { console.warn('SKIPPED (i): cargo is unavailable or the crate failed to build; the b1 vectors are NOT re-checked'); return; }
   const boards = [...PINNED_BOARDS, ...PINNED_HELD].map((k) => ART.boards.find((b: any) => keyOf(b.pieces) === k));
@@ -563,8 +580,9 @@ test('(i) cross-crate: the pinned counter with B1ONLY counts 5040 x the orders e
     const cl = b.classes.map(([si, l]: [number, string]) => `${si}:${l || '-'}`).join(';');
     return `p${i}#${b1}#${sh}#${cl}`;
   });
-  for (const [n, env] of [[0, { SDB: '0' }], [1, { SDB: '1' }], [2, { SDB: '2' }], [INFEAS, {}]] as [number, Record<string, string>][]) {
-    const got = run(bin, lines, { MULTI: '1', B1ONLY: '1', ...env });
+  const runs = ([[0, { SDB: '0' }], [1, { SDB: '1' }], [2, { SDB: '2' }], [INFEAS, {}]] as [number, Record<string, string>][])
+    .map(([n, env]) => run(bin, lines, { MULTI: '1', B1ONLY: '1', ...env }).then((got) => [n, got] as [number, any[]]));
+  for (const [n, got] of await Promise.all(runs)) {
     boards.forEach((b: any, i: number) => {
       const g = got.find((x: any) => x.name === `p${i}`);
       const v = vecOf(b.name);
@@ -614,61 +632,81 @@ const CANDS: number[][] = [];
 POOL.forEach((_: any, i: number) => { const m = MATE[i]!; if (m >= i) CANDS.push(m === i ? [i] : [i, m]); });
 const CIDX = new Map<string, number>(CANDS.map((c, n) => [c.join(','), n] as [string, number]));
 const unionOf = (cs: number[][]) => [...new Set(cs.flat())].sort((a, b) => a - b);
-const VEC: Uint8Array[] = POOL.map((b: any) => Uint8Array.from(vecOf(b.name)));
-const STAT = POOL.map((b: any, i: number) => tables(b, [...VEC[i]!]));
-/** An entry answers, per first-bag order o: k(o) the key J*8192+built (-1 when not built in the budget), j(o) J, b(o) built.
- * Computed on demand from the cost vector and the per-code tables, with this file's own cost rule, so nothing of size
- * boards x orders is held: a materialised table per budget took several GB and stalled the sharded CI run. */
-type Ent = { k: (o: number) => number; j: (o: number) => number; b: (o: number) => number };
-function keysFor(bk: string): Ent[] {
+/** every board's vector, flat: board i is VEC[i] = V.subarray(i * B, (i + 1) * B). */
+const NB = POOL.length;
+const V = new Uint8Array(NB * B);
+const VEC: Uint8Array[] = POOL.map((b: any, i: number) => vecU8(b.name, V.subarray(i * B, (i + 1) * B)));
+const STAT = POOL.map((b: any, i: number) => tables(b, VEC[i]!));
+/** Per-budget tables over every board, flat: for board i and first-bag cost code c (0..INFEAS), index i * 11 + c.
+ * KT is the key J*8192+built, or -1 when the code is not built in the budget (c > lim); JT and BT are J and built for the
+ * code, whether or not it is built (only read once the key is >= 0). Computed here from the per-code tables with this
+ * file's own cost rule; nothing of size boards x orders beyond the vectors themselves is held. */
+type Tab = { KT: Float64Array; JT: Float64Array; BT: Float64Array };
+function tabFor(bk: string): Tab {
   const lim = bk === 'inf' ? INFEAS - 1 : Number(bk);
-  return POOL.map((_: any, i: number) => {
-    const v = VEC[i]!, [J, Bt] = STAT[i].out[bk];
-    return {
-      k: (o: number) => { const c = v[o]!; return c <= lim ? J[c] * 8192 + Bt[c] : -1; },
-      j: (o: number) => J[v[o]!],
-      b: (o: number) => Bt[v[o]!],
-    };
-  });
-}
-let KC: [string, Ent[]] | null = null;
-const keysOf = (bk: string): Ent[] => (KC && KC[0] === bk ? KC[1] : (KC = [bk, keysFor(bk)])[1]);
-/** a pair candidate: per order the best of its boards (key is J-major, so the pair's J is the winner's). */
-function candTable(K: Ent[]): Ent[] {
-  return CANDS.map((c) => {
-    const w = new Uint8Array(B).fill(255);
-    for (let o = 0; o < B; o++) {
-      let best = -1;
-      c.forEach((i, m) => { const kk = K[i]!.k(o); if (kk >= 0 && (best < 0 || kk > best)) { best = kk; w[o] = m; } });
+  const W = INFEAS + 1;
+  const KT = new Float64Array(NB * W), JT = new Float64Array(NB * W), BT = new Float64Array(NB * W);
+  for (let i = 0; i < NB; i++) {
+    const [J, Bt] = STAT[i].out[bk];
+    for (let c = 0; c < W; c++) {
+      expect(Bt[c]).toBeLessThan(8192);
+      JT[i * W + c] = J[c]; BT[i * W + c] = Bt[c];
+      KT[i * W + c] = c <= lim ? J[c] * 8192 + Bt[c] : -1;
     }
-    return {
-      k: (o: number) => (w[o] === 255 ? -1 : K[c[w[o]!]!]!.k(o)),
-      j: (o: number) => K[c[w[o]!]!]!.j(o),
-      b: (o: number) => K[c[w[o]!]!]!.b(o),
-    };
-  });
+  }
+  return { KT, JT, BT };
 }
-function valOf(K: Ent[], set: number[]): [number, number] {
+const KCACHE = new Map<string, Tab>();   // four budgets x 3 Float64Array(boards x 11): about 10 MB each
+const keysOf = (bk: string): Tab => KCACHE.get(bk) ?? KCACHE.set(bk, tabFor(bk)).get(bk)!;
+const W11 = INFEAS + 1;
+/** the best-keyed board of `set` at order o, as an index into the flat tables (-1 when none builds it). */
+function bestAt(T: Tab, set: number[], o: number): number {
+  let best = -1, a = -1;
+  for (let m = 0; m < set.length; m++) {
+    const i = set[m]!, ix = i * W11 + V[i * B + o]!, kk = T.KT[ix]!;
+    if (kk > best) { best = kk; a = ix; }
+  }
+  return a;
+}
+function valOf(T: Tab, set: number[]): [number, number] {
   let p = 0, bu = 0;
   for (let o = 0; o < B; o++) {
-    let best = -1, a = -1;
-    for (const i of set) { const kk = K[i]!.k(o); if (kk >= 0 && kk > best) { best = kk; a = i; } }
-    if (a >= 0) { p += K[a]!.j(o); bu += K[a]!.b(o); }
+    const a = bestAt(T, set, o);
+    if (a >= 0) { p += T.JT[a]!; bu += T.BT[a]!; }
   }
   return [p, bu];
 }
-function picksOf(K: Ent[], set: number[]): number[] {
+function picksOf(T: Tab, set: number[]): number[] {
   const out: number[] = [];
   for (let o = 0; o < B; o++) {
     let best = -1, a = -1;
-    set.forEach((i, m) => { const kk = K[i]!.k(o); if (kk >= 0 && kk > best) { best = kk; a = m; } });
+    set.forEach((i, m) => { const kk = T.KT[i * W11 + V[i * B + o]!]!; if (kk > best) { best = kk; a = m; } });
     out.push(a);
   }
   return out;
 }
-function walkTree(nd: any, idx: number[], K: Ent[], set: number[], mem: number[]) {
+/** Per candidate and order: CIX the flat table index of the best-keyed board of the candidate (-1 when none builds it), and
+ * CJ its J (-1 likewise). The key is J-major, so the winner's J is the largest J among the built boards. Buffers are reused. */
+let CIXBUF: Int32Array | null = null, CJBUF: Int32Array | null = null;
+function candTables(T: Tab): [Int32Array, Int32Array] {
+  const cix = (CIXBUF ??= new Int32Array(CANDS.length * B)), cj = (CJBUF ??= new Int32Array(CANDS.length * B));
+  CANDS.forEach((c, n) => {
+    for (let o = 0; o < B; o++) {
+      let m = -1, bi = -1, bkey = -1;
+      for (let q = 0; q < c.length; q++) {
+        const ix = c[q]! * W11 + V[c[q]! * B + o]!;
+        const kk = T.KT[ix]!;
+        if (kk > bkey) { bkey = kk; bi = ix; }
+        if (kk >= 0 && T.JT[ix]! > m) m = T.JT[ix]!;
+      }
+      cix[n * B + o] = bi; cj[n * B + o] = m;
+    }
+  });
+  return [cix, cj];
+}
+function walkTree(nd: any, idx: number[], T: Tab, set: number[], mem: number[]) {
   if ('m' in nd) {
-    const tot = set.map((i) => idx.reduce((s, o) => s + (K[i]!.k(o) >= 0 ? K[i]!.j(o) * 2 ** 26 + K[i]!.b(o) : 0), 0));
+    const tot = set.map((i) => idx.reduce((s, o) => { const ix = i * W11 + V[i * B + o]!; return s + (T.KT[ix]! >= 0 ? T.JT[ix]! * 2 ** 26 + T.BT[ix]! : 0); }, 0));
     let bm = 0;
     tot.forEach((t: number, m: number) => { if (t > tot[bm]!) bm = m; });
     expect(nd.m).toBe(bm);
@@ -678,7 +716,7 @@ function walkTree(nd: any, idx: number[], K: Ent[], set: number[], mem: number[]
   const y = idx.filter((o) => FEAT[nd.f]![o]), n = idx.filter((o) => !FEAT[nd.f]![o]);
   expect(y.length > 0 && n.length > 0).toBe(true);
   expect(nd.feature).toBe(FEAT_NAMES[nd.f]);
-  walkTree(nd.y, y, K, set, mem); walkTree(nd.n, n, K, set, mem);
+  walkTree(nd.y, y, T, set, mem); walkTree(nd.n, n, T, set, mem);
 }
 const depthOf = (nd: any): number => ('m' in nd ? 0 : 1 + Math.max(depthOf(nd.y), depthOf(nd.n)));
 
@@ -708,7 +746,7 @@ test('(j) pins: the sets crate, the artefact and the b1 vectors it was built fro
 
 test('(j) every set value, greedy step, k=1 optimum, k=2 optimum, pick string and rule tree is recomputed here', () => {
   for (const bk of BKEYS) {
-    const K = keysOf(bk), r = SETS.budgets[bk], Kc = candTable(K);
+    const K = keysOf(bk), r = SETS.budgets[bk];
     const pos = (rec: any) => rec.boards.map((x: any) => x.pos);
     const chk = (rec: any) => {
       for (const x of rec.boards) {
@@ -726,36 +764,53 @@ test('(j) every set value, greedy step, k=1 optimum, k=2 optimum, pick string an
     // exact >= greedy
     for (const k of ['1', '2', '3']) { const e = r.exact[k], g = r.greedy[k]; expect(e.pc3 > g.pc3 || (e.pc3 === g.pc3 && e.built >= g.built)).toBe(true); }
     // k = 1 over all pair candidates
-    const f1 = Kc.map((x) => { let p = 0, b = 0; for (let o = 0; o < B; o++) if (x.k(o) >= 0) { p += x.j(o); b += x.b(o); } return [p, b]; });
+    const f1 = CANDS.map((c) => valOf(K, c));
     let best = 0;
     f1.forEach((v: number[], i: number) => { const bv = f1[best]!; if (v[0]! > bv[0]! || (v[0] === bv[0] && v[1]! > bv[1]!)) best = i; });
     expect(r.exact['1'].pairs).toEqual([CANDS[best]]);
-    // k = 2: bounded exhaustive over pairs of candidates (f(ab) <= f(a) + f(b)), pc3 only
+    // k = 2: bounded exhaustive over pairs of candidates (f(ab) <= f(a) + f(b)), pc3 only. A pair's value at an order is the
+    // better of the two candidates' keys, and the key is J-major, so it is the larger J (-1 where neither builds it).
+    const [CIX, CJ] = candTables(K);
     const order = f1.map((_: any, i: number) => i).sort((a: number, b: number) => f1[b]![0]! - f1[a]![0]!);
     let top = 0;
     for (let x = 0; x < order.length; x++) {
       const a = order[x]!;
       if (f1[a]![0]! * 2 < top) break;
+      const ca = CJ.subarray(a * B, (a + 1) * B);
       for (let y = x + 1; y < order.length; y++) {
         const b = order[y]!;
         if (f1[a]![0]! + f1[b]![0]! < top) break;
+        const cb = CJ.subarray(b * B, (b + 1) * B);
         let p = 0;
         for (let o = 0; o < B; o++) {
-          const ka = Kc[a]!.k(o), kb = Kc[b]!.k(o);
-          if (ka < 0 && kb < 0) continue;
-          p += ka >= kb ? Kc[a]!.j(o) : Kc[b]!.j(o);
+          const ja = ca[o]!, jb = cb[o]!;
+          const m = ja > jb ? ja : jb;
+          if (m > 0) p += m;
         }
         if (p > top) top = p;
       }
     }
     expect(top).toBe(r.exact['2'].pc3);
-    // greedy step k = argmax over all pair candidates of the grown set (the union of boards)
+    // greedy step k = argmax over all pair candidates of the grown set (the union of boards). The grown set's value is the
+    // base set's plus, at each order where the candidate's best key beats the base set's, the candidate's J and built minus the base's.
     for (const k of [2, 3, 4, 5]) {
       const prev: number[][] = r.greedy[String(k - 1)].pairs;
+      const base = unionOf(prev);
+      const bk0 = new Float64Array(B), bj0 = new Float64Array(B), bb0 = new Float64Array(B);
+      let P0 = 0, B0 = 0;
+      for (let o = 0; o < B; o++) {
+        const a = bestAt(K, base, o);
+        if (a < 0) { bk0[o] = -1; continue; }
+        bk0[o] = K.KT[a]!; bj0[o] = K.JT[a]!; bb0[o] = K.BT[a]!; P0 += bj0[o]!; B0 += bb0[o]!;
+      }
       let bp = -1, bb = -1;
       for (let c = 0; c < CANDS.length; c++) {
         if (prev.some((q: number[]) => q.join(',') === CANDS[c]!.join(','))) continue;
-        const [p, b] = valOf(K, unionOf([...prev, CANDS[c]!]));
+        let p = P0, b = B0;
+        for (let o = 0, q = c * B; o < B; o++, q++) {
+          const a = CIX[q]!;
+          if (a >= 0 && K.KT[a]! > bk0[o]!) { p += K.JT[a]! - bj0[o]!; b += K.BT[a]! - bb0[o]!; }
+        }
         if (p > bp || (p === bp && b > bb)) { bp = p; bb = b; }
       }
       expect([bp, bb]).toEqual([r.greedy[String(k)].pc3, r.greedy[String(k)].built]);
@@ -770,7 +825,8 @@ test('(j) every set value, greedy step, k=1 optimum, k=2 optimum, pick string an
       let p = 0, b = 0, unb = 0, diff = 0;
       for (let o = 0; o < B; o++) {
         const i = s3[mem[o]!]!;
-        if (K[i]!.k(o) >= 0) { p += K[i]!.j(o); b += K[i]!.b(o); } else unb++;
+        const ix = i * W11 + V[i * B + o]!;
+        if (K.KT[ix]! >= 0) { p += K.JT[ix]!; b += K.BT[ix]!; } else unb++;
         if (pk[o]! >= 0 && pk[o] !== mem[o]) diff++;
       }
       expect([p, b, unb, diff]).toEqual([rule.pc3, rule.built, rule.unbuildable, rule.differs]);

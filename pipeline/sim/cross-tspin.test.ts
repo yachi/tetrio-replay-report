@@ -31,7 +31,8 @@
 import { test, expect, describe } from 'bun:test';
 import { emptyBoard, H, detectTSpin } from './sim.ts';
 import type { Board, ActivePiece } from './vendor/core/srs.ts';
-import { tryMove, tryRotate, isValidPosition, setKickset } from './vendor/core/srs.ts';
+import { setKickset } from './vendor/core/srs.ts';
+import { spinEdges } from './srs-bfs-native.ts';
 import type { PieceType } from './vendor/core/types.ts';
 import { occ, ccTspin, ccKickIndex } from './cc-tspin.ts';
 import { loadCases, runCase, verifiedIndex } from './verified-prefix.ts';
@@ -48,27 +49,16 @@ type Rot = 0 | 1 | 2 | 3;
  * cold-clear's verdict depends on i.
  */
 function spinCandidates(board: Board): { piece: ActivePiece; i: number }[] {
-  const spawn: ActivePiece = { type: 'T', rotation: 0, col: 3, row: 18 };
-  if (!isValidPosition(board, spawn)) return [];
+  // The BFS over the vendored SRS primitives is `spinEdges` (Rust by default, the TS BFS under
+  // SRS_BFS_NATIVE=off; srs-bfs-native.test.ts holds the two equal): every rotation that rests where it
+  // lands, in BFS order. The kick index and the dedup stay HERE, on cold-clear's own kick table
+  // (`ccKickIndex`), so the comparison side is never the ported code.
   const out: { piece: ActivePiece; i: number }[] = [];
-  const seen = new Set<string>(), dedup = new Set<string>();
-  const key = (p: ActivePiece) => `${p.rotation}:${p.col}:${p.row}`;
-  const q: ActivePiece[] = [spawn];
-  seen.add(key(spawn));
-  for (let h = 0; h < q.length; h++) {
-    const cur = q[h]!;
-    for (const dir of [1, -1] as const) {
-      const post = tryRotate(board, cur, dir);
-      if (!post) continue;
-      if (tryMove(board, post, 0, 1) !== null) continue;   // still falls -> not resting here
-      const i = ccKickIndex('T', cur.rotation as Rot, post.rotation as Rot, post.col - cur.col, post.row - cur.row);
-      const dk = `${key(post)}:${i}`;
-      if (!dedup.has(dk)) { dedup.add(dk); out.push({ piece: post, i }); }
-    }
-    for (const n of [tryMove(board, cur, -1, 0), tryMove(board, cur, 1, 0), tryMove(board, cur, 0, 1),
-                     tryRotate(board, cur, 1), tryRotate(board, cur, -1)]) {
-      if (n && !seen.has(key(n))) { seen.add(key(n)); q.push(n); }
-    }
+  const dedup = new Set<string>();
+  for (const [pr, pc, py, qr, qc, qy] of spinEdges(board, 'T')) {
+    const i = ccKickIndex('T', pr as Rot, qr as Rot, qc! - pc!, qy! - py!);
+    const dk = `${qr}:${qc}:${qy}:${i}`;
+    if (!dedup.has(dk)) { dedup.add(dk); out.push({ piece: { type: 'T', rotation: qr as Rot, col: qc!, row: qy! }, i }); }
   }
   return out;
 }

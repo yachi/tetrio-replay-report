@@ -44,8 +44,9 @@ import { test, expect, describe } from 'bun:test';
 import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { emptyBoard, H } from './sim.ts';
-import type { Board, ActivePiece } from './vendor/core/srs.ts';
-import { tryMove, tryRotate, hardDrop, getPieceCells, isValidPosition, setKickset } from './vendor/core/srs.ts';
+import type { Board } from './vendor/core/srs.ts';
+import { getPieceCells, setKickset } from './vendor/core/srs.ts';
+import { drops } from './srs-bfs-native.ts';
 import type { PieceType } from './vendor/core/types.ts';
 import { loadCases, runCase, verifiedIndex } from './verified-prefix.ts';
 import { discoverCorpus } from '../corpus-membership.ts';
@@ -77,22 +78,13 @@ function keyOfPairs(pairs: [number, number][]): string {
 
 /** Our reachable resting placements via a 0G-complete BFS over the engine primitives. */
 export function ourReachable(board: Board, type: PieceType): Set<string> {
+  // The BFS itself is `drops` (Rust by default, the TS BFS under SRS_BFS_NATIVE=off; srs-bfs-native.test.ts
+  // holds the two equal). Cells and keys are computed here from the vendored piece shapes; the comparison
+  // side is cold-clear's own `find_moves`, never this port.
   setKickset('SRS');
-  const spawn: ActivePiece = { type, rotation: 0, col: 3, row: 18 };
   const out = new Set<string>();
-  if (!isValidPosition(board, spawn)) return out;
-  const seen = new Set<string>();
-  const key = (p: ActivePiece) => `${p.rotation}:${p.col}:${p.row}`;
-  const q: ActivePiece[] = [spawn];
-  seen.add(key(spawn));
-  for (let h = 0; h < q.length; h++) {
-    const cur = q[h]!;
-    out.add(keyOfCells(getPieceCells(hardDrop(board, cur))));
-    for (const n of [tryMove(board, cur, -1, 0), tryMove(board, cur, 1, 0), tryMove(board, cur, 0, 1),
-                     tryRotate(board, cur, 1), tryRotate(board, cur, -1)]) {
-      if (n && !seen.has(key(n))) { seen.add(key(n)); q.push(n); }
-    }
-  }
+  for (const [rotation, col, row] of drops(board, type, 3, 18))
+    out.add(keyOfCells(getPieceCells({ type, rotation: rotation as 0 | 1 | 2 | 3, col, row })));
   return out;
 }
 
