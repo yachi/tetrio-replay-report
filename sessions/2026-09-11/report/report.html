@@ -2302,13 +2302,34 @@
       flag.hidden = true;
       side.appendChild(name); side.appendChild(callout); side.appendChild(cv);
       side.appendChild(strip); side.appendChild(state); side.appendChild(flag);
-      boardsEl.appendChild(side);
       cv.addEventListener("click", function (e) {
         var r = cv.getBoundingClientRect();
         if (e.clientX - r.left < r.width / 2) stepBy(-1); else stepBy(1);
       });
       return { side: side, cv: cv, callout: callout, strip: strip, state: state, flag: flag };
     });
+    // Visual left-to-right follows video.json `seats` (the VOD overlay) when
+    // present, so the HTML replay opening matches YouTube. Slot indices, colours
+    // and moments stay facts["players"] order (yachi is still slot 0 on this
+    // site). Without seats, boards stay in payload order.
+    var seatOrder = P.map(function (_pp, s) { return s; });
+    if (D.seats) {
+      if (!Array.isArray(D.seats) || D.seats.length !== P.length) {
+        throw new Error("replay: seats must name every player once");
+      }
+      seatOrder = D.seats.map(function (name) {
+        var i = -1;
+        P.forEach(function (pp, s) { if (pp.d.user === name) i = s; });
+        if (i < 0) throw new Error("replay: seats name " + name + " is not a player");
+        return i;
+      });
+      var seen = {};
+      seatOrder.forEach(function (s) {
+        if (seen[s]) throw new Error("replay: seats repeats a player");
+        seen[s] = 1;
+      });
+    }
+    seatOrder.forEach(function (s) { boardsEl.appendChild(sides[s].side); });
 
     var seek = $(".rp-seek"), posEl = $(".rp-pos"), playBtn = $('[data-act="play"]');
     var speedSel = $(".rp-speed"), live = $(".rp-sr"), help = $(".rp-help");
