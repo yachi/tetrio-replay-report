@@ -148,6 +148,11 @@
     "session": "2026-11-25",
     "replays_md5": "548cb68a5dd9684ee84a6f36f231d4a5",
     "replay_facts_md5": "77e54fa9080e17584458dfbe8e119ee0"
+   },
+   {
+    "session": "2026-11-27",
+    "replays_md5": "f57553058f05ceecbaa81262cda01321",
+    "replay_facts_md5": "00fceb533e90f820afd4ddfde3c63c23"
    }
   ],
   "transcription_md5": "3defc3596321216fba682fea06724fc8",
@@ -180,7 +185,8 @@
   "2026-11-19",
   "2026-11-23",
   "2026-11-24",
-  "2026-11-25"
+  "2026-11-25",
+  "2026-11-27"
  ],
  "window_pieces": 21,
  "window_rule": "0-based lock index <= 21 is in_opener (emit-opener-facts.ts's convention; emit-attack-facts.ts counts from 1)",
@@ -188,24 +194,24 @@
  "denominators": {
   "pinglamb": {
    "TSD": {
-    "all": 7731,
-    "in_opener": 1502,
-    "mid_game": 6229
+    "all": 7939,
+    "in_opener": 1546,
+    "mid_game": 6393
    },
    "TSS": {
-    "all": 878,
-    "in_opener": 120,
-    "mid_game": 758
+    "all": 905,
+    "in_opener": 124,
+    "mid_game": 781
    },
    "TST": {
-    "all": 2008,
-    "in_opener": 1960,
-    "mid_game": 48
+    "all": 2078,
+    "in_opener": 2028,
+    "mid_game": 50
    },
    "mini_TSS": {
-    "all": 477,
+    "all": 489,
     "in_opener": 18,
-    "mid_game": 459
+    "mid_game": 471
    },
    "mini_TSD": {
     "all": 0,
@@ -214,28 +220,28 @@
    },
    "other_scored": 0,
    "recon_disagreed": 0,
-   "unscored_past_prefix": 971
+   "unscored_past_prefix": 1013
   },
   "yachi": {
    "TSD": {
-    "all": 7029,
-    "in_opener": 1772,
-    "mid_game": 5257
+    "all": 7270,
+    "in_opener": 1822,
+    "mid_game": 5448
    },
    "TSS": {
-    "all": 1453,
-    "in_opener": 345,
-    "mid_game": 1108
+    "all": 1511,
+    "in_opener": 354,
+    "mid_game": 1157
    },
    "TST": {
-    "all": 1245,
-    "in_opener": 1176,
-    "mid_game": 69
+    "all": 1295,
+    "in_opener": 1223,
+    "mid_game": 72
    },
    "mini_TSS": {
-    "all": 126,
-    "in_opener": 14,
-    "mid_game": 112
+    "all": 134,
+    "in_opener": 16,
+    "mid_game": 118
    },
    "mini_TSD": {
     "all": 0,
@@ -244,14 +250,14 @@
    },
    "other_scored": 0,
    "recon_disagreed": 0,
-   "unscored_past_prefix": 670
+   "unscored_past_prefix": 681
   }
  },
  "check": {
-  "tspin_clears_scored": 20947,
-  "reconstruction_agreed": 20947,
+  "tspin_clears_scored": 21621,
+  "reconstruction_agreed": 21621,
   "reconstruction_disagreed": 0,
-  "rowmap_steps": 370767,
+  "rowmap_steps": 383205,
   "rowmap_unverified": 34,
   "by_session": {
    "2026-07-22": {
@@ -469,6 +475,14 @@
      "pinglamb": 371,
      "yachi": 366
     }
+   },
+   "2026-11-27": {
+    "tspin_clears": 674,
+    "reconstruction_disagreed": 0,
+    "players": {
+     "pinglamb": 317,
+     "yachi": 357
+    }
    }
   }
  },
@@ -525,8 +539,8 @@
       "yachi": 0
      },
      "no_roof": {
-      "pinglamb": 713,
-      "yachi": 571
+      "pinglamb": 727,
+      "yachi": 594
      },
      "t_overlap": {
       "pinglamb": 0,
@@ -534,8 +548,8 @@
      }
     },
     "orientation_baseline": {
-     "pinglamb": 71,
-     "yachi": 102
+     "pinglamb": 72,
+     "yachi": 105
     }
    }
   }
@@ -2298,7 +2312,73 @@
    "2026-11-25 m5r10 pinglamb lock 53",
    "2026-11-25 m5r13 yachi lock 64",
    "2026-11-25 m5r13 pinglamb lock 45",
-   "2026-11-25 m5r13 pinglamb lock 91"
+   "2026-11-25 m5r13 pinglamb lock 91",
+   "2026-11-27 m1r2 pinglamb lock 52",
+   "2026-11-27 m1r2 pinglamb lock 235",
+   "2026-11-27 m1r2 yachi lock 133",
+   "2026-11-27 m1r4 pinglamb lock 250",
+   "2026-11-27 m1r4 pinglamb lock 289",
+   "2026-11-27 m1r4 pinglamb lock 298",
+   "2026-11-27 m1r4 yachi lock 295",
+   "2026-11-27 m1r6 yachi lock 23",
+   "2026-11-27 m1r9 pinglamb lock 44",
+   "2026-11-27 m1r10 yachi lock 71",
+   "2026-11-27 m1r13 pinglamb lock 239",
+   "2026-11-27 m1r13 yachi lock 122",
+   "2026-11-27 m1r13 yachi lock 238",
+   "2026-11-27 m2r3 pinglamb lock 89",
+   "2026-11-27 m2r3 pinglamb lock 102",
+   "2026-11-27 m2r3 pinglamb lock 133",
+   "2026-11-27 m2r6 yachi lock 108",
+   "2026-11-27 m2r6 pinglamb lock 59",
+   "2026-11-27 m2r7 pinglamb lock 78",
+   "2026-11-27 m2r7 yachi lock 67",
+   "2026-11-27 m2r9 pinglamb lock 99",
+   "2026-11-27 m2r9 yachi lock 115",
+   "2026-11-27 m2r10 pinglamb lock 29",
+   "2026-11-27 m2r11 pinglamb lock 40",
+   "2026-11-27 m2r12 yachi lock 25",
+   "2026-11-27 m2r12 yachi lock 125",
+   "2026-11-27 m2r12 yachi lock 156",
+   "2026-11-27 m2r12 pinglamb lock 27",
+   "2026-11-27 m2r12 pinglamb lock 63",
+   "2026-11-27 m2r12 pinglamb lock 104",
+   "2026-11-27 m3r1 pinglamb lock 67",
+   "2026-11-27 m3r1 pinglamb lock 153",
+   "2026-11-27 m3r1 yachi lock 32",
+   "2026-11-27 m3r1 yachi lock 75",
+   "2026-11-27 m3r2 yachi lock 37",
+   "2026-11-27 m3r2 yachi lock 95",
+   "2026-11-27 m3r4 pinglamb lock 47",
+   "2026-11-27 m3r4 pinglamb lock 64",
+   "2026-11-27 m3r4 yachi lock 48",
+   "2026-11-27 m3r4 yachi lock 54",
+   "2026-11-27 m3r4 yachi lock 82",
+   "2026-11-27 m3r5 yachi lock 25",
+   "2026-11-27 m3r10 yachi lock 62",
+   "2026-11-27 m3r10 yachi lock 152",
+   "2026-11-27 m3r10 pinglamb lock 62",
+   "2026-11-27 m3r12 pinglamb lock 29",
+   "2026-11-27 m4r3 yachi lock 107",
+   "2026-11-27 m4r8 pinglamb lock 78",
+   "2026-11-27 m4r8 yachi lock 29",
+   "2026-11-27 m4r9 pinglamb lock 39",
+   "2026-11-27 m4r10 yachi lock 40",
+   "2026-11-27 m4r10 yachi lock 152",
+   "2026-11-27 m4r10 pinglamb lock 144",
+   "2026-11-27 m4r10 pinglamb lock 152",
+   "2026-11-27 m5r1 pinglamb lock 47",
+   "2026-11-27 m5r1 yachi lock 28",
+   "2026-11-27 m5r3 yachi lock 77",
+   "2026-11-27 m5r4 pinglamb lock 42",
+   "2026-11-27 m5r5 yachi lock 115",
+   "2026-11-27 m5r5 yachi lock 131",
+   "2026-11-27 m5r5 pinglamb lock 40",
+   "2026-11-27 m5r5 pinglamb lock 78",
+   "2026-11-27 m5r5 pinglamb lock 123",
+   "2026-11-27 m5r9 yachi lock 115",
+   "2026-11-27 m5r9 pinglamb lock 93",
+   "2026-11-27 m5r10 yachi lock 73"
   ],
   "recon_dropped_tsd": []
  },

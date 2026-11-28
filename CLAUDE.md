@@ -1810,7 +1810,9 @@ won-gap 收窄、lost-gap 擴闊，24 局嘅一晚兩個尺寸都係一局話事
 （留一局：抽走 m1r7，數字變 +3.43%，即係郁 1.62 pp），
 抽走之後更闊，正負號唔變，而第二大嗰局 m6r13 郁得差唔多一樣遠。11-25 個 won-gap 都要 annotation
 （留一局：抽走 m3r2，數字變 +0.56%，即係郁 2.17 pp），
-抽走之後更窄，正負號唔變：m3r2 係嗰晚最長嗰局，yachi 用 335 粒、.5433 每粒贏落嚟。Two consequences worth
+抽走之後更窄，正負號唔變：m3r2 係嗰晚最長嗰局，yachi 用 335 粒、.5433 每粒贏落嚟。11-27 兩個數都要 annotation：
+won-gap（留一局：抽走 m3r10，數字變 +1.66%，即係郁 2.19 pp），
+lost-gap（留一局：抽走 m4r10，數字變 +0.83%，即係郁 2.08 pp）——兩個抽走之後都更窄，正負號唔變：m3r10 係 yachi 用 288 粒、.5000 每粒贏落嚟嘅長局，m4r10 係 pinglamb 用 211 粒、.7393 每粒輸嗰局。Two consequences worth
 knowing before writing another report:
 
 - **The volume route is not a law.** 08-01's headline was that 326 extra pieces bought back a

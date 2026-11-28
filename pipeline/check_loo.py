@@ -672,12 +672,26 @@ PUBLISHED = (
     #     app_gap_lost    +8.6071 pp  m1r13 -> +6.0113  rel 0.302  1.46x
     ("2026-11-25", "app_gap_won", "series"),
     ("2026-11-25", "app_gap_lost", "series"),
+    ("2026-11-27", "app_gap_won", "series"),
+    ("2026-11-27", "app_gap_lost", "series"),
 )
 
 # The named exception list: every (session, figure) already investigated, with the reason it
 # crosses. Named, not a raised threshold — a sixth case must be looked at, and a case that
 # stops crossing must be taken off the list and out of the prose.
 ANNOTATED = {
+    ("2026-11-27", "app_gap_won"): (
+        "the won-regime gap is +3.8670 pp and m3r10 alone takes it to +1.6685 — NARROWER, by "
+        "2.1985, the sign surviving. m3r10 is the night's third-longest round (about 195 s), a "
+        "round yachi won at .5000 attack per piece over 288 pieces, 8.4% of his 3434-piece "
+        "winning-round pool; without that low-efficiency long win his winning rounds sit closer "
+        "to pinglamb's. `rel` 0.569, the next round 1.17x below it."),
+    ("2026-11-27", "app_gap_lost"): (
+        "the lost-regime gap is +2.9212 pp and m4r10 alone takes it to +0.8363 — NARROWER, by "
+        "2.0849, the sign surviving. m4r10 is a round pinglamb lost at .7393 attack per piece "
+        "over 211 pieces, 6.5% of his 3252-piece losing-round pool; without that high-efficiency "
+        "loss his losing rounds sit almost level with yachi's. `rel` 0.714, the next round 1.16x "
+        "below it."),
     ("2026-11-25", "app_gap_won"): (
         "the won-regime gap is +2.7400 pp and m3r2 alone takes it to +0.5659 — NARROWER, by "
         "2.1741, the sign surviving. m3r2 is the night's longest round (about 226 s, 208 lines), "

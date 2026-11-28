@@ -1,0 +1,354 @@
+{
+ "schema": "session-video/1",
+ "video": {
+  "id": "_Ss3Jl1oPB0",
+  "url": "https://www.youtube.com/watch?v=_Ss3Jl1oPB0",
+  "fetched": "2026-11-28",
+  "format": "360p mp4 via yt-dlp",
+  "sha256": "5e5e57f50a0d89b0ecab96dc413a9a05a77ce2dea94ae14f1db5819e75c77aec",
+  "duration_s": 6121
+ },
+ "report_eligible": false,
+ "alignment": {
+  "method": "each replay's ts is the match's end; walking back by the replay's own round lengths plus the gap between rounds, every round start is snapped to the first frame after the empty-board countdown in the video, sampled at 4 frames a second (pipeline/video_snap.py)",
+  "max_snap_s": 0.26,
+  "link_lead_s": 1
+ },
+ "matches": [
+  {
+   "position": 1,
+   "file": "replay-2026-11-27-01.ttrm",
+   "rounds": [
+    {
+     "round": 1,
+     "play_start_s": 99.0,
+     "replay_s": 18.67
+    },
+    {
+     "round": 2,
+     "play_start_s": 127.75,
+     "replay_s": 175.873
+    },
+    {
+     "round": 3,
+     "play_start_s": 313.75,
+     "replay_s": 26.6
+    },
+    {
+     "round": 4,
+     "play_start_s": 350.25,
+     "replay_s": 216.5
+    },
+    {
+     "round": 5,
+     "play_start_s": 576.75,
+     "replay_s": 70.25
+    },
+    {
+     "round": 6,
+     "play_start_s": 657.25,
+     "replay_s": 68.767
+    },
+    {
+     "round": 7,
+     "play_start_s": 736.0,
+     "replay_s": 31.867
+    },
+    {
+     "round": 8,
+     "play_start_s": 777.75,
+     "replay_s": 29.983
+    },
+    {
+     "round": 9,
+     "play_start_s": 817.75,
+     "replay_s": 30.662
+    },
+    {
+     "round": 10,
+     "play_start_s": 858.5,
+     "replay_s": 61.225
+    },
+    {
+     "round": 11,
+     "play_start_s": 929.75,
+     "replay_s": 41.583
+    },
+    {
+     "round": 12,
+     "play_start_s": 981.5,
+     "replay_s": 32.2
+    },
+    {
+     "round": 13,
+     "play_start_s": 1023.75,
+     "replay_s": 187.092
+    }
+   ]
+  },
+  {
+   "position": 2,
+   "file": "replay-2026-11-27-02.ttrm",
+   "rounds": [
+    {
+     "round": 1,
+     "play_start_s": 1327.25,
+     "replay_s": 101.137
+    },
+    {
+     "round": 2,
+     "play_start_s": 1438.25,
+     "replay_s": 14.667
+    },
+    {
+     "round": 3,
+     "play_start_s": 1463.0,
+     "replay_s": 122.8
+    },
+    {
+     "round": 4,
+     "play_start_s": 1596.0,
+     "replay_s": 38.982
+    },
+    {
+     "round": 5,
+     "play_start_s": 1645.0,
+     "replay_s": 30.242
+    },
+    {
+     "round": 6,
+     "play_start_s": 1685.25,
+     "replay_s": 97.933
+    },
+    {
+     "round": 7,
+     "play_start_s": 1793.25,
+     "replay_s": 139.812
+    },
+    {
+     "round": 8,
+     "play_start_s": 1943.0,
+     "replay_s": 18.45
+    },
+    {
+     "round": 9,
+     "play_start_s": 1971.5,
+     "replay_s": 100.157
+    },
+    {
+     "round": 10,
+     "play_start_s": 2081.75,
+     "replay_s": 46.587
+    },
+    {
+     "round": 11,
+     "play_start_s": 2138.5,
+     "replay_s": 33.632
+    },
+    {
+     "round": 12,
+     "play_start_s": 2182.0,
+     "replay_s": 123.067
+    },
+    {
+     "round": 13,
+     "play_start_s": 2315.25,
+     "replay_s": 65.85
+    }
+   ]
+  },
+  {
+   "position": 3,
+   "file": "replay-2026-11-27-03.ttrm",
+   "rounds": [
+    {
+     "round": 1,
+     "play_start_s": 2623.0,
+     "replay_s": 116.85
+    },
+    {
+     "round": 2,
+     "play_start_s": 2749.75,
+     "replay_s": 79.433
+    },
+    {
+     "round": 3,
+     "play_start_s": 2839.25,
+     "replay_s": 64.437
+    },
+    {
+     "round": 4,
+     "play_start_s": 2913.75,
+     "replay_s": 82.65
+    },
+    {
+     "round": 5,
+     "play_start_s": 3006.5,
+     "replay_s": 38.567
+    },
+    {
+     "round": 6,
+     "play_start_s": 3055.0,
+     "replay_s": 23.1
+    },
+    {
+     "round": 7,
+     "play_start_s": 3088.25,
+     "replay_s": 46.983
+    },
+    {
+     "round": 8,
+     "play_start_s": 3145.25,
+     "replay_s": 15.567
+    },
+    {
+     "round": 9,
+     "play_start_s": 3170.75,
+     "replay_s": 19.133
+    },
+    {
+     "round": 10,
+     "play_start_s": 3200.0,
+     "replay_s": 194.75
+    },
+    {
+     "round": 11,
+     "play_start_s": 3405.0,
+     "replay_s": 37.5
+    },
+    {
+     "round": 12,
+     "play_start_s": 3452.5,
+     "replay_s": 69.923
+    },
+    {
+     "round": 13,
+     "play_start_s": 3532.5,
+     "replay_s": 65.283
+    }
+   ]
+  },
+  {
+   "position": 4,
+   "file": "replay-2026-11-27-04.ttrm",
+   "rounds": [
+    {
+     "round": 1,
+     "play_start_s": 4022.0,
+     "replay_s": 60.583
+    },
+    {
+     "round": 2,
+     "play_start_s": 4092.75,
+     "replay_s": 45.683
+    },
+    {
+     "round": 3,
+     "play_start_s": 4148.25,
+     "replay_s": 128.328
+    },
+    {
+     "round": 4,
+     "play_start_s": 4286.75,
+     "replay_s": 135.067
+    },
+    {
+     "round": 5,
+     "play_start_s": 4431.75,
+     "replay_s": 21.487
+    },
+    {
+     "round": 6,
+     "play_start_s": 4463.5,
+     "replay_s": 44.483
+    },
+    {
+     "round": 7,
+     "play_start_s": 4518.0,
+     "replay_s": 12.24
+    },
+    {
+     "round": 8,
+     "play_start_s": 4540.25,
+     "replay_s": 54.773
+    },
+    {
+     "round": 9,
+     "play_start_s": 4605.0,
+     "replay_s": 32.533
+    },
+    {
+     "round": 10,
+     "play_start_s": 4647.75,
+     "replay_s": 138.367
+    },
+    {
+     "round": 11,
+     "play_start_s": 4796.0,
+     "replay_s": 33.392
+    },
+    {
+     "round": 12,
+     "play_start_s": 4839.5,
+     "replay_s": 40.82
+    }
+   ]
+  },
+  {
+   "position": 5,
+   "file": "replay-2026-11-27-05.ttrm",
+   "rounds": [
+    {
+     "round": 1,
+     "play_start_s": 4928.0,
+     "replay_s": 88.85
+    },
+    {
+     "round": 2,
+     "play_start_s": 5027.0,
+     "replay_s": 55.867
+    },
+    {
+     "round": 3,
+     "play_start_s": 5092.75,
+     "replay_s": 84.078
+    },
+    {
+     "round": 4,
+     "play_start_s": 5187.0,
+     "replay_s": 46.417
+    },
+    {
+     "round": 5,
+     "play_start_s": 5243.5,
+     "replay_s": 112.1
+    },
+    {
+     "round": 6,
+     "play_start_s": 5365.5,
+     "replay_s": 52.883
+    },
+    {
+     "round": 7,
+     "play_start_s": 5428.5,
+     "replay_s": 23.7
+    },
+    {
+     "round": 8,
+     "play_start_s": 5462.25,
+     "replay_s": 26.7
+    },
+    {
+     "round": 9,
+     "play_start_s": 5499.0,
+     "replay_s": 106.398
+    },
+    {
+     "round": 10,
+     "play_start_s": 5615.25,
+     "replay_s": 216.733
+    }
+   ]
+  }
+ ]
+}

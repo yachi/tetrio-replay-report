@@ -171,6 +171,11 @@
     "session": "2026-11-25",
     "replays_md5": "548cb68a5dd9684ee84a6f36f231d4a5",
     "replay_facts_md5": "77e54fa9080e17584458dfbe8e119ee0"
+   },
+   {
+    "session": "2026-11-27",
+    "replays_md5": "f57553058f05ceecbaa81262cda01321",
+    "replay_facts_md5": "00fceb533e90f820afd4ddfde3c63c23"
    }
   ],
   "routes_md5": "b5f8218f119ed62fb5f92e2af40cc754",
@@ -203,7 +208,8 @@
   "2026-11-19",
   "2026-11-23",
   "2026-11-24",
-  "2026-11-25"
+  "2026-11-25",
+  "2026-11-27"
  ],
  "outcomes": [],
  "nodes": [
@@ -216,10 +222,10 @@
     "pinglamb": 0,
     "yachi": 0
    },
-   "opportunities": 3238,
+   "opportunities": 3352,
    "opportunities_by_player": {
-    "pinglamb": 1792,
-    "yachi": 1446
+    "pinglamb": 1850,
+    "yachi": 1502
    },
    "pc_off_page": 0,
    "pc_off_page_by_player": {
