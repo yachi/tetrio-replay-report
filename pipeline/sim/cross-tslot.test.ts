@@ -94,8 +94,21 @@ realData('two methods, no shared code, disagree on nothing across the corpus', (
     }
   }
   // A shape cold-clear recognises that our search cannot reach at all would be a real defect in
-  // the probe every published figure rests on. There are none.
-  expect(unexplained).toEqual([]);
+  // the probe every published figure rests on. Each one is named here with how it was checked, never
+  // absorbed under a bound (the DT_ORDER_IN_OPENER rule): a new one is a red build to investigate.
+  //
+  // 2026-11-27 m1r4 pinglamb lock 36, the first in twenty-eight sessions. cold-clear's
+  // `tst_twist_right@3` matches the column heights of the col-3 well under the S just locked (row 29
+  // col 3 filled, rows 30-39 col 3 open). Checked on 2026-11-28 by a THIRD search, the vendored
+  // Triangle engine's own moves (route-demos.ts `searchAll`, with and without the 180 edge): it finds
+  // 36 resting T placements and credits a spin at none of them. The T does reach the well
+  // (cells (3,5),(3,6),(4,6),(3,7) from the bottom), but only by a sideways step at row 30 and a fall,
+  // so the last move is a fall and no spin is credited. So our search is right and cold-clear's height
+  // pattern over-counts on a board that is not near-topout, which the shared sanction does not cover.
+  const CC_OVERCOUNT = [
+    "replay-2026-11-27-01.ttrm r3 pinglamb lock 36: tst_twist_right@3 [no T-spin reachable and stackTop 27 > 21 — NOT near-topout, a real false negative]",
+  ];
+  expect(unexplained).toEqual(CC_OVERCOUNT);
 
   // Anti-vacuity: a port that silently detected nothing would agree with everything above. These
   // pin that both methods are actually firing, and roughly how often.
@@ -172,7 +185,8 @@ realData('two methods, no shared code, disagree on nothing across the corpus', (
   // 2026-11-23: 285266 -> 298951 (13685 boards, 82 rounds), `unexplained` still EMPTY.
   // 2026-11-24: 298951 -> 311770 (12819 boards, 72 rounds), `unexplained` still EMPTY.
   // 2026-11-25: 311770 -> 323095 (11325 boards, 62 rounds), `unexplained` still EMPTY.
-  expect(both + oursOnly + ccOnly + neither).toBe(323095);
+  // 2026-11-27: 323095 -> 333781 (10686 boards, 61 rounds); `unexplained` holds one named cold-clear over-count (CC_OVERCOUNT above).
+  expect(both + oursOnly + ccOnly + neither).toBe(333781);
 // Explicit timeout, following the slow corpus test in openers.test.ts. This walks every verified
 // board of every session — ~95 s at nine sessions — and bun's default per-test timeout is 5 s, so
 // without this it fails on elapsed time whatever the assertions say. Not a new cost: the same

@@ -85,6 +85,7 @@ const STSD_HITS: string[] = [
   "2026-11-24 m3r4 yachi lock 9 (mirrored)", "2026-11-24 m6r9 pinglamb lock 26 (mirrored)",
   "2026-11-25 m2r1 yachi lock 75 (mirrored)", "2026-11-25 m2r1 yachi lock 251", "2026-11-25 m3r12 yachi lock 64 (mirrored)",
   "2026-11-25 m4r2 yachi lock 98", "2026-11-25 m4r13 pinglamb lock 86",
+  "2026-11-27 m1r13 yachi lock 234",
 ];
 
 const FOLLOWUP_NOT_FIRED: string[] = [
@@ -152,19 +153,19 @@ const CROSS_ROUTE_UNSCORED: string[] = [
 ];
 
 /** Per player: the opportunity (scored full TSDs), split at the 0-based opener window. */
-const TSD_DENOM = { pinglamb: { all: 7731, in_opener: 1502, mid_game: 6229 },
-                    yachi: { all: 7029, in_opener: 1772, mid_game: 5257 } };
+const TSD_DENOM = { pinglamb: { all: 7939, in_opener: 1546, mid_game: 6393 },
+                    yachi: { all: 7270, in_opener: 1822, mid_game: 5448 } };
 /** Per player: hits, their split, the mirrored ones, the follow-ups that fired. */
 const HITS = { pinglamb: { all: 30, in_opener: 1, mid_game: 29, mirrored: 19, garbage_in_window: 0 },
-               yachi: { all: 74, in_opener: 3, mid_game: 71, mirrored: 39, garbage_in_window: 0 } };
-const FOLLOWUP_FIRED = { pinglamb: 22, yachi: 48 };
+               yachi: { all: 75, in_opener: 3, mid_game: 72, mirrored: 39, garbage_in_window: 0 } };
+const FOLLOWUP_FIRED = { pinglamb: 22, yachi: 49 };
 /** The controls (the same window at other spins; the ablations; the orientation baseline). */
 const CONTROLS = {
   under: { TSS: { pinglamb: 0, yachi: 4 }, TST: { pinglamb: 0, yachi: 0 },
            mini_TSS: { pinglamb: 0, yachi: 0 }, mini_TSD: { pinglamb: 0, yachi: 0 } },
-  ablation: { no_must_empty: { pinglamb: 62, yachi: 96 }, no_roof: { pinglamb: 30, yachi: 74 },
-              t_overlap: { pinglamb: 36, yachi: 76 } },
-  orientation_baseline: { pinglamb: 71, yachi: 102 },
+  ablation: { no_must_empty: { pinglamb: 63, yachi: 99 }, no_roof: { pinglamb: 30, yachi: 75 },
+              t_overlap: { pinglamb: 36, yachi: 78 } },
+  orientation_baseline: { pinglamb: 72, yachi: 105 },
 };
 
 /** Measured byte-identical on this corpus, each for its reason; asserted to STAY identical. */
@@ -194,7 +195,7 @@ test('quarantined: report_eligible false, no claim ids', () => {
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
   const n = checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT);
-  expect(n).toBe(20947);
+  expect(n).toBe(21621);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 
@@ -292,7 +293,7 @@ test('cross-route: the SDPC Spin rounds that reached its STMB Cave, from that ar
 test('the follow-up row map is verified against the engine at every step it uses', () => {
   const c = art().check;
   expect(c.rowmap_unverified).toBe(34);
-  expect(c.rowmap_steps).toBe(370767);
+  expect(c.rowmap_steps).toBe(383205);
   expect(art().hits.every((h: any) => h.followup.reason !== 'rowmap_unverified')).toBe(true);
 });
 

@@ -41,6 +41,7 @@ const Z_HOLD_BAG1 = [
   '2026-11-01 m11r7 pinglamb',  // 7th O (as drawn), prefix 262, no bag 2
   '2026-11-05 m5r7 yachi',      // mirrored: its bag-1 Z is S, and the 7th is T; prefix 107, no bag 2
   '2026-11-19 m4r18 yachi',
+  '2026-11-27 m4r4 yachi',
 ];
 /** The 6-lock field matched and the 7th piece WAS the bag-1 Z, placed somewhere off the page. */
 const Z_PLACED_ELSEWHERE_BAG1 = [
@@ -55,6 +56,7 @@ const Z_LEFT_BAG1 = [
   '2026-10-29 m2r8 yachi',      // matched z_left at 7 and the 6-lock field; prefix 29, no bag 2
   '2026-11-19 m3r5 yachi',
   '2026-11-23 m6r3 yachi',
+  '2026-11-27 m4r12 yachi',
 ];
 const I_EARLY_CASES = ['2026-09-11 m7r2 yachi (mirrored)'];
 const TST_DONATE_CASES = [
@@ -117,9 +119,9 @@ const PC_GARBAGE_IN_WINDOW: string[] = [];
 // 2.normal_OS (all under its own) and 1 to 2.normal_SO (under its own), three entries to
 // TST_DONATE_CASES (m2r1, m2r2, m2r5) and one to PC_OFF_PAGE (m1r3).
 const CONDITIONS = {
-  '2.ideal': { '2.ideal': 553, '2.normal_OS': 76, '2.normal_SO': 23 },
-  '2.normal_OS': { '2.ideal': 1, '2.normal_OS': 184, '2.normal_SO': 31 },
-  '2.normal_SO': { '2.ideal': 16, '2.normal_OS': 1, '2.normal_SO': 58 },
+  '2.ideal': { '2.ideal': 582, '2.normal_OS': 79, '2.normal_SO': 25 },
+  '2.normal_OS': { '2.ideal': 1, '2.normal_OS': 195, '2.normal_SO': 36 },
+  '2.normal_SO': { '2.ideal': 16, '2.normal_OS': 1, '2.normal_SO': 59 },
   '2.i_early': { '2.normal_OS': 1 },
 };
 

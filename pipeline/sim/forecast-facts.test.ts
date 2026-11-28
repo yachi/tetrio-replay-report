@@ -142,6 +142,9 @@ const PATH_OPENED: Record<string, Record<string, number>> = {
   // One of yachi's: replay-2026-11-25-05.ttrm r4 lock 17 — ACCESS_CLASS's ninth member
   // (forecast-access-class.test.ts). The corpus count goes 8 -> 9.
   '2026-11-25': { yachi: 1, pinglamb: 0 },
+  // One of pinglamb's: replay-2026-11-27-01.ttrm r11 lock 18 — ACCESS_CLASS's tenth member
+  // (forecast-access-class.test.ts). The corpus count goes 9 -> 10.
+  '2026-11-27': { yachi: 0, pinglamb: 1 },
 };
 
 /** `unattributed` per session and player — the bucket that was identically zero until 2026-09-19.

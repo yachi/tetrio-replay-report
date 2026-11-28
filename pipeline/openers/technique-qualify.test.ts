@@ -32,17 +32,17 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
 const KEYS = ['stsd', 'stmbcave', 'imperialcross', 'doubledagger', 'btcannon', 'cutcopy', 'kaidan', 'dtcannon', 'kingcrimson', 'cavetsstst', 'hamburger'] as const;
 
 const BY_PLAYER: Record<string, any> = {
-  stsd: { pinglamb: { qualified: 30, not_qualified: {} }, yachi: { qualified: 70, not_qualified: { dpc: 1, fragment: 2, ownership_unverified: 1 } } },
-  stmbcave: { pinglamb: { qualified: 40, not_qualified: { not_whole_shape: 22 } }, yachi: { qualified: 63, not_qualified: { dpc: 1, not_whole_shape: 39 } } },
+  stsd: { pinglamb: { qualified: 30, not_qualified: {} }, yachi: { qualified: 71, not_qualified: { dpc: 1, fragment: 2, ownership_unverified: 1 } } },
+  stmbcave: { pinglamb: { qualified: 41, not_qualified: { not_whole_shape: 22 } }, yachi: { qualified: 64, not_qualified: { dpc: 1, not_whole_shape: 41 } } },
   imperialcross: { pinglamb: { qualified: 9, not_qualified: {} }, yachi: { qualified: 4, not_qualified: { fragment: 1 } } },
   doubledagger: { pinglamb: { qualified: 6, not_qualified: { not_whole_shape: 27 } }, yachi: { qualified: 9, not_qualified: { not_whole_shape: 11 } } },
   btcannon: { pinglamb: { qualified: 0, not_qualified: {} }, yachi: { qualified: 0, not_qualified: {} } },
   cutcopy: { pinglamb: { qualified: 0, not_qualified: {} }, yachi: { qualified: 2, not_qualified: { fragment: 1 } } },
-  kaidan: { pinglamb: { qualified: 28, not_qualified: { fragment: 52, garbage_in_shape: 62, z_not_one_piece: 62 } }, yachi: { qualified: 47, not_qualified: { dpc: 1, fragment: 64, garbage_in_shape: 65, ownership_unverified: 2, z_not_one_piece: 97 } } },
+  kaidan: { pinglamb: { qualified: 29, not_qualified: { fragment: 52, garbage_in_shape: 62, z_not_one_piece: 62 } }, yachi: { qualified: 48, not_qualified: { dpc: 1, fragment: 68, garbage_in_shape: 69, ownership_unverified: 2, z_not_one_piece: 103 } } },
   dtcannon: { pinglamb: { qualified: 0, not_qualified: {} }, yachi: { qualified: 33, not_qualified: { ownership_unverified: 1 } } },
   kingcrimson: { pinglamb: { qualified: 1, not_qualified: {} }, yachi: { qualified: 0, not_qualified: {} } },
   cavetsstst: { pinglamb: { qualified: 1, not_qualified: {} }, yachi: { qualified: 0, not_qualified: {} } },
-  hamburger: { pinglamb: { qualified: 3, not_qualified: { dpc: 1, fragment: 30, garbage_in_shape: 8, in_opener: 5 } }, yachi: { qualified: 7, not_qualified: { dpc: 2, fragment: 75, garbage_in_shape: 11, in_opener: 104, ownership_unverified: 2 } } },
+  hamburger: { pinglamb: { qualified: 3, not_qualified: { dpc: 1, fragment: 32, garbage_in_shape: 8, in_opener: 5 } }, yachi: { qualified: 8, not_qualified: { dpc: 2, fragment: 78, garbage_in_shape: 12, in_opener: 105, ownership_unverified: 2 } } },
 };
 
 /** every hit that does not qualify, with its reasons (階段のドネイト and ハンバーガー: the tally above only) */
@@ -116,6 +116,8 @@ const NOT_QUALIFIED: Record<string, string[]> = {
     "2026-11-23 m4r3 yachi lock 96 (stmbcave): not_whole_shape",
     "2026-11-23 m5r5 yachi lock 32 (stmbcave): dpc",
     "2026-11-24 m5r9 pinglamb lock 46 (stmbcave): not_whole_shape",
+    "2026-11-27 m1r11 yachi lock 42 (stmbcave): not_whole_shape",
+    "2026-11-27 m2r5 yachi lock 32 (stmbcave): not_whole_shape",
   ],
   imperialcross: [
     "2026-08-14 m8r1 yachi lock 38 (imperialcross): fragment",

@@ -23,7 +23,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
    '2026-11-25', '2026-11-27']);
 
 /** Clean 7-lock rounds that were compared and were not the 基本形. Pinned per player. */
-const BAG1_OPPORTUNITIES = { pinglamb: 1792, yachi: 1446 };
+const BAG1_OPPORTUNITIES = { pinglamb: 1850, yachi: 1502 };
 
 const EMPTY_LISTS = ['bag2_garbage_stripped', 'bag2_none_tsd_before_complete', 'bag2_none_extra_piece',
   'bag2_none_moved_piece', 'bag2_none_unexplained', 'pc_off_page', 'bag2_handedness_mismatch',
