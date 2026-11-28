@@ -26,7 +26,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
    '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22',
-   '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-27']);
+   '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26', '2026-11-27']);
 
 /** Bag 1 matched the 6-lock field, the lock-7 piece was NOT the (mirror-aware) bag-1 Z: a hold. */
 const Z_HOLD_BAG1 = [
@@ -119,9 +119,9 @@ const PC_GARBAGE_IN_WINDOW: string[] = [];
 // 2.normal_OS (all under its own) and 1 to 2.normal_SO (under its own), three entries to
 // TST_DONATE_CASES (m2r1, m2r2, m2r5) and one to PC_OFF_PAGE (m1r3).
 const CONDITIONS = {
-  '2.ideal': { '2.ideal': 582, '2.normal_OS': 79, '2.normal_SO': 25 },
-  '2.normal_OS': { '2.ideal': 1, '2.normal_OS': 195, '2.normal_SO': 36 },
-  '2.normal_SO': { '2.ideal': 16, '2.normal_OS': 1, '2.normal_SO': 59 },
+  '2.ideal': { '2.ideal': 612, '2.normal_OS': 83, '2.normal_SO': 27 },
+  '2.normal_OS': { '2.ideal': 1, '2.normal_OS': 206, '2.normal_SO': 37 },
+  '2.normal_SO': { '2.ideal': 16, '2.normal_OS': 1, '2.normal_SO': 60 },
   '2.i_early': { '2.normal_OS': 1 },
 };
 

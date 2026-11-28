@@ -20,10 +20,10 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
    '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22',
    '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24',
-   '2026-11-25', '2026-11-27']);
+   '2026-11-25', '2026-11-26', '2026-11-27']);
 
 /** Clean 7-lock rounds that were compared and were not the 基本形. Pinned per player. */
-const BAG1_OPPORTUNITIES = { pinglamb: 1850, yachi: 1502 };
+const BAG1_OPPORTUNITIES = { pinglamb: 1920, yachi: 1562 };
 
 const EMPTY_LISTS = ['bag2_garbage_stripped', 'bag2_none_tsd_before_complete', 'bag2_none_extra_piece',
   'bag2_none_moved_piece', 'bag2_none_unexplained', 'pc_off_page', 'bag2_handedness_mismatch',

@@ -30,7 +30,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(
   `${import.meta.dir}/../../sessions`,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-27']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26', '2026-11-27']);
 const sessionDir = (d: string) => `${import.meta.dir}/../../sessions/${d}`;
 const artefact = (s: string) => `${sessionDir(s)}/sim/replay-facts.json`;
 
@@ -122,7 +122,9 @@ const ADMISSION: Record<string, [number, number]> = {
   '2026-09-10': [130, 130], '2026-09-11': [102, 102], '2026-09-17': [98, 98],
   '2026-09-18': [254, 254], '2026-09-19': [300, 300], '2026-10-03': [292, 292],
   '2026-10-09': [204, 204], '2026-10-12': [110, 110], '2026-10-20': [60, 60],
-  '2026-10-22': [126, 126], '2026-10-29': [136, 136], '2026-11-01': [260, 260], '2026-11-05': [134, 134], '2026-11-17': [48, 48], '2026-11-19': [88, 88], '2026-11-23': [164, 164], '2026-11-24': [144, 144], '2026-11-25': [124, 124], '2026-11-27': [122, 122],
+  '2026-10-22': [126, 126], '2026-10-29': [136, 136], '2026-11-01': [260, 260], '2026-11-05': [134, 134], '2026-11-17': [48, 48], '2026-11-19': [88, 88], '2026-11-23': [164, 164], '2026-11-24': [144, 144], '2026-11-25': [124, 124],
+  '2026-11-26': [150, 150],
+  '2026-11-27': [122, 122],
 };
 
 /** Every player-round whose engine totals disagree with facts.json. EMPTY since 2026-10-31, and kept
@@ -217,9 +219,14 @@ test('admission counts are pinned per session, and the exceptions are exactly th
  *  2026-11-25 adds ONE (`topout`, engine survives, lock null), the same class, yachi's: round 6 of
  *  replay-2026-11-25-02.ttrm; 11-25 admits 124 of 124, so the list is 38.
  *
+ *  2026-11-26 adds SIX (`topout`, engine survives, lock null), the same class: yachi in
+ *  replay-2026-11-26-01.ttrm r11, replay-2026-11-26-03.ttrm r1 and replay-2026-11-26-04.ttrm r6,
+ *  and pinglamb in replay-2026-11-26-04.ttrm r0, replay-2026-11-26-05.ttrm r11 and
+ *  replay-2026-11-26-07.ttrm r10; 11-26 admits 150 of 150, so the list is 44.
+ *
  *  2026-11-27 adds ONE (`topout`, engine survives, lock null), the same class, yachi's: round 8 of
  *  replay-2026-11-27-02.ttrm (gameoverreason topout in the .ttrm); 11-27 admits 122 of 122, so the
- *  list is 39. */
+ *  list is 45. */
 const KNOCKOUT_EXCEPTIONS = [
   { session: '2026-07-22', file: 'replay-2026-07-22-2.ttrm', round: 1, user: 'yachi', ending: 'topout', lock: null },
   { session: '2026-07-22', file: 'replay-2026-07-22-7.ttrm', round: 5, user: 'pinglamb', ending: 'topout', lock: null },
@@ -259,6 +266,12 @@ const KNOCKOUT_EXCEPTIONS = [
   { session: '2026-11-24', file: 'replay-2026-11-24-02.ttrm', round: 2, user: 'yachi', ending: 'topout', lock: null },
   { session: '2026-11-24', file: 'replay-2026-11-24-04.ttrm', round: 5, user: 'yachi', ending: 'topout', lock: null },
   { session: '2026-11-25', file: 'replay-2026-11-25-02.ttrm', round: 6, user: 'yachi', ending: 'topout', lock: null },
+  { session: '2026-11-26', file: 'replay-2026-11-26-01.ttrm', round: 11, user: 'yachi', ending: 'topout', lock: null },
+  { session: '2026-11-26', file: 'replay-2026-11-26-03.ttrm', round: 1, user: 'yachi', ending: 'topout', lock: null },
+  { session: '2026-11-26', file: 'replay-2026-11-26-04.ttrm', round: 0, user: 'pinglamb', ending: 'topout', lock: null },
+  { session: '2026-11-26', file: 'replay-2026-11-26-04.ttrm', round: 6, user: 'yachi', ending: 'topout', lock: null },
+  { session: '2026-11-26', file: 'replay-2026-11-26-05.ttrm', round: 11, user: 'pinglamb', ending: 'topout', lock: null },
+  { session: '2026-11-26', file: 'replay-2026-11-26-07.ttrm', round: 10, user: 'pinglamb', ending: 'topout', lock: null },
   { session: '2026-11-27', file: 'replay-2026-11-27-02.ttrm', round: 8, user: 'yachi', ending: 'topout', lock: null },
 ];
 

@@ -34,7 +34,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
    '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22',
-   '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-27']);
+   '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26', '2026-11-27']);
 
 /** Bag 1 missed the 7-lock board, matched the 6-lock L-held field, and the 7th piece was NOT the
  *  mirror-aware bag-1 L (J when mirrored): a hold. Most of them go on to place the held L on its tower
@@ -83,6 +83,11 @@ const L_HOLD_BAG1: string[] = [
   // 2026-11-23: two, both yachi's, in m4 (m4r8, m4r10).
   "2026-11-23 m4r8 yachi", "2026-11-23 m4r10 yachi",
   "2026-11-25 m3r12 yachi",
+  "2026-11-26 m3r3 pinglamb",
+  "2026-11-26 m3r3 yachi",
+  "2026-11-26 m5r12 yachi",
+  "2026-11-26 m5r5 yachi",
+  "2026-11-26 m7r1 yachi",
 ];
 /** The 6-lock field matched and the 7th piece WAS the bag-1 L (J when mirrored), placed off the page
  *  (not on its tower: no 7-lock bag1.l_top match). Measured EMPTY through twenty sessions; the first
@@ -121,6 +126,9 @@ const BAG2_GARBAGE_STRIPPED: string[] = [
   "2026-11-01 m6r5 yachi (6)", "2026-11-01 m6r7 yachi (12)",
   "2026-11-05 m2r1 yachi (6)",
   "2026-11-23 m3r11 yachi (6)",
+  "2026-11-26 m3r3 pinglamb (11)",
+  "2026-11-26 m7r2 pinglamb (1)",
+  "2026-11-26 m7r3 yachi (6)",
 ];
 /** No bag-2 match: the board before the TST is a strict subset of a bag-2 board. MEASURED, not matched. */
 const BAG2_NONE_TST_BEFORE_COMPLETE: string[] = [
@@ -154,7 +162,9 @@ const BAG2_NONE_MOVED_PIECE: string[] = [
   "2026-09-18 m6r6 yachi under 2.compromise, Z moved", "2026-09-19 m2r6 yachi under 2.compromise, Z moved",
   "2026-09-19 m6r6 yachi under 2.compromise, Z moved", "2026-09-19 m10r9 yachi under 2.compromise, S moved",
   "2026-10-03 m20r8 yachi under 2.compromise, Z moved", "2026-10-09 m11r4 pinglamb under 2.compromise, S moved",
-  "2026-11-23 m1r10 yachi under 2.compromise, S moved", "2026-11-27 m1r6 yachi under 2.compromise, Z moved",
+  "2026-11-23 m1r10 yachi under 2.compromise, S moved",
+  "2026-11-26 m1r6 yachi under 2.compromise, Z moved",
+  "2026-11-27 m1r6 yachi under 2.compromise, Z moved",
 ];
 /** 8-line PCs on no drawn pattern, named with the node they stop under. Every one but 2026-07-24 m4r4
  *  has the occupancy of the page's patterns and other colours: most are one recurring arrangement
@@ -178,6 +188,7 @@ const PC_OFF_PAGE: string[] = [
   // m4r4 mirrored (prefix 18, the L_HOLD_BAG1 round), m10r6 as drawn (prefix 16).
   "2026-11-01 m4r4 yachi under 2.ideal.other", "2026-11-01 m10r6 yachi under 2.ideal.other",
   "2026-11-25 m3r7 pinglamb under 2.ideal.other",
+  "2026-11-26 m5r5 yachi under 2.ideal.other",
 ];
 
 /** Measured empty. A first entry is a red build to investigate, never a number to absorb. */
@@ -187,20 +198,20 @@ const PC_GARBAGE_IN_WINDOW: string[] = [];
 const MULTI_COLOUR_RESOLVED_BY_GROUP: string[] = [];
 
 /** Both players mirror 山岳積み2号: pinned as a count per player, not a list. */
-const MIRRORED_BAG1 = { yachi: 190, pinglamb: 25 };
+const MIRRORED_BAG1 = { yachi: 196, pinglamb: 25 };
 
 /** Cases per measured node. No corpus round reaches the 4-line PCs, 2.normal#2/#3 or anything under
  *  2.compromise past its TST: those zeros are COMPARED (the classifier detects all three PC kinds and
  *  the bag-3 and bag-4 snapshot boards; the demos test reaches each one), never "not compared". */
 const NODE_CASES: Record<string, number> = {
-  'bag1.l_top': 432, 'bag1.l_hold': 102, 'bag1.l_placed_elsewhere': 1,
+  'bag1.l_top': 438, 'bag1.l_hold': 107, 'bag1.l_placed_elsewhere': 1,
   '2.pc4#1': 0, '2.pc4#2': 0, '2.pc4#3': 0,
-  '2.ideal': 271, '2.normal#1': 112, '2.normal#2': 0, '2.normal#3': 0, '2.compromise': 20,
+  '2.ideal': 278, '2.normal#1': 113, '2.normal#2': 0, '2.normal#3': 0, '2.compromise': 21,
   // 2026-11-17 adds one pc#2, yachi's m1r5, as drawn, at lock 19 past a prefix verified to 18 (`verified: false`).
   // 2026-11-01 adds two pc#3, both yachi's, at lock 19 past the verified prefix (`verified: false`):
   // m3r6 mirrored (prefix 15), m8r3 as drawn (prefix 14).
   // 2026-11-24 adds one pc#3 and one pc#7 (both under 2.ideal).
-  '2.ideal.pc#1': 5, '2.ideal.pc#2': 14, '2.ideal.pc#3': 22, '2.ideal.pc#4': 0, '2.ideal.pc#5': 0,
+  '2.ideal.pc#1': 5, '2.ideal.pc#2': 14, '2.ideal.pc#3': 23, '2.ideal.pc#4': 0, '2.ideal.pc#5': 0,
   '2.ideal.pc#6': 0, '2.ideal.pc#7': 2, '2.ideal.pc#8': 0, '2.ideal.pc#9': 0, '2.ideal.pc#10': 0,
   '2.ideal.pc#11': 0, '2.ideal.pc#12': 0, '2.ideal.pc#13': 0, '2.ideal.pc#14': 0,
   '2.normal.pc#1': 4, '2.normal.pc#2': 0, '2.normal.pc#3': 0, '2.normal.pc#4': 0, '2.normal.pc#5': 0,
@@ -226,9 +237,9 @@ const UNMEASURED: Record<string, string> = {
  *  trigger is a pair of early pairs with no threshold, so it never decides. A sizeable minority of
  *  2.ideal rounds dealt O before S, so the condition is a description of the page, not of the play. */
 const CONDITIONS = {
-  '2.ideal': { '2.compromise': 54, '2.ideal': 217 },
-  '2.compromise': { '2.compromise': 20 },
-  '2.normal#1': { '2.compromise': 107, '2.ideal': 5 },
+  '2.ideal': { '2.compromise': 55, '2.ideal': 223 },
+  '2.compromise': { '2.compromise': 21 },
+  '2.normal#1': { '2.compromise': 108, '2.ideal': 5 },
 };
 
 /** The case object's key order is part of the artefact's bytes. */

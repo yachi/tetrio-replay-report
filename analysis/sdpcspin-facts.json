@@ -165,6 +165,11 @@
     "replay_facts_md5": "77e54fa9080e17584458dfbe8e119ee0"
    },
    {
+    "session": "2026-11-26",
+    "replays_md5": "d01f24b6610227c64eac1035f203b334",
+    "replay_facts_md5": "2cb4ae5af4da74208db58d34d101ad67"
+   },
+   {
     "session": "2026-11-27",
     "replays_md5": "f57553058f05ceecbaa81262cda01321",
     "replay_facts_md5": "00fceb533e90f820afd4ddfde3c63c23"
@@ -201,6 +206,7 @@
   "2026-11-23",
   "2026-11-24",
   "2026-11-25",
+  "2026-11-26",
   "2026-11-27"
  ],
  "outcomes": [],
@@ -214,10 +220,10 @@
     "pinglamb": 0,
     "yachi": 1
    },
-   "opportunities": 3808,
+   "opportunities": 3948,
    "opportunities_by_player": {
-    "pinglamb": 1928,
-    "yachi": 1880
+    "pinglamb": 2000,
+    "yachi": 1948
    },
    "pc_off_page": 0,
    "pc_off_page_by_player": {
@@ -254,10 +260,10 @@
     "pinglamb": 0,
     "yachi": 1
    },
-   "opportunities": 3808,
+   "opportunities": 3948,
    "opportunities_by_player": {
-    "pinglamb": 1928,
-    "yachi": 1880
+    "pinglamb": 2000,
+    "yachi": 1948
    },
    "pc_off_page": 0,
    "pc_off_page_by_player": {

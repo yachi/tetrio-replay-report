@@ -295,6 +295,18 @@ def check_artefact(data):
     _need(data.get("schema") == "replay-facts/1", f"unknown schema {data.get('schema')!r}")
 
 
+
+def _video_seats(session):
+    """Left-to-right VOD seating from video.json, or None when the night has no seats."""
+    path = os.path.normpath(os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "..", "sessions", session, "video", "video.json"))
+    if not os.path.isfile(path):
+        return None
+    with open(path, encoding="utf-8") as fh:
+        seats = (json.load(fh).get("video") or {}).get("seats")
+    return list(seats) if seats else None
+
+
 def payload(data, facts):
     """The JSON the player reads for the 最癲一局 round, or None when there is none to replay."""
     if data is None:
@@ -410,7 +422,7 @@ def _round_payload(data, facts, mi, ri, extra=()):
         moments.append([pos[(s, i)] - (1 if before else 0), s, kind, label])
     moments.sort()
     flags = sorted([pos[(s, i)], s, kind] for s, i, kind in flags)
-    return {
+    out = {
         "session": data["session"], "file": m["file"], "match": m["index"], "round": ri + 1,
         "label": f"m{m['index']}r{ri + 1}", "winner": fr["winner"], "seq": rr["seq"],
         "shapes": data["shapes"], "width": data["board"]["width"], "rows": data["board"]["rows"],
@@ -418,6 +430,14 @@ def _round_payload(data, facts, mi, ri, extra=()):
         "order": order, "players": players, "moments": moments, "flags": flags,
         "flag_words": FLAG_WORDS,
     }
+    seats = _video_seats(data["session"])
+    if seats is not None:
+        missing = [u for u in seats if u not in order_users]
+        extra = [u for u in order_users if u not in seats]
+        _need(not missing and not extra,
+              f"{data['session']}: video.seats {seats} does not match players {order_users}")
+        out["seats"] = seats
+    return out
 
 
 # ---------------------------------------------------------------- markup

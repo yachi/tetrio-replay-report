@@ -42,7 +42,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-27']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26', '2026-11-27']);
 const ART_PATH = `${import.meta.dir}/../../analysis/accidental-facts.json`;
 const OPENERS = import.meta.dir;
 const ANALYSIS = `${import.meta.dir}/../../analysis`;
@@ -95,8 +95,8 @@ const RULE: Record<string, [number, number[]]> = {
 };
 
 const DENOM = {
-  pinglamb: { TST: { all: 2078, in_opener: 2028, mid_game: 50 } },
-  yachi: { TST: { all: 1295, in_opener: 1223, mid_game: 72 } },
+  pinglamb: { TST: { all: 2153, in_opener: 2102, mid_game: 51 } },
+  yachi: { TST: { all: 1343, in_opener: 1268, mid_game: 75 } },
 };
 const HITS = { pinglamb: { all: 0, in_opener: 0, mid_game: 0, garbage_in_window: 0 },
                yachi: { all: 0, in_opener: 0, mid_game: 0, garbage_in_window: 0 } };
@@ -236,7 +236,7 @@ test('quarantined: report_eligible false, no claim ids, one spin_rule variant wi
 });
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
-  expect(checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT)).toBe(21621);
+  expect(checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT)).toBe(22438);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 

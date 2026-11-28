@@ -27,22 +27,22 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-27']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26', '2026-11-27']);
 
 const KEYS = ['stsd', 'stmbcave', 'imperialcross', 'doubledagger', 'btcannon', 'cutcopy', 'kaidan', 'dtcannon', 'kingcrimson', 'cavetsstst', 'hamburger'] as const;
 
 const BY_PLAYER: Record<string, any> = {
   stsd: { pinglamb: { qualified: 30, not_qualified: {} }, yachi: { qualified: 71, not_qualified: { dpc: 1, fragment: 2, ownership_unverified: 1 } } },
-  stmbcave: { pinglamb: { qualified: 41, not_qualified: { not_whole_shape: 22 } }, yachi: { qualified: 64, not_qualified: { dpc: 1, not_whole_shape: 41 } } },
+  stmbcave: { pinglamb: { qualified: 41, not_qualified: { not_whole_shape: 22 } }, yachi: { qualified: 66, not_qualified: { dpc: 1, not_whole_shape: 41 } } },
   imperialcross: { pinglamb: { qualified: 9, not_qualified: {} }, yachi: { qualified: 4, not_qualified: { fragment: 1 } } },
-  doubledagger: { pinglamb: { qualified: 6, not_qualified: { not_whole_shape: 27 } }, yachi: { qualified: 9, not_qualified: { not_whole_shape: 11 } } },
+  doubledagger: { pinglamb: { qualified: 6, not_qualified: { not_whole_shape: 28 } }, yachi: { qualified: 9, not_qualified: { not_whole_shape: 11 } } },
   btcannon: { pinglamb: { qualified: 0, not_qualified: {} }, yachi: { qualified: 0, not_qualified: {} } },
   cutcopy: { pinglamb: { qualified: 0, not_qualified: {} }, yachi: { qualified: 2, not_qualified: { fragment: 1 } } },
-  kaidan: { pinglamb: { qualified: 29, not_qualified: { fragment: 52, garbage_in_shape: 62, z_not_one_piece: 62 } }, yachi: { qualified: 48, not_qualified: { dpc: 1, fragment: 68, garbage_in_shape: 69, ownership_unverified: 2, z_not_one_piece: 103 } } },
-  dtcannon: { pinglamb: { qualified: 0, not_qualified: {} }, yachi: { qualified: 33, not_qualified: { ownership_unverified: 1 } } },
+  kaidan: { pinglamb: { qualified: 34, not_qualified: { fragment: 52, garbage_in_shape: 62, z_not_one_piece: 62 } }, yachi: { qualified: 50, not_qualified: { dpc: 1, fragment: 72, garbage_in_shape: 74, ownership_unverified: 2, z_not_one_piece: 108 } } },
+  dtcannon: { pinglamb: { qualified: 0, not_qualified: {} }, yachi: { qualified: 34, not_qualified: { ownership_unverified: 1 } } },
   kingcrimson: { pinglamb: { qualified: 1, not_qualified: {} }, yachi: { qualified: 0, not_qualified: {} } },
   cavetsstst: { pinglamb: { qualified: 1, not_qualified: {} }, yachi: { qualified: 0, not_qualified: {} } },
-  hamburger: { pinglamb: { qualified: 3, not_qualified: { dpc: 1, fragment: 32, garbage_in_shape: 8, in_opener: 5 } }, yachi: { qualified: 8, not_qualified: { dpc: 2, fragment: 78, garbage_in_shape: 12, in_opener: 105, ownership_unverified: 2 } } },
+  hamburger: { pinglamb: { qualified: 3, not_qualified: { dpc: 1, fragment: 33, garbage_in_shape: 8, in_opener: 5 } }, yachi: { qualified: 8, not_qualified: { dpc: 2, fragment: 82, garbage_in_shape: 13, in_opener: 105, ownership_unverified: 2 } } },
 };
 
 /** every hit that does not qualify, with its reasons (階段のドネイト and ハンバーガー: the tally above only) */
@@ -161,6 +161,7 @@ const NOT_QUALIFIED: Record<string, string[]> = {
     "2026-11-23 m5r4 yachi lock 113 (doubledagger): not_whole_shape",
     "2026-11-23 m5r9 pinglamb lock 35 (doubledagger): not_whole_shape",
     "2026-11-25 m1r11 yachi lock 40 (doubledagger): not_whole_shape",
+    "2026-11-26 m6r5 pinglamb lock 123 (doubledagger): not_whole_shape",
   ],
   btcannon: [],
   cutcopy: [
