@@ -68,7 +68,7 @@ preview the first bag's dealt order o1 is known before any hold decision, so the
   S1  python3 $E --sets                                                        # writes analysis/tst-openers-tp-sets.json via pipeline/sim/tst-sets-rs (about 5 s)
   T1  python3 $E --tsd-input > $W/tsd.in ; pipeline/sim/tst-tsd-rs/target/release/tst-tsd < $W/tsd.in > $W/tsd.out   # offline, about 30 min on 4 cores
       python3 $E --tsd $W/tsd.out ; python3 $E --tsd-check                   # writes / checks analysis/tst-openers-tp-tsd.json (TST->TSD->PC, bag 3 only)
-  S2  python3 $E --sets-check                                                  # CI: byte-compares a fresh crate run, recomputes every set, pick and tree in numpy (about 30 s)
+  S2  python3 $E --sets-check                                                  # CI: byte-compares a fresh crate run, recomputes every set, pick and tree in numpy (one forked worker per budget and objective)
 
 THE X BOARDS (schema tst-openers-tp-x/1, md5 in the main artefact's md5.x; offline, about 25 min on 4 cores):
 
@@ -1611,8 +1611,45 @@ def sets_check_cmd(args):
     rawt = sets_crate_run(art, b1, pt)
     want = json.dumps(sets_artefact(art, b1, raw, rawt), separators=(",", ":"), ensure_ascii=False) + "\n"
     assert SETS_OUT.read_text() == want, "analysis/tst-openers-tp-sets.json is not what the crate runs build"
-    sets_check_obj(art, b1, raw, None)
-    sets_check_obj(art, b1, rawt, pt)
+    t0, f0 = sets_check_obj(art, b1, raw, None)
+    t1, f1 = sets_check_obj(art, b1, rawt, pt)
+    notes = run_forked([("any-PC " + bk, fn) for bk, fn in t0] + [("TSD " + bk, fn) for bk, fn in t1])
+    f0(); f1()
+    print("ok: " + "; ".join(notes))
+    print("ok: sets artefact equals the crate run; every set value, pick, greedy step, pair, dominance claim, triple certificate and tree recomputed")
+
+
+def run_forked(tasks, jobs=None):
+    """Run each (label, fn) in a forked child, `jobs` at a time (default: the cores), and return each fn's string in task order.
+    A child shares the parent's arrays copy-on-write, so nothing is pickled; a child that raises prints its traceback and the
+    whole check fails after every child has finished."""
+    import os, traceback
+    jobs = jobs or os.cpu_count() or 1
+    out, running, failed, todo = {}, {}, [], list(enumerate(tasks))
+    while todo or running:
+        while todo and len(running) < jobs:
+            i, (label, fn) = todo.pop(0)
+            r, w = os.pipe()
+            pid = os.fork()
+            if pid == 0:
+                os.close(r)
+                code = 0
+                try:
+                    os.write(w, ("%s: %s" % (label, fn())).encode())
+                except BaseException:
+                    traceback.print_exc()
+                    code = 1
+                os._exit(code)
+            os.close(w)
+            running[pid] = (i, label, r)
+        pid, st = os.wait()
+        i, label, r = running.pop(pid)
+        with os.fdopen(r, "rb") as fh:
+            out[i] = fh.read().decode()
+        if os.waitstatus_to_exitcode(st) != 0:
+            failed.append(label)
+    assert not failed, "sets check failed: " + ", ".join(failed)
+    return [out[i] for i in range(len(tasks))]
 
 
 def sets_check_obj(art, b1, raw, pt):
@@ -1637,12 +1674,11 @@ def sets_check_obj(art, b1, raw, pt):
     assert len(P) == B and len(set(P)) == B
     feat = np.array([[(p.index(KINDS[i]) < p.index(KINDS[j])) for i in range(7) for j in range(i + 1, 7)] +
                      [p[0] == k for k in KINDS] for p in P], dtype=bool)          # B x 28
-    notes = []
 
     def val_of(key):                       # the (pc3, built) of an order-wise max key array
         return int((key >> SH).sum()), int((key & 8191).sum())
 
-    for bk in BKEYS:
+    def one(bk):
         r = raw["budgets"][bk]
         lim = INFEAS - 1 if bk == "inf" else int(bk)
         Jb = np.stack([np.array(tabs[b["name"]][bk][0])[np.frombuffer(vec[b["name"]], dtype=np.uint8)] for b in bs]).astype(np.int64)
@@ -1724,7 +1760,7 @@ def sets_check_obj(art, b1, raw, pt):
                 if v == t3:
                     best3.append([int(red[a]), int(red[b_]), int(red[c_])])
         assert min(best3) == ex[3]["set"], f"triple tie rule ({bk})"
-        notes.append(f"{bk}: reduced {m}, triple certificate evaluated {surv} of {m*(m-1)*(m-2)//6}")
+        note = f"reduced {m}, triple certificate evaluated {surv} of {m*(m-1)*(m-2)//6}"
         # greedy chains: every step the argmax over all boards, the first of the tied reduced boards
         def step_ok(prev, rec, k):
             s = rec["set"]
@@ -1787,6 +1823,18 @@ def sets_check_obj(art, b1, raw, pt):
             if y.any() and (~y).any():
                 best1 = max(best1, max(sub[mm][y].sum() for mm in range(nu)) + max(sub[mm][~y].sum() for mm in range(nu)))
         assert (t1["pc3"], t1["built"]) == (int(best1 >> 26), int(best1 & ((1 << 26) - 1))), f"depth-1 tree is not optimal ({bk})"
+        return note
+
+    def final():
+        fixed_check(raw, pr, bs, tabs, vec)
+    return [(bk, (lambda bk=bk: one(bk))) for bk in BKEYS], final
+
+
+def fixed_check(raw, pr, bs, tabs, vec):
+    import numpy as np
+
+    def val_of(key):                       # the (pc3, built) of an order-wise max key array
+        return int((key >> SH).sum()), int((key & 8191).sum())
     fx = raw["fixed"]
     s = fx["set"]
     assert s == raw["budgets"]["2"]["exact"][2]["set"]
@@ -1796,8 +1844,6 @@ def sets_check_obj(art, b1, raw, pt):
         K = np.stack([np.where(np.frombuffer(vec[b["name"]], dtype=np.uint8) <= lim, (np.array(tabs[b["name"]][bk][0])[np.frombuffer(vec[b["name"]], dtype=np.uint8)].astype(np.int64) << SH) | np.array(tabs[b["name"]][bk][1])[np.frombuffer(vec[b["name"]], dtype=np.uint8)], 0) for b in (bs[i] for i in fx["ub"])])
         v = val_of(K.max(0))
         assert fx["values"][bk] == {"pc3": v[0], "built": v[1]}, f"fixed value ({bk})"
-    print("ok: " + "; ".join(notes))
-    print("ok: sets artefact equals the crate run; every set value, pick, greedy step, pair, dominance claim, triple certificate and tree recomputed")
 
 
 def depth_of(nd):
