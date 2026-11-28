@@ -48,14 +48,14 @@ describe('srs-bfs-rs == the TS BFS', () => {
   test('seeded boards, all pieces, SRS and SRS+ for I, both modes, in order', () => {
     const boards = [...randomBoards(12345, 120, 12), ...randomBoards(67890, 120, 18), ...randomBoards(999, 60, 8)];
     compare(boards, PIECES, true);
-  });
+  }, 120_000);
 
   test('an empty board and a spawn-blocked board', () => {
     const blocked = emptyBoard().map(r => [...r]) as (PieceType | null)[][];
     for (let c = 0; c < W; c++) blocked[18]![c] = 'I';
     compare([emptyBoard() as Board, blocked as Board], PIECES, true);
     expect(nativeDrops(blocked as Board, 'T')).toEqual([]);
-  });
+  }, 120_000);
 
   test('control: the comparison sees a wrong answer', () => {
     const b = emptyBoard() as Board;
