@@ -464,6 +464,9 @@ PLAN = {
     "typescript": Entry(DEFAULT, needs=["bun"], matrix="shard",
                         roots=CORPUS + ("spec/", "tools/", "nix/")),
     "manifest": Entry(DEFAULT, needs=["bun"], roots=CORPUS + ("tools/",)),
+    # the emitters build their own crates, which no import closure reaches, so pipeline/sim/ is a root
+    "tst-openers": Entry(DEFAULT, roots=CORPUS + ("pipeline/sim/",)),
+    "tst-openers-sets": Entry(DEFAULT, roots=CORPUS + ("pipeline/sim/",)),
     "spec": Entry(DEFAULT, needs=["dafny"], roots=("spec/",), skips={
         "Install Dafny ${{ env.DAFNY_VERSION }} (pinned by sha256)": _TOOLCHAIN_SKIP % "dafny",
         "Mutation-test the spec": "schedule/inputs.mutation only — --weekly runs it",

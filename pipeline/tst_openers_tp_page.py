@@ -2490,6 +2490,55 @@ def site_card(inputs=None, prose=None):
             "title": PR["overview_title"], "blurb": PR["index_card"]["blurb"]}
 
 
+class _ForkPool:
+    """Run zero-argument callables returning a short str in forked children, at most cpu_count at a time.
+
+    The result is small (one line of JSON), so a child writes it to its pipe and exits before the parent
+    reads it; the pipe buffer holds it. A slot is [(ok, text)] once its child has been reaped."""
+
+    def __init__(self, jobs=None):
+        self.jobs = jobs or os.cpu_count() or 1
+        self.running = {}
+
+    def submit(self, fn):
+        while len(self.running) >= self.jobs:
+            self._reap()
+        sys.stdout.flush()
+        sys.stderr.flush()
+        r, w = os.pipe()
+        pid = os.fork()
+        if pid == 0:
+            os.close(r)
+            code = 0
+            try:
+                text = fn()
+            except BaseException:
+                import traceback
+                text, code = traceback.format_exc()[-4000:], 1
+            os.write(w, text.encode())
+            os._exit(code)
+        os.close(w)
+        slot = [None]
+        self.running[pid] = (r, slot)
+        return slot
+
+    def _reap(self):
+        pid, status = os.wait()
+        r, slot = self.running.pop(pid)
+        chunks = []
+        while True:
+            b = os.read(r, 65536)
+            if not b:
+                break
+            chunks.append(b)
+        os.close(r)
+        slot[0] = (os.waitstatus_to_exitcode(status) == 0, b"".join(chunks).decode())
+
+    def drain(self):
+        while self.running:
+            self._reap()
+
+
 def selftest(repo=REPO):
     art, cat = load_inputs(repo)
     PR = load_prose()
@@ -2507,15 +2556,33 @@ def selftest(repo=REPO):
 
     builds = load_builds(repo)
 
+    # each audit runs in a forked worker (copy-on-write, nothing pickled); the verdicts are read back and
+    # reported in submission order at the end, so the counts and the printed lines are the serial run's
+    pool = _ForkPool()
+    pending = []
+
     def expect(label, mutated, want, a=None, c=None, bd=None, px=None, L=None):
+        args = (mutated, a or art, c or cat, PR, px or pcxd, bd or builds, L or Lsets)
+
+        def run(args=args):
+            bad = audit(*args)
+            return json.dumps([bool(bad), str(bad[:2])[:2000]])
+        pending.append((label, want, pool.submit(run)))
+
+    def report_expects():
         nonlocal killed, survived
-        bad = audit(mutated, a or art, c or cat, PR, px or pcxd, bd or builds, L or Lsets)
-        if bool(bad) == want:
-            killed += want
-            print(f'  {"killed" if want else "passed"}: {label}')
-        else:
-            survived += 1
-            print(f'  {"SURVIVED" if want else "FAILED control"}: {label} {bad[:2]}', file=sys.stderr)
+        pool.drain()
+        for label, want, slot in pending:
+            ok, data = slot[0]
+            if not ok:
+                raise RuntimeError(f"selftest worker failed on {label!r}:\n{data}")
+            bad, shown = json.loads(data)
+            if bad == want:
+                killed += want
+                print(f'  {"killed" if want else "passed"}: {label}')
+            else:
+                survived += 1
+                print(f'  {"SURVIVED" if want else "FAILED control"}: {label} {shown}', file=sys.stderr)
 
     def sub(pattern, fn, flags=0, text=None):
         text = page if text is None else text
@@ -2985,6 +3052,7 @@ def selftest(repo=REPO):
            render(art, cat, PR, pcxd, None, L=Lsets, orders={**orders, "orders": {**orders["orders"], next(iter(orders["orders"])):
                                                                   {**next(iter(orders["orders"].values())), "n": [0, 0, 0, 1]}}}),
            True)
+    report_expects()
     print(f"selftest: {killed} killed, {survived} survived")
     return 1 if survived else 0
 
