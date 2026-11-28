@@ -87,6 +87,26 @@ _MIR = re.compile(r'<div class="muted sm mir" data-same="([01])">(.*?)</div>', r
 _MF = re.compile(r'<b data-m="(\w+)">(.*?)</b>', re.S)
 
 
+def _idmemo(fn):
+    """Memoise a pure function of artefact objects by the IDENTITY of its non-scalar arguments, each pinned so its id is never
+    reused. Sound here because the selftest deep-copies an artefact and edits the copy BEFORE anything reads it, so no object is
+    mutated after it has been an argument; a corrupted copy is a different object and always misses. The audit and the
+    renderer take the same boards over and over (every mutant re-audits the same clean artefact), which is what this saves."""
+    cache = {}
+
+    def key(a):
+        return a if a is None or isinstance(a, (str, int, float, bool)) else id(a)
+
+    def wrapped(*args):
+        k = tuple(key(a) for a in args)
+        hit = cache.get(k)
+        if hit is None:
+            hit = cache[k] = (args, fn(*args))
+        return hit[1]
+    wrapped.__wrapped__ = fn
+    return wrapped
+
+
 # ------------------------------------------------------------------ the catalogue (originals + mirrors)
 
 def mirror_kind(k):
@@ -276,11 +296,13 @@ def order_perms():
 
 # ------------------------------------------------------------------ figures
 
+@_idmemo
 def deltas(b, k):
     c = b["cum"][k]
     return [c[i] - (c[i - 1] if i else 0) for i in range(len(c))]
 
 
+@_idmemo
 def figs(b, k):
     """(built, pc3n, joint) of board `b` at budget `k`, exact: built = cum[-1] / 5040^2, joint = sum(delta * p5) / 5040^3
     (the chance that bag 1 as drawn and a random bag 2 build a shape AND bag 3 clears), pc3 = joint / built."""
@@ -289,6 +311,7 @@ def figs(b, k):
     return Fraction(b["cum"][k][-1], N2), n, Fraction(n, N2 * BAG)
 
 
+@_idmemo
 def strings(b):
     """budget -> (two-bag built, bag-3 PC given built, joint) display strings; 未計 where nothing is built."""
     out = {}
@@ -298,6 +321,7 @@ def strings(b):
     return out
 
 
+@_idmemo
 def tstrings(b, pt):
     """budget -> [TST->TSD->PC given built, TST->TSD->PC joint] display strings, `pt` the per-class count of the 5040 bag-3
     orders whose PC plan holds a full T-spin Double (analysis/tst-openers-tp-tsd.json); 未計 where nothing is built."""
@@ -309,6 +333,7 @@ def tstrings(b, pt):
     return out
 
 
+@_idmemo
 def live(b):
     """The classes some budget ends a deal on (a nonzero delta): the artefact lists every leftover class of every shape
     the board is listed by, and a class no tiling holding the board has gets no deal."""
@@ -316,6 +341,7 @@ def live(b):
     return [i for i in range(len(b["classes"])) if any(d[i] for d in ds)]
 
 
+@_idmemo
 def holders(cat, b):
     """class index -> the first tiling (of the class's shape) that holds the board, has that leftover and a nonzero count;
     only for the live classes."""
@@ -330,12 +356,14 @@ def holders(cat, b):
     return out
 
 
+@_idmemo
 def shown_class(b):
     """The class a card draws: the largest share of the joint (delta_inf * p5), the earliest on a tie."""
     d = deltas(b, BK_SET)
     return max(range(len(d)), key=lambda i: (d[i] * b["classes"][i][2], -i))
 
 
+@_idmemo
 def mirror_index(art):
     by = {b["name"]: b for b in art["boards"]}
     for b in art["boards"]:
@@ -446,6 +474,7 @@ def bag1_library(repo=REPO):
     return lib
 
 
+@_idmemo
 def bag1_names(b, lib):
     """(names whose bag 1 equals the board letter for letter, catalogue names equal by occupancy only), each deduplicated."""
     c = {}
@@ -474,6 +503,7 @@ def rep_key(b, cat):
     return (-routed(cat, b), sum(1 for s in b["shapes"] if s >= ID_OFFSET), -figs(b, BK_SET)[2], b["name"])
 
 
+@_idmemo
 def pairs(art, cat):
     """One entry per mirror pair: (representative, partner). The representative is the board with more source shapes that
     have a route-page name (so the card carries the opener's name), then the one listed by fewer mirror shapes (so the
@@ -516,6 +546,7 @@ def fam_strings(L, k):
     return [pct(built), pct(Fraction(n, bn * BAG)) if bn else "未計", pct(joint)]
 
 
+@_idmemo
 def pair_of(art, a, b):
     """The artefact's `families.pairs` entry of the mirror pair {a, b}: the policy over the two hands."""
     for P in art["families"]["pairs"]:
@@ -530,6 +561,7 @@ def fl_spans(fmt, L):
                    f'{_esc(fmt.format(a=fam_strings(L, k)[0], b=fam_strings(L, k)[1], c=fam_strings(L, k)[2]))}</span>' for k in BK)
 
 
+@_idmemo
 def families(art, cat):
     """Hold-swap families are the artefact's layouts (`families.list`). Returns (name -> indices of the layouts listing the
     board, name -> its pair's representative board). The artefact is read, never recomputed here: the family counts need the
@@ -545,6 +577,7 @@ def families(art, cat):
     return by_name, rep_of
 
 
+@_idmemo
 def card_layouts(r, m, art, by_name):
     """The layouts of a card's mirror pair, one per mirror class, the best first (larger joint at the opening budget,
     then the lower index)."""
@@ -603,6 +636,7 @@ def threshold(art):
     return Fraction(*art["prune"]["threshold"])
 
 
+@_idmemo
 def ranked(art, cat):
     """The ranked pairs: those whose representative's unlimited joint is above the pruning threshold, best first. Above
     the threshold every board was counted, so a rank there is complete; at or below it uncounted boards could be higher."""
@@ -612,11 +646,13 @@ def ranked(art, cat):
     return rows
 
 
+@_idmemo
 def unranked(art, cat):
     th = threshold(art)
     return [(r, p) for r, p in pairs(art, cat) if figs(r, BK_SET)[2] <= th]
 
 
+@_idmemo
 def rank_data(art, R):
     """budget -> (rank strings by position in `R`, card order by position). A rank is 1 + the number of ranked pairs with
     a strictly larger joint at that budget, printed only above the threshold."""
@@ -684,6 +720,7 @@ def px_entry(rows, left, ex):
                 b3=one(b3["deal"], [b3["deal"]], b3["h"], b3["plan"]) if b3 else None)
 
 
+@_idmemo
 def build_data(art, cat, R, PR, builds, pcxd, orders, pt=None):
     rk, od = rank_data(art, R)
     cards, px = {}, {}
@@ -1530,6 +1567,7 @@ def render(art, cat, PR, pcxd, builds=None, L=None, orders=None):
 
 # ------------------------------------------------------------------ audit (a second route, straight from cum and classes)
 
+@_idmemo
 def ex_strings(b):
     """Independent recomputation of `strings`: explicit loops over the classes, exact fractions."""
     out = {}
@@ -1543,6 +1581,7 @@ def ex_strings(b):
     return out
 
 
+@_idmemo
 def ex_tstrings(b, pt):
     """Independent recomputation of `tstrings`: explicit loops over the classes, exact fractions."""
     out = {}
@@ -1556,6 +1595,7 @@ def ex_tstrings(b, pt):
     return out
 
 
+@_idmemo
 def ex_classes(cat, b):
     """The (shape index, leftover, p5) set the listed shapes' own tilings give (every leftover of a buildable tiling), in
     the stated order (-p5, shape index, leftover)."""
@@ -1567,6 +1607,7 @@ def ex_classes(cat, b):
     return sorted(got, key=lambda c: (-c[2], c[0], c[1]))
 
 
+@_idmemo
 def ex_counts(b, k, C):
     """Independent recomputation of `counts_line`: explicit loops over the classes."""
     prev, num = 0, 0
@@ -1723,7 +1764,17 @@ def _b1_grid_check(b, names, lib):
         if not ok:
             return False
     return True
+def _audit_layouts_msgs(art):
+    msgs = []
+    audit_layouts_into(art, msgs)
+    return msgs
+
+
 def audit_layouts(art, bad):
+    bad += _audit_layouts_msgs_memo(art)
+
+
+def audit_layouts_into(art, bad):
     """The artefact's family layouts, re-checked from its boards: seven placements one per kind on 28 disjoint cells, every
     variant a kept board equal to the layout less one piece, the mirror symmetric, the policy's figures between the best
     variant and the sum of the variants (the sandwich), picks within the 5040 first-bag orders, the PC count monotone in the
@@ -1770,6 +1821,9 @@ def audit_layouts(art, bad):
         for a, b2 in zip(BK, BK[1:]):
             if L["num"][a][1] > L["num"][b2][1]:
                 bad.append(f"{tag}: the family PC counts are not monotone from budget {a} to {b2}")
+
+
+_audit_layouts_msgs_memo = _idmemo(_audit_layouts_msgs)
 
 
 def audit_orders(island, R, orders):
@@ -2490,6 +2544,21 @@ def site_card(inputs=None, prose=None):
             "title": PR["overview_title"], "blurb": PR["index_card"]["blurb"]}
 
 
+def _dc(x):
+    """copy.deepcopy for the JSON-shaped graphs the selftest corrupts (dict / list / tuple / scalars, no shared sub-objects:
+    checked on every input it is used for), several times faster because it keeps no memo; anything else falls back."""
+    t = type(x)
+    if t is dict:
+        return {k: _dc(v) for k, v in x.items()}
+    if t is list:
+        return [_dc(v) for v in x]
+    if t is tuple:
+        return tuple(_dc(v) for v in x)
+    if x is None or t in (str, int, float, bool):
+        return x
+    return copy.deepcopy(x)
+
+
 class _ForkPool:
     """Run zero-argument callables returning a short str in forked children, at most cpu_count at a time.
 
@@ -2558,6 +2627,7 @@ def selftest(repo=REPO):
 
     # each audit runs in a forked worker (copy-on-write, nothing pickled); the verdicts are read back and
     # reported in submission order at the end, so the counts and the printed lines are the serial run's
+    audit(page, art, cat, PR, pcxd, builds, Lsets)  # warm the identity memos in the parent: the forked workers inherit them
     pool = _ForkPool()
     pending = []
 
@@ -2565,6 +2635,8 @@ def selftest(repo=REPO):
         args = (mutated, a or art, c or cat, PR, px or pcxd, bd or builds, L or Lsets)
 
         def run(args=args):
+            if callable(args[0]):  # a mutant page built in the worker, not in the serial parent
+                args = (args[0](),) + args[1:]
             bad = audit(*args)
             return json.dumps([bool(bad), str(bad[:2])[:2000]])
         pending.append((label, want, pool.submit(run)))
@@ -2640,12 +2712,12 @@ def selftest(repo=REPO):
     expect("a bag-1 opener name dropped from a title", sub(r'<div class="src">(.*?)</div>', lambda t: t.replace(PR["b1_prefix"].format(n="迷走砲"), "", 1)), True)
     expect("a bag-1 name line emptied", re.sub(r'data-b1="[^"]+"', 'data-b1=""', page, count=1), True)
     expect("a bag-1 name planted on an unnamed board", re.sub(r'data-b1="" data-b1s=""', 'data-b1="迷走砲" data-b1s=""', page, count=1), True)
-    worse = copy.deepcopy(art)
+    worse = _dc(art)
     for b in worse["boards"]:
         if b["b1"][0] and b["name"] == ranked(art, cat)[0][0]["name"]:
             b["b1"] = (["山岳積み"], [])
             break
-    expect("a wrong bag-1 name in the artefact", rnd(worse), True)
+    expect("a wrong bag-1 name in the artefact", lambda: rnd(worse), True)
     expect("a hold tag dropped from a title", sub(r'<div class="src">(.*?)</div>', lambda s: re.sub("（hold .）", "", s)), True)
     flip = lambda k: "held" if k == "placed" else "placed"
     expect("a card's data-kind flipped", sub(r'data-kind="(\w+)"', flip), True)
@@ -2655,15 +2727,15 @@ def selftest(repo=REPO):
     expect("a held pruning number edited", sub(r'data-pr="kept_held">(\d)', bump), True)
     expect("a held boards total edited", sub(r'data-pr="boards_held">(\d)', bump), True)
     expect("a placed pruning number edited", sub(r'data-pr="kept_placed">(\d)', bump), True)
-    worse = copy.deepcopy(art)
+    worse = _dc(art)
     hb = next(b for b in worse["boards"] if b["kind"] == "held")
     hb["held"] = "S"
     expect("a held board given held S", page, True, a=worse)
-    worse = copy.deepcopy(art)
+    worse = _dc(art)
     pb = next(b for b in worse["boards"] if b["kind"] == "placed")
     pb["held"] = "T"
     expect("a placed board given held T", page, True, a=worse)
-    worse = copy.deepcopy(art)
+    worse = _dc(art)
     worse["prune"]["kinds"]["held"][1] += 1
     worse["prune"]["kept"] += 1
     expect("the held pruning count edited in the artefact", page, True, a=worse)
@@ -2680,30 +2752,30 @@ def selftest(repo=REPO):
     expect("a with-mirror pair line edited", sub(r'data-pair="1"><span data-fl="0" hidden>[^<]*?(\d)', bump), True)
     expect("a with-mirror pair line deleted", re.sub(r'<div class="sm pairl" data-pair="1">.*?</div>', "", page, count=1, flags=re.S), True)
     expect("a family's with-mirror line edited", sub(r'data-fboth="1"><span data-fl="0" hidden>[^<]*?(\d)', bump), True)
-    w = copy.deepcopy(art)
+    w = _dc(art)
     w["families"]["pairs"][0]["num"]["inf"][1] += 10 ** 12
     expect("an edited pair joint in the artefact", page, True, a=w)
     expect("a family table deleted", re.sub(r'<details class="fam".*?</details>', "", page, count=1, flags=re.S), True)
     expect("a family pointed at another layout", sub(r'data-fam="(\d+)"', lambda h: "999"), True)
     shown = int(re.search(r'data-fam="(\d+)"', page).group(1))
-    w = copy.deepcopy(art)
+    w = _dc(art)
     w["families"]["list"][0]["num"]["inf"][1] += 10 ** 12
     expect("an edited family joint in the artefact", page, True, a=w)
-    w = copy.deepcopy(art)
+    w = _dc(art)
     w["families"]["list"][shown]["num"]["inf"][0] += N2 // 100
     expect("an edited family built count in the artefact", page, True, a=w)
-    w = copy.deepcopy(art)
+    w = _dc(art)
     w["families"]["list"][shown]["pick"]["inf"][0] += 1
     expect("an edited family pick count in the artefact", page, True, a=w)
-    w = copy.deepcopy(art)
+    w = _dc(art)
     w["families"]["list"][0]["variants"].pop()
     w["families"]["list"][0]["pick"]["inf"].pop()
     expect("a family variant dropped from the artefact", page, True, a=w)
-    w = copy.deepcopy(art)
+    w = _dc(art)
     L0 = w["families"]["list"][0]
     L0["variants"][0] = next(b["name"] for b in art["boards"] if b["name"] not in L0["variants"])
     expect("a family variant that is not a hold swap of the layout", page, True, a=w)
-    w = copy.deepcopy(art)
+    w = _dc(art)
     w["families"]["complete"] = False
     expect("families.complete flipped", page, True, a=w)
     expect("a 4th-bag word on the page", page.replace("</body>", "<p>4 巡</p></body>", 1), True)
@@ -2740,70 +2812,70 @@ def selftest(repo=REPO):
     expect("a worked-PC cell moved", sub(r'<li data-p="[A-Z]" data-c="(\d+)', lambda c: str((int(c) + 1) % 60)), True)
     expect("a worked-PC hold flag flipped", sub(r'<li data-p="[A-Z]" data-c="[\d,]+" data-h="([01])"', lambda h: "1" if h == "0" else "0"), True)
 
-    worse = copy.deepcopy(art)
+    worse = _dc(art)
     b = next(b for b in worse["boards"] if len(b["classes"]) > 1 and b["name"] == ranked(art, cat)[0][0]["name"])
     b["classes"][0][2] -= 1
-    expect("a class's p5 edited in the artefact", render(art, cat, PR, pcxd), True, a=worse)
-    worse = copy.deepcopy(art)
+    expect("a class's p5 edited in the artefact", lambda: render(art, cat, PR, pcxd), True, a=worse)
+    worse = _dc(art)
     r0 = ranked(art, cat)[0][0]["name"]
     b = next(b for b in worse["boards"] if b["name"] == r0)
     b["cum"]["inf"][-1] += 7
     expect("a cumulative count edited after rendering", page, True, a=worse)
-    worse = copy.deepcopy(art)
+    worse = _dc(art)
     b = next(b for b in worse["boards"] if b["name"] == r0)
     b["cum"]["0"][-1] = b["cum"]["inf"][-1] + 1
-    expect("a budget count above the unlimited one", rnd(worse), True, a=worse)
-    worse = copy.deepcopy(art)
+    expect("a budget count above the unlimited one", lambda: rnd(worse), True, a=worse)
+    worse = _dc(art)
     b = next(b for b in worse["boards"] if b["name"] == r0)
     b["classes"].reverse()
     expect("classes reordered", page, True, a=worse)
-    worse = copy.deepcopy(art)
+    worse = _dc(art)
     worse["prune"]["kept"] += 1
     expect("the pruning count edited in the artefact", page, True, a=worse)
     # the builds and worked PCs: rendered from corrupted inputs, so only audit_builds can see it
     k0 = f'{ranked(art, cat)[0][0]["name"]}#{live(ranked(art, cat)[0][0])[0]}'
-    bd = copy.deepcopy(builds)
+    bd = _dc(builds)
     o = bd[k0]["order"]
     o[-1][1] = [q + 1 for q in o[-1][1]]
-    expect("a build piece moved", render(art, cat, PR, pcxd, bd), True, bd=bd)
-    bd = copy.deepcopy(builds)
+    expect("a build piece moved", lambda: render(art, cat, PR, pcxd, bd), True, bd=bd)
+    bd = _dc(builds)
     o = bd[k0]["order"]
     n1 = len(ranked(art, cat)[0][0]["pieces"])
     o[0], o[n1] = o[n1], o[0]
-    expect("bag 1 not placed first", render(art, cat, PR, pcxd, bd), True, bd=bd)
-    bd = copy.deepcopy(builds)
+    expect("bag 1 not placed first", lambda: render(art, cat, PR, pcxd, bd), True, bd=bd)
+    bd = _dc(builds)
     bd[k0]["order"][0][2] += 1
-    expect("a soft-drop count edited", render(art, cat, PR, pcxd, bd), True, bd=bd)
-    bd = copy.deepcopy(builds)
+    expect("a soft-drop count edited", lambda: render(art, cat, PR, pcxd, bd), True, bd=bd)
+    bd = _dc(builds)
     rests = lambda cs, occ: any(q < 10 or (q - 10 in occ and q - 10 not in cs) for q in cs)
     o, sw = next((v["order"], i) for v in bd.values() for i in range(len(v["order"]) - 1)
                  if not rests(v["order"][i + 1][1], {q for _, cs, _ in v["order"][:i] for q in cs}))
     o[sw], o[sw + 1] = o[sw + 1], o[sw]
-    expect("two build steps swapped so one floats", render(art, cat, PR, pcxd, bd), True, bd=bd)
-    bd = copy.deepcopy(builds)
+    expect("two build steps swapped so one floats", lambda: render(art, cat, PR, pcxd, bd), True, bd=bd)
+    bd = _dc(builds)
     kk, o = next((k, v["order"]) for k, v in bd.items()
                  if any(x for _, _, x in v["order"]) and not all(x for _, _, x in v["order"]))
     a = next(i for i, st in enumerate(o) if st[2])
     z = next(i for i, st in enumerate(o) if not st[2])
     o[a][2], o[z][2] = 0, 1
-    expect("a soft drop moved to another step, total unchanged", render(art, cat, PR, pcxd, bd), True, bd=bd)
+    expect("a soft drop moved to another step, total unchanged", lambda: render(art, cat, PR, pcxd, bd), True, bd=bd)
     hk = next((r for r, _ in ranked(art, cat) if r["kind"] == "held"), None)
     if hk is None:
         print("  skipped: a held build with a T in its first six steps (no ranked held card)")
     else:
-        bd = copy.deepcopy(builds)
+        bd = _dc(builds)
         kh = f'{hk["name"]}#{live(hk)[0]}'
         bd[kh]["order"][0][0] = "T"
-        expect("a held build with a T in its first six steps", render(art, cat, PR, pcxd, bd), True, bd=bd)
-    bd = copy.deepcopy(builds)
+        expect("a held build with a T in its first six steps", lambda: render(art, cat, PR, pcxd, bd), True, bd=bd)
+    bd = _dc(builds)
     del bd[k0]
-    expect("a build missing", render(art, cat, PR, pcxd, bd), True, bd=bd)
-    px = copy.deepcopy(pcxd)
+    expect("a build missing", lambda: render(art, cat, PR, pcxd, bd), True, bd=bd)
+    px = _dc(pcxd)
     shown = {shown_line(cat, r) for r, _ in ranked(art, cat)}
     ln = next(k for k, v in px.items() if v["b3"] and k not in shown)
     pl = px[ln]["b3"]["plan"]
     pl[0][1] = [q + 1 for q in pl[0][1]]
-    expect("a class's worked-PC step moved", render(art, cat, PR, px), True, px=px)
+    expect("a class's worked-PC step moved", lambda: render(art, cat, PR, px), True, px=px)
     m = OP._ISLAND.search(page)
     isl = json.loads(m.group(1).replace("<\\/", "</"))
     e = next(v for v in isl["px"].values() if v["b3"])
