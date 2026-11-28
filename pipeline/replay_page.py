@@ -79,6 +79,44 @@ MARKUP_SINK = re.compile(r"\binnerHTML\b|\bouterHTML\b|insertAdjacentHTML|docume
 # Zero external requests: no element may fetch anything. The page links OUT with <a href>, which a
 # browser does not fetch, so href is allowed; src=, <link>, @import, url( and fetch( are not.
 EXTERNAL = re.compile(r"\ssrc\s*=|<link\b|@import|\burl\(|\bfetch\(|XMLHttpRequest|\bimport\(")
+# The same three patterns as one search per alternative. An alternation, or a part that opens
+# with `\b` or a lookbehind, makes `re` try every position of a multi-megabyte page; a part that
+# opens with a literal lets it skip ahead. So each part is its literal tail plus a test on the
+# character before the match: `\b` before a word character is "no word character before", and
+# `\s` is "a space character before". any() over the parts is true exactly when the alternation
+# matches; `--selftest` checks the two forms agree on planted strings.
+_WORD = re.compile(r"\w")
+_SPACE = re.compile(r"\s")
+
+
+class _Part:
+    def __init__(self, tail, before=None):
+        self.tail, self.before = re.compile(tail), before
+
+    def search(self, page):
+        for m in self.tail.finditer(page):
+            i = m.start()
+            if self.before is None:
+                return True
+            if self.before == "nonword" and not (i and _WORD.match(page, i - 1)):
+                return True
+            if self.before == "space" and i and _SPACE.match(page, i - 1):
+                return True
+        return False
+
+
+_SPLIT = {
+    "BADGE": [_Part(r"data-claim"), _Part(r"claim-badge"), _Part(r"已驗證")],
+    "MARKUP_SINK": [_Part(r"innerHTML\b", "nonword"), _Part(r"outerHTML\b", "nonword"),
+                    _Part(r"insertAdjacentHTML"), _Part(r"document\.write")],
+    "EXTERNAL": [_Part(r"src\s*=", "space"), _Part(r"<link\b"), _Part(r"@import"),
+                 _Part(r"url\(", "nonword"), _Part(r"fetch\(", "nonword"), _Part(r"XMLHttpRequest"),
+                 _Part(r"import\(", "nonword")],
+}
+
+
+def _hit(name, page):
+    return any(p.search(page) for p in _SPLIT[name])
 
 
 def _need(cond, msg):
@@ -390,14 +428,14 @@ def _audit_quarantine(page, required, island_id):
     """The quarantine and single-file rules any simulator page obeys: no badge, every sentence in
     `required`, no markup sink, no external request, exactly one data island `island_id`."""
     bad = []
-    if BADGE.search(page):
+    if _hit("BADGE", page):
         bad.append("the page carries a claim badge — simulator boards must not be badged")
     for s in required:
         if s not in page:
             bad.append(f"a quarantine sentence is gone: {s[:40]!r}…")
-    if MARKUP_SINK.search(page):
+    if _hit("MARKUP_SINK", page):
         bad.append("the page assigns markup (innerHTML or similar) — build nodes instead")
-    if EXTERNAL.search(page):
+    if _hit("EXTERNAL", page):
         bad.append("the page makes an external request — it must be one self-contained file")
     if page.count(f'id="{island_id}"') != 1:
         bad.append("the page must inline exactly one data island")
@@ -466,6 +504,18 @@ def _selftest():
         ok &= good
         print(f"  {'ok ' if good else 'BAD'} {name}: {'rejected' if found else 'accepted'}"
               f"{'' if applied else '  <- the mutant did not apply'}")
+    # the split search must answer exactly as each alternation does, page and edge cases alike
+    probes = [page, "", "src=", " src=", "\tsrc =x", "xsrc=", "<link", "<linkx", "url(", "aurl(",
+              "_fetch(", " fetch(", "innerHTMLx", "a.innerHTML=", "outerHTML", "insertAdjacentHTML",
+              "document.write", "documentXwrite", "import(", "reimport(", "@import", "XMLHttpRequest",
+              "data-claim", "claim-badge", "已驗證", "\nsrc\n=", "src =", "é src=", "innerHTML",
+              "fetch(", "éurl(", "_import(", "x.innerHTML", "(url(", "srcsrc ="]
+    whole = {"BADGE": BADGE, "MARKUP_SINK": MARKUP_SINK, "EXTERNAL": EXTERNAL}
+    disagree = [(n, q[:20]) for n in whole for q in probes
+                if bool(whole[n].search(q)) != _hit(n, q)]
+    print(f"  {'ok ' if not disagree else 'BAD'} split searches agree with the alternations "
+          f"on {len(probes)} probes{'' if not disagree else f': {disagree}'}")
+    ok &= not disagree
     eligible = json.loads(json.dumps(data))
     eligible["report_eligible"] = True
     try:

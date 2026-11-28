@@ -93,6 +93,25 @@ _FIG = re.compile(r'data-f="(\w+)">(.*?)</b>', re.S)
 _ISLAND = re.compile(r'<script id="data" type="application/json">(.*?)</script>', re.S)
 
 
+def _idmemo(fn):
+    """Memoise a pure function of artefact objects by their identity. The selftest audits one artefact many
+    times; a mutated artefact is a deep copy, so it is a new object and misses. Callers must not mutate what
+    it returns (none does: every result is read, never written)."""
+    cache = {}
+
+    def key(a):
+        return a if a is None or isinstance(a, (str, int, float, bool)) else id(a)
+
+    def wrapped(*args):
+        k = tuple(key(a) for a in args)
+        hit = cache.get(k)
+        if hit is None:
+            hit = cache[k] = (args, fn(*args))
+        return hit[1]
+    wrapped.__wrapped__ = fn
+    return wrapped
+
+
 def _need(cond, msg):
     if not cond:
         raise ValueError(f"tst openers page: {msg}")
@@ -153,6 +172,7 @@ def load_prose(path=PROSE_PATH):
     return json.loads(text)
 
 
+@_idmemo
 def p4_index(art):
     """'rows|left' -> its sampled record; a record with no draws is no record (gen.py's `not r['n']`)."""
     return {r["line"]: r for r in art["pc4"] if r["n"]}
@@ -293,6 +313,7 @@ def mirror_key(s):
     return min(a, b)
 
 
+@_idmemo
 def entries(art, shp):
     """The ranked list: one entry per shape up to left-right mirroring, sorted by `rank_key` (the fixed-bag-1
     joint first); `best` is the best single tiling (the see-both-bags figure); a shape with no tiling is not ranked."""
@@ -394,6 +415,7 @@ def structure(ents):
     return full, F, P, groups, order, me_cells, me
 
 
+@_idmemo
 def build_data(ents, prose):
     """The island: per shape the player-facing rows (grid, four figure strings, leftover), best first."""
     shapes = {}
@@ -660,6 +682,7 @@ def expected_upper(o, idx):
     return [pct(Fraction(best[1]["B"], N2)), pct(best[0] / N2)]
 
 
+@_idmemo
 def expected_card(art, sid, idx):
     """A card's figures computed from the artefact alone and by a different route from `fixed_figs`: the best
     bag-1 board re-picked from every board's class counts, each class's PC read straight off a tiling ending
@@ -744,6 +767,27 @@ def audit_pcx(cards, ents, pcxd):
     return bad
 
 
+@_idmemo
+def _board_lists_bad(ents):
+    """shape id -> the problem with its `fixed.b1s` board list, or None; artefact-only, so `audit_rows` reads it."""
+    out = {}
+    for e in ents:
+        o, f = e["o"], e["o"].get("fixed")
+        sid = o["id"]
+        out[sid] = None
+        if f and f["nb1"]:
+            pl = placements(o)
+            b1s = f.get("b1s") or []
+            sets = [{(k, tuple(sorted(cs))) for k, cs in t["pieces"]} for t in o["til"]]
+            if len(b1s) != f["nb1"] or b1s != sorted(b1s) or len({tuple(b) for b in b1s}) != len(b1s):
+                out[sid] = (f"shape {sid}: the bag-1 board list is not {f['nb1']} distinct boards in the counter's order")
+            elif sorted(b1s[f["best"]]) != sorted(pl.index((k, tuple(sorted(cs)))) for k, cs in f["b1"]):
+                out[sid] = (f"shape {sid}: board {f['best']} of the list is not the fixed bag-1 board")
+            elif any(sorted(pl[j][0] for j in b) != list("IJLOSZ") or not any({pl[j] for j in b} <= S for S in sets) for b in b1s):
+                out[sid] = (f"shape {sid}: a listed board is not one IJLOSZ placement each inside one tiling")
+    return out
+
+
 def audit_rows(island, art, ents, cards):
     """The per-build rows: `fixed.b1s` is the counter's board list (one placement of each of IJLOSZ, sorted,
     distinct, board `best` = `fixed.b1`, each inside a tiling); rows are in non-increasing 合計 order; and the
@@ -751,19 +795,12 @@ def audit_rows(island, art, ents, cards):
     bad = []
     printed = {int(sid): [re.sub(r"<[^>]+>", "", html.unescape(v)) for k, v in _FIG.findall(b) if k in ("two", "pc3", "pc4", "joint")]
                for sid, _, b in cards}
+    lists = _board_lists_bad(ents)
     for e in ents:
-        o, f = e["o"], e["o"].get("fixed")
+        o = e["o"]
         sid = o["id"]
-        if f and f["nb1"]:
-            pl = placements(o)
-            b1s = f.get("b1s") or []
-            sets = [{(k, tuple(sorted(cs))) for k, cs in t["pieces"]} for t in o["til"]]
-            if len(b1s) != f["nb1"] or b1s != sorted(b1s) or len({tuple(b) for b in b1s}) != len(b1s):
-                bad.append(f"shape {sid}: the bag-1 board list is not {f['nb1']} distinct boards in the counter's order")
-            elif sorted(b1s[f["best"]]) != sorted(pl.index((k, tuple(sorted(cs)))) for k, cs in f["b1"]):
-                bad.append(f"shape {sid}: board {f['best']} of the list is not the fixed bag-1 board")
-            elif any(sorted(pl[j][0] for j in b) != list("IJLOSZ") or not any({pl[j] for j in b} <= S for S in sets) for b in b1s):
-                bad.append(f"shape {sid}: a listed board is not one IJLOSZ placement each inside one tiling")
+        if lists[sid]:
+            bad.append(lists[sid])
         rows = island["shapes"].get(f"s{sid}", {}).get("t", [])
         js = [Fraction(r[4].rstrip("%")) if r[4] not in ("–",) else Fraction(-1) for r in rows]
         if js != sorted(js, reverse=True):
