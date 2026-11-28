@@ -412,6 +412,10 @@ bin/derive-doc-numbers <date>                  # read-only: the hand-typed per-s
 bin/build-cc-coach [--path]                    # build/cached cold-clear coach; bin/new-session uses it as CC_COACH by default
 python3 -m pipeline.build_report sessions/<date>/report         # regenerate the derived report sections
 python3 -m pipeline.build_report sessions/<date>/report --check # CI gate: fail if they drifted from facts.json
+python3 -m pipeline.video_snap sessions/<date> --video <mp4> --id <id> --write  # snap every round to a GO (refuses an ambiguous window)
+python3 -m pipeline.video_verify sessions/<date> --video <mp4>  # mandatory: in-game win counters AND opening piece sequence (VOD NEXT vs replay seq) at each play_start, plus win counters at each 落 T 之前 moment; max_snap_s is not this check
+python3 -m pipeline.video_snap --selftest
+python3 -m pipeline.video_verify --selftest
 python3 -m pipeline.check_prose_figures sessions/<date>/report   # CI gate: every 約-figure is floored
 python3 -m pipeline.check_proof_links sessions/<date>/report      # CI gate: every badge's lemma exists
 python3 -m pipeline.check_generated_css sessions/<date>/report    # CI gate: generated CSS stays in its region
@@ -4626,6 +4630,47 @@ second. `replay_links` adds an EMPTY `a.rl-v` after each replay link (drawn by i
 `_same_text` holds) plus a 影片 row under each match card's pips; the replay page's ▶ link follows the
 playhead; the technique, route, DPC and second-PC case links and the report's routes-techniques cells
 carry 「▶ 影片」. Video tier: never badged or counted, and a night without the file gets no link.
+
+**A new `video.json` is not done when `video_snap` prints a small `max_snap_s`.** That number is
+the largest |snap − prediction| over rounds that each found *a* GO inside a 2 s window. Extra GOs
+are common (the 2026-11-26 VOD has 82 GOs for 75 replay rounds: some mid-round false jumps, some
+between matches). `max_snap_s` does not prove the snapped GO is the right round, and a unique
+nearest GO can still be the wrong one if the real start sits just outside the window. yachi on the
+11-26 links: 「喺直播影片睇呢一刻 link 時間錯哂，唔好再錯」. The mandatory check is
+`python3 -m pipeline.video_verify sessions/<date> --video <mp4>`: at every `play_start_s` the
+in-game FT7 score must equal that round's pre-round running score from `facts.json`, the boards
+must be a start of a round (not mid-play), and the opening piece sequence on screen (current
+piece + NEXT queue, by colour) must match that round's replay `seq` (current = seq[0], NEXT =
+seq[1:6] at GO; a first-piece hold, or a last countdown frame still showing seq[0:5], is the
+same bag). Win counters alone are not enough: two rounds can share a score, and 11-26 m7r10
+(yachi: 「第7場第10局 html replay opening not match YouTube」) had the right 4-5 score and the
+right TZOSIL bag at t=6524, but the HTML replay still *looked* wrong because it drew
+`facts["players"][0]` (yachi) on the left while the VOD seats pinglamb left / yachi right.
+When a night's `video.json` records `video.seats` (left-to-right names on the VOD), the replay
+player must lay the boards out in that order; do not change `facts["players"]` or slot colours
+to get there, and do not invent a timestamp shift when the bag already matches. The same
+command also checks every in-round moment link
+(report 「睇第一次（mXrY，落 T 之前）」, `<a class="rl-v">` title 「喺直播影片睇呢一刻」 — that
+is the tooltip yachi named). Those times are `floor(play_start_s + frames/60 - link_lead_s)`
+(`video_links.moment_url`; `frames` is the replay's cumulative 60 fps count from GO to the T
+lock). At the linked second the FT7 *win counters* must match the labeled round: 0-0 is r1 of
+that match, score a-b is round a+b+1 (yachi: 「00 係第一round」「果個係勝利數字」 — this is
+the on-screen win count, not video t=0:00). The T-spin itself should appear within about two
+seconds after the link (the 1 s lead, plus flooring, plus the banner). `video_snap --write` runs
+this itself and will not write a file that fails. It also refuses an *ambiguous* prediction (two
+GOs inside `WINDOW_S`) or two rounds snapping to the same GO, instead of guessing. `--selftest`
+covers both tools (CI: "Check video snap and frame verification"), including a mid-round score
+bar planted as the wrong round and an opening-queue fixture that must match m7r10's TZOSIL bag
+and must be refused when labeled as m7r9's TIOJSL bag. Do not ship a file whose times were only
+clock-aligned, only snapped, or only inspected by storyboard thumbnails. A night whose VOD
+cannot be downloaded stays `stream_clock` and must keep saying so; do not invent a frame check
+you did not run. The 11-26 committed times *were* the right GOs (all 75 scores *and* all 75
+opening bags) *and* the nine 「落 T 之前」 moment links landed in the labeled round, with the
+T-spin banner 0–0.5 s after `t_lock` and 1–2.5 s after the link, when checked against the 360p
+file of `5EaYQ3zemvo` (7222.8 s locally, 7223 s on YouTube; not a trimmed re-upload). The m7r10
+opening complaint was a seating mismatch, not a wrong `play_start_s`; `video.seats` for that
+night is `["pinglamb", "yachi"]`. The earlier gap was that nothing in the pipeline had required
+the score, moment, or opening-sequence check.
 
 **Seven nights have a video.json (since 2026-11-06, yachi: 「scan all live in that channel」).** The
 channel that streamed 11-05 has a live stream for 09-10, 09-18 (two streams; a match names its stream

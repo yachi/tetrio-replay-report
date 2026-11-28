@@ -89,6 +89,13 @@ def check(facts, data):
     if data["alignment"].get("kind", "frames") not in NOTES:
         raise ValueError(f"alignment kind {data['alignment']['kind']!r} is not one of {sorted(NOTES)}")
     vids = videos(data)
+    seats = data.get("video", {}).get("seats")
+    if seats is not None:
+        if list(seats) != list(dict.fromkeys(seats)) or set(seats) != set(facts["players"]):
+            raise ValueError(
+                f"video.seats {seats} must be the facts.json players "
+                f"{list(facts['players'])} in VOD left-to-right order"
+            )
     vm, fm = data["matches"], facts["matches"]
     if len(vm) != len(fm):
         raise ValueError(f"{len(vm)} video matches against {len(fm)} replay matches")

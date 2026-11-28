@@ -886,6 +886,15 @@ jobs:
           python3 -m pipeline.video_clock --check
           python3 -m pipeline.video_clock --selftest
           python3 -m pipeline.video_links --selftest
+      # pipeline/video_snap.py walks back to a GO; --selftest rebuilds 11-17 from a
+      # synthetic signal and refuses an ambiguous window (two GOs near one prediction).
+      # pipeline/video_verify.py is the in-game score/frame check max_snap_s does not
+      # provide; --selftest reads committed fixtures and planted wrong scores / mid-play.
+      - name: Check video snap and frame verification
+        if: env.INPUTS_UNCHANGED != '1'
+        run: |
+          python3 -m pipeline.video_snap --selftest
+          python3 -m pipeline.video_verify --selftest
 
       # The Stray Cannon route pages render from a hand-checked transcription of the
       # shiwehi.com page. Gate the transcription first (grammar, the cross-check against

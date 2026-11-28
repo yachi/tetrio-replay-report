@@ -49,6 +49,8 @@ class Video:
                        for m in data["matches"] for r in m["rounds"]}
         self.urls = {(m["position"], r["round"]): video_of(data, m)["url"]
                      for m in data["matches"] for r in m["rounds"]}
+        seats = data.get("video", {}).get("seats")
+        self.seats = list(seats) if seats else None
 
     def at(self, seconds, url=None):
         return f"{url or self.url}&t={max(0, int(seconds - self.lead))}s"

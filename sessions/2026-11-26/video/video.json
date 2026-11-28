@@ -6,7 +6,11 @@
   "fetched": "2026-11-28",
   "format": "360p mp4 via yt-dlp",
   "sha256": "4f7e3bf3901a48263915933b7ff7823aed3ec6e82ef2ea37e00992ead4fd8fb7",
-  "duration_s": 7222
+  "duration_s": 7222,
+  "seats": [
+   "pinglamb",
+   "yachi"
+  ]
  },
  "report_eligible": false,
  "alignment": {
