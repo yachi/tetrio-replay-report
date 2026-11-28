@@ -1952,8 +1952,9 @@ jobs:
   tst-openers-sets:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
-    # The learn-these-boards recount (pipeline/sim/tst-sets-rs + a numpy recount), its own runner so it runs
-    # beside the other TST checks instead of after them.
+    # The learn-these-boards recount (pipeline/sim/tst-sets-rs, then pipeline/sim/tst-sets-check-rs recounting its output
+    # independently; the numpy recount stays the reference, SETS_NATIVE=off), its own runner so it runs beside the other TST
+    # checks instead of after them.
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -1967,9 +1968,12 @@ jobs:
         if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
-          # the recount uses numpy, which the runner's python3 lacks; Ubuntu's own package, installed only when missing
+          # the vector tables use numpy, which the runner's python3 lacks; Ubuntu's own package, installed only when missing
           python3 -c 'import numpy' 2>/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq python3-numpy; }
           cargo test --release --locked --manifest-path pipeline/sim/tst-sets-rs/Cargo.toml
+          cargo build --release --locked --manifest-path pipeline/sim/tst-sets-check-rs/Cargo.toml
+          # the Rust recount against the numpy one at one budget, and it must refuse three altered runs
+          python3 pipeline/sim/emit-tst-openers-tp.py --sets-check-equal 2
           python3 pipeline/sim/emit-tst-openers-tp.py --sets-check
 
       - name: Audit the input closure

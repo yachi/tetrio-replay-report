@@ -68,7 +68,8 @@ preview the first bag's dealt order o1 is known before any hold decision, so the
   S1  python3 $E --sets                                                        # writes analysis/tst-openers-tp-sets.json via pipeline/sim/tst-sets-rs (about 5 s)
   T1  python3 $E --tsd-input > $W/tsd.in ; pipeline/sim/tst-tsd-rs/target/release/tst-tsd < $W/tsd.in > $W/tsd.out   # offline, about 30 min on 4 cores
       python3 $E --tsd $W/tsd.out ; python3 $E --tsd-check                   # writes / checks analysis/tst-openers-tp-tsd.json (TST->TSD->PC, bag 3 only)
-  S2  python3 $E --sets-check                                                  # CI: byte-compares a fresh crate run, recomputes every set, pick and tree in numpy (one forked worker per budget and objective)
+  S2  python3 $E --sets-check                                                  # CI: byte-compares a fresh crate run, recounts every set, pick and tree in tst-sets-check-rs (SETS_NATIVE=off: the numpy recount, one forked worker per budget and objective)
+  S3  python3 $E --sets-check-equal 2                                          # CI: the Rust and numpy recounts' notes agree at one budget, and the Rust one refuses three altered runs
 
 THE X BOARDS (schema tst-openers-tp-x/1, md5 in the main artefact's md5.x; offline, about 25 min on 4 cores):
 
@@ -1492,12 +1493,12 @@ def sets_input_lines(art, b1, pt=None):
     return out
 
 
-def sets_crate_run(art, b1, pt=None):
+def sets_crate_run(art, b1, pt=None, lines=None):
     r = subprocess.run(["cargo", "build", "--release", "--locked", "--quiet", "--manifest-path", str(SIM / SETS_CRATE / "Cargo.toml")],
                        capture_output=True, text=True)
     assert r.returncode == 0, "cargo build of tst-sets-rs failed:\n" + r.stderr
     exe = SIM / SETS_CRATE / "target" / "release" / "tst-sets"
-    r = subprocess.run([str(exe)], input="\n".join(sets_input_lines(art, b1, pt)) + "\n", capture_output=True, text=True)
+    r = subprocess.run([str(exe)], input="\n".join(sets_input_lines(art, b1, pt) if lines is None else lines) + "\n", capture_output=True, text=True)
     assert r.returncode == 0, "tst-sets failed:\n" + r.stderr
     sys.stderr.write(r.stderr)
     return json.loads(r.stdout)
@@ -1604,19 +1605,99 @@ def sets_cmd(args):
     print(f"wrote {SETS_OUT}", file=sys.stderr)
 
 
+SETS_CHECK_CRATE = "tst-sets-check-rs"
+SETS_CHECK_EXE = SIM / SETS_CHECK_CRATE / "target" / "release" / "tst-sets-check"
+
+
+def sets_check_build():
+    r = subprocess.run(["cargo", "build", "--release", "--locked", "--quiet", "--manifest-path", str(SIM / SETS_CHECK_CRATE / "Cargo.toml")],
+                       capture_output=True, text=True)
+    assert r.returncode == 0, "cargo build of tst-sets-check-rs failed:\n" + r.stderr
+
+
+def sets_check_run(raw, lines, only=None):
+    return subprocess.run([str(SETS_CHECK_EXE)] + ([only] if only else []), input=json.dumps(raw, separators=(",", ":")) + "\n" + "\n".join(lines) + "\n",
+                          capture_output=True, text=True)
+
+
+def sets_check_native(raw, lines, only=None):
+    """The independent Rust recount of one run's raw output (`SETS_NATIVE=off` selects the numpy one instead): {budget: note,
+    "fixed": "ok"}. It panics, and this raises, on any assertion the numpy check makes."""
+    sets_check_build()
+    r = sets_check_run(raw, lines, only)
+    sys.stderr.write(r.stderr)
+    assert r.returncode == 0, "tst-sets-check failed:\n" + r.stderr[-2000:]
+    out = dict(l.split("\t", 1) for l in r.stdout.splitlines() if l)
+    assert list(out) == ([only] if only else list(BKEYS)) + ["fixed"] and out["fixed"] == "ok", "tst-sets-check output: " + r.stdout[:500]
+    return out
+
+
+def sets_native_on():
+    import os
+    v = os.environ.get("SETS_NATIVE", "on")
+    assert v in ("on", "off"), "SETS_NATIVE is on or off"
+    return v == "on"
+
+
 def sets_check_cmd(args):
     art, b1 = sets_load()
-    raw = sets_crate_run(art, b1)
     pt = tsd_pt(art)
-    rawt = sets_crate_run(art, b1, pt)
+    lines0, lines1 = sets_input_lines(art, b1), sets_input_lines(art, b1, pt)
+    raw = sets_crate_run(art, b1, None, lines0)
+    rawt = sets_crate_run(art, b1, pt, lines1)
     want = json.dumps(sets_artefact(art, b1, raw, rawt), separators=(",", ":"), ensure_ascii=False) + "\n"
     assert SETS_OUT.read_text() == want, "analysis/tst-openers-tp-sets.json is not what the crate runs build"
-    t0, f0 = sets_check_obj(art, b1, raw, None)
-    t1, f1 = sets_check_obj(art, b1, rawt, pt)
-    notes = run_forked([("any-PC " + bk, fn) for bk, fn in t0] + [("TSD " + bk, fn) for bk, fn in t1])
-    f0(); f1()
+    if sets_native_on():
+        sets_check_pairs(art["boards"], raw)
+        sets_check_pairs(art["boards"], rawt)
+        n0 = sets_check_native(raw, lines0)
+        n1 = sets_check_native(rawt, lines1)
+        notes = ["any-PC %s: %s" % (bk, n0[bk]) for bk in BKEYS] + ["TSD %s: %s" % (bk, n1[bk]) for bk in BKEYS]
+    else:
+        t0, f0 = sets_check_obj(art, b1, raw, None)
+        t1, f1 = sets_check_obj(art, b1, rawt, pt)
+        notes = run_forked([("any-PC " + bk, fn) for bk, fn in t0] + [("TSD " + bk, fn) for bk, fn in t1])
+        f0(); f1()
     print("ok: " + "; ".join(notes))
     print("ok: sets artefact equals the crate run; every set value, pick, greedy step, pair, dominance claim, triple certificate and tree recomputed")
+
+
+def sets_check_equal_cmd(args):
+    """Cheap CI check that the Rust recount and the numpy one say the same thing: the any-PC objective at one budget through both
+    (their notes must be equal), and the Rust one must refuse a run whose artefact value, pick and dominance claim were each altered."""
+    import copy
+    art, b1 = sets_load()
+    lines = sets_input_lines(art, b1)
+    raw = sets_crate_run(art, b1, None, lines)
+    sets_check_pairs(art["boards"], raw)
+    bk = args.sets_check_equal
+    assert bk in BKEYS, "budget is one of " + " ".join(BKEYS)
+    nat = sets_check_native(raw, lines, bk)
+    tasks, _ = sets_check_obj(art, b1, raw, None)
+    ref = dict(tasks)[bk]()
+    assert nat[bk] == ref, f"native and numpy notes differ at budget {bk}: {nat[bk]!r} vs {ref!r}"
+    muts = {}
+    m = copy.deepcopy(raw); m["budgets"][bk]["exact"][1]["pc3"] += 1; muts["set value"] = m
+    m = copy.deepcopy(raw); e = m["budgets"][bk]["exact"]; e[0]["set"] = [(e[0]["set"][0] + 1) % len(raw["pairs"])]; muts["k=1 pick"] = m
+    m = copy.deepcopy(raw); d = m["budgets"][bk]["dominated"]; assert d; d[0][1] = d[0][0]; muts["dominance claim"] = m
+    for name, mr in muts.items():
+        assert sets_check_run(mr, lines, bk).returncode != 0, f"tst-sets-check accepted an altered {name}"
+    print(f"ok: tst-sets-check and the numpy recount give the same note at budget {bk}: {nat[bk]}; the Rust one refuses {len(muts)} altered runs")
+
+
+def sets_check_pairs(bs, raw):
+    """The candidates: every board is in exactly one pair, a pair is {board, its mirror} (found by the mirror key, not by the
+    crate's mate list), and the pairs are listed at their smaller board position."""
+    pr = raw["pairs"]
+    bykey = {board_key(b["pieces"]): i for i, b in enumerate(bs)}
+    exp = []
+    for i, b in enumerate(bs):
+        m = bykey.get(mirror_board_key(board_key(b["pieces"])), i)
+        if m >= i:
+            exp.append([i] if m == i else [i, m])
+    assert pr == exp, "pairs are not {board, mirror}"
+    assert sorted(i for p_ in pr for i in p_) == list(range(len(bs))), "pairs do not partition the boards"
+    return pr
 
 
 def run_forked(tasks, jobs=None):
@@ -1657,17 +1738,7 @@ def sets_check_obj(art, b1, raw, pt):
     bs = art["boards"]
     nb = len(bs)
     tabs, vec = board_tables(art, b1, pt)
-    # the candidates: every board is in exactly one pair, a pair is {board, its mirror} (found here by the mirror key, not by the
-    # crate's mate list), and the pairs are listed at their smaller board position
-    pr = raw["pairs"]
-    bykey = {board_key(b["pieces"]): i for i, b in enumerate(bs)}
-    exp = []
-    for i, b in enumerate(bs):
-        m = bykey.get(mirror_board_key(board_key(b["pieces"])), i)
-        if m >= i:
-            exp.append([i] if m == i else [i, m])
-    assert pr == exp, "pairs are not {board, mirror}"
-    assert sorted(i for p_ in pr for i in p_) == list(range(nb)), "pairs do not partition the boards"
+    pr = sets_check_pairs(bs, raw)
     n = len(pr)
     pos = np.arange(n)
     P = perms_order()
@@ -1881,6 +1952,7 @@ def main():
     ap.add_argument("--sets", action="store_true")
     ap.add_argument("--sets-input", action="store_true")
     ap.add_argument("--sets-check", action="store_true")
+    ap.add_argument("--sets-check-equal", metavar="BUDGET")
     ap.add_argument("--tsd")
     ap.add_argument("--tsd-input", action="store_true")
     ap.add_argument("--tsd-check", action="store_true")
@@ -1915,6 +1987,8 @@ def main():
         return tsd_check_cmd(a)
     if a.sets_check:
         return sets_check_cmd(a)
+    if a.sets_check_equal:
+        return sets_check_equal_cmd(a)
     if a.sets or a.sets_input:
         return sets_cmd(a)
     if a.b1_input or a.b1_merge:
