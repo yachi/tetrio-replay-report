@@ -35,6 +35,9 @@ formal claim, and proved with [Dafny](https://dafny.org).
 | [2026-11-17](sessions/2026-11-17) | yachi 0 : 3 pinglamb | 24 over 3 matches | 92 |
 | [2026-11-19](sessions/2026-11-19) | yachi 1 : 3 pinglamb | 44 over 4 matches | 95 |
 | [2026-11-23](sessions/2026-11-23) | yachi 2 : 5 pinglamb | 82 over 7 matches | 105 |
+| [2026-11-24](sessions/2026-11-24) | yachi 1 : 5 pinglamb | 72 over 6 matches | 104 |
+| [2026-11-25](sessions/2026-11-25) | yachi 3 : 2 pinglamb | 62 over 5 matches | 102 |
+| [2026-11-26](sessions/2026-11-26) | yachi 2 : 5 pinglamb | 75 over 7 matches | 101 |
 
 **Two things about that last column.** It is `claims-proof-map.json`'s row count, i.e. what
 `dafny verify` actually certified for that session — not a target and not comparable across
@@ -47,6 +50,8 @@ it skipped 2026-09-18 for one session after that night landed, found on 2026-10-
 counting rows against `sessions/*`. It then stopped at 2026-10-12 for five more sessions (10-20 to 11-05), found
 on 2026-11-17's pass the same way; every row above is re-derived from `facts.json` and the committed
 maps, and 2026-11-05's counts are its eight replayed matches (its video-read ninth is in no count).
+It then stopped at 2026-11-23 for two more sessions (11-24 and 11-25), found on 2026-11-26's pass
+the same way; those two rows and 2026-11-26's are re-derived from the committed maps.
 
 2026-07-24 also carries a lighter "即場戰報" (`report-2026-07-24.html`) with its own
 independent 20-claim proof layer in [`sessions/2026-07-24/proof`](sessions/2026-07-24/proof).
@@ -241,6 +246,7 @@ unless it is:
 | 2026-11-23 | 14 of 18 testable — **78%** | 12 of 18 — **67%** | 12 of 18 — **67%** |
 | 2026-11-24 | 13 of 17 testable — **76%** | 11 of 17 — **65%** | 11 of 17 — **65%** |
 | 2026-11-25 | 12 of 16 testable — **75%** | 10 of 16 — **62%** | 10 of 16 — **62%** |
+| 2026-11-26 | 14 of 18 testable — **78%** | 12 of 18 — **67%** | 12 of 18 — **67%** |
 
 Every figure above is measured, and `pipeline/claims/check_equiv_coverage.py` re-derives
 them on push. **Until 2026-08-15 none of that was true**: three of the six sessions had
@@ -251,8 +257,8 @@ the denominator moving too. Enumerating every kind costs ~5× the wall clock and
 that session at 81%. A figure that moved with an argument nobody varied had been reading as
 a property of the data.
 
-The **≥85%** acceptance gate P4 declared is missed by <!--equiv:gate-count-->twenty of the 27<!--/equiv:gate-count-->
-rows above (<!--equiv:gate-sessions-->2026-07-22, 08-09, 08-14, 08-19, 08-25, 09-03, 09-10, 09-11, 09-17, 10-09, 10-12, 10-20, 10-22, 10-29, 11-05, 11-17, 11-19, 11-23, 11-24 and 11-25<!--/equiv:gate-sessions-->), and
+The **≥85%** acceptance gate P4 declared is missed by <!--equiv:gate-count-->21 of the 28<!--/equiv:gate-count-->
+rows above (<!--equiv:gate-sessions-->2026-07-22, 08-09, 08-14, 08-19, 08-25, 09-03, 09-10, 09-11, 09-17, 10-09, 10-12, 10-20, 10-22, 10-29, 11-05, 11-17, 11-19, 11-23, 11-24, 11-25 and 11-26<!--/equiv:gate-sessions-->), and
 2026-07-22 — the session the gate was declared on — is one of them at 81%. That is reported rather than enforced: one hand claim is worth 10.0
 points on 2026-07-28, so no threshold exists that is both honest and stable, and a floor all
 twenty-four pass would sit at 60% and bless that session's artefact by definition. The gate compares

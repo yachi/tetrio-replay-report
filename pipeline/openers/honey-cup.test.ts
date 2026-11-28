@@ -29,7 +29,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
    '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22',
-   '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25']);
+   '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26']);
 
 /** Bag 1 missed the 7-lock board, matched the 6-lock held-J field, and the 7th piece was NOT the
  *  mirror-aware bag-1 J (L when mirrored): a hold. */
@@ -128,6 +128,11 @@ const TST_DONATE_CASES: string[] = [
   "2026-11-25 m1r8 pinglamb",
   "2026-11-25 m3r9 pinglamb",
   "2026-11-25 m4r6 pinglamb",
+  "2026-11-26 m1r4 yachi",
+  "2026-11-26 m1r8 pinglamb",
+  "2026-11-26 m5r6 pinglamb",
+  "2026-11-26 m5r8 pinglamb",
+  "2026-11-26 m6r5 pinglamb",
 ];
 /** A bag-2 match that needed complete garbage rows stripped from under it (the count in brackets). */
 const BAG2_GARBAGE_STRIPPED: string[] = [
@@ -234,6 +239,16 @@ const BAG2_GARBAGE_STRIPPED: string[] = [
   "2026-11-25 m4r8 yachi (6)",
   "2026-11-25 m4r10 yachi (6)",
   "2026-11-25 m5r8 pinglamb (4)",
+  "2026-11-26 m2r2 yachi (8)",
+  "2026-11-26 m2r8 pinglamb (6)",
+  "2026-11-26 m2r9 yachi (6)",
+  "2026-11-26 m4r5 yachi (6)",
+  "2026-11-26 m4r6 pinglamb (4)",
+  "2026-11-26 m5r8 pinglamb (12)",
+  "2026-11-26 m5r11 yachi (6)",
+  "2026-11-26 m6r2 pinglamb (4)",
+  "2026-11-26 m7r5 yachi (6)",
+  "2026-11-26 m7r7 yachi (1)",
 ];
 /** No bag-2 match: the board before the TST is a strict subset of a bag-2 board. MEASURED, not matched. */
 const BAG2_NONE_TST_BEFORE_COMPLETE: string[] = [
@@ -292,6 +307,7 @@ const BAG2_NONE_TST_BEFORE_COMPLETE: string[] = [
   "2026-11-25 m4r3 yachi under 2.ideal",
   "2026-11-25 m5r4 yachi under 2.ideal",
   "2026-11-25 m5r7 yachi under 2.ideal",
+  "2026-11-26 m7r9 yachi under 2.ideal",
 ];
 /** No bag-2 match: the board before the TST is a bag-2 board plus exactly four cells (their letters). MEASURED. */
 const BAG2_NONE_EXTRA_PIECE: string[] = [
@@ -378,6 +394,10 @@ const BAG2_NONE_MOVED_PIECE: string[] = [
   "2026-11-24 m6r5 pinglamb under 2.ideal, L moved",
   "2026-11-25 m4r1 pinglamb under 2.ideal, J moved",
   "2026-11-25 m4r9 pinglamb under 2.ideal, J moved",
+  "2026-11-26 m2r7 pinglamb under 2.ideal, J moved",
+  "2026-11-26 m3r6 pinglamb under 2.ideal, J moved",
+  "2026-11-26 m7r9 pinglamb under 2.compromise, O moved",
+  "2026-11-26 m7r10 pinglamb under 2.ideal, L moved",
 ];
 /** 8-line PCs that are on no drawn pattern, named with the node they stop under. The compromise ones are
  *  NOT filed under the page source's hidden compromise list (html_comment_boards): nothing classifies against it. */
@@ -400,6 +420,7 @@ const PC_OFF_PAGE: string[] = [
   // 2026-11-19: one, pinglamb's m2r5, a Perfect Clear on no drawn pattern under 2.compromise.
   "2026-11-19 m2r5 pinglamb under 2.compromise.other",
   "2026-11-25 m2r7 pinglamb under 2.compromise.other",
+  "2026-11-26 m3r2 pinglamb under 2.compromise.other",
 ];
 
 /** Measured empty. A first entry is a red build to investigate, never a number to absorb. */
@@ -410,12 +431,12 @@ const PC_GARBAGE_IN_WINDOW: string[] = [];
 const MULTI_COLOUR_RESOLVED_BY_GROUP: string[] = [];
 
 /** Both players mirror Honey Cup (unlike 迷走砲): pinned as a count per player, not a list. */
-const MIRRORED_BAG1 = { pinglamb: 425, yachi: 133 };
+const MIRRORED_BAG1 = { pinglamb: 439, yachi: 140 };
 
 /** Cases per measured node. The five 2.ideal forms share one occupancy, so these split by colour. */
 const NODE_CASES: Record<string, number> = {
-  'bag1.j_hold': 31, 'bag1.j_right': 879, 'bag1.j_placed_elsewhere': 34,
-  '2.ideal#1': 0, '2.ideal#2': 0, '2.ideal#3': 41, '2.ideal#4': 204, '2.ideal#5': 70, '2.compromise': 263,
+  'bag1.j_hold': 31, 'bag1.j_right': 918, 'bag1.j_placed_elsewhere': 34,
+  '2.ideal#1': 0, '2.ideal#2': 0, '2.ideal#3': 47, '2.ideal#4': 212, '2.ideal#5': 74, '2.compromise': 273,
   // 2026-10-12 adds three bag-3 PCs: two pc#1 (m7r2, pinglamb and yachi, both mirrored) and the
   // corpus's FIRST pc#9 — yachi's m5r1, mirrored, at lock 19 on a prefix verified only to 18, so
   // that case is `verified: false` and the node count carries it as the artefact does.
@@ -435,20 +456,20 @@ const NODE_CASES: Record<string, number> = {
   // `verified: false`, carried the same way) and one pc#2 (pinglamb's m3r5, mirrored, verified).
   // 2026-11-23 adds three: one each under pc#2, pc#3 and pc#6.
   // 2026-11-25 adds two: one pc#1 and one pc#2.
-  '2.ideal.pc#1': 18, '2.ideal.pc#2': 12, '2.ideal.pc#3': 11, '2.ideal.pc#4': 13, '2.ideal.pc#5': 9,
-  '2.ideal.pc#6': 4, '2.ideal.pc#7': 0, '2.ideal.pc#8': 2, '2.ideal.pc#9': 1, '2.ideal.pc#10': 0,
+  '2.ideal.pc#1': 21, '2.ideal.pc#2': 12, '2.ideal.pc#3': 12, '2.ideal.pc#4': 15, '2.ideal.pc#5': 9,
+  '2.ideal.pc#6': 4, '2.ideal.pc#7': 0, '2.ideal.pc#8': 2, '2.ideal.pc#9': 2, '2.ideal.pc#10': 0,
   '2.ideal.pc#11': 0, '2.ideal.pc#12': 0, '2.ideal.pc#13': 0, '2.ideal.pc#14': 0, '2.ideal.pc#15': 0,
-  '2.compromise.tst_donate': 86, '2.compromise.tst_donate.after': 0, '2.compromise.roof': 0,
+  '2.compromise.tst_donate': 91, '2.compromise.tst_donate.after': 0, '2.compromise.roof': 0,
   '2.compromise.roof.after': 0,
 };
 
 /** The compromise form's condition (the page's example, など) against the form actually built, in the
  *  handedness the page draws. It holds for a minority of the compromise rounds: never the reason. */
 const CONDITIONS = {
-  '2.compromise': { '(none)': 224, '2.compromise': 39 },
-  '2.ideal#3': { '(none)': 32, '2.compromise': 9 },
-  '2.ideal#4': { '(none)': 181, '2.compromise': 23 },
-  '2.ideal#5': { '(none)': 54, '2.compromise': 16 },
+  '2.compromise': { '(none)': 232, '2.compromise': 41 },
+  '2.ideal#3': { '(none)': 37, '2.compromise': 10 },
+  '2.ideal#4': { '(none)': 189, '2.compromise': 23 },
+  '2.ideal#5': { '(none)': 58, '2.compromise': 16 },
 };
 
 /** The case object's key order is part of the artefact's bytes. */

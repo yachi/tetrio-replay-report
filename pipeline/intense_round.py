@@ -30,19 +30,19 @@ mechanism is real, this round is the illustration, and neither is the other". Wh
 still banned is a corpus figure the round appears to license, or the round's numbers
 generalised without one.
 
-The result: over 1956 decided rounds in twenty-seven sessions, downstacking is the only printed
+The result: over 2031 decided rounds in twenty-eight sessions, downstacking is the only printed
 measure that becomes MORE decisive as rounds intensify — paired AUC across terciles of
-combined VS runs 66.1 → 70.7 → 73.9 for the per-piece rate (Spearman rho +0.139 against
-intensity; raw 清走 +0.134). It survives both controls the closing note quotes: it is not
+combined VS runs 66.0 → 70.2 → 73.7 for the per-piece rate (Spearman rho +0.136 against
+intensity; raw 清走 +0.135). It survives both controls the closing note quotes: it is not
 round LENGTH (the same test against duration is rho +0.036, while APM's and 攻擊's apparent
-decay IS a length effect at rho -0.162 / -0.166 — which is why the attacking lede this
+decay IS a length effect at rho -0.164 / -0.168 — which is why the attacking lede this
 section used to carry was not supported as stated), and it is not the loser dying with
 garbage still on the board (normalising by how much garbage ARRIVED strengthens it to
-rho +0.267, and 食 — which carries that same death bias but no skill — does not trend,
-rho +0.111).
+rho +0.261, and 食 — which carries that same death bias but no skill — does not trend,
+rho +0.116).
 
 **The ninth session moved every one of those figures and moved none of the conclusions;
-the tenth through twenty-seventh did it again.** The tercile progression flattened at both ends
+the tenth through twenty-eighth did it again.** The tercile progression flattened at both ends
 over 09-03 (62.6 → 67.0 → 80.9 became 62.2 → 68.7 → 77.1), 09-10 moved the middle to
 62.1 → 67.5 → 77.1, 09-11 lifted both ends to 62.3 → 67.5 → 77.5, 09-17 lifted all three to
 63.1 → 68.6 → 77.8, 09-19 raised the bottom two while lowering the top to
@@ -62,9 +62,10 @@ to 66.0 → 70.4 → 74.6, and
 11-19 — 44 rounds — raised the middle and lowered the top, to 65.7 → 70.4 → 74.3, and
 11-23 — 82 rounds — lowered the bottom and the top and raised the middle, to 65.3 → 70.7 → 74.2, and
 11-24 — 72 rounds — raised the bottom two and lowered the top, to 65.6 → 70.8 → 73.8, and
-11-25 — 62 rounds — raised the bottom and the top and lowered the middle, to 66.1 → 70.7 → 73.9;
+11-25 — 62 rounds — raised the bottom and the top and lowered the middle, to 66.1 → 70.7 → 73.9, and
+11-26 — 75 rounds — lowered all three, to 66.0 → 70.2 → 73.7;
 the headline rho went
-+0.203 → +0.177 → +0.183 → +0.182 → +0.178 → +0.157 → +0.151 → +0.163 → +0.170 → +0.163 → +0.160 → +0.156 → +0.152 → +0.139 → +0.139 → +0.143 → +0.141 → +0.144 → +0.138 → +0.139, i.e. down, back up,
++0.203 → +0.177 → +0.183 → +0.182 → +0.178 → +0.157 → +0.151 → +0.163 → +0.170 → +0.163 → +0.160 → +0.156 → +0.152 → +0.139 → +0.139 → +0.143 → +0.141 → +0.144 → +0.138 → +0.139 → +0.136, i.e. down, back up,
 barely at all, down
 again, then the largest single fall the series has had (0.021, against a previous largest of
 0.026 at 09-03 and nothing else above 0.006), then a sixth of that fall, and then back up by
@@ -96,7 +97,7 @@ Every figure in that paragraph is a string CORPUS holds, and `check_intense_corp
 them; do not edit one without re-rendering the block. That death bias is real all the same, and the note keeps it.
 
 **The monotone progression and its controls are the finding; p is supporting evidence.**
-The 1956 rounds are nested in matches, in sessions and in two players, so every p here
+The 2031 rounds are nested in matches, in sessions and in two players, so every p here
 assumes an independence the data does not have and is anti-conservative. They are printed
 raw AND Bonferroni-adjusted with the family size beside them, never Holm-adjusted: Holm's
 value for one test is a function of the ENTIRE vector of the family's raw p, so a re-source
@@ -188,19 +189,19 @@ if _missing:
 # (rho is a two-sided point estimate), `fmt_auc` likewise, and `fmt_p` CEILS, because a
 # p-value is an upper bound on a false-positive rate and the safe direction is up.
 CORPUS = {
-    "n": 1956,
-    "sessions": 27,
+    "n": 2031,
+    "sessions": 28,
     "m": 26,
     "tercile_test": "cleared_pp/intensity",
-    "terciles": ["66.1", "70.7", "73.9"],
+    "terciles": ["66.0", "70.2", "73.7"],
     "tests": {
-        "cleared_pp/intensity": {"rho": "+0.139", "raw": "0.0001", "adj": "0.0001"},
-        "cleared/intensity": {"rho": "+0.134", "raw": "0.0001", "adj": "0.0001"},
-        "cleared_pp/duration": {"rho": "+0.036", "raw": "0.1156", "adj": "1.0000"},
-        "apm/duration": {"rho": "-0.162", "raw": "0.0001", "adj": "0.0001"},
-        "attack/duration": {"rho": "-0.166", "raw": "0.0001", "adj": "0.0001"},
-        "cleared_per_received/intensity": {"rho": "+0.267", "raw": "0.0001", "adj": "0.0001"},
-        "received/intensity": {"rho": "+0.111", "raw": "0.0001", "adj": "0.0001"},
+        "cleared_pp/intensity": {"rho": "+0.136", "raw": "0.0001", "adj": "0.0001"},
+        "cleared/intensity": {"rho": "+0.135", "raw": "0.0001", "adj": "0.0001"},
+        "cleared_pp/duration": {"rho": "+0.036", "raw": "0.1027", "adj": "1.0000"},
+        "apm/duration": {"rho": "-0.164", "raw": "0.0001", "adj": "0.0001"},
+        "attack/duration": {"rho": "-0.168", "raw": "0.0001", "adj": "0.0001"},
+        "cleared_per_received/intensity": {"rho": "+0.261", "raw": "0.0001", "adj": "0.0001"},
+        "received/intensity": {"rho": "+0.116", "raw": "0.0001", "adj": "0.0001"},
     },
 }
 

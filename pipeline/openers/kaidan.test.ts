@@ -58,7 +58,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26']);
 const ART_PATH = `${import.meta.dir}/../../analysis/kaidan-facts.json`;
 const TR = JSON.parse(readFileSync(KAIDAN.transcriptionPath, 'utf8'));
 const V = TR.variants.find((v: any) => v.id === 'kaidan');
@@ -185,6 +185,18 @@ const KAIDAN_HITS: string[] = [
   "2026-11-25 m5r6 yachi lock 53",
   "2026-11-25 m5r9 yachi lock 42",
   "2026-11-25 m5r13 yachi lock 138 (mirrored)",
+  "2026-11-26 m1r4 pinglamb lock 35",
+  "2026-11-26 m1r4 pinglamb lock 175",
+  "2026-11-26 m1r5 yachi lock 62 (mirrored)",
+  "2026-11-26 m1r7 yachi lock 42 (mirrored)",
+  "2026-11-26 m1r7 yachi lock 89",
+  "2026-11-26 m1r9 pinglamb lock 40 (mirrored)",
+  "2026-11-26 m2r2 pinglamb lock 50",
+  "2026-11-26 m3r8 yachi lock 30",
+  "2026-11-26 m4r8 pinglamb lock 131 (mirrored)",
+  "2026-11-26 m5r11 yachi lock 137 (mirrored)",
+  "2026-11-26 m7r2 yachi lock 68",
+  "2026-11-26 m7r7 yachi lock 94",
 ];
 
 const PAYOFF_NOT_FIRED: string[] = [
@@ -305,6 +317,14 @@ const PAYOFF_NOT_FIRED: string[] = [
   "2026-11-25 m3r6 pinglamb lock 25 (past_verified at lock 27)",
   "2026-11-25 m4r11 pinglamb lock 80 (well_covered at lock 85)",
   "2026-11-25 m5r13 yachi lock 138 (well_filled_not_i at lock 145)",
+  "2026-11-26 m1r4 pinglamb lock 35 (well_filled_not_i at lock 38)",
+  "2026-11-26 m1r4 pinglamb lock 175 (well_covered at lock 181)",
+  "2026-11-26 m1r5 yachi lock 62 (well_filled_not_i at lock 71)",
+  "2026-11-26 m1r7 yachi lock 42 (well_covered at lock 43)",
+  "2026-11-26 m1r7 yachi lock 89 (round_ended)",
+  "2026-11-26 m2r2 pinglamb lock 50 (well_filled_not_i at lock 51)",
+  "2026-11-26 m5r11 yachi lock 137 (well_filled_not_i at lock 138)",
+  "2026-11-26 m7r7 yachi lock 94 (past_verified at lock 95)",
 ];
 
 const GARBAGE_IN_WINDOW: string[] = [
@@ -380,6 +400,13 @@ const GARBAGE_IN_WINDOW: string[] = [
   "2026-11-25 m5r5 yachi lock 54",
   "2026-11-25 m5r5 yachi lock 73",
   "2026-11-25 m5r13 yachi lock 138",
+  "2026-11-26 m1r5 yachi lock 62",
+  "2026-11-26 m1r7 yachi lock 42",
+  "2026-11-26 m1r9 pinglamb lock 40",
+  "2026-11-26 m2r2 pinglamb lock 50",
+  "2026-11-26 m3r8 yachi lock 30",
+  "2026-11-26 m5r11 yachi lock 137",
+  "2026-11-26 m7r7 yachi lock 94",
 ];
 
 const KAIDAN_IN_OPENER: string[] = [
@@ -458,6 +485,11 @@ const WELL_DEPTH_LT4: string[] = [
   "2026-11-25 m5r5 yachi lock 54 (3 deep)",
   "2026-11-25 m5r9 yachi lock 42 (2 deep)",
   "2026-11-25 m5r13 yachi lock 138 (2 deep)",
+  "2026-11-26 m1r4 pinglamb lock 35 (3 deep)",
+  "2026-11-26 m1r7 yachi lock 42 (2 deep)",
+  "2026-11-26 m1r7 yachi lock 89 (3 deep)",
+  "2026-11-26 m2r2 pinglamb lock 50 (2 deep)",
+  "2026-11-26 m7r2 yachi lock 68 (2 deep)",
 ];
 
 const RECON_DROPPED_TSD: string[] = [];
@@ -738,26 +770,26 @@ const SHACHIKUTRAIN_ALSO_KAIDAN: string[] = [
 ];
 
 /** window_off_board, per player: a count with a property check, not a list (see the header). */
-const WINDOW_OFF_BOARD = { pinglamb: 1130, yachi: 853 };
+const WINDOW_OFF_BOARD = { pinglamb: 1187, yachi: 893 };
 /** Per player: the opportunities (scored full TSDs), split at the 0-based opener window. */
 const DENOM = {
-  pinglamb: { all: 7731, in_opener: 1502, mid_game: 6229 },
-  yachi: { all: 7029, in_opener: 1772, mid_game: 5257 },
+  pinglamb: { all: 8041, in_opener: 1557, mid_game: 6484 },
+  yachi: { all: 7279, in_opener: 1830, mid_game: 5449 },
 };
 /** Per player: hits, their split, mirrored, garbage in the window. */
 const HITS = {
-  pinglamb: { all: 90, in_opener: 1, mid_game: 89, mirrored: 50, garbage_in_window: 68 },
-  yachi: { all: 146, in_opener: 7, mid_game: 139, mirrored: 77, garbage_in_window: 87 },
+  pinglamb: { all: 95, in_opener: 1, mid_game: 94, mirrored: 52, garbage_in_window: 70 },
+  yachi: { all: 153, in_opener: 7, mid_game: 146, mirrored: 80, garbage_in_window: 92 },
 };
 /** Per player: the payoff (stored under `followup_by_player`, the shared artefact key). */
 const PAYOFF = {
-  pinglamb: { fired: 54, not_fired: { i_in_well_not_quad: 10, past_verified: 1, round_ended: 3, well_covered: 10, well_filled_not_i: 12 } },
-  yachi: { fired: 56, not_fired: { i_in_well_not_quad: 10, past_verified: 3, round_ended: 2, well_covered: 35, well_filled_not_i: 40 } },
+  pinglamb: { fired: 56, not_fired: { i_in_well_not_quad: 10, past_verified: 1, round_ended: 3, well_covered: 11, well_filled_not_i: 14 } },
+  yachi: { fired: 58, not_fired: { i_in_well_not_quad: 10, past_verified: 4, round_ended: 3, well_covered: 36, well_filled_not_i: 42 } },
 };
 const CONTROLS = {
   under: { TSS: { pinglamb: 5, yachi: 11 }, TST: { pinglamb: 0, yachi: 0 }, mini_TSS: { pinglamb: 0, yachi: 0 }, mini_TSD: { pinglamb: 0, yachi: 0 } },
-  ablation: { no_must_empty: { pinglamb: 1418, yachi: 1158 }, no_roof: { pinglamb: 382, yachi: 353 }, t_overlap: { pinglamb: 375, yachi: 442 } },
-  orientation_baseline: { pinglamb: 71, yachi: 102 },
+  ablation: { no_must_empty: { pinglamb: 1480, yachi: 1194 }, no_roof: { pinglamb: 395, yachi: 363 }, t_overlap: { pinglamb: 391, yachi: 459 } },
+  orientation_baseline: { pinglamb: 71, yachi: 105 },
 };
 /** What discriminates, measured: full TSDs (not only hits) whose anchored flat T meets ONE part of the window — the
  *  roof row above the cleared rows, the cleared rows, the well rows under them. The cleared rows are entailed by the
@@ -832,7 +864,7 @@ test('quarantined: report_eligible false, no claim ids, one variant measured at 
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
   const n = checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT);
-  expect(n).toBe(20947);
+  expect(n).toBe(21764);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 
@@ -1049,8 +1081,8 @@ test('donation: the shipped predicate reproduced per session and player, and eve
 
 test('the payoff row map is verified against the engine at every step it uses', () => {
   const c = art().check;
-  expect(c.rowmap_unverified).toBe(34);
-  expect(c.rowmap_steps).toBe(370767);
+  expect(c.rowmap_unverified).toBe(35);
+  expect(c.rowmap_steps).toBe(386541);
   expect(art().hits.every((h: any) => h.followup.reason !== 'rowmap_unverified')).toBe(true);
 });
 

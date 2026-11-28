@@ -62,13 +62,14 @@ const SESSIONS = [
   { dir: '2026-11-23', rounds: 164, strict: 138, equal: 26, faults: 2202, perfect: 14621, pieces: 15879 },
   { dir: '2026-11-24', rounds: 144, strict: 124, equal: 20, faults: 2072, perfect: 13352, pieces: 14581 },
   { dir: '2026-11-25', rounds: 124, strict: 111, equal: 13, faults: 1905, perfect: 11786, pieces: 12945 },
+  { dir: '2026-11-26', rounds: 150, strict: 130, equal: 20, faults: 2691, perfect: 14261, pieces: 15774 },
 ];
 
 // At module scope, not inside a test: a membership check that lives in a test can be skipped
 // by whatever skips the test, and the whole point is that it runs before any literal is read.
 assertCorpusIsEverySessionOnDisk(`${import.meta.dir}/../sessions`, SESSIONS.map(s => s.dir));
 
-const CORPUS = { rounds: 3912, strict: 3364, equal: 548, faults: 60867, perfect: 333936, pieces: 370767 };
+const CORPUS = { rounds: 4062, strict: 3494, equal: 568, faults: 63558, perfect: 348197, pieces: 386541 };
 
 interface Row {
   session: string; file: string; round: number; who: string;
@@ -203,8 +204,9 @@ test('a fault-free round is a round of nothing but perfect pieces', () => {
   // 2026-11-23 adds six on 164 player-rounds, 3.7%. Recorded, not read (99 -> 105).
   // 2026-11-24 adds five on 144 player-rounds, 3.5%. Recorded, not read (105 -> 110).
   // 2026-11-25 adds three on 124 player-rounds, 2.4%. Recorded, not read (110 -> 113).
+  // 2026-11-26 adds seven on 150 player-rounds, 4.7%. Recorded, not read (113 -> 120).
   const clean = rows.filter(r => r.faults === 0);
-  expect(clean.length).toBe(113);
+  expect(clean.length).toBe(120);
   for (const r of clean) {
     expect(r.perfect).toBe(r.pieces);
     expect(r.combo).toBe(r.perfect);
@@ -261,6 +263,10 @@ test('the four finesse rates are four different numbers, so a rate must name its
   // share > event rate > the meaningless one > faulty share). A reader who took 17.16 away as
   // "the" fault rate would be wrong twice over: it is one corpus-state's reading of a quantity
   // that moves, and it is one of four defensible ones.
+  // Twenty-eight-session figures (2026-11-26 added): 16.42 -> 16.44, 9.93 -> 9.92, 90.07 -> 90.08,
+  // 15.42 -> 15.44, 1.653 -> 1.658. 11-26 is 150 player-rounds (3.7% of the pool) at a higher
+  // fault-event rate (17.06%) and a lower faulty share (9.59%) than the pool, with more faults
+  // per faulty piece (1.779).
   // Twenty-seven-session figures (2026-11-25 added): 16.48 -> 16.42, 9.97 -> 9.93, 90.03 -> 90.07,
   // 15.47 -> 15.42, 1.653 -> 1.653. 11-25 is 124 player-rounds (3.2% of the pool).
   // Twenty-six-session figures (2026-11-24 added): 16.57 -> 16.48, 10.03 -> 9.97, 89.97 -> 90.03,
@@ -271,11 +277,11 @@ test('the four finesse rates are four different numbers, so a rate must name its
   // 15.74 -> 15.68, 1.647 -> 1.648. 11-19 is 88 player-rounds (2.5% of the pool).
   // Twenty-three-session figures (2026-11-17 added): 16.82 -> 16.77, 10.22 -> 10.19, 89.78 -> 89.81,
   // 15.78 -> 15.74, 1.647 -> 1.647. 11-17 is 48 player-rounds (1.4% of the pool).
-  expect(pct(faults / pieces)).toBe(16.42);               // fault EVENTS per piece
-  expect(pct(1 - perfect / pieces)).toBe(9.93);          // share of pieces that were faulty
-  expect(pct(perfect / pieces)).toBe(90.07);              // TETR.IO's own displayed figure
-  expect(pct(faults / (faults + perfect))).toBe(15.42);    // on no meaningful denominator
+  expect(pct(faults / pieces)).toBe(16.44);               // fault EVENTS per piece
+  expect(pct(1 - perfect / pieces)).toBe(9.92);          // share of pieces that were faulty
+  expect(pct(perfect / pieces)).toBe(90.08);              // TETR.IO's own displayed figure
+  expect(pct(faults / (faults + perfect))).toBe(15.44);    // on no meaningful denominator
   // and the mechanism behind the gap: fault events per FAULTY piece, > 1 by construction
-  expect(Math.round(faults / (pieces - perfect) * 1000) / 1000).toBe(1.653);
+  expect(Math.round(faults / (pieces - perfect) * 1000) / 1000).toBe(1.658);
   expect(faults / (pieces - perfect)).toBeGreaterThan(1);
 });
