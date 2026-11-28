@@ -1797,6 +1797,14 @@ jobs:
           set -euo pipefail
           cargo build --release --locked --manifest-path pipeline/sim/forecast-rs/Cargo.toml
 
+      # The Rust SRS search behind cross-movegen / cross-tspin (pipeline/sim/srs-bfs-rs); built by
+      # srs-bfs-native.ts on first use when stale, built here once for the same reason.
+      - name: Build the native SRS search
+        if: env.INPUTS_UNCHANGED != '1'
+        run: |
+          set -euo pipefail
+          cargo build --release --locked --manifest-path pipeline/sim/srs-bfs-rs/Cargo.toml
+
       # The TST opener counter (pipeline/sim/tst2bag-rs, binaries tst2bag and pc4; path dependencies on
       # oracle-rs and pc-solver-rs) is built by pipeline/openers/tst-openers.test.ts on first use when
       # stale. Built here once so the two shards do not each wait on cargo's lock; the test itself runs in
@@ -2313,12 +2321,44 @@ jobs:
       # REACH_NATIVE=off: route-orders-cc and cutcopy-own-cc call reach(), whose default is the Rust
       # search in oracle-rs, and this job builds no Rust crate. The TS search is the reference the
       # Rust one is held equal to (reach-native.test.ts, typescript job), so the cross-check runs on it.
+      # SRS_BFS_NATIVE: cross-movegen and cross-tspin run OUR side's BFS (the vendored SRS primitives)
+      # in Rust (pipeline/sim/srs-bfs-rs, bun:ffi), the part that took most of this step; cold-clear's
+      # answer (the cc-oracle binary, cc-tspin.ts) and detectTSpin stay as they were, so neither test
+      # compares a piece of code with its own port. srs-bfs-native.test.ts (typescript job) holds the
+      # Rust answer equal to the TS BFS. Built here once, up front, so the parallel test processes below
+      # do not each wait on cargo's lock; if cargo is missing or the build fails the job falls back to
+      # the TS BFS (SRS_BFS_NATIVE=off, slower, same assertions) rather than going red on tooling.
+      - name: Build the native SRS search (falls back to the TS search if cargo is unavailable)
+        if: env.INPUTS_UNCHANGED != '1'
+        run: |
+          if cargo build --release --locked --manifest-path pipeline/sim/srs-bfs-rs/Cargo.toml; then
+            echo "SRS_BFS_NATIVE=on" >> "$GITHUB_ENV"
+          else
+            echo "::warning::srs-bfs-rs did not build; the cross tests run the TS BFS"
+            echo "SRS_BFS_NATIVE=off" >> "$GITHUB_ENV"
+          fi
+
+      # The five files are independent processes (each reads the committed corpus, spawns its own
+      # cc-oracle, writes nothing shared; cross-srs-tables needs no oracle), so they run side by side
+      # and every exit status is collected: any failure fails the step, none is hidden by `wait`.
       - name: Reachability (cross-movegen), kick tables (cross-srs-tables), T-spin rule (cross-tspin), own Cut Copy designs (cutcopy-own-cc) vs cold-clear
         if: env.INPUTS_UNCHANGED != '1'
         env:
           CC_ORACLE: ./result/bin/cc-oracle
           REACH_NATIVE: 'off'
-        run: bun test pipeline/sim/cross-movegen.test.ts pipeline/sim/cross-srs-tables.test.ts pipeline/sim/cross-tspin.test.ts pipeline/openers/cutcopy-own-cc.test.ts pipeline/openers/route-orders-cc.test.ts
+        run: |
+          set -u
+          pids=(); names=()
+          for f in pipeline/sim/cross-movegen.test.ts pipeline/sim/cross-srs-tables.test.ts pipeline/sim/cross-tspin.test.ts pipeline/openers/cutcopy-own-cc.test.ts pipeline/openers/route-orders-cc.test.ts; do
+            bun test "$f" > "$RUNNER_TEMP/$(basename "$f").log" 2>&1 &
+            pids+=($!); names+=("$f")
+          done
+          rc=0
+          for i in "${!pids[@]}"; do
+            if wait "${pids[$i]}"; then echo "ok   ${names[$i]}"; else echo "FAIL ${names[$i]}"; rc=1; fi
+            cat "$RUNNER_TEMP/$(basename "${names[$i]}").log"
+          done
+          exit $rc
 
       - name: Audit the input closure
         if: env.INPUTS_UNCHANGED != '1' && github.event.schedule == '41 5 * * *'
