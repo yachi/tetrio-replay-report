@@ -18,15 +18,20 @@ each night:
 * then, per match, the last round is snapped to the GO nearest its prediction, and each earlier
   round is predicted GAP_S plus its own length before the next round's SNAPPED start and snapped
   in turn ("walking back"). A round with no GO within WINDOW_S of its prediction is an error,
-  never a guess.
+  never a guess. Two GOs inside the same window, or two rounds snapping to the same GO, are
+  also an error: extra GOs are common, and nearest-in-window is not allowed to pick one.
 
-`max_snap_s` in the file is the largest |snapped - predicted| over every round.
+`max_snap_s` in the file is the largest |snapped - predicted| over every round. That is not a
+check that the snapped GO is the right round. `video_snap --write` runs pipeline/video_verify.py
+on the same file (in-game FT7 score at each play_start_s, boards not mid-play) and will not
+write a file that fails.
 
 The NEXT-queue boxes are this channel's 640x360 layout (NEXT_BOXES, as fractions of the frame, so
 any resolution of the same layout works). A different layout needs new boxes; the tool fails
 loudly (too few GOs) rather than snapping to something else. Trust tier: VIDEO, as
-pipeline/video_links.py says. The written file is checked with pipeline/video_section.check.
-Needs ffmpeg/ffprobe on PATH; no Python dependency beyond the standard library.
+pipeline/video_links.py says. The written file is checked with pipeline/video_section.check and
+pipeline/video_verify.verify. Needs ffmpeg/ffprobe on PATH; no Python dependency beyond the
+standard library.
 """
 import argparse
 import datetime as dt
@@ -149,14 +154,23 @@ def snap(facts, events):
         pred = _unix(m["ts"]) - c - rlen(rounds[-1])
         res = [None] * len(rounds)
         for i in range(len(rounds) - 1, -1, -1):
-            s = _nearest(events, pred, WINDOW_S)
-            if s is None:
+            cands = [e for e in events if abs(e - pred) <= WINDOW_S]
+            if not cands:
                 raise ValueError(f"m{m['index']}r{i + 1}: no GO within {WINDOW_S} s of "
                                  f"{pred:.2f} s")
+            if len(cands) > 1:
+                shown = ", ".join(f"{c:.2f}" for c in cands)
+                raise ValueError(
+                    f"m{m['index']}r{i + 1}: {len(cands)} GOs within {WINDOW_S} s of "
+                    f"{pred:.2f} s ({shown}); assignment is ambiguous, refusing to guess")
+            s = cands[0]
             res[i] = (s, pred)
             if i:
                 pred = s - GAP_S - rlen(rounds[i - 1])
         out.append((m, res))
+    starts = [s for _, res in out for s, _ in res]
+    if len(set(starts)) != len(starts):
+        raise ValueError("two rounds snapped to the same GO")
     return out
 
 
@@ -215,12 +229,26 @@ def main(argv):
     _, _, dur = probe(a.video)
     meta = {"id": a.id, "url": f"https://www.youtube.com/watch?v={a.id}", "fetched": a.fetched,
             "format": a.format_note, "sha256": _sha256(a.video), "duration_s": int(dur)}
+    # Keep a previously recorded VOD left-to-right seating (video.seats) so a
+    # re-snap does not silently drop it and un-align the HTML replay vs YouTube.
+    existing = sess / "video" / "video.json"
+    if existing.is_file():
+        prev = json.loads(existing.read_text(encoding="utf-8")).get("video") or {}
+        if prev.get("seats") and prev.get("id") == a.id:
+            meta["seats"] = list(prev["seats"])
     events = gos(signal(a.video))
     data = build(facts, events, meta)
     check(facts, data)
+    n_rounds = sum(len(m["rounds"]) for m in data["matches"])
+    if len(events) != n_rounds:
+        print(f"note: {len(events)} GOs in the video, {n_rounds} replay rounds; "
+              f"extra GOs are ok only if video_verify confirms each assigned start")
+    from pipeline.video_verify import verify
+    verify(facts, data, a.video, session=sess.name)
     for pos, w in per_match_snap(facts, events).items():
         print(f"m{pos}: max snap {w:.2f} s")
-    print(f"{len(events)} GOs in the video; max_snap_s {data['alignment']['max_snap_s']}")
+    print(f"{len(events)} GOs in the video; max_snap_s {data['alignment']['max_snap_s']}; "
+          f"video_verify ok")
     text = json.dumps(data, ensure_ascii=False, indent=1) + "\n"
     if a.write:
         out = sess / "video" / "video.json"
@@ -301,10 +329,18 @@ def selftest():
     stag[i0 + 2] = (0.5, 0.5)
     if i0 * STEP in gos(stag):
         bad.append("a GO was found where only one queue moved")
+    # Extra GOs outside every window must not move a snap; two GOs inside one
+    # window must be refused (nearest-in-window is not allowed to guess).
+    far = max(events) + 30
+    extra_ok = build(facts, events + [far], ref["video"])
+    if extra_ok["matches"] != ref["matches"]:
+        bad.append("an extra GO outside every window changed a snap")
+    refused("two GOs inside one window", facts, events + [starts[3] + 0.5])
     for b in bad:
         print("FAIL", b)
     print(f"{'ok ' if not bad else 'FAIL'} video_snap selftest: 11-17 rebuilt from a synthetic "
-          f"signal, {len(events)} GOs; 4 planted faults refused, 1 shifted video followed")
+          f"signal, {len(events)} GOs; 5 planted faults refused, 1 shifted video followed, "
+          f"1 extra GO outside a window ignored")
     return 1 if bad else 0
 
 
