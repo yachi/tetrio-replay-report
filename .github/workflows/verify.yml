@@ -1805,6 +1805,15 @@ jobs:
           set -euo pipefail
           cargo build --release --locked --manifest-path pipeline/sim/srs-bfs-rs/Cargo.toml
 
+      # The cut copy drills' minNeed search is Rust too (pipeline/sim/cutcopy-rs, loaded by cutcopy-native.ts;
+      # minNeedTs is the reference, CUTCOPY_NATIVE=off selects it). cutcopy-native.test.ts holds the two equal on
+      # every committed drill at caps 1-3; on the weekly schedule at every cap, not a stride.
+      - name: Build the native cut copy search
+        if: env.INPUTS_UNCHANGED != '1'
+        run: |
+          set -euo pipefail
+          cargo build --release --locked --manifest-path pipeline/sim/cutcopy-rs/Cargo.toml
+
       # The TST opener counter (pipeline/sim/tst2bag-rs, binaries tst2bag and pc4; path dependencies on
       # oracle-rs and pc-solver-rs) is built by pipeline/openers/tst-openers.test.ts on first use when
       # stale. Built here once so the two shards do not each wait on cargo's lock; the test itself runs in
@@ -1831,7 +1840,7 @@ jobs:
         if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
-          if [ "$GITHUB_EVENT_NAME" = schedule ]; then export ORACLE_CACHE=off ORACLE_NATIVE_FULL=1 FORECAST_NATIVE_FULL=1 REPLAY_NATIVE_FULL=1 REACH_NATIVE_FULL=1 ATTACK_NATIVE_FULL=1 FINESSE_NATIVE_FULL=1; fi
+          if [ "$GITHUB_EVENT_NAME" = schedule ]; then export ORACLE_CACHE=off ORACLE_NATIVE_FULL=1 FORECAST_NATIVE_FULL=1 REPLAY_NATIVE_FULL=1 REACH_NATIVE_FULL=1 ATTACK_NATIVE_FULL=1 FINESSE_NATIVE_FULL=1 CUTCOPY_NATIVE_FULL=1; fi
           REPLAY_DIR=sessions/2026-07-22 bun test --parallel --shard=${{ matrix.shard }}/4 2>&1 | tee "$RUNNER_TEMP/bun-shard.log"
 
       # A shard that ran fewer files than its share would read green over tests nobody ran. bun

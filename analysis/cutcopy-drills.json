@@ -26,7 +26,7 @@
   "sessions/2026-11-01/sim/replay-facts.json": "2957aa454c78787ee02e47ba557c71b7"
  },
  "code": {
-  "pipeline/sim/cutcopy-drills.ts": "18b743eccc116a92c80377e64366742a",
+  "pipeline/sim/cutcopy-drills.ts": "d2c854aaf63c588d60698c591bd95efc",
   "pipeline/sim/emit-cutcopy-drills.ts": "2098ccb241d6ce4fa36fdfbe90c9ce0b",
   "pipeline/cutcopy_practice_engine.js": "193f0a99162b65ab948e392af368e1a9",
   "pipeline/sim/technique-facts.ts": "2e80fa0e35e7f8ba51d8148d62ef65c8",
