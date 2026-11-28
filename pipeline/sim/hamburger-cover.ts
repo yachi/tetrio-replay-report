@@ -50,3 +50,42 @@ export function withMidGameOnly(check: (h: any, d: any) => { qualifies: boolean;
     return { ...r, qualifies: false, not_qualified: [...r.not_qualified, 'in_opener'] };
   };
 }
+
+/**
+ * The stacking, as yachi reads it (「Hamburger 要起碼食兩次TSS 整到右下一層層顏色咁先算係 hamburger」; harddrop's Repeat
+ * and Tetris boards draw it): a hit counts only when it is at least the SECOND layer, i.e. on the board before its T,
+ * two rows under its nub (the row under the cover row), the three cells under the T's arms (the nub's column and one
+ * each side) are the three cells an earlier T left after a full T-spin Single of its own: one T lock, a full spin that
+ * cleared one line, with exactly those three of its cells still on the board. That is the layered T row the page
+ * draws; garbage, another piece or a T cut some other way is no layer.
+ *
+ *   `stacked_on`: that earlier T's 0-based lock index, or null (no layer under it, or ownership unverified).
+ */
+export const LAYER_DR = 2;
+export function hamburgerStackedOn(h: Hit, d: TechDigest): number | null {
+  if (h.lock === 0) return null;
+  const own = owners(d, h.lock);
+  if (own.bad !== null && own.bad < h.lock) return null;
+  const g = own.boards[h.lock - 1]!;
+  const low = d.locks[h.lock]!.cells.reduce((a, b) => b.row > a.row ? b : a);
+  const r = low.row + LAYER_DR;
+  if (r >= H) return null;
+  const os = [-1, 0, 1].map(dc => { const c = low.col + dc; return c >= 0 && c < W ? g[r]![c]! : -3; });
+  const k = os[0]!;
+  if (k < 0 || os.some(o => o !== k) || k >= h.lock) return null;
+  const lk = d.locks[k]!;
+  if (lk.piece !== 'T' || lk.spin !== 'full' || lk.cleared !== 1) return null;
+  let n = 0;
+  for (const row of g) for (const o of row) if (o === k) n++;
+  return n === 3 ? k : null;
+}
+
+/** a qualify check with each hit's `stacked_on` added, failing every hit with no layer under it (`not_stacked`) */
+export function withStackedOnly(check: (h: any, d: any) => { qualifies: boolean; not_qualified: string[] }) {
+  return (h: any, d: any) => {
+    const r = check(h, d);
+    const stacked_on = hamburgerStackedOn(h, d);
+    if (stacked_on !== null) return { ...r, stacked_on };
+    return { ...r, qualifies: false, not_qualified: [...r.not_qualified, 'not_stacked'], stacked_on };
+  };
+}

@@ -6415,6 +6415,13 @@ the prose does not name is a build error). `bin/build-docs` prints a card's opti
 byte-identical. A coordinator probe scored only locks strictly inside the verified prefix; the hits on its last lock are
 named in the test (`AT_VERIFIED_EDGE`) and are the whole difference.
 
+**It must be at least the second layer (since 2026-11-28, yachi: 「要起碼食兩次TSS 整到右下一層層顏色咁先算係
+hamburger」).** `hamburger-cover.ts`'s `withStackedOnly` adds `not_stacked` unless the three cells two rows under the
+T's nub (the nub column and its two neighbours, the place harddrop's Repeat and Tetris boards draw the previous layer's
+residue) are owned by ONE earlier T lock that was a full spin clearing one line and keeps exactly those three cells;
+each hit carries `stacked_on` (that lock, or null). Which hits stand on a layer is the test's named `STACKED` list, and
+the overview prints no split when no hit qualifies (`technique_page.py`, default-preserving for every other page).
+
 **Overlaps, measured in the test:** 欄干's TSS (its T stood) and Cave TSS 接 TST (a mini) share no hit; 基本的なドネイト's TSS
 rule fires on many of the same T's, and since `hamburger` joined its `OTHER_PAGES` those are this page's, so
 基本的なドネイト's artefact moved in content and its tests were repinned. Adding `hamburger` to `technique-qualify.ts`

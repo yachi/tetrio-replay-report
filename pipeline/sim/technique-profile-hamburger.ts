@@ -17,7 +17,7 @@ import type { TechniqueProfile } from './technique-profile.ts';
 import { QUALIFY_OPTIONS, techniqueQualifier } from './technique-qualify.ts';
 import { DPC_LOCKS } from './shachikutrain-qualify.ts';
 import { WHOLE_SHAPE_RULE, withWholeShape } from './technique-wholeshape.ts';
-import { withHamburgerCover, withMidGameOnly } from './hamburger-cover.ts';
+import { withHamburgerCover, withMidGameOnly, withStackedOnly } from './hamburger-cover.ts';
 
 const SIM = import.meta.dir;
 const OPENERS = `${SIM}/../openers`;
@@ -94,12 +94,16 @@ export const HAMBURGER: TechniqueProfile = {
       `dpc: the board is empty after one of the ${DPC_LOCKS} locks before the T, the T itself, or one of the ${DPC_LOCKS} after it (the DPC setup)`,
       'ownership_unverified: a lock before the T has a row map the digest could not verify, so its pieces cannot be told apart',
       WHOLE_SHAPE_RULE,
+      'not_stacked: no earlier layer under the T: on the board before it, the three cells two rows under its nub (the '
+        + 'nub\'s column and one each side, the row under the cover row) are not the three cells one earlier T left '
+        + 'after a full T-spin Single of its own (yachi: 「Hamburger 要起碼食兩次TSS 整到右下一層層顏色咁先算係 hamburger」; '
+        + 'harddrop\'s Repeat and Tetris boards draw the layers); stacked_on is that earlier T\'s lock, or null',
       'qualifies iff none applies; the shape stood at every hit either way',
       'cover (a field, not a rule): one_sz when one whole S or Z covers both cover cells, complete_pieces when whole '
         + 'pieces do otherwise, not_complete when a cover cell is garbage or a fragment, null when ownership is unverified',
     ],
-    check: withMidGameOnly(withHamburgerCover(withWholeShape(`${OPENERS}/hamburger-technique.json`,
-                          techniqueQualifier(`${OPENERS}/hamburger-technique.json`, QUALIFY_OPTIONS.hamburger)))),
+    check: withStackedOnly(withMidGameOnly(withHamburgerCover(withWholeShape(`${OPENERS}/hamburger-technique.json`,
+                          techniqueQualifier(`${OPENERS}/hamburger-technique.json`, QUALIFY_OPTIONS.hamburger))))),
   },
   lists: (hits, name) => ({
     hamburger_hits: hits.map(h => `${name(h)} ${tag(h)}`),
