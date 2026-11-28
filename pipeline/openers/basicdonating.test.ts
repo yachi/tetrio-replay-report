@@ -35,31 +35,31 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26']);
 const ART_PATH = `${import.meta.dir}/../../analysis/basicdonating-facts.json`;
 const TR = JSON.parse(readFileSync(BASICDONATING.transcriptionPath, 'utf8'));
 const USERS = ['pinglamb', 'yachi'] as const;
 const H = 40, W = 10;
 
 /** Per player: the opportunities (scored full TSDs), split at the 0-based opener window. */
-const DENOM: Record<string, any> = {"pinglamb":{"all":7731,"in_opener":1502,"mid_game":6229},"yachi":{"all":7029,"in_opener":1772,"mid_game":5257}};
+const DENOM: Record<string, any> = {"pinglamb":{"all":8041,"in_opener":1557,"mid_game":6484},"yachi":{"all":7279,"in_opener":1830,"mid_game":5449}};
 /** The same for the TSS variant (scored full TSSs). */
-const DENOM_TSS: Record<string, any> = {"pinglamb":{"all":878,"in_opener":120,"mid_game":758},"yachi":{"all":1453,"in_opener":345,"mid_game":1108}};
-const HITS: Record<string, any> = {"rule":{"pinglamb":{"all":510,"in_opener":164,"mid_game":346,"mirrored":0,"garbage_in_window":154},"yachi":{"all":455,"in_opener":54,"mid_game":401,"mirrored":0,"garbage_in_window":174}},"rule_tss":{"pinglamb":{"all":42,"in_opener":9,"mid_game":33,"mirrored":0,"garbage_in_window":11},"yachi":{"all":180,"in_opener":111,"mid_game":69,"mirrored":0,"garbage_in_window":26}}};
+const DENOM_TSS: Record<string, any> = {"pinglamb":{"all":906,"in_opener":126,"mid_game":780},"yachi":{"all":1528,"in_opener":356,"mid_game":1172}};
+const HITS: Record<string, any> = {"rule":{"pinglamb":{"all":534,"in_opener":175,"mid_game":359,"mirrored":0,"garbage_in_window":159},"yachi":{"all":466,"in_opener":58,"mid_game":408,"mirrored":0,"garbage_in_window":179}},"rule_tss":{"pinglamb":{"all":43,"in_opener":9,"mid_game":34,"mirrored":0,"garbage_in_window":11},"yachi":{"all":187,"in_opener":112,"mid_game":75,"mirrored":0,"garbage_in_window":31}}};
 /** The payoff (stored under `followup_by_player`, the shared artefact key). */
-const PAYOFF: Record<string, any> = {"rule":{"pinglamb":{"fired":47,"not_fired":{"i_in_well_not_quad":26,"past_verified":16,"round_ended":12,"well_covered":31,"well_filled_not_i":378}},"yachi":{"fired":77,"not_fired":{"i_in_well_not_quad":33,"past_verified":13,"round_ended":12,"well_covered":59,"well_filled_not_i":261}}},"rule_tss":{"pinglamb":{"fired":3,"not_fired":{"i_in_well_not_quad":3,"well_covered":9,"well_filled_not_i":27}},"yachi":{"fired":26,"not_fired":{"i_in_well_not_quad":15,"past_verified":10,"well_covered":13,"well_filled_not_i":116}}}};
+const PAYOFF: Record<string, any> = {"rule":{"pinglamb":{"fired":49,"not_fired":{"i_in_well_not_quad":27,"past_verified":16,"round_ended":12,"well_covered":35,"well_filled_not_i":395}},"yachi":{"fired":79,"not_fired":{"i_in_well_not_quad":35,"past_verified":13,"round_ended":13,"well_covered":59,"well_filled_not_i":267}}},"rule_tss":{"pinglamb":{"fired":3,"not_fired":{"i_in_well_not_quad":3,"well_covered":10,"well_filled_not_i":27}},"yachi":{"fired":30,"not_fired":{"i_in_well_not_quad":16,"past_verified":10,"well_covered":13,"well_filled_not_i":118}}}};
 /** The same rule at the other scored spins, and with each clause dropped at the opportunity. */
-const CONTROLS: Record<string, any> = {"rule":{"under":{"TSS":{"pinglamb":42,"yachi":180},"TST":{"pinglamb":1959,"yachi":1090},"mini_TSS":{"pinglamb":9,"yachi":4},"mini_TSD":{"pinglamb":0,"yachi":0}},"ablation":{"allow_t_nub":{"pinglamb":510,"yachi":455},"allow_fragment":{"pinglamb":574,"yachi":523},"no_reopen":{"pinglamb":584,"yachi":634},"allow_late_hole":{"pinglamb":639,"yachi":586}},"orientation_baseline":{"pinglamb":71,"yachi":102}},"rule_tss":{"under":{"TSD":{"pinglamb":510,"yachi":455},"TST":{"pinglamb":1959,"yachi":1090},"mini_TSS":{"pinglamb":9,"yachi":4},"mini_TSD":{"pinglamb":0,"yachi":0}},"ablation":{"allow_t_nub":{"pinglamb":42,"yachi":180},"allow_fragment":{"pinglamb":64,"yachi":242},"no_reopen":{"pinglamb":79,"yachi":236},"allow_late_hole":{"pinglamb":69,"yachi":220}},"orientation_baseline":{"pinglamb":201,"yachi":593}}};
-const QUALIFY: Record<string, any> = {"pinglamb":{"qualified":228,"not_qualified":{"opener_route":187,"other_page":151,"opener_spin":4}},"yachi":{"qualified":275,"not_qualified":{"other_page":337,"opener_route":35,"opener_spin":98}}};
+const CONTROLS: Record<string, any> = {"rule":{"under":{"TSS":{"pinglamb":43,"yachi":187},"TST":{"pinglamb":2033,"yachi":1135},"mini_TSS":{"pinglamb":9,"yachi":4},"mini_TSD":{"pinglamb":0,"yachi":0}},"ablation":{"allow_t_nub":{"pinglamb":534,"yachi":466},"allow_fragment":{"pinglamb":599,"yachi":534},"no_reopen":{"pinglamb":608,"yachi":649},"allow_late_hole":{"pinglamb":668,"yachi":601}},"orientation_baseline":{"pinglamb":71,"yachi":105}},"rule_tss":{"under":{"TSD":{"pinglamb":534,"yachi":466},"TST":{"pinglamb":2033,"yachi":1135},"mini_TSS":{"pinglamb":9,"yachi":4},"mini_TSD":{"pinglamb":0,"yachi":0}},"ablation":{"allow_t_nub":{"pinglamb":43,"yachi":187},"allow_fragment":{"pinglamb":67,"yachi":251},"no_reopen":{"pinglamb":81,"yachi":248},"allow_late_hole":{"pinglamb":70,"yachi":230}},"orientation_baseline":{"pinglamb":208,"yachi":624}}};
+const QUALIFY: Record<string, any> = {"pinglamb":{"qualified":234,"not_qualified":{"opener_route":199,"other_page":158,"opener_spin":4}},"yachi":{"qualified":285,"not_qualified":{"other_page":343,"opener_route":37,"opener_spin":98}}};
 /** Qualifying hits per session (the list itself is `lists.qualified_hits`, held to `hits` below). */
-const QUALIFIED_BY_SESSION: Record<string, number> = {'2026-07-22': 14, '2026-07-24': 15, '2026-07-28': 14, '2026-08-01': 25, '2026-08-09': 18, '2026-08-14': 23, '2026-08-19': 25, '2026-08-25': 21, '2026-09-03': 9, '2026-09-10': 17, '2026-09-11': 10, '2026-09-17': 12, '2026-09-18': 30, '2026-09-19': 51, '2026-10-03': 42, '2026-10-09': 34, '2026-10-12': 13, '2026-10-20': 8, '2026-10-22': 4, '2026-10-29': 16, '2026-11-01': 26, '2026-11-05': 13, '2026-11-17': 7, '2026-11-19': 7, '2026-11-23': 17, '2026-11-24': 18, '2026-11-25': 14};
+const QUALIFIED_BY_SESSION: Record<string, number> = {'2026-07-22': 14, '2026-07-24': 15, '2026-07-28': 14, '2026-08-01': 25, '2026-08-09': 18, '2026-08-14': 23, '2026-08-19': 25, '2026-08-25': 21, '2026-09-03': 9, '2026-09-10': 17, '2026-09-11': 10, '2026-09-17': 12, '2026-09-18': 30, '2026-09-19': 51, '2026-10-03': 42, '2026-10-09': 34, '2026-10-12': 13, '2026-10-20': 8, '2026-10-22': 4, '2026-10-29': 16, '2026-11-01': 26, '2026-11-05': 13, '2026-11-17': 7, '2026-11-19': 7, '2026-11-23': 17, '2026-11-24': 18, '2026-11-25': 14, '2026-11-26': 16,};
 /** How many donating columns a hit has, and how each column's covering pieces sit (inside the cleared rows or not). */
-const COLUMNS = { per_hit: {1: 879, 2: 199, 3: 109 }, cover: { cleared: 573, kept: 1031 } };
+const COLUMNS = { per_hit: {1: 915, 2: 206, 3: 109 }, cover: { cleared: 584, kept: 1070 } };
 /** Per other technique artefact: [its T's that are a donation here, its T's]. None is contained whole: a page's
  *  window does not read the ownership of its covering cells, and many of its hits cover with garbage or a fragment. */
 const COMMON: Record<string, [number, number]> = {
-  stsd: [0, 104], stmbcave: [161, 165], imperialcross: [9, 14], doubledagger: [47, 53], btcannon: [0, 0],
-  cutcopy: [1, 3], shachikutrain: [57, 133], parapet: [19, 363], kaidan: [104, 236], dtcannon: [0, 34], hamburger: [116, 242],
+  stsd: [0, 104], stmbcave: [163, 167], imperialcross: [9, 14], doubledagger: [48, 54], btcannon: [0, 0],
+  cutcopy: [1, 3], shachikutrain: [62, 141], parapet: [21, 375], kaidan: [111, 248], dtcannon: [0, 35], hamburger: [116, 248],
 };
 
 let DIGESTS: TechDigest[] | null = null;
@@ -127,10 +127,10 @@ test('quarantined: report_eligible false, no claim ids, two rule variants (TSD, 
 });
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
-  expect(checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT)).toBe(20947);
+  expect(checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT)).toBe(21764);
   expect(art().check.reconstruction_disagreed).toBe(0);
-  expect(art().check.rowmap_unverified).toBe(34);
-  expect(art().check.rowmap_steps).toBe(370767);
+  expect(art().check.rowmap_unverified).toBe(35);
+  expect(art().check.rowmap_steps).toBe(386541);
 });
 
 test('the Python twin on the drawings: the rule fires where the gate records it, with its holes, and nowhere else', () => {

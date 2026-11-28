@@ -34,7 +34,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26']);
 const ART_PATH = `${import.meta.dir}/../../analysis/hamburger-facts.json`;
 const TR = JSON.parse(readFileSync(HAMBURGER.transcriptionPath, 'utf8'));
 const H = 40;
@@ -195,23 +195,23 @@ const QUALIFIED_PAYOFF_FIRED: string[] = [
   '2026-11-23 m4r3 yachi lock 87',
 ];
 
-const OPP_DENOM = { pinglamb: { all: 878, in_opener: 120, mid_game: 758 }, yachi: { all: 1453, in_opener: 345, mid_game: 1108 } };
-const HITS = { pinglamb: { all: 46, in_opener: 5, mid_game: 41, mirrored: 15, garbage_in_window: 36 },
-               yachi: { all: 196, in_opener: 104, mid_game: 92, mirrored: 150, garbage_in_window: 73 } };
+const OPP_DENOM = { pinglamb: { all: 906, in_opener: 126, mid_game: 780 }, yachi: { all: 1528, in_opener: 356, mid_game: 1172 } };
+const HITS = { pinglamb: { all: 47, in_opener: 5, mid_game: 42, mirrored: 16, garbage_in_window: 37 },
+               yachi: { all: 201, in_opener: 104, mid_game: 97, mirrored: 152, garbage_in_window: 77 } };
 /** the payoff: `well_covered` / `well_filled_not_i` are another layer of the stacking (the page's Repeat) */
-const PAYOFF = { pinglamb: { fired: 25, not_fired: { i_in_well_not_quad: 5, well_covered: 5, well_filled_not_i: 11 } },
-                 yachi: { fired: 37, not_fired: { i_in_well_not_quad: 16, past_verified: 8, round_ended: 1, well_covered: 18, well_filled_not_i: 116 } } };
-const QUALIFY = { pinglamb: { qualified: 3, not_qualified: { dpc: 1, fragment: 30, garbage_in_shape: 8, in_opener: 5 } },
-                  yachi: { qualified: 7, not_qualified: { dpc: 2, fragment: 75, garbage_in_shape: 11, in_opener: 104, ownership_unverified: 2 } } };
+const PAYOFF = { pinglamb: { fired: 25, not_fired: { i_in_well_not_quad: 5, well_covered: 5, well_filled_not_i: 12 } },
+                 yachi: { fired: 39, not_fired: { i_in_well_not_quad: 17, past_verified: 8, round_ended: 1, well_covered: 19, well_filled_not_i: 117 } } };
+const QUALIFY = { pinglamb: { qualified: 3, not_qualified: { dpc: 1, fragment: 31, garbage_in_shape: 8, in_opener: 5 } },
+                  yachi: { qualified: 7, not_qualified: { dpc: 2, fragment: 79, garbage_in_shape: 12, in_opener: 104, ownership_unverified: 2 } } };
 /** cover kind per player, over every hit and over the qualifying ones */
 const COVER: Record<string, any> = {
-  pinglamb: { all: { complete_pieces: 2, not_complete: 37, one_sz: 7 }, qualified: { complete_pieces: 2, one_sz: 1 } },
-  yachi: { all: { complete_pieces: 2, not_complete: 86, null: 2, one_sz: 106 }, qualified: { complete_pieces: 2, one_sz: 5 } },
+  pinglamb: { all: { complete_pieces: 2, not_complete: 38, one_sz: 7 }, qualified: { complete_pieces: 2, one_sz: 1 } },
+  yachi: { all: { complete_pieces: 2, not_complete: 91, null: 2, one_sz: 106 }, qualified: { complete_pieces: 2, one_sz: 5 } },
 };
-const CONTROLS = {under: {TSD: {pinglamb: 0, yachi: 0}, TST: {pinglamb: 0, yachi: 0}, mini_TSS: {pinglamb: 0, yachi: 0}, mini_TSD: {pinglamb: 0, yachi: 0}}, ablation: {no_must_empty: {pinglamb: 373, yachi: 537}, no_roof: {pinglamb: 46, yachi: 197}, t_overlap: {pinglamb: 50, yachi: 200}}, orientation_baseline: {pinglamb: 201, yachi: 593}};
+const CONTROLS = {under: {TSD: {pinglamb: 0, yachi: 0}, TST: {pinglamb: 0, yachi: 0}, mini_TSS: {pinglamb: 0, yachi: 0}, mini_TSD: {pinglamb: 0, yachi: 0}}, ablation: {no_must_empty: {pinglamb: 381, yachi: 562}, no_roof: {pinglamb: 47, yachi: 202}, t_overlap: {pinglamb: 51, yachi: 205}}, orientation_baseline: {pinglamb: 208, yachi: 624}};
 /** full TSSs whose anchored T meets ONE row of the window: `above` the row over the arms, `arms` the T's arm row,
  *  `cleared` the row the TSS clears (the cover and the nub), `below` the hole row under it */
-const PART_ONLY: Record<string, number> = { above: 938, arms: 567, cleared: 1366, below: 311 };
+const PART_ONLY: Record<string, number> = { above: 976, arms: 587, cleared: 1422, below: 319 };
 /** [this page's hits that are hits there, this page's hits], per other technique artefact that shares any */
 const COMMON: Record<string, number> = { basicdonating: 116 };
 
@@ -280,7 +280,7 @@ test('quarantined: report_eligible false, no claim ids, one variant, a payoff an
 });
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
-  expect(checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT)).toBe(20947);
+  expect(checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT)).toBe(21764);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 

@@ -148,6 +148,11 @@
     "session": "2026-11-25",
     "replays_md5": "548cb68a5dd9684ee84a6f36f231d4a5",
     "replay_facts_md5": "77e54fa9080e17584458dfbe8e119ee0"
+   },
+   {
+    "session": "2026-11-26",
+    "replays_md5": "d01f24b6610227c64eac1035f203b334",
+    "replay_facts_md5": "2cb4ae5af4da74208db58d34d101ad67"
    }
   ],
   "transcription_md5": "5dd25a2b0b6ddcb417f881ce395443d8",
@@ -180,7 +185,8 @@
   "2026-11-19",
   "2026-11-23",
   "2026-11-24",
-  "2026-11-25"
+  "2026-11-25",
+  "2026-11-26"
  ],
  "window_pieces": 21,
  "window_rule": "0-based lock index <= 21 is in_opener (emit-opener-facts.ts's convention; emit-attack-facts.ts counts from 1)",
@@ -188,24 +194,24 @@
  "denominators": {
   "pinglamb": {
    "mini_TSS": {
-    "all": 477,
+    "all": 499,
     "in_opener": 18,
-    "mid_game": 459
+    "mid_game": 481
    },
    "TSS": {
-    "all": 878,
-    "in_opener": 120,
-    "mid_game": 758
+    "all": 906,
+    "in_opener": 126,
+    "mid_game": 780
    },
    "TSD": {
-    "all": 7731,
-    "in_opener": 1502,
-    "mid_game": 6229
+    "all": 8041,
+    "in_opener": 1557,
+    "mid_game": 6484
    },
    "TST": {
-    "all": 2008,
-    "in_opener": 1960,
-    "mid_game": 48
+    "all": 2083,
+    "in_opener": 2034,
+    "mid_game": 49
    },
    "mini_TSD": {
     "all": 0,
@@ -214,28 +220,28 @@
    },
    "other_scored": 0,
    "recon_disagreed": 0,
-   "unscored_past_prefix": 971
+   "unscored_past_prefix": 1005
   },
   "yachi": {
    "mini_TSS": {
-    "all": 126,
-    "in_opener": 14,
-    "mid_game": 112
+    "all": 135,
+    "in_opener": 16,
+    "mid_game": 119
    },
    "TSS": {
-    "all": 1453,
-    "in_opener": 345,
-    "mid_game": 1108
+    "all": 1528,
+    "in_opener": 356,
+    "mid_game": 1172
    },
    "TSD": {
-    "all": 7029,
-    "in_opener": 1772,
-    "mid_game": 5257
+    "all": 7279,
+    "in_opener": 1830,
+    "mid_game": 5449
    },
    "TST": {
-    "all": 1245,
-    "in_opener": 1176,
-    "mid_game": 69
+    "all": 1293,
+    "in_opener": 1221,
+    "mid_game": 72
    },
    "mini_TSD": {
     "all": 0,
@@ -244,15 +250,15 @@
    },
    "other_scored": 0,
    "recon_disagreed": 0,
-   "unscored_past_prefix": 670
+   "unscored_past_prefix": 729
   }
  },
  "check": {
-  "tspin_clears_scored": 20947,
-  "reconstruction_agreed": 20947,
+  "tspin_clears_scored": 21764,
+  "reconstruction_agreed": 21764,
   "reconstruction_disagreed": 0,
-  "rowmap_steps": 370767,
-  "rowmap_unverified": 34,
+  "rowmap_steps": 386541,
+  "rowmap_unverified": 35,
   "by_session": {
    "2026-07-22": {
     "tspin_clears": 795,
@@ -469,6 +475,14 @@
      "pinglamb": 371,
      "yachi": 366
     }
+   },
+   "2026-11-26": {
+    "tspin_clears": 817,
+    "reconstruction_disagreed": 0,
+    "players": {
+     "pinglamb": 435,
+     "yachi": 382
+    }
    }
   }
  },
@@ -527,7 +541,7 @@
       "yachi": 0
      },
      "no_roof": {
-      "pinglamb": 212,
+      "pinglamb": 222,
       "yachi": 20
      },
      "t_overlap": {
@@ -536,8 +550,8 @@
      }
     },
     "orientation_baseline": {
-     "pinglamb": 435,
-     "yachi": 110
+     "pinglamb": 457,
+     "yachi": 116
     }
    }
   }
@@ -886,7 +900,25 @@
    "2026-11-25 m3r11 yachi lock 86",
    "2026-11-25 m4r1 pinglamb lock 39",
    "2026-11-25 m5r1 pinglamb lock 35",
-   "2026-11-25 m5r10 yachi lock 29"
+   "2026-11-25 m5r10 yachi lock 29",
+   "2026-11-26 m1r10 yachi lock 26",
+   "2026-11-26 m1r10 yachi lock 86",
+   "2026-11-26 m2r3 pinglamb lock 75",
+   "2026-11-26 m2r3 pinglamb lock 94",
+   "2026-11-26 m2r6 pinglamb lock 202",
+   "2026-11-26 m2r9 pinglamb lock 130",
+   "2026-11-26 m3r8 pinglamb lock 54",
+   "2026-11-26 m5r3 pinglamb lock 107",
+   "2026-11-26 m5r4 yachi lock 98",
+   "2026-11-26 m6r5 yachi lock 50",
+   "2026-11-26 m6r9 yachi lock 163",
+   "2026-11-26 m7r2 pinglamb lock 158",
+   "2026-11-26 m7r4 pinglamb lock 138",
+   "2026-11-26 m7r5 yachi lock 147",
+   "2026-11-26 m7r7 pinglamb lock 46",
+   "2026-11-26 m7r8 pinglamb lock 112",
+   "2026-11-26 m7r9 pinglamb lock 69",
+   "2026-11-26 m7r10 pinglamb lock 76"
   ],
   "recon_dropped_tsd": []
  },

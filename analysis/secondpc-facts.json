@@ -11,12 +11,12 @@
  "setups": 27,
  "solutions": 157,
  "pc_anchor": {
-  "rounds": 3912,
-  "rounds_agree": 3912,
-  "pcs_replay": 492,
+  "rounds": 4062,
+  "rounds_agree": 4062,
+  "pcs_replay": 525,
   "disagree": []
  },
- "sessions": 27,
+ "sessions": 28,
  "inputs": {
   "sessions": [
    {
@@ -153,6 +153,11 @@
     "session": "2026-11-25",
     "replays_md5": "548cb68a5dd9684ee84a6f36f231d4a5",
     "replay_facts_md5": "77e54fa9080e17584458dfbe8e119ee0"
+   },
+   {
+    "session": "2026-11-26",
+    "replays_md5": "d01f24b6610227c64eac1035f203b334",
+    "replay_facts_md5": "2cb4ae5af4da74208db58d34d101ad67"
    }
   ],
   "setups_md5": "fa919ccdb651e5c621b0945b43983666",
@@ -160,9 +165,9 @@
  },
  "by_player": {
   "pinglamb": {
-   "pc_points": 290,
-   "no_next_pc": 281,
-   "other_lines": 8,
+   "pc_points": 308,
+   "no_next_pc": 298,
+   "other_lines": 9,
    "garbage": 1,
    "rounds_rowmap_stops": 0,
    "cases": {
@@ -187,11 +192,11 @@
    }
   },
   "yachi": {
-   "pc_points": 202,
-   "no_next_pc": 198,
+   "pc_points": 217,
+   "no_next_pc": 213,
    "other_lines": 1,
    "garbage": 0,
-   "rounds_rowmap_stops": 31,
+   "rounds_rowmap_stops": 32,
    "cases": {
     "all": 3,
     "verified": 0

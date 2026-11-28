@@ -96,7 +96,7 @@ bun cross-extract.mjs   # how much of each quarantined section two engines agree
 `scan-firstdiv` showed the remaining divergences are dominated by garbage-insertion TIMING, not
 placement — no second `hoisted` to find. `cross-extract` then measured Triangle as a SECOND EXTRACTOR:
 over the verified prefix, sim and Triangle agree bit-exact on **96.8%** of locks, backing **96.7%** of
-forecast events and **95.5%** of opener rounds with an independent engine — the dual-implementation
+forecast events and **95.4%** of opener rounds with an independent engine — the dual-implementation
 evidence the quarantined sections are missing. Building that check exposed the oracle's own hole-pairing
 bug (the FIFO-vs-iid issue fixed above): before it, the one surviving forecast (`forecast_lineclear`)
 was flagged non-dual purely because the oracle mis-paired a garbage hole. The sim matched ground truth

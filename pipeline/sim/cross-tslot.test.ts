@@ -60,7 +60,7 @@ const SESSIONS = (sessionsOnDisk(SESSIONS_DIR).length
   ? assertCorpusIsEverySessionOnDisk(SESSIONS_DIR,
       ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14', '2026-08-19', '2026-08-25',
        '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17', '2026-09-18', '2026-09-19',
-       '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25'])
+       '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26'])
   : []).map(s => `${SESSIONS_DIR}/${s}`);
 const t = test as unknown as { skipIf: (c: boolean) => typeof test };
 const realData = t.skipIf(SESSIONS.length === 0);
@@ -172,7 +172,8 @@ realData('two methods, no shared code, disagree on nothing across the corpus', (
   // 2026-11-23: 285266 -> 298951 (13685 boards, 82 rounds), `unexplained` still EMPTY.
   // 2026-11-24: 298951 -> 311770 (12819 boards, 72 rounds), `unexplained` still EMPTY.
   // 2026-11-25: 311770 -> 323095 (11325 boards, 62 rounds), `unexplained` still EMPTY.
-  expect(both + oursOnly + ccOnly + neither).toBe(323095);
+  // 2026-11-26: 323095 -> 336413 (13318 boards, 75 rounds), `unexplained` still EMPTY.
+  expect(both + oursOnly + ccOnly + neither).toBe(336413);
 // Explicit timeout, following the slow corpus test in openers.test.ts. This walks every verified
 // board of every session — ~95 s at nine sessions — and bun's default per-test timeout is 5 s, so
 // without this it fails on elapsed time whatever the assertions say. Not a new cost: the same

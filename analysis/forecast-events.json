@@ -468,6 +468,21 @@
    "separation": 7,
    "mechanism": "line-clear",
    "mechanism_step": 66
+  },
+  {
+   "session": "2026-11-26",
+   "file": "replay-2026-11-26-01.ttrm",
+   "round_index0": 3,
+   "match": 1,
+   "round": 4,
+   "player": "yachi",
+   "lock": 131,
+   "roof_lock": 128,
+   "lines": 2,
+   "kind": "forecast_lineclear",
+   "separation": 3,
+   "mechanism": "line-clear",
+   "mechanism_step": 129
   }
  ]
 }
