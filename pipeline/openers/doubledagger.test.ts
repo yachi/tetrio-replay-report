@@ -8,7 +8,8 @@
  *      for every player (`donation.check`, `donation.players`), as `stsd.test.ts` holds it.
  *   3. THE PYTHON TWIN: `windowMatch` over every U-slot board of every committed `*-routes.json` fires on
  *      exactly the boards the gate records (`cross_source.fires` + `also`): harddrop's SDPC Spin, another
- *      author, draws this shape in its second C-Spin build.
+ *      author, draws this shape in its second C-Spin build (4), and the same author's 合掌TSD donation
+ *      drawings fire it too (2, in `also`, not an independent source).
  *   4. THE ROUTE ARTEFACTS: the one SDPC Spin round that reached that build (`3.second`) is measured over the
  *      bag harddrop draws the shape in, and named with what happened there.
  *   5. STMB CAVE IS NOT THIS: both pages lay the T flat, nub down; anchored on the same T the two windows
@@ -122,7 +123,7 @@ const CONTROLS = {
  *  exactly the headline's hits; the cleared rows (entailed by the clear) and the overhang row (which a TSD slot
  *  nearly always has) admit almost every full TSD. The overhang still has work to do: it is what tells the two
  *  hands apart (the `noRoof` mutant makes a lock match both, and the matcher refuses it). */
-const PART_ONLY = { cleared: 14587, overhang: 14583, lower: 53 };
+const PART_ONLY = { cleared: 15144, overhang: 15140, lower: 54 };
 
 /** Measured byte-identical on this corpus, each for its reason; asserted to STAY identical. */
 const EQUIVALENT: Record<string, string> = {
@@ -201,7 +202,7 @@ test('the Python twin: windowMatch fires on exactly the routes boards the gate r
   const want = [...TR.cross_source.fires, ...TR.cross_source.also]
     .map((e: any) => `${e.file} ${e.node} ${e.variant} ${e.mirrored}`);
   expect(got.sort()).toEqual(want.sort());
-  expect(want.length).toBe(4);
+  expect(want.length).toBe(6);
   expect(TR.cross_source.labelled_not_fired).toEqual([]);
 });
 

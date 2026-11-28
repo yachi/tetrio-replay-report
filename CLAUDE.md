@@ -520,6 +520,14 @@ bun pipeline/sim/emit-route-demos.ts --opener sdpcspin \
   --out analysis/sdpcspin-demos.json                            # the constructed SDPC Spin demos (quarantined, not corpus data); emit AFTER the facts
 bun test pipeline/openers/sdpcspin.test.ts pipeline/openers/sdpcspin-demos.test.ts  # its two tests
 python3 -m pipeline.sdpcspin_page --selftest    # the docs/sdpcspin*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_gasshotsd_routes            # CI gate: the 合掌TSDパフェ route transcription
+python3 -m pipeline.openers.extract_gasshotsd_routes --selftest #   its mutants; --html-dir <dir> re-checks gasshotsd.html
+bun pipeline/sim/emit-route-facts.ts --opener gasshotsd \
+  --out analysis/gasshotsd-facts.json                           # 合掌TSD's corpus route artefact (quarantined)
+bun pipeline/sim/emit-route-demos.ts --opener gasshotsd \
+  --out analysis/gasshotsd-demos.json                           # its constructed demos (quarantined, not corpus data); emit AFTER the facts
+bun test pipeline/openers/gasshotsd.test.ts pipeline/openers/gasshotsd-demos.test.ts  # its two tests
+python3 -m pipeline.gasshotsd_page --selftest   # the docs/gasshotsd*.html audit's mutants (--out-dir <dir> renders)
 python3 -m pipeline.openers.extract_stsd_shapes            # CI gate: the STSD technique transcription
 python3 -m pipeline.openers.extract_stsd_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch
 bun pipeline/sim/emit-technique-facts.ts --technique stsd \
@@ -936,6 +944,15 @@ equivalent marker pair.
   directory, an `ARTEFACTS` row and a `verify` matrix entry. While it existed it sat in `verify`
   and not in `pipeline`, so `build_report --check` never ran on it and its corpus-wide footnote
   had to be rebuilt by hand every time a session landed (nine times); a new subset has the same gap.
+- **Landing a session hand-pins the three forecast globs.** `bin/add-session-dates` appends the date
+  to every bracketed list of bare dates (its header; the command comment above says the literals
+  beside those lists are still measured by hand). `pipeline/sim/forecast-corpus.test.ts`,
+  `forecast-facts.test.ts` and `forecast-access-class.test.ts` discover `sessions/*` with
+  `readdirSync`. After the forecast artefacts are emitted, write the new session into
+  `forecast-corpus.test.ts`'s per-session maps (`PINNED_TOTALS` and the maps beside it), into
+  `forecast-facts.test.ts`'s `PATH_OPENED` (one row per directory on disk), and into
+  `forecast-access-class.test.ts` (`ACCESS_CLASS` when the sweep finds a new member, and the
+  `SESSIONS.length` pin, which counts directories).
 - **Every job but the two matrices (`verify`, `pipeline`) is repo-wide, and `bin/verify-repo` is what
   runs them** (twenty of the twenty-two on 2026-10-28, when the `lean` job landed — main already held 21 jobs while this read 「20」; eighteen of the twenty on 2026-10-16; this read 「Sixteen」 until then, and was already
   one short at nineteen jobs — derive it as the job count less two, never carry it). `bin/new-session`
@@ -3581,7 +3598,10 @@ metric's Double-first rounds instead (see 「定式路線頁」 and 「C-Spin �
 corpus barely plays; its test cross-checks against the ordering metric's Triple-first rounds. A
 sixth, SDPC Spin (`docs/sdpcspin.html`), has no column either (`wiki-openers.json` draws no SDPC
 field), and is the opener yachi's Double-first rounds actually are: its test cross-checks against the
-ordering metric's Double-first rounds both ways and against stick spin's bag-1 cases.
+ordering metric's Double-first rounds both ways and against stick spin's bag-1 cases. A seventh,
+合掌TSDパフェ (`docs/gasshotsd.html`), has no column either: the catalogue entry is the hole-empty
+基本形, not a harddrop field, and the corpus does not play it (`gasshotsd.test.ts` pins an empty
+case list).
 
 The repertoires split, reproduced independently in all twenty-three sessions (pinned in `openers.test.ts`):
 **pinglamb opens Honey Cup** more than yachi does, **yachi opens Mountainous Stacking** more than
@@ -4714,6 +4734,23 @@ no profile hashes). The five sibling transcription gates printed byte-identical 
 edited and the pre-edit `route_transcription.py` (compared with `cmp`), and `bin/build-docs --check`
 passed against the edited `route_page.py` before SDPC Spin was registered, so no sibling page moved.
 
+**Adding or editing a route.** The catalogue node (`catalogue.nodes`, rule 2 in
+`route_transcription.py`) is the hole-empty base: the check places a T in its `U` cells and compares
+occupancy with `opener-fields.json`. That `U` is the empty hole. An illustration that draws a `U`
+overlay, and a second colouring of the same occupancy, stay their own nodes. `pc_lines` is the height
+of the drawn body; `total_lines` is that height plus every earlier spin along the list's base chain
+(the extractors' `lines:` check, which `route_page.pc_lines_of` reads for the demo end). An opening
+TSD contributes 2, so a body of 2 is a total of 4 and a body of 4 is a total of 6. The classifier's
+height is `ROWS = 8` (`match.ts`, the same constant in `route_transcription.py`). A board with more
+than 8 non-empty rows carries an `unmatchable` reason. `matchAgainst` skips a taller board, and
+the grammar rejects a taller board that has no such reason. The facts artefact stores `routes_md5` of the whole routes
+JSON, so a metadata field such as `total_lines` moves that hash, and 意外 T-spin and 基本的なドネイト
+hash the route facts artefacts (`ROUTE_ARTEFACTS`). An edit to `route-facts.ts` itself is in every
+route profile's `hashFiles.classifier` and in each technique profile that lists the file, Double
+Dagger among them, and in the DPC and Second PC facts that share the technique digest. `bin/emit-corpus`
+rebuilds that corpus tier, which the daily schedule runs in full; follow it with
+`bin/verify-repo --check`. The hash-line check in the paragraph above is the sibling openers' pages.
+
 ### 迷走砲
 
 shiwehi.com's 迷走砲 page draws a tree: bag 1, five bag-2 branches, and the bag-3 Perfect Clear
@@ -5446,6 +5483,25 @@ false 「staircase over several locks」 example); that file is hashed, so all n
 demos' `classifier_md5` moved, and `git diff` shows those lines and nothing else. One shared TEST module was added too:
 `pipeline/openers/technique-donation-checks.ts` (`H`, `W`, `scored`, `donationVerdict`) is `parapet.test.ts`'s donation helper
 moved verbatim so `kaidan.test.ts` can import it, and `parapet.test.ts` imports it now; no artefact hashes it.
+
+### 合掌TSDパフェ（Gassho TSD）
+
+The seventh card under 定式路線, after SDPC Spin: `pipeline/openers/gasshotsd-routes.json` (gated by
+`extract_gasshotsd_routes.py` through the shared gate), `analysis/gasshotsd-facts.json`
+(`gasshotsd.test.ts`), `analysis/gasshotsd-demos.json` (`gasshotsd-demos.test.ts`), and
+`docs/gasshotsd.html` plus `gasshotsd-demos.html`. There is no node page: no corpus round reaches
+bag 1, and the shared renderer refuses a page with no case. Counts are read off the artefacts and
+tests, never typed here.
+
+It is a bag-1 opening, not a TST opener and not a mid-game technique. The catalogue node is
+`bag1.left`, the hole-empty 基本形 (Ivan's `Gassho TSD PC`); the TSD-overlay board is that shape
+with the hole drawn `U` and is an illustration, and the I-early board is the same occupancy coloured
+differently. The page's 「4ライン」 and 「6ライン」 count the TSD's two lines; the drawn bodies are
+2 rows and 4 rows. Under the ZJO heading the page says 「SLOを先置き」; that is named as the page's
+typo (`2.zjo.pc:slo_typo`), and the setup board stays O, J and Z. The 63-stack board is 9 rows and
+the REN-after board is 10, both `unmatchable`. Second-shade letters `h n k m r y u` are a later
+I O J L S Z T, read that way when a PC pattern is compared. The only built demo is the bag-1 基本形;
+every other drawing is named unbuilt with the reason.
 
 ### STMB Cave
 
@@ -6596,6 +6652,23 @@ figures are exact fractions re-derived by the page audit, floored for print.
 | pruned variants | `pipeline/sim/tst-d-rs` (binary `tst-d`, on `oracle-rs`; `Cargo.lock` committed) → `analysis/tst-openers-tp-x.json` (`tst-openers-tp-x/1`): every candidate board below the threshold that is a listed layout less one piece, with its cum per budget built by F1 from tst-d's bag-2 counts D and its own first-bag vector; X1-X5 in the emitter's docstring. `--x-verify` (tst-d against the committed cum on every kept board) is the hard gate, run offline; CI's `--check` re-derives the families from both files |
 | builds | `pipeline/sim/tst-build-rs` (binary `tst-build`) run by `pipeline/sim/emit-tst-builds.py` → `analysis/tst-openers-tp-builds.json` (`tst-openers-tp-builds/1`, constructed): per card and live class, one placement order the engine plays from empty (bag 1 first, soft-drop counts) ending on that class's tiling with the TST slot open. Clicking a class tile in 「睇晒 N 種收尾」 steps it and shows that class's worked PCs (yachi 2026-11-22: 「㩒去啲其他形，出咩好？ 3 巡PC 方法？」). The page audit (`audit_builds`) checks every build against the drawn grid, whole pieces, bag 1 first, soft-drop sums and the TST cells, and replays every worked PC; `--check` re-runs it in CI (about two minutes) |
 | dealing orders | `pipeline/sim/emit-tst-orders.py` runs `tst-build` with `ORDERS=1` → `analysis/tst-openers-tp-orders.json` (`tst-openers-tp-orders/5`, constructed): per card and live class, the set `w` of the 5040 dealt orders of bag 2 that build it (bag 1 on the board, the kind it left out in the hold, one hold slot, `tst2bag-tp-rs`'s FCounter restricted to that class's tilings; base64, one bit per order in the emitter's `perms()` order) and its counts with bag-2 soft drops <= 0, 1, 2, any; and per card a DECISION LIST `plans[card]` (yachi 2026-11-23: 「呢個組合先就砌呢個形，其他合就砌另個形」, superseding 11-23's per-class yes/no rules). It walks the live classes in class order (best p5 first) over U, the orders some class builds: each step is a greedy list of rules (conjunctions of at most `RULE_MAX` (3) precedences 「A dealt before B」, each minimal under dropping one precedence) whose orders inside U all build that class, a rule's count is what it adds when picked, and the step's orders leave U; `else` is a class building every order left, `open` what no step settles, `none` the orders no class builds. **Since schema /5 (2026-11-24, yachi: 「make sure 其他地方都冇呢個bug class」) the list walks ALL 5040 orders**: first `nr` rules decide orders no class builds (→ 砌唔到), and every rule and the `else` step is checked against every order still undecided. Before, they were checked against U alone, so a rule or `else` could hand unbuildable orders to a class (Tsar Cannon 1 without 180 read 「任何次序都」 over orders that build nothing); `none_open` counts unbuildable orders no rule decides. The list is at the ANY soft-drop budget (the page says so), not the page's default. Before writing, the emitter reproduces every board's `cum` at every class and budget from these strings and the bag-1 vectors (cum_b[k] = Σ_s n_s · #(orders whose least cost over live classes 0..k is <= b − s)); the order index is the emitter's, so the binary prints its own table (`PERMS=1`) and the emitter refuses to run unless it equals `perms()`. The class panel prints the list (three rules per step, the rest folded), each step's class a button opening that class's panel; `audit_orders` re-walks every plan from `w` (validity inside U, minimality, counts, step order, `else` coverage, `open`, `none`, the island). A `no180` section (yachi 2026-11-24: 「加埋如果冇180 rotation」) holds the same `orders` (no `pairs`; a class may have none) and `plans` with the engine's search run with `NO180=1`, i.e. no 180 rotation for any bag-2 piece; bag 1 is NOT recomputed (its vectors' crate is pinned elsewhere), and the panel's 有 180 / 冇 180 toggle says so. The audit walks both sections and requires every no-180 order of a class to build it with 180 too. `--check` re-runs it in CI (under a minute) |
+
+**Cataloguing a 52-cell finish.** `survey_ok` (`extract_tst_opener_shapes.py`) admits a shape when the
+cells are a whole number of tetrominoes, from 36 to 52, the stack is at most 8 rows, and no row is
+already full without the T. The counter then requires the stood T to be reachable as a full spin:
+`f.spin == 2` (`Spin::Normal` in `oracle-rs`; a mini is code 1), `tst_ok` in `tst2bag-rs` and
+`tst2bag-tp-rs`. A bag-1 board is kept when a search from empty builds it out of its own six pieces.
+A placement under a filled cell spends one soft drop (`SDB`), and that bag-1 cost is subtracted from
+the bag-2 budget (the hold-swap identity in the dealing-orders row), so a finish the survey accepts
+can still drop out of a tight budget.
+
+**Board names are regenerated, and mirror counts are per hand.** Kept boards are named on every emit,
+upper bound descending then board key (`emit-tst-openers-tp.py`: placed `t<i>`, held `h<i>`).
+`oracle-rs` kick order and spawn column differ by handedness, so a shape and its mirror are counted
+separately, and a mirror already in the catalogue is skipped (`1000 + id`). Adding a shape can change
+another board's upper bound, so the names, the competition ranks and the mirror partner move on boards
+whose pieces were not edited. The test pins a board by its pieces. Re-emit and read the whole artefact
+diff.
 
 Rules the page depends on, each of which a simplification would break:
 

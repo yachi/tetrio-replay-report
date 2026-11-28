@@ -90,7 +90,7 @@ const NODE_CASES: Record<string, number> = {
  *  PC patterns count the rounds that reached their anchor, so they are zero with the bag-2 boards. */
 const OPPORTUNITIES: Record<string, Record<string, number>> = {
   'bag1.left': { pinglamb: 1941, yachi: 1890 },
-  'bag1.l_top': { pinglamb: 1792, yachi: 1446 },
+  'bag1.l_top': { pinglamb: 1862, yachi: 1506 },
   'bag1.l_placed_elsewhere': { pinglamb: 1941, yachi: 1890 },
   '2.normal#1': { pinglamb: 0, yachi: 1 },
   '2.normal#2': { pinglamb: 0, yachi: 1 },

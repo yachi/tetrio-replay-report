@@ -1082,6 +1082,17 @@ const HIT_NOT_DONATION: string[] = [
   "2026-11-25 m4r10 yachi lock 74 (parapet: filled_above_window)",
   "2026-11-25 m4r11 yachi lock 109 (parapet_tss: filled_above_window)",
   "2026-11-25 m4r4 yachi lock 59 (parapet: filled_above_window)",
+  "2026-11-26 m1r7 pinglamb lock 46 (parapet: filled_above_window)",
+  "2026-11-26 m1r10 pinglamb lock 108 (parapet: filled_above_window)",
+  "2026-11-26 m1r11 yachi lock 75 (parapet_tss: filled_above_window)",
+  "2026-11-26 m1r11 yachi lock 129 (parapet_tss: filled_above_window)",
+  "2026-11-26 m2r8 yachi lock 19 (parapet: incomplete)",
+  "2026-11-26 m4r1 yachi lock 48 (parapet_tss: filled_above_window)",
+  "2026-11-26 m4r8 yachi lock 40 (parapet_tss: filled_above_window)",
+  "2026-11-26 m6r6 pinglamb lock 17 (parapet: filled_above_window)",
+  "2026-11-26 m6r7 yachi lock 69 (parapet_tss: filled_above_window)",
+  "2026-11-26 m6r9 yachi lock 160 (parapet_tss: filled_above_window)",
+  "2026-11-26 m7r2 yachi lock 82 (parapet: filled_above_window)",
 ];
 
 /** window_off_board, per variant and player: a count with a property check, not a list (see the header). */
@@ -1126,8 +1137,8 @@ const CONTROLS = {
  *  of the window — the rows above the cleared rows, the cleared rows, the rows under them (the well). The cleared
  *  rows are entailed by the clear (NaiveClauseForced) and do the least work; the well rows under them do the most.
  *  For the TSD the `no_roof` ablation (the window less the row above the T) is exactly `below`. */
-const PART_ONLY = { parapet: { above: 8357, cleared: 12857, below: 793 },
-                    parapet_tss: { above: 291, cleared: 706, below: 254 } };
+const PART_ONLY = { parapet: { above: 8664, cleared: 13325, below: 820 },
+                    parapet_tss: { above: 304, cleared: 740, below: 266 } };
 /** BT砲's window and this one agree, in the same hand, on every cell they share (the BT is built from the Parapet
  *  terrain): a lock that is a hit of both is possible, so it is named rather than asserted absent. */
 const BTCANNON_ALSO_PARAPET: string[] = [];
@@ -1584,7 +1595,8 @@ const QUALIFIED_HITS = [
   '2026-10-22 m4r5 pinglamb lock 36 (parapet)', '2026-10-22 m8r1 yachi lock 54 (parapet)',
   '2026-11-01 m7r3 yachi lock 76 (parapet_tss)', '2026-11-01 m15r1 yachi lock 29 (parapet_tss)',
   '2026-11-23 m1r3 yachi lock 60 (parapet_tss)', '2026-11-23 m4r1 pinglamb lock 27 (parapet)',
-  '2026-11-24 m3r6 pinglamb lock 6 (parapet)', '2026-11-24 m4r4 yachi lock 123 (parapet_tss)'];
+  '2026-11-24 m3r6 pinglamb lock 6 (parapet)', '2026-11-24 m4r4 yachi lock 123 (parapet_tss)',
+  '2026-11-26 m4r6 yachi lock 228 (parapet_tss)', '2026-11-26 m6r7 yachi lock 69 (parapet_tss)'];
 /** Hits failing one rule and nothing else; `fragment` and `garbage_in_shape` alone fail none (every such hit also
  *  has its L split), which is why the rule-off check below turns them off beside `allowSplitL`. */
 const ONLY: Record<string, string[]> = {
@@ -1596,7 +1608,8 @@ const ONLY: Record<string, string[]> = {
     '2026-09-19 m18r2 pinglamb lock 120 (parapet)', '2026-10-03 m5r4 yachi lock 75 (parapet_tss)',
     '2026-10-20 m4r7 yachi lock 92 (parapet)', '2026-10-22 m7r1 yachi lock 17 (parapet)',
     '2026-10-29 m3r2 yachi lock 179 (parapet)', '2026-10-29 m9r8 pinglamb lock 109 (parapet)',
-    '2026-11-05 m6r7 pinglamb lock 24 (parapet_tss)', '2026-11-25 m4r10 yachi lock 74 (parapet)'],
+    '2026-11-05 m6r7 pinglamb lock 24 (parapet_tss)', '2026-11-25 m4r10 yachi lock 74 (parapet)',
+    '2026-11-26 m4r8 yachi lock 40 (parapet_tss)'],
   dpc: [
     '2026-08-14 m6r8 pinglamb lock 27 (parapet_tss)'],
   ownership_unverified: [
@@ -1605,7 +1618,8 @@ const ONLY: Record<string, string[]> = {
   not_whole_shape: [
     '2026-07-28 m6r5 yachi lock 185 (parapet_tss)', '2026-10-09 m7r7 yachi lock 42 (parapet_tss)',
     '2026-10-29 m1r1 yachi lock 93 (parapet_tss)', '2026-10-29 m5r3 yachi lock 72 (parapet_tss)',
-    '2026-11-23 m4r11 yachi lock 63 (parapet_tss)'],
+    '2026-11-23 m4r11 yachi lock 63 (parapet_tss)',
+    '2026-11-26 m6r9 yachi lock 160 (parapet_tss)'],
   fragment: [],
   garbage_in_shape: [],
 };
