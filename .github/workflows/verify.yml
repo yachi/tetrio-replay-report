@@ -1705,12 +1705,14 @@ jobs:
   typescript:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
-    # Two shards, each a runner of its own: bun splits the test FILES between them
-    # (`--shard=k/2`), and the step after the suite checks each ran its share.
+    # Four shards, each a runner of its own: bun splits the test FILES between them
+    # (`--shard=k/4`), and the step after the suite checks each ran its share. Two shards left one
+    # runner at ~7.5 min of a ~34 CPU-min suite on 4 cores (2026-11-28); with four, a shard is
+    # bounded by its longest single file rather than by its share of the CPU.
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2]
+        shard: [1, 2, 3, 4]
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -1822,27 +1824,27 @@ jobs:
         run: |
           set -euo pipefail
           if [ "$GITHUB_EVENT_NAME" = schedule ]; then export ORACLE_CACHE=off ORACLE_NATIVE_FULL=1 FORECAST_NATIVE_FULL=1 REPLAY_NATIVE_FULL=1 REACH_NATIVE_FULL=1 ATTACK_NATIVE_FULL=1 FINESSE_NATIVE_FULL=1; fi
-          REPLAY_DIR=sessions/2026-07-22 bun test --parallel --shard=${{ matrix.shard }}/2 2>&1 | tee "$RUNNER_TEMP/bun-shard.log"
+          REPLAY_DIR=sessions/2026-07-22 bun test --parallel --shard=${{ matrix.shard }}/4 2>&1 | tee "$RUNNER_TEMP/bun-shard.log"
 
       # A shard that ran fewer files than its share would read green over tests nobody ran. bun
-      # prints `--shard=k/2: running X/Y test files`; Y must be every test file git tracks (the count
-      # is re-derived here, never typed) and X the share bun's split gives shard k: ceil for 1, floor
-      # for 2, so the two shards together run all Y.
+      # prints `--shard=k/n: running X/Y test files`; Y must be every test file git tracks (the count
+      # is re-derived here, never typed) and X the share bun's round-robin split gives shard k,
+      # (Y + n - k) // n, so the n shards together run all Y. n is the 4 of `--shard=k/4` and of the matrix above; change all three together.
       - name: Check the shard ran its share of the test files
         if: env.INPUTS_UNCHANGED != '1'
         run: |
           set -euo pipefail
-          python3 - "${{ matrix.shard }}" "$RUNNER_TEMP/bun-shard.log" <<'EOF'
+          python3 - "${{ matrix.shard }}" 4 "$RUNNER_TEMP/bun-shard.log" <<'EOF'
           import re, subprocess, sys
-          k, log = int(sys.argv[1]), open(sys.argv[2], encoding='utf-8', errors='replace').read()
-          m = re.search(r'--shard=%d/2: running (\d+)/(\d+) test files' % k, log)
+          k, n, log = int(sys.argv[1]), int(sys.argv[2]), open(sys.argv[3], encoding='utf-8', errors='replace').read()
+          m = re.search(r'--shard=%d/%d: running (\d+)/(\d+) test files' % (k, n), log)
           if not m:
-              sys.exit(f'no `--shard={k}/2: running X/Y test files` line in the bun output')
+              sys.exit(f'no `--shard={k}/{n}: running X/Y test files` line in the bun output')
           x, y = int(m[1]), int(m[2])
           tracked = subprocess.run(['git', 'ls-files'], capture_output=True, text=True, check=True).stdout.split('\n')
           want = sum(1 for f in tracked if re.search(r'(\.|_)(test|spec)\.(ts|tsx|js|mjs|cjs|jsx)$', f))
-          share = (y + 2 - k) // 2
-          print(f'shard {k}/2 ran {x} of {y} test files; git tracks {want}; its share is {share}')
+          share = (y + n - k) // n
+          print(f'shard {k}/{n} ran {x} of {y} test files; git tracks {want}; its share is {share}')
           if y != want or x != share:
               sys.exit('FAIL: the shard did not run its share of the tracked test files')
           EOF
