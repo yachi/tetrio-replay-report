@@ -38,6 +38,7 @@ from decimal import Decimal
 import html
 import itertools
 import json
+import marshal
 import os
 import re
 import shutil
@@ -186,8 +187,9 @@ def load_inputs(repo=REPO):
     return art, cat
 
 
+@_idmemo
 def all_boards(art):
-    """name -> board over the kept boards and the extra ones (`analysis/tst-openers-tp-x.json`: the variants of a family
+    """Memoised by identity (callers only read it). name -> board over the kept boards and the extra ones (`analysis/tst-openers-tp-x.json`: the variants of a family
     layout the pruning dropped, counted so the family figures are exact). Extra boards have no card and no rank."""
     by = {b["name"]: b for b in art["boards"]}
     for b in art.get("xboards", []):
@@ -303,11 +305,17 @@ def deltas(b, k):
 
 
 @_idmemo
+def _pc3n(b, k):
+    """The joint's numerator over 5040^3: sum(delta * p5) over the classes."""
+    d = deltas(b, k)
+    return sum(d[i] * p5 for i, (_s, _l, p5) in enumerate(b["classes"]))
+
+
+@_idmemo
 def figs(b, k):
     """(built, pc3n, joint) of board `b` at budget `k`, exact: built = cum[-1] / 5040^2, joint = sum(delta * p5) / 5040^3
     (the chance that bag 1 as drawn and a random bag 2 build a shape AND bag 3 clears), pc3 = joint / built."""
-    d = deltas(b, k)
-    n = sum(d[i] * p5 for i, (_s, _l, p5) in enumerate(b["classes"]))
+    n = _pc3n(b, k)
     return Fraction(b["cum"][k][-1], N2), n, Fraction(n, N2 * BAG)
 
 
@@ -420,7 +428,19 @@ def _b1_cat_name(n):
     return " / ".join(re.sub(r"\s*\{.*?\}", "", part).strip() for part in n.split(" / "))
 
 
+_B1LIB = {}
+
+
 def bag1_library(repo=REPO):
+    """The library is read from committed files only, so it is built once per process and the SAME list is returned to every
+    caller (which is also what lets `bag1_names`' identity memo hit across audits). Callers only iterate it."""
+    hit = _B1LIB.get(repo)
+    if hit is None:
+        hit = _B1LIB[repo] = _bag1_library(repo)
+    return hit
+
+
+def _bag1_library(repo):
     """[(name, source, by_letter, normalised drawing, kind)] of every named opener's bag-1 board, as drawn and mirrored:
     route pages and harddrop's fields by letter, Ivan's catalogue by occupancy only. A 24-cell drawing holding a T is a
     `placed` board (the T is one of the six pieces); a 24-cell drawing with NO T, and a 28-cell drawing less its T cells,
@@ -474,15 +494,18 @@ def bag1_library(repo=REPO):
     return lib
 
 
-@_idmemo
-def bag1_names(b, lib):
-    """(names whose bag 1 equals the board letter for letter, catalogue names equal by occupancy only), each deduplicated."""
+def _b1_board(b):
     c = {}
     for k, cs in b["pieces"]:
         for i in cs:
             c[(i % 10, i // 10)] = k
     f = _b1_norm(c)
-    occ = frozenset(p for p, _ in f)
+    return f, frozenset(p for p, _ in f)
+
+
+def bag1_names_ref(b, lib):
+    """The reference scan `bag1_names` answers from an index: every library entry compared with the board in turn."""
+    f, occ = _b1_board(b)
     ex, same = [], []
     for nm, _src, by_letter, d, kd in lib:
         if kd != b["kind"]:
@@ -492,6 +515,30 @@ def bag1_names(b, lib):
         elif not by_letter and frozenset(p for p, _ in d) == occ and nm not in same:
             same.append(nm)
     return ex, same
+
+
+@_idmemo
+def _bag1_index(lib):
+    """{(kind, drawing): names} of the by-letter entries and {(kind, occupancy): names} of the catalogue ones, each list
+    deduplicated in library order, which is the order the reference scan appends in."""
+    ex, same = {}, {}
+    for nm, _src, by_letter, d, kd in lib:
+        if by_letter:
+            lst = ex.setdefault((kd, d), [])
+        else:
+            lst = same.setdefault((kd, frozenset(p for p, _ in d)), [])
+        if nm not in lst:
+            lst.append(nm)
+    return ex, same
+
+
+@_idmemo
+def bag1_names(b, lib):
+    """(names whose bag 1 equals the board letter for letter, catalogue names equal by occupancy only), each deduplicated.
+    Answered from `_bag1_index`; the selftest holds it equal to `bag1_names_ref` on every board."""
+    f, occ = _b1_board(b)
+    ix, iy = _bag1_index(lib)
+    return list(ix.get((b["kind"], f), ())), list(iy.get((b["kind"], occ), ()))
 
 
 def routed(cat, b):
@@ -1807,14 +1854,14 @@ def audit_layouts_into(art, bad):
             bad.append(f"{tag}: fewer than two variants, or two holding the same piece")
         for k in BK:
             bn, pn = L["num"][k]
-            js = [Fraction(figs(v, k)[1], N2 * BAG) for v in vs]
-            bs = [figs(v, k)[0] for v in vs]
-            joint, built = Fraction(pn, N2 * BAG), Fraction(bn, N2)
+            # every joint shares the denominator N2 * BAG and every built N2, so the sandwich is compared on the numerators
+            js = [_pc3n(v, k) for v in vs]
+            bs = [v["cum"][k][-1] for v in vs]
             if len(L["pick"][k]) != len(vs) or sum(L["pick"][k]) > BAG or any(x < 0 for x in L["pick"][k]):
                 bad.append(f"{tag}: the picked orders at budget {k} are not within the {BAG} first-bag orders")
-            if vs and not (max(js) <= joint <= min(Fraction(1), sum(js))):
+            if vs and not (max(js) <= pn <= min(N2 * BAG, sum(js))):
                 bad.append(f"{tag}: the family joint at budget {k} is outside the sandwich of its variants")
-            if vs and not (built <= min(Fraction(1), sum(bs))):
+            if vs and not (bn <= min(N2, sum(bs))):
                 bad.append(f"{tag}: the family built at budget {k} exceeds the sum of its variants")
             if bn > N2 or (pn > 0 and bn == 0):  # a family can build at a budget whose classes never clear (PC 0)
                 bad.append(f"{tag}: built / PC counts at budget {k} disagree")
@@ -1850,7 +1897,7 @@ def audit_orders(island, R, orders):
         for q in c:
             m &= pre[q]
         return m
-    pc = lambda x: bin(x).count("1")
+    pc = int.bit_count
     for r, _ in R:
         c = island["cards"].get(r["name"], {})
         lv = live(r)
@@ -2025,6 +2072,9 @@ def audit(page, art, cat, PR, pcxd=None, builds=None, L=None, orders=None):
     if "4 巡" in page or "第 4 包" in page:
         bad.append("the page mentions a 4th bag: this page counts bag 3 only")
     rkm = {r["name"]: rk[BK_SHOWN][i] for i, (r, _) in enumerate(R)}
+    card_at = {}  # name -> where `data-card="name"` first occurs, i.e. page.index of it, found in one pass
+    for cm in _CARDAT.finditer(page):
+        card_at.setdefault(cm.group(1), cm.start())
     for n, (name, rkt, body) in enumerate(cards):
         r, m = R[n]
         f = {k: re.sub(r"<[^>]+>", "", html.unescape(v)) for k, v in OP._FIG.findall(body)}
@@ -2063,7 +2113,7 @@ def audit(page, art, cat, PR, pcxd=None, builds=None, L=None, orders=None):
             bad.append(f"card {name}: the title does not name the hold piece")
         if rkt != rk[BK_SHOWN][n]:
             bad.append(f"card {name}: the opening rank {rkt} is not the recomputed {rk[BK_SHOWN][n]}")
-        shown_rk = re.search(r'<div class="rk num">(.*?)</div>', page[page.index(f'data-card="{name}"'):], re.S).group(1)
+        shown_rk = _RKNUM.search(page, card_at[name]).group(1)
         if shown_rk != rkt:
             bad.append(f"card {name}: the rank badge and its data-rk differ")
         mm = _MIR.search(body)
@@ -2328,13 +2378,23 @@ def ex_set(art_by, vecs, names, bk, pt=None):
 _SX_MEMO = {}
 
 
+_CARDAT = re.compile(r'data-card="([^"]*)"')
+_RKNUM = re.compile(r'<div class="rk num">(.*?)</div>', re.S)
+
+
+@_idmemo
+def _art_digest(art):
+    """The whole artefact's digest, once per artefact object (a corrupted copy is a new object and is hashed afresh)."""
+    return hashlib.md5(json.dumps(art, sort_keys=True).encode()).digest()
+
+
 def audit_sets(page, art, cat, PR, L):
     sx = page[page.find('<section class="sx"'):page.find("</section>", page.find('<section class="sx"')) + 10]
     isl = _SXISL.search(page)
     bar = page.find('<div class="bar" data-bar="sd">') > page.find("<main>")
     key = (hashlib.sha256((sx + (isl.group(1) if isl else "") + str(bar) + str(page.count('<div class="bar" data-bar="sd">'))
                            + str(page.find('<div class="bar" data-bar="sd">') > page.find('<section class="sx"'))).encode()).digest(),
-           id(L["S"]), json.dumps(art["boards"][:1], sort_keys=True), hashlib.md5(json.dumps(art, sort_keys=True).encode()).digest())
+           id(L["S"]), json.dumps(art["boards"][:1], sort_keys=True), _art_digest(art))
     if key not in _SX_MEMO:
         try:
             _SX_MEMO[key] = _audit_sets(page, art, cat, PR, L)
@@ -2546,14 +2606,22 @@ def site_card(inputs=None, prose=None):
 
 def _dc(x):
     """copy.deepcopy for the JSON-shaped graphs the selftest corrupts (dict / list / tuple / scalars, no shared sub-objects:
-    checked on every input it is used for), several times faster because it keeps no memo; anything else falls back."""
+    checked on every input it is used for). A marshal round trip copies such a graph in C; a graph marshal refuses falls
+    back to the walk below, which keeps no memo."""
+    try:
+        return marshal.loads(marshal.dumps(x))
+    except ValueError:
+        return _dc_walk(x)
+
+
+def _dc_walk(x):
     t = type(x)
     if t is dict:
-        return {k: _dc(v) for k, v in x.items()}
+        return {k: _dc_walk(v) for k, v in x.items()}
     if t is list:
-        return [_dc(v) for v in x]
+        return [_dc_walk(v) for v in x]
     if t is tuple:
-        return tuple(_dc(v) for v in x)
+        return tuple(_dc_walk(v) for v in x)
     if x is None or t in (str, int, float, bool):
         return x
     return copy.deepcopy(x)
@@ -2610,6 +2678,10 @@ class _ForkPool:
 
 def selftest(repo=REPO):
     art, cat = load_inputs(repo)
+    # the indexed bag-1 lookup must answer exactly what the reference scan answers, on every kept board and a stride of the rest
+    lib = bag1_library(repo)
+    for b in art["boards"] + art["xboards"][::7]:
+        _need(bag1_names(b, lib) == bag1_names_ref(b, lib), f"bag1_names disagrees with bag1_names_ref on {b.get('name')}")
     PR = load_prose()
     pcxd = load_pcx(repo)
     Lsets = load_sets(repo)
