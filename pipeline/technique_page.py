@@ -231,7 +231,8 @@ class TechniqueSite:
 
     def _qualified_only(self, art, n, showcase=None):
         out = {"qualified": str(n)}
-        if self.p.split_field:
+        if self.p.split_field and n:
+            # (no qualifying hit: no split to state, and none is printed)
             out.update({f"split.{v}": str(k) for v, k in self.split_counts(art).items()})
         if self.p.showcase:
             # the showcase under `corpus_qualified_only` ranges over the qualifying hits of the primary variant
@@ -710,7 +711,7 @@ class TechniqueSite:
                 + ([f'    <p>{_esc(Q["split"]["lead"])}' + _esc(Q["split"]["join"]).join(
                     f'{_esc(w)}<span data-figure="split.{_esc(v)}">{_esc(fig["split." + v])}</span>'
                     f'{_esc(Q["summary_unit"])}' for v, w in Q["split"]["values"]) + '</p>']
-                   if self.p.split_field else [])
+                   if any(k.startswith("split.") for k in fig) else [])
                 + [f'    <p>{_esc(Q["summary_note"])}</p>', "  </section>"])
 
     def _qualify_section(self, art, fig, users):
@@ -1576,5 +1577,8 @@ def site_card(site, art):
            "kicker": card["kicker"], "title": site.PROSE["overview_title"], "blurb": card["blurb"]}
     if site.p.split_field:
         # opt-in: the qualifying count split by the profile's field, words from the prose's index_card.split
-        out["meta_note"] = card["split"].format(**site.split_counts(art))
+        # (no qualifying hit: no split to state)
+        counts = site.split_counts(art)
+        if sum(counts.values()):
+            out["meta_note"] = card["split"].format(**counts)
     return out

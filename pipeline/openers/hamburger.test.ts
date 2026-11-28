@@ -25,7 +25,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { build, serialise, digestCorpus, prepare, windowMatch, type Mutants, type TechDigest, type Cell }
   from '../sim/technique-facts.ts';
 import { HAMBURGER } from '../sim/technique-profile-hamburger.ts';
-import { hamburgerCover, withMidGameOnly } from '../sim/hamburger-cover.ts';
+import { hamburgerCover, withMidGameOnly, hamburgerStackedOn, withStackedOnly } from '../sim/hamburger-cover.ts';
 import { TECHNIQUES } from '../sim/techniques.ts';
 import { assertCorpusIsEverySessionOnDisk } from '../corpus-membership.ts';
 import { checkNamedList, checkScoredAgainstOpenerFacts, checkHitPositions } from './technique-facts-checks.ts';
@@ -155,19 +155,12 @@ const OPENER_OTHER_HITS: string[] = [
   '2026-10-29 m1r1 yachi lock 13',
   '2026-11-01 m18r5 yachi lock 19',
 ];
-const QUALIFIED_MID_GAME: string[] = [
-  '2026-08-25 m6r7 pinglamb lock 115',
-  '2026-09-18 m3r2 yachi lock 66',
-  '2026-09-18 m8r1 yachi lock 38',
-  '2026-09-18 m11r1 yachi lock 207',
-  '2026-09-19 m10r2 pinglamb lock 27',
-  '2026-10-03 m10r6 yachi lock 28',
-  '2026-11-01 m14r3 yachi lock 54',
-  '2026-11-01 m14r4 pinglamb lock 91',
-  '2026-11-23 m4r3 yachi lock 87',
-  '2026-11-25 m2r1 yachi lock 259',
-  '2026-11-27 m2r3 yachi lock 75',
-];
+/** none since 2026-11-28 (yachi: a Hamburger needs at least a second stacked TSS layer); the eleven that qualified before
+ *  fail `not_stacked` only. */
+const QUALIFIED_MID_GAME: string[] = [];
+/** the hits standing on an earlier TSS layer: the previous T's three-cell residue two rows under the nub (the page's
+ *  Repeat board), by `hamburgerStackedOn`. */
+const STACKED: string[] = ['2026-09-10 m1r7 yachi lock 55 on 43'];
 const COVER_NOT_ONE_SZ_OR_NULL: string[] = [
   '2026-08-19 m9r4 yachi lock 35 (null)',
   '2026-08-25 m6r7 pinglamb lock 115 (complete_pieces)',
@@ -192,11 +185,7 @@ const AT_VERIFIED_EDGE: string[] = [
   '2026-10-12 m7r5 yachi lock 84 (not_complete)',
   '2026-11-25 m2r1 yachi lock 259 (complete_pieces)',
 ];
-const QUALIFIED_PAYOFF_FIRED: string[] = [
-  '2026-11-01 m14r4 pinglamb lock 91',
-  '2026-11-23 m4r3 yachi lock 87',
-  '2026-11-27 m2r3 yachi lock 75',
-];
+const QUALIFIED_PAYOFF_FIRED: string[] = [];
 
 const OPP_DENOM = { pinglamb: { all: 933, in_opener: 130, mid_game: 803 }, yachi: { all: 1586, in_opener: 365, mid_game: 1221 } };
 const HITS = { pinglamb: { all: 49, in_opener: 5, mid_game: 44, mirrored: 17, garbage_in_window: 39 },
@@ -204,12 +193,12 @@ const HITS = { pinglamb: { all: 49, in_opener: 5, mid_game: 44, mirrored: 17, ga
 /** the payoff: `well_covered` / `well_filled_not_i` are another layer of the stacking (the page's Repeat) */
 const PAYOFF = { pinglamb: { fired: 26, not_fired: { i_in_well_not_quad: 5, well_covered: 6, well_filled_not_i: 12 } },
                  yachi: { fired: 41, not_fired: { i_in_well_not_quad: 17, past_verified: 8, round_ended: 1, well_covered: 20, well_filled_not_i: 120 } } };
-const QUALIFY = { pinglamb: { qualified: 3, not_qualified: { dpc: 1, fragment: 33, garbage_in_shape: 8, in_opener: 5 } },
-                  yachi: { qualified: 8, not_qualified: { dpc: 2, fragment: 82, garbage_in_shape: 13, in_opener: 105, ownership_unverified: 2 } } };
+const QUALIFY = { pinglamb: { qualified: 0, not_qualified: { dpc: 1, fragment: 33, garbage_in_shape: 8, in_opener: 5, not_stacked: 49 } },
+                  yachi: { qualified: 0, not_qualified: { dpc: 2, fragment: 82, garbage_in_shape: 13, in_opener: 105, not_stacked: 206, ownership_unverified: 2 } } };
 /** cover kind per player, over every hit and over the qualifying ones */
 const COVER: Record<string, any> = {
-  pinglamb: { all: { complete_pieces: 2, not_complete: 40, one_sz: 7 }, qualified: { complete_pieces: 2, one_sz: 1 } },
-  yachi: { all: { complete_pieces: 2, not_complete: 95, null: 2, one_sz: 108 }, qualified: { complete_pieces: 2, one_sz: 6 } },
+  pinglamb: { all: { complete_pieces: 2, not_complete: 40, one_sz: 7 }, qualified: {} },
+  yachi: { all: { complete_pieces: 2, not_complete: 95, null: 2, one_sz: 108 }, qualified: {} },
 };
 const CONTROLS = {under: {TSD: {pinglamb: 0, yachi: 0}, TST: {pinglamb: 0, yachi: 0}, mini_TSS: {pinglamb: 0, yachi: 0}, mini_TSD: {pinglamb: 0, yachi: 0}}, ablation: {no_must_empty: {pinglamb: 393, yachi: 583}, no_roof: {pinglamb: 49, yachi: 208}, t_overlap: {pinglamb: 53, yachi: 212}}, orientation_baseline: {pinglamb: 212, yachi: 647}};
 /** full TSSs whose anchored T meets ONE row of the window: `above` the row over the arms, `arms` the T's arm row,
@@ -345,6 +334,22 @@ test('mid-game only: every opener hit fails in_opener and nothing else fails it;
   expect(withMidGameOnly(ok)({ in_opener: false }, null)).toEqual({ qualifies: true, not_qualified: [] });
   expect(withMidGameOnly(inner)({ in_opener: true }, null)).toEqual({ qualifies: false, not_qualified: ['x', 'in_opener'] });
 });
+
+test('stacked: re-derived from every digest; not_stacked iff no earlier layer; the wrapper adds exactly that', () => {
+  const a = art();
+  const byKey = new Map(digests().map(d => [`${d.file}|${d.round}|${d.user}`, d]));
+  for (const h of a.hits) {
+    const d = byKey.get(`${h.file}|${h.round_index0}|${h.player}`)!;
+    expect(hamburgerStackedOn(h, d), qName(h)).toBe(h.stacked_on);
+    expect(h.not_qualified.includes('not_stacked'), qName(h)).toBe(h.stacked_on === null);
+  }
+  expect(a.hits.filter((h: any) => h.stacked_on !== null).map((h: any) => `${qName(h)} on ${h.stacked_on}`)).toEqual(STACKED);
+  // a qualifier must stand on a layer
+  expect(a.hits.some((h: any) => h.qualifies && h.stacked_on === null)).toBe(false);
+  const ok = (h: any) => ({ qualifies: true, not_qualified: [] as string[] });
+  const h0 = { lock: 0 } as any;
+  expect(withStackedOnly(ok)(h0, null as any)).toEqual({ qualifies: false, not_qualified: ['not_stacked'], stacked_on: null });
+}, 600_000);
 
 test('the cover: re-derived from every digest; whole pieces on every qualifying hit; the split pinned', () => {
   const a = art();

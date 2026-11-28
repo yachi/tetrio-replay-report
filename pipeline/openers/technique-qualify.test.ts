@@ -42,7 +42,7 @@ const BY_PLAYER: Record<string, any> = {
   dtcannon: { pinglamb: { qualified: 0, not_qualified: {} }, yachi: { qualified: 34, not_qualified: { ownership_unverified: 1 } } },
   kingcrimson: { pinglamb: { qualified: 1, not_qualified: {} }, yachi: { qualified: 0, not_qualified: {} } },
   cavetsstst: { pinglamb: { qualified: 1, not_qualified: {} }, yachi: { qualified: 0, not_qualified: {} } },
-  hamburger: { pinglamb: { qualified: 3, not_qualified: { dpc: 1, fragment: 33, garbage_in_shape: 8, in_opener: 5 } }, yachi: { qualified: 8, not_qualified: { dpc: 2, fragment: 82, garbage_in_shape: 13, in_opener: 105, ownership_unverified: 2 } } },
+  hamburger: { pinglamb: { qualified: 0, not_qualified: { dpc: 1, fragment: 33, garbage_in_shape: 8, in_opener: 5, not_stacked: 49 } }, yachi: { qualified: 0, not_qualified: { dpc: 2, fragment: 82, garbage_in_shape: 13, in_opener: 105, not_stacked: 206, ownership_unverified: 2 } } },
 };
 
 /** every hit that does not qualify, with its reasons (階段のドネイト and ハンバーガー: the tally above only) */
@@ -216,10 +216,10 @@ test('qualify: every committed verdict is the hook\'s, and each rule turned off 
      ['fragment', 'garbage_in_shape', 'z_not_one_piece', 'dpc', 'not_whole_shape']],
   ];
   const live = new Set<string>();
-  // ハンバーガー's `in_opener` is its own wrapper (hamburger-cover.ts's withMidGameOnly), outside this module's rules:
-  // read every verdict without it, and hamburger.test.ts checks the wrapper
+  // ハンバーガー's `in_opener` and `not_stacked` are its own wrappers (hamburger-cover.ts's withMidGameOnly and
+  // withStackedOnly), outside this module's rules: read every verdict without them, and hamburger.test.ts checks them
   const generic = (h: any) => {
-    const nq = h.not_qualified.filter((x: string) => x !== 'in_opener');
+    const nq = h.not_qualified.filter((x: string) => x !== 'in_opener' && x !== 'not_stacked');
     return { ...h, qualifies: nq.length === 0, not_qualified: nq };
   };
   for (const k of KEYS) {
