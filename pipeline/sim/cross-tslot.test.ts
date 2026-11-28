@@ -60,7 +60,7 @@ const SESSIONS = (sessionsOnDisk(SESSIONS_DIR).length
   ? assertCorpusIsEverySessionOnDisk(SESSIONS_DIR,
       ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14', '2026-08-19', '2026-08-25',
        '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17', '2026-09-18', '2026-09-19',
-       '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26'])
+       '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26', '2026-11-27'])
   : []).map(s => `${SESSIONS_DIR}/${s}`);
 const t = test as unknown as { skipIf: (c: boolean) => typeof test };
 const realData = t.skipIf(SESSIONS.length === 0);
@@ -94,8 +94,20 @@ realData('two methods, no shared code, disagree on nothing across the corpus', (
     }
   }
   // A shape cold-clear recognises that our search cannot reach at all would be a real defect in
-  // the probe every published figure rests on. There are none.
-  expect(unexplained).toEqual([]);
+  // the probe every published figure rests on. Each one is named here with how it was checked, never
+  // absorbed under a bound (the DT_ORDER_IN_OPENER rule): a new one is a red build to investigate.
+  //
+  // 2026-11-27 m1r4 pinglamb lock 36, the first in twenty-eight sessions to reach this list. cold-clear's
+  // `tst_twist_right@3` matches the column heights of the col-3 well under the S just locked. Checked on
+  // 2026-11-28 by a THIRD search, the vendored Triangle engine's own moves (route-demos.ts `searchAll`,
+  // with and without the 180 edge): no resting T placement is credited a spin. A rotation does reach a
+  // spin position that would complete one row, but the cell under it is open, so the T falls on and
+  // loses the rotation. So our search is right and cold-clear's height pattern over-counts. The shared
+  // sanction now names that case (`floatingSpinLines` in tslot-sanction.ts, tested on this board in
+  // tslot-sanction.test.ts), so the board is sanctioned and this list is empty again. A new entry is
+  // still a red build to investigate.
+  const CC_OVERCOUNT: string[] = [];
+  expect(unexplained).toEqual(CC_OVERCOUNT);
 
   // Anti-vacuity: a port that silently detected nothing would agree with everything above. These
   // pin that both methods are actually firing, and roughly how often.
@@ -173,7 +185,8 @@ realData('two methods, no shared code, disagree on nothing across the corpus', (
   // 2026-11-24: 298951 -> 311770 (12819 boards, 72 rounds), `unexplained` still EMPTY.
   // 2026-11-25: 311770 -> 323095 (11325 boards, 62 rounds), `unexplained` still EMPTY.
   // 2026-11-26: 323095 -> 336413 (13318 boards, 75 rounds), `unexplained` still EMPTY.
-  expect(both + oursOnly + ccOnly + neither).toBe(336413);
+  // 2026-11-27: 336413 -> 347099 (10686 boards, 61 rounds); `unexplained` holds one named cold-clear over-count (CC_OVERCOUNT above).
+  expect(both + oursOnly + ccOnly + neither).toBe(347099);
 // Explicit timeout, following the slow corpus test in openers.test.ts. This walks every verified
 // board of every session — ~95 s at nine sessions — and bun's default per-test timeout is 5 s, so
 // without this it fails on elapsed time whatever the assertions say. Not a new cost: the same

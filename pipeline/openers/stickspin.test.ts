@@ -41,7 +41,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
    '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22',
-   '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26']);
+   '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26', '2026-11-27']);
 
 /** Bag 1 matched (six pieces, the page's board) and the 7th lock was NOT a full T-spin Single on a
  *  drawn U slot: the piece, the engine's spin and the lines it cleared. The one round is a T laid
@@ -147,12 +147,17 @@ const PC_GARBAGE_IN_WINDOW: string[] = [];
 /** Only yachi reaches bag 1, and he mirrors it twice: pinned as a count per player, not a list. */
 const MIRRORED_BAG1 = { yachi: 2 };
 
-/** Cases per measured node. EVERY ROUND STOPS AT BAG 1: 81 at bag1.pc (the TSS laid flat), 1 at
+/** The cases that go past bag 1, named, with the node they reach. 2026-11-27 m1r10 yachi is the first:
+ *  bag 2 matched 2.sd at lock 12 (dealt LSOTJIZ), verified, and nothing past it matched. Every other
+ *  case stops at bag 1 (STOPS_AT_BAG1). */
+const REACHED_BAG2: Record<string, string> = { '2026-11-27 m1r10 yachi': '2.sd' };
+
+/** Cases per measured node. Every round but REACHED_BAG2 STOPS AT BAG 1 (bag1.pc counts the bag-2 case too): 81 at bag1.pc (the TSS laid flat), 1 at
  *  bag1.left (no spin), none at bag1.fire (the TSS stood up). The bag-2 and later zeros are COMPARED
  *  (69 bag-2 opportunities; the demos test reaches every board), never "not compared". */
 const NODE_CASES: Record<string, number> = {
   'bag1.left': 1, 'bag1.fire': 0, '2.fire#1': 0, '2.fire#2': 0, '2.fire.td#2': 0, '2.fire.td#3': 0,
-  '2.fire.td#4': 0, 'bag1.pc': 92, '2.sd': 0, '2.sd.pc#1': 0, '2.sd.pc#2': 0, '2.sd.pc#3': 0, '2.sd.pc#4': 0,
+  '2.fire.td#4': 0, 'bag1.pc': 93, '2.sd': 1, '2.sd.pc#1': 0, '2.sd.pc#2': 0, '2.sd.pc#3': 0, '2.sd.pc#4': 0,
   '2.sd.pc#5': 0, '2.sd.pc#6': 0, '2.sd.pc#7': 0, '2.sd.pc#8': 0, '2.sd.pc#9': 0, '2.sd.pc#10': 0,
   '2.sd.pc#11': 0, '2.sd.pc#12': 0, '2.sd.pc#13': 0, '2.sd.pc#14': 0, '2.sd.pc#15': 0, '2.sd.pc#16': 0,
   '2.sd.pc#17': 0, '2.sd.pc#18': 0, '2.sd.pc#19': 0, '2.sd.tst': 0, '2.sd.imperial': 0, '2.sd.stmb': 0,
@@ -164,8 +169,8 @@ const NODE_CASES: Record<string, number> = {
 /** Opportunities: bag 1 at 6 locks, the spin step at lock 7, bag 2 at 13 locks. bag1.left's is BOTH
  *  players': pinglamb has no case, and an earlier emitter built its per-player tally from the cases
  *  alone, so his 1259 opportunities vanished and the denominator read 1223 (yachi's). Pinned per player. */
-const OPPORTUNITIES: Record<string, number> = { 'bag1.left': 3831, 'bag1.fire': 93, 'bag1.pc': 93, '2.sd': 79 };
-const BAG1_OPPORTUNITIES_BY_PLAYER = { pinglamb: 1941, yachi: 1890 };
+const OPPORTUNITIES: Record<string, number> = { 'bag1.left': 3948, 'bag1.fire': 94, 'bag1.pc': 94, '2.sd': 80 };
+const BAG1_OPPORTUNITIES_BY_PLAYER = { pinglamb: 2000, yachi: 1948 };
 /** Nodes the classifier cannot compare, and why (from the routes JSON, never a count of 0). */
 const UNMEASURED: Record<string, string> = {
   'bag1.right': 'mirror_of: bag1.left', 'bag1.fire.after': 'illustration', '2.fire.tsd': 'illustration',
@@ -221,6 +226,8 @@ const DT_NOT_STICKSPIN: Record<string, 'dt_cannon' | 'both_orders' | 'jl_split' 
   '2026-11-23 m6r4 pinglamb': 'stray_cannon',
   // 2026-11-24: one both_orders, pinglamb's m2r5 (prefix 106): one Double and two Triples in the window, cspin_order 1.
   '2026-11-24 m2r5 pinglamb': 'both_orders',
+  // 2026-11-27: one both_orders, pinglamb's m1r6 (prefix 94): one Double and two Triples in the window, cspin_order 1.
+  '2026-11-27 m1r6 pinglamb': 'both_orders',
 };
 /** Stick-spin bag-1 rounds with a COMPLETE opener window (0-based locks 0-21) that are not Double-first: none has a Triple
  *  in the window (the bag1.pc ones a TSD and no TST; bag1.left's 10-12 m8r4 no T-spin at all). */
@@ -233,6 +240,8 @@ const STICKSPIN_NOT_DT: string[] = [
   '2026-11-05 m4r7 yachi',
   // 2026-11-24: one, yachi's m1r13, bag1.pc, no Triple in its complete window.
   '2026-11-24 m1r13 yachi',
+  // 2026-11-27: one, yachi's m1r10, bag1.pc, no Triple in its complete window (it is also the corpus's first 2.sd case).
+  '2026-11-27 m1r10 yachi',
 ];
 /** Double-first rounds that ARE stick spin, per player: the cross-check's positive count. */
 // 2026-11-01 adds four, all yachi's bag1.pc (m1r5, m4r2, m4r5, m9r1): the session's every Double-first round.
@@ -373,14 +382,17 @@ test('per-node counts, opportunities, the mirror split and why every round stops
   const mirrored: Record<string, number> = {};
   for (const c of art.cases) if (c.bag1.mirrored) mirrored[c.player] = (mirrored[c.player] ?? 0) + 1;
   expect(mirrored).toEqual(MIRRORED_BAG1);
-  expect(art.conditions).toEqual({});
+  // the one bag-2 case tallies under the page's (none): its 2.sd states no order condition met
+  expect(art.conditions).toEqual({ '2.sd': { '(none)': 1 } });
   const stops: Record<string, number> = {};
+  const reached: Record<string, string> = {};
   for (const c of art.cases) {
-    expect(c.deepest, caseName(c)).toBe(c.bag1.node);
+    if (c.deepest !== c.bag1.node) { reached[caseName(c)] = c.deepest; continue; }
     const k = `${c.bag1.node} | ${c.bag2 ? 'sampled' : 'unsampled'} | ${c.bag2_near ? `${c.bag2_near.kind} ${c.bag2_near.cells}` : '-'}`;
     stops[k] = (stops[k] ?? 0) + 1;
   }
   expect(stops).toEqual(STOPS_AT_BAG1);
+  expect(reached).toEqual(REACHED_BAG2);
   // a round at bag1.pc / bag1.fire fired its 7th lock on that node's U slot; bag1.left's did not
   for (const c of art.cases) {
     expect(c.bag1.spin, caseName(c)).not.toBeNull();
@@ -414,9 +426,9 @@ test('the near kind is opt-in: without it, every sampled miss is unexplained and
 const count = (o: any, id: string) => o.nodes.find((n: any) => n.id === id).cases;
 const opp = (o: any, id: string) => o.nodes.find((n: any) => n.id === id).opportunities;
 const MUTANTS: [string, Mutants, (o: any) => void][] = [
-  ['mirroring disabled', { noMirror: true }, o => expect(count(o, 'bag1.pc')).toBe(92 - 2)],
+  ['mirroring disabled', { noMirror: true }, o => expect(count(o, 'bag1.pc')).toBe(93 - 2)],
   ['the spin\'s U cells read as drawn in a mirrored round', { spinMirrorUnaware: true }, o => {
-    expect(count(o, 'bag1.pc')).toBe(92 - 2);
+    expect(count(o, 'bag1.pc')).toBe(93 - 2);
     expect(o.lists.bag1_spin_off_page.length).toBe(BAG1_SPIN_OFF_PAGE.length + 2);
   }],
   ['the bag-1 TSS stops the bag-2 sample', { spinClearStops: true }, o => {

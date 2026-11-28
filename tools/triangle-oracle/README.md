@@ -96,7 +96,7 @@ bun cross-extract.mjs   # how much of each quarantined section two engines agree
 `scan-firstdiv` showed the remaining divergences are dominated by garbage-insertion TIMING, not
 placement — no second `hoisted` to find. `cross-extract` then measured Triangle as a SECOND EXTRACTOR:
 over the verified prefix, sim and Triangle agree bit-exact on **96.8%** of locks, backing **96.7%** of
-forecast events and **95.4%** of opener rounds with an independent engine — the dual-implementation
+forecast events and **95.5%** of opener rounds with an independent engine — the dual-implementation
 evidence the quarantined sections are missing. Building that check exposed the oracle's own hole-pairing
 bug (the FIFO-vs-iid issue fixed above): before it, the one surviving forecast (`forecast_lineclear`)
 was flagged non-dual purely because the oracle mis-paired a garbage hole. The sim matched ground truth
@@ -151,6 +151,7 @@ Three separate staleness deltas had stacked up behind it, and the prose above qu
 | 13 | 11-17 added (24 rounds; 1218 of its 1314 prefix locks bit-exact, 92.7% — below the pool, so it lowers the lock figure a tenth to 96.7%; its 117 of 128 forecast events, 91.4%, lower the forecast figure to 96.7%, and its 42 of 45 opener rounds, 93.3%, leave the opener figure at 95.5%) | → 96.7% |
 | 14 | 11-19 added (44 rounds; 2152 of its 2195 prefix locks bit-exact, 98.0% — above the pool, so it lifts the lock figure a tenth to 96.8%; its 185 of 187 forecast events, 98.9%, leave the forecast figure at 96.7%, and its 79 of 82 opener rounds, 96.3%, leave the opener figure at 95.5%), then 11-23 (82 rounds; 4084 of its 4127, 98.9%, lift the lock figure to 96.9%; its 380 of 387 forecast events, 98.1%, lift the forecast figure to 96.8%, and its 148 of 151 opener rounds, 98.0%, lift the opener figure to 95.6%) | → 96.9% |
 | 15 | 11-24 added (the opener figure lifted to 95.7%), then 11-25 (62 rounds; 2938 of its 3119 prefix locks bit-exact, 94.2% — below the pool, so it lowers the lock figure a tenth to 96.8%; its 280 of 299 forecast events, 93.6%, lower the forecast figure to 96.7%, and its 104 of 117 opener rounds, 88.9%, lower the opener figure to 95.5%) | → 96.8% |
+| 16 | 11-26 added (75 rounds; 3413 of its 3559 prefix locks bit-exact, 95.8% — below the pool; its 127 of 136 opener rounds, 93.3%, lower the opener figure to 95.4%), then 11-27 (61 rounds; 3083 of its 3176, 97.0%, leave the lock figure at 96.8%; its 275 of 286 forecast events, 96.1%, leave the forecast figure at 96.7%, and its 112 of 115 opener rounds, 97.3%, lift the opener figure to 95.5%) | → 96.8% |
 
 Only delta 3 is the one a "new session" checklist would catch. Delta 1 is prose left behind by a
 regeneration, delta 2 is an artefact left behind by a *source* change — and delta 2 is the large one.

@@ -677,6 +677,9 @@ PUBLISHED = (
     #     app_gap_lost    +6.3620 pp   m5r9  -> +4.7238  rel 0.257  1.24x
     ("2026-11-26", "app_gap_won", "series"),
     ("2026-11-26", "app_gap_lost", "series"),
+    # 2026-11-27: both regime gaps carry a round-level ANNOTATED entry.
+    ("2026-11-27", "app_gap_won", "series"),
+    ("2026-11-27", "app_gap_lost", "series"),
 )
 
 # The named exception list: every (session, figure) already investigated, with the reason it
@@ -689,6 +692,18 @@ ANNOTATED = {
         "a round yachi won at .5433 attack per piece over 335 pieces, 10.5% of his 3193-piece "
         "winning-round pool; without that low-efficiency long win his winning rounds sit almost "
         "level with pinglamb's. `rel` 0.793, the next round 1.23x below it."),
+    ("2026-11-27", "app_gap_won"): (
+        "the won-regime gap is +3.8670 pp and m3r10 alone takes it to +1.6685 — NARROWER, by "
+        "2.1985, the sign surviving. m3r10 is the night's third-longest round (about 195 s), a "
+        "round yachi won at .5000 attack per piece over 288 pieces, 8.4% of his 3434-piece "
+        "winning-round pool; without that low-efficiency long win his winning rounds sit closer "
+        "to pinglamb's. `rel` 0.569, the next round 1.17x below it."),
+    ("2026-11-27", "app_gap_lost"): (
+        "the lost-regime gap is +2.9212 pp and m4r10 alone takes it to +0.8363 — NARROWER, by "
+        "2.0849, the sign surviving. m4r10 is a round pinglamb lost at .7393 attack per piece "
+        "over 211 pieces, 6.5% of his 3252-piece losing-round pool; without that high-efficiency "
+        "loss his losing rounds sit almost level with yachi's. `rel` 0.714, the next round 1.16x "
+        "below it."),
     ("2026-11-24", "app_gap_lost"): (
         "the lost-regime gap is +1.8026 pp and m1r7 alone takes it to +3.4311 — WIDER, by "
         "1.6285, the 08-14 / 09-10 direction. m1r7 is a round yachi lost at .6700 attack per "

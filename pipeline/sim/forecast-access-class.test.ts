@@ -188,6 +188,10 @@
  * class's TENTH member (replay-2026-11-26-03.ttrm r9 lock 24, pinglamb). Every count measured
  * against the nine-member list is void until re-run, as above.
  *
+ * NOT RE-MEASURED 2026-11-27, and the SET moved again: the twenty-eighth session adds TWO candidates
+ * (clearAlone 65 -> 67, one `overdetermined`, one `access`), the class's TENTH member
+ * (replay-2026-11-27-01.ttrm r11 lock 18, pinglamb's). Counts against the nine-member list are void.
+ *
  * NOT RE-MEASURED 2026-11-17 either. The twenty-third session adds TWO candidates (clearAlone
  * 58 -> 60, both `formed`) and no member; ACCESS_CLASS still holds the eight entries of 2026-11-05
  * and the set test passed unchanged with the new session on disk.
@@ -428,6 +432,12 @@ const ACCESS_CLASS: Member[] = [
   // pinglamb (now 2 of 10), the second of his after 2026-08-09's.
   { session: '2026-11-26', file: 'replay-2026-11-26-03.ttrm', round: 9, user: 'pinglamb',
     lock: 24, step: 23, mechanism: 'access', kind: 'path_opened' },
+  // THE TENTH, from 2026-11-27 — the twenty-eighth session in date order AND in arrival, pinglamb's
+  // second (yachi 8 of 9 before it; his other is 2026-08-09). Found by the sweep: the engine
+  // calls it `access` and this file's replica agrees. Like the ninth, NOT measured by the scratch
+  // counterfactual probe on this pass. Its lock, 18, is inside the opener window (0-based 0-21).
+  { session: '2026-11-27', file: 'replay-2026-11-27-01.ttrm', round: 11, user: 'pinglamb',
+    lock: 18, step: 17, mechanism: 'access', kind: 'path_opened' },
 ];
 
 const key = (m: Member) =>
@@ -551,7 +561,7 @@ test('the class does not exist beyond the verified prefixes either', () => {
  *  which is `finesse-counters.test.ts`'s lesson arriving here: a test name cannot fail, so a name
  *  carrying figures is a 冇第二份 figure with a green build next to it. Derived from the same
  *  constants the assertions use, it moves when they do. */
-const DECOMP = { clearAlone: 68, formed: 37, overdetermined: 21, access: 10 };
+const DECOMP = { clearAlone: 70, formed: 37, overdetermined: 22, access: 11 };
 
 test(`the ${DECOMP.clearAlone} candidates decompose ${DECOMP.formed} formed / `
    + `${DECOMP.overdetermined} overdetermined / ${DECOMP.access} access, and nothing else`, () => {
@@ -660,6 +670,7 @@ test(`the ${DECOMP.clearAlone} candidates decompose ${DECOMP.formed} formed / `
   // 2026-11-26 adds 3, splitting 1 `formed`, 1 `overdetermined` and 1 `access` — clearAlone 65 -> 68,
   // formed 36 -> 37, overdetermined 20 -> 21, access 9 -> 10. The `access` one is ACCESS_CLASS's
   // tenth member (pinglamb, replay-2026-11-26-03.ttrm r9 lock 24).
+  // 2026-11-27 adds 1 `access` and 1 `overdetermined` (clearAlone 65 -> 67, overdetermined 20 -> 21, access 9 -> 10): ACCESS_CLASS's tenth member.
   expect(result.clearAlone).toBe(DECOMP.clearAlone);
   expect(result.formed).toBe(DECOMP.formed);
   expect(result.overdetermined).toBe(DECOMP.overdetermined);
@@ -689,6 +700,6 @@ test('the sweep reached the corpus it claims to have swept', () => {
   // count against a pin rather than one literal against another — a session arriving fails here,
   // which is the whole job. `localised` is the second half: discovery finding 7 directories says
   // nothing about the sweep having replayed them.
-  expect(SESSIONS.length).toBe(28);
-  expect(result.localised).toBe(9596);   // 9236 + 360 with 2026-11-26
+  expect(SESSIONS.length).toBe(29);
+  expect(result.localised).toBe(9893);   // 9236 + 360 with 2026-11-26, + 297 with 2026-11-27
 });

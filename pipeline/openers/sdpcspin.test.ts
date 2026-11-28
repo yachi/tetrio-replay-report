@@ -45,7 +45,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
    '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22',
-   '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26']);
+   '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26', '2026-11-27']);
 
 /** Bag 1 matched (six pieces, either colouring) and the 7th lock was NOT the drawn TSS: the piece, the
  *  engine's spin and the lines it cleared. Both are stick spin's too: 10-12 m8r4 lays its T flat on the
@@ -82,7 +82,7 @@ const BAG2_NONE_TSD_BEFORE_COMPLETE: string[] = [
 ];
 /** A sampled bag 2 that matched nothing and is no subset, superset or moved piece of 2.tsd: its bag-2 T
  *  clears two lines with NO spin (stick spin names it for the same reason). */
-const BAG2_NONE_UNEXPLAINED: string[] = ['2026-10-03 m9r6 yachi'];
+const BAG2_NONE_UNEXPLAINED: string[] = ['2026-10-03 m9r6 yachi', '2026-11-27 m1r10 yachi'];
 
 /** Measured EMPTY. A first entry is a red build to investigate. */
 const BAG2_NONE_EXTRA_PIECE: string[] = [];
@@ -123,7 +123,7 @@ const DEEPEST_UNVERIFIED: string[] = ['2026-10-03 m15r5 yachi', '2026-10-03 m16r
 
 /** Bag 1 by player and handedness: yachi mirrors it in 95 of 97 (stick spin's 2 of 90 the other way
  *  round, because the page draws stick spin's board mirrored); pinglamb's four are all as drawn. */
-const MIRRORED_BAG1 = { yachi: 98 };
+const MIRRORED_BAG1 = { yachi: 99 };
 
 /** Cases per measured node. The bag-3 and later zeros are COMPARED, never "not compared". */
 const NODE_CASES: Record<string, number> = {
@@ -139,7 +139,7 @@ const NODE_CASES: Record<string, number> = {
   // COLOUR_DISAGREE board) and six bag1.jl (m1r5, m4r2, m4r5, m9r1, m10r4, m11r4); all but m4r2
   // (BAG2_NONE_TSD_BEFORE_COMPLETE) reach 2.tsd, and m4r5, m9r1 and m14r6 reach 3.first at lock 19;
   // the other three are STOPS_AT_2TSD; no cave.
-  'bag1.lj.left': 1, 'bag1.lj': 10, 'bag1.jl.left': 1, 'bag1.jl': 92, '2.tsd': 88, '3.first': 63, '3.second': 1,
+  'bag1.lj.left': 1, 'bag1.lj': 10, 'bag1.jl.left': 1, 'bag1.jl': 93, '2.tsd': 88, '3.first': 63, '3.second': 1,
   '3.third': 1, '3.first.cave': 11, '3.first.cave.stsd.next': 0, '3.first.trinity': 0, '3.first.trinity.tsd': 0,
   '3.first.trinity.tss': 0, '3.second.cspin': 0, '3.second.alt#1': 0, '3.second.alt#2': 0, '3.second.cspin.dt#1': 0,
   '3.second.cspin.dt#2': 0, '3.second.cspin.o_first#1': 0, '3.second.cspin.o_first#2': 0,
@@ -158,8 +158,8 @@ const STRUCTURAL_ZERO: Record<string, string> = {
 /** Opportunities per player: bag 1 at 6 locks (both stage boards share them), the TSS at lock 7, bag 2
  *  at 13 locks, the bag-3 boards and the PC patterns under 2.tsd, bag 4 and 5 under the board reached. */
 const OPPORTUNITIES: Record<string, Record<string, number>> = {
-  'bag1.lj.left': { pinglamb: 1941, yachi: 1890 }, 'bag1.jl.left': { pinglamb: 1941, yachi: 1890 },
-  'bag1.lj': { pinglamb: 4, yachi: 7 }, 'bag1.jl': { pinglamb: 0, yachi: 93 }, '2.tsd': { pinglamb: 4, yachi: 85 },
+  'bag1.lj.left': { pinglamb: 2000, yachi: 1948 }, 'bag1.jl.left': { pinglamb: 2000, yachi: 1948 },
+  'bag1.lj': { pinglamb: 4, yachi: 7 }, 'bag1.jl': { pinglamb: 0, yachi: 94 }, '2.tsd': { pinglamb: 4, yachi: 86 },
   '3.first': { pinglamb: 4, yachi: 84 }, '3.second': { pinglamb: 4, yachi: 84 }, '3.third': { pinglamb: 4, yachi: 84 },
   '3.first.cave': { pinglamb: 0, yachi: 63 }, '3.first.trinity': { pinglamb: 0, yachi: 11 },
   '3.second.cspin': { pinglamb: 1, yachi: 0 }, '3.second.alt#1': { pinglamb: 1, yachi: 0 },
@@ -181,7 +181,7 @@ const UNMEASURED: Record<string, string> = {
 const STOPS: Record<string, number> = {
   '3.first.cave | sampled | -': 11, '3.first | sampled | -': 52, '3.second | sampled | -': 1, '3.third | sampled | -': 1,
   '2.tsd | sampled | -': 23,
-  'bag1.jl | sampled | -': 1,         // 10-03 m9r6: BAG2_NONE_UNEXPLAINED
+  'bag1.jl | sampled | -': 2,         // 10-03 m9r6 and 11-27 m1r10: BAG2_NONE_UNEXPLAINED
   'bag1.jl | unsampled | subset': 9,  // BAG2_NONE_TSD_BEFORE_COMPLETE
   'bag1.jl | unsampled | -': 4,       // a verified prefix ending at the TSS (verified_to 6): 10-03 m2r4, m11r7, m17r4, 10-09 m2r3
   'bag1.jl.left | unsampled | -': 1, 'bag1.lj.left | unsampled | -': 1,  // BAG1_SPIN_OFF_PAGE
@@ -207,6 +207,7 @@ const DT_NOT_SDPCSPIN: Record<string, 'dt_cannon' | 'both_orders' | 'garbage_bag
   '2026-11-05 m4r4 pinglamb': 'both_orders',  // two Triples and one Double in the window, cspin_order 1 (prefix 33)
   '2026-11-23 m6r4 pinglamb': 'stray_cannon', // pinglamb's one Double-first round of the session (prefix 104)
   '2026-11-24 m2r5 pinglamb': 'both_orders',  // one Double and two Triples in the window, cspin_order 1 (prefix 106)
+  '2026-11-27 m1r6 pinglamb': 'both_orders',  // one Double and two Triples in the window, cspin_order 1 (prefix 94)
 };
 /** SDPC Spin rounds with a COMPLETE opener window (0-based locks 0-21) that are not Double-first: none
  *  holds a Triple in the window. Stick spin's ten (its STICKSPIN_NOT_DT) and pinglamb's 09-18 m6r4, a
@@ -222,6 +223,8 @@ const SDPCSPIN_NOT_DT: string[] = [
   '2026-11-05 m4r7 yachi',
   // 2026-11-24: one, yachi's m1r13 (STOPS_AT_2TSD no_tst).
   '2026-11-24 m1r13 yachi',
+  // 2026-11-27: one, yachi's m1r10 (BAG2_NONE_UNEXPLAINED), no Triple in its complete window.
+  '2026-11-27 m1r10 yachi',
 ];
 /** Double-first rounds that ARE SDPC Spin, per player: the ordering cross-check's positive count. */
 // 2026-11-01 adds four, all yachi's (m1r5, m4r2, m4r5, m9r1): the session's every Double-first round.
@@ -472,7 +475,7 @@ const MUTANTS: [string, Mutants, (o: any) => void][] = [
   ['mirroring disabled', { noMirror: true }, o => expect(count(o, 'bag1.jl')).toBe(2)],
   ['the spin\'s U cells read as drawn in a mirrored round', { spinMirrorUnaware: true }, o => {
     expect(count(o, 'bag1.jl')).toBe(2);
-    expect(o.lists.bag1_spin_off_page.length).toBe(BAG1_SPIN_OFF_PAGE.length + 96);
+    expect(o.lists.bag1_spin_off_page.length).toBe(BAG1_SPIN_OFF_PAGE.length + 97);
   }],
   ['the bag-1 TSS stops the bag-2 sample', { spinClearStops: true }, o => {
     expect(opp(o, '2.tsd')).toBe(0);

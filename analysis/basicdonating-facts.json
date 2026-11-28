@@ -153,10 +153,15 @@
     "session": "2026-11-26",
     "replays_md5": "d01f24b6610227c64eac1035f203b334",
     "replay_facts_md5": "2cb4ae5af4da74208db58d34d101ad67"
+   },
+   {
+    "session": "2026-11-27",
+    "replays_md5": "f57553058f05ceecbaa81262cda01321",
+    "replay_facts_md5": "00fceb533e90f820afd4ddfde3c63c23"
    }
   ],
   "transcription_md5": "e00a1278d1471f4fbb4f0a13500bdc72",
-  "emitter_md5": "c3232d382790505c06b2d0c4a88fe58a"
+  "emitter_md5": "13c6f3e35f14ccc62249f96ca89566dc"
  },
  "sessions": [
   "2026-07-22",
@@ -186,7 +191,8 @@
   "2026-11-23",
   "2026-11-24",
   "2026-11-25",
-  "2026-11-26"
+  "2026-11-26",
+  "2026-11-27"
  ],
  "window_pieces": 21,
  "window_rule": "0-based lock index <= 21 is in_opener (emit-opener-facts.ts's convention; emit-attack-facts.ts counts from 1)",
@@ -198,24 +204,24 @@
  "denominators": {
   "pinglamb": {
    "TSD": {
-    "all": 8041,
-    "in_opener": 1557,
-    "mid_game": 6484
+    "all": 8249,
+    "in_opener": 1601,
+    "mid_game": 6648
    },
    "TSS": {
-    "all": 906,
-    "in_opener": 126,
-    "mid_game": 780
+    "all": 933,
+    "in_opener": 130,
+    "mid_game": 803
    },
    "TST": {
-    "all": 2083,
-    "in_opener": 2034,
-    "mid_game": 49
+    "all": 2153,
+    "in_opener": 2102,
+    "mid_game": 51
    },
    "mini_TSS": {
-    "all": 499,
+    "all": 511,
     "in_opener": 18,
-    "mid_game": 481
+    "mid_game": 493
    },
    "mini_TSD": {
     "all": 0,
@@ -224,28 +230,28 @@
    },
    "other_scored": 0,
    "recon_disagreed": 0,
-   "unscored_past_prefix": 1005
+   "unscored_past_prefix": 1047
   },
   "yachi": {
    "TSD": {
-    "all": 7279,
-    "in_opener": 1830,
-    "mid_game": 5449
+    "all": 7520,
+    "in_opener": 1880,
+    "mid_game": 5640
    },
    "TSS": {
-    "all": 1528,
-    "in_opener": 356,
-    "mid_game": 1172
+    "all": 1586,
+    "in_opener": 365,
+    "mid_game": 1221
    },
    "TST": {
-    "all": 1293,
-    "in_opener": 1221,
-    "mid_game": 72
+    "all": 1343,
+    "in_opener": 1268,
+    "mid_game": 75
    },
    "mini_TSS": {
-    "all": 135,
-    "in_opener": 16,
-    "mid_game": 119
+    "all": 143,
+    "in_opener": 18,
+    "mid_game": 125
    },
    "mini_TSD": {
     "all": 0,
@@ -254,14 +260,14 @@
    },
    "other_scored": 0,
    "recon_disagreed": 0,
-   "unscored_past_prefix": 729
+   "unscored_past_prefix": 740
   }
  },
  "check": {
-  "tspin_clears_scored": 21764,
-  "reconstruction_agreed": 21764,
+  "tspin_clears_scored": 22438,
+  "reconstruction_agreed": 22438,
   "reconstruction_disagreed": 0,
-  "rowmap_steps": 386541,
+  "rowmap_steps": 398979,
   "rowmap_unverified": 35,
   "by_session": {
    "2026-07-22": {
@@ -487,6 +493,14 @@
      "pinglamb": 435,
      "yachi": 382
     }
+   },
+   "2026-11-27": {
+    "tspin_clears": 674,
+    "reconstruction_disagreed": 0,
+    "players": {
+     "pinglamb": 317,
+     "yachi": 357
+    }
    }
   }
  },
@@ -494,39 +508,39 @@
   "rule": {
    "hits_by_player": {
     "pinglamb": {
-     "all": 534,
-     "in_opener": 175,
-     "mid_game": 359,
+     "all": 544,
+     "in_opener": 178,
+     "mid_game": 366,
      "mirrored": 0,
-     "garbage_in_window": 159
+     "garbage_in_window": 163
     },
     "yachi": {
-     "all": 466,
-     "in_opener": 58,
-     "mid_game": 408,
+     "all": 486,
+     "in_opener": 61,
+     "mid_game": 425,
      "mirrored": 0,
-     "garbage_in_window": 179
+     "garbage_in_window": 189
     }
    },
    "followup_by_player": {
     "pinglamb": {
-     "fired": 49,
+     "fired": 50,
      "not_fired": {
-      "i_in_well_not_quad": 27,
+      "i_in_well_not_quad": 28,
       "past_verified": 16,
       "round_ended": 12,
       "well_covered": 35,
-      "well_filled_not_i": 395
+      "well_filled_not_i": 403
      }
     },
     "yachi": {
-     "fired": 79,
+     "fired": 82,
      "not_fired": {
-      "i_in_well_not_quad": 35,
-      "past_verified": 13,
-      "round_ended": 13,
-      "well_covered": 59,
-      "well_filled_not_i": 267
+      "i_in_well_not_quad": 37,
+      "past_verified": 14,
+      "round_ended": 15,
+      "well_covered": 61,
+      "well_filled_not_i": 277
      }
     }
    },
@@ -534,11 +548,11 @@
     "under": {
      "TSS": {
       "pinglamb": 43,
-      "yachi": 187
+      "yachi": 189
      },
      "TST": {
-      "pinglamb": 2033,
-      "yachi": 1135
+      "pinglamb": 2100,
+      "yachi": 1182
      },
      "mini_TSS": {
       "pinglamb": 9,
@@ -551,25 +565,25 @@
     },
     "ablation": {
      "allow_t_nub": {
-      "pinglamb": 534,
-      "yachi": 466
+      "pinglamb": 544,
+      "yachi": 486
      },
      "allow_fragment": {
-      "pinglamb": 599,
-      "yachi": 534
+      "pinglamb": 610,
+      "yachi": 555
      },
      "no_reopen": {
-      "pinglamb": 608,
-      "yachi": 649
+      "pinglamb": 619,
+      "yachi": 671
      },
      "allow_late_hole": {
-      "pinglamb": 668,
-      "yachi": 601
+      "pinglamb": 681,
+      "yachi": 627
      }
     },
     "orientation_baseline": {
-     "pinglamb": 71,
-     "yachi": 105
+     "pinglamb": 72,
+     "yachi": 108
     }
    }
   },
@@ -583,11 +597,11 @@
      "garbage_in_window": 11
     },
     "yachi": {
-     "all": 187,
-     "in_opener": 112,
-     "mid_game": 75,
+     "all": 189,
+     "in_opener": 113,
+     "mid_game": 76,
      "mirrored": 0,
-     "garbage_in_window": 31
+     "garbage_in_window": 32
     }
    },
    "followup_by_player": {
@@ -600,24 +614,24 @@
      }
     },
     "yachi": {
-     "fired": 30,
+     "fired": 31,
      "not_fired": {
       "i_in_well_not_quad": 16,
       "past_verified": 10,
       "well_covered": 13,
-      "well_filled_not_i": 118
+      "well_filled_not_i": 119
      }
     }
    },
    "controls": {
     "under": {
      "TSD": {
-      "pinglamb": 534,
-      "yachi": 466
+      "pinglamb": 544,
+      "yachi": 486
      },
      "TST": {
-      "pinglamb": 2033,
-      "yachi": 1135
+      "pinglamb": 2100,
+      "yachi": 1182
      },
      "mini_TSS": {
       "pinglamb": 9,
@@ -631,24 +645,24 @@
     "ablation": {
      "allow_t_nub": {
       "pinglamb": 43,
-      "yachi": 187
+      "yachi": 189
      },
      "allow_fragment": {
       "pinglamb": 67,
-      "yachi": 251
+      "yachi": 255
      },
      "no_reopen": {
-      "pinglamb": 81,
-      "yachi": 248
+      "pinglamb": 82,
+      "yachi": 253
      },
      "allow_late_hole": {
       "pinglamb": 70,
-      "yachi": 230
+      "yachi": 239
      }
     },
     "orientation_baseline": {
-     "pinglamb": 208,
-     "yachi": 624
+     "pinglamb": 212,
+     "yachi": 647
     }
    }
   }
@@ -662,19 +676,19 @@
   ],
   "by_player": {
    "pinglamb": {
-    "qualified": 234,
+    "qualified": 236,
     "not_qualified": {
-     "opener_route": 199,
+     "opener_route": 205,
      "opener_spin": 4,
-     "other_page": 158
+     "other_page": 160
     }
    },
    "yachi": {
-    "qualified": 285,
+    "qualified": 294,
     "not_qualified": {
-     "opener_route": 37,
-     "opener_spin": 98,
-     "other_page": 343
+     "opener_route": 42,
+     "opener_spin": 99,
+     "other_page": 352
     }
    }
   }
@@ -1910,7 +1924,39 @@
    "2026-11-26 m7r4 pinglamb lock 19 column 4",
    "2026-11-26 m7r5 pinglamb lock 19 column 4",
    "2026-11-26 m7r6 yachi lock 29 column 2",
-   "2026-11-26 m7r10 yachi lock 293 column 7+8"
+   "2026-11-26 m7r10 yachi lock 293 column 7+8",
+   "2026-11-27 m1r2 pinglamb lock 104 column 0",
+   "2026-11-27 m1r2 yachi lock 31 column 2",
+   "2026-11-27 m1r2 yachi lock 111 column 6",
+   "2026-11-27 m1r5 pinglamb lock 28 column 9",
+   "2026-11-27 m1r5 yachi lock 32 column 4",
+   "2026-11-27 m1r10 yachi lock 6 column 4+5+6",
+   "2026-11-27 m1r10 yachi lock 13 column 6",
+   "2026-11-27 m1r10 yachi lock 25 column 5",
+   "2026-11-27 m1r11 yachi lock 42 column 5+6",
+   "2026-11-27 m2r1 pinglamb lock 38 column 1+2",
+   "2026-11-27 m2r3 yachi lock 19 column 5",
+   "2026-11-27 m2r3 yachi lock 75 column 9",
+   "2026-11-27 m2r4 pinglamb lock 23 column 4",
+   "2026-11-27 m2r5 yachi lock 32 column 4",
+   "2026-11-27 m2r7 yachi lock 88 column 0",
+   "2026-11-27 m2r10 yachi lock 33 column 7+8",
+   "2026-11-27 m2r13 yachi lock 88 column 7",
+   "2026-11-27 m3r1 pinglamb lock 22 column 4",
+   "2026-11-27 m3r1 yachi lock 22 column 5",
+   "2026-11-27 m3r2 yachi lock 121 column 3",
+   "2026-11-27 m3r4 pinglamb lock 20 column 4",
+   "2026-11-27 m3r6 pinglamb lock 20 column 4+5",
+   "2026-11-27 m3r7 yachi lock 56 column 5",
+   "2026-11-27 m3r10 pinglamb lock 19 column 4",
+   "2026-11-27 m3r10 yachi lock 24 column 5",
+   "2026-11-27 m4r2 pinglamb lock 24 column 4",
+   "2026-11-27 m4r4 yachi lock 191 column 1",
+   "2026-11-27 m4r9 pinglamb lock 27 column 6+9",
+   "2026-11-27 m4r10 yachi lock 213 column 8",
+   "2026-11-27 m4r11 yachi lock 20 column 4",
+   "2026-11-27 m5r2 yachi lock 23 column 5",
+   "2026-11-27 m5r8 yachi lock 34 column 9"
   ],
   "payoff_not_fired": [
    "2026-07-22 m1r1 pinglamb lock 19 (well_filled_not_i at lock 20)",
@@ -2981,7 +3027,34 @@
    "2026-11-26 m7r4 pinglamb lock 19 (well_filled_not_i at lock 24)",
    "2026-11-26 m7r5 pinglamb lock 19 (well_filled_not_i at lock 24)",
    "2026-11-26 m7r6 yachi lock 29 (well_filled_not_i at lock 31)",
-   "2026-11-26 m7r10 yachi lock 293 (well_filled_not_i at lock 294)"
+   "2026-11-26 m7r10 yachi lock 293 (well_filled_not_i at lock 294)",
+   "2026-11-27 m1r2 yachi lock 31 (well_filled_not_i at lock 32)",
+   "2026-11-27 m1r2 yachi lock 111 (well_filled_not_i at lock 113)",
+   "2026-11-27 m1r5 pinglamb lock 28 (i_in_well_not_quad at lock 33)",
+   "2026-11-27 m1r5 yachi lock 32 (well_filled_not_i at lock 34)",
+   "2026-11-27 m1r10 yachi lock 6 (well_filled_not_i at lock 7)",
+   "2026-11-27 m1r10 yachi lock 13 (well_filled_not_i at lock 18)",
+   "2026-11-27 m1r10 yachi lock 25 (well_covered at lock 34)",
+   "2026-11-27 m1r11 yachi lock 42 (well_filled_not_i at lock 44)",
+   "2026-11-27 m2r1 pinglamb lock 38 (well_filled_not_i at lock 40)",
+   "2026-11-27 m2r3 yachi lock 19 (well_filled_not_i at lock 26)",
+   "2026-11-27 m2r4 pinglamb lock 23 (well_filled_not_i at lock 24)",
+   "2026-11-27 m2r5 yachi lock 32 (well_filled_not_i at lock 35)",
+   "2026-11-27 m2r10 yachi lock 33 (well_filled_not_i at lock 34)",
+   "2026-11-27 m2r13 yachi lock 88 (well_covered at lock 93)",
+   "2026-11-27 m3r1 pinglamb lock 22 (well_filled_not_i at lock 25)",
+   "2026-11-27 m3r1 yachi lock 22 (i_in_well_not_quad at lock 23)",
+   "2026-11-27 m3r2 yachi lock 121 (round_ended)",
+   "2026-11-27 m3r4 pinglamb lock 20 (well_filled_not_i at lock 21)",
+   "2026-11-27 m3r6 pinglamb lock 20 (well_filled_not_i at lock 21)",
+   "2026-11-27 m3r7 yachi lock 56 (well_filled_not_i at lock 60)",
+   "2026-11-27 m3r10 pinglamb lock 19 (well_filled_not_i at lock 21)",
+   "2026-11-27 m3r10 yachi lock 24 (well_filled_not_i at lock 32)",
+   "2026-11-27 m4r2 pinglamb lock 24 (well_filled_not_i at lock 26)",
+   "2026-11-27 m4r9 pinglamb lock 27 (well_filled_not_i at lock 30)",
+   "2026-11-27 m4r10 yachi lock 213 (past_verified at lock 214)",
+   "2026-11-27 m4r11 yachi lock 20 (i_in_well_not_quad at lock 21)",
+   "2026-11-27 m5r8 yachi lock 34 (round_ended)"
   ],
   "garbage_in_window": [
    "2026-07-22 m1r7 pinglamb lock 9",
@@ -3363,7 +3436,22 @@
    "2026-11-26 m6r7 yachi lock 69",
    "2026-11-26 m7r3 pinglamb lock 27",
    "2026-11-26 m7r6 yachi lock 29",
-   "2026-11-26 m7r10 yachi lock 293"
+   "2026-11-26 m7r10 yachi lock 293",
+   "2026-11-27 m1r2 yachi lock 111",
+   "2026-11-27 m1r5 pinglamb lock 28",
+   "2026-11-27 m1r5 yachi lock 32",
+   "2026-11-27 m1r10 yachi lock 25",
+   "2026-11-27 m2r1 pinglamb lock 38",
+   "2026-11-27 m2r3 yachi lock 75",
+   "2026-11-27 m2r10 yachi lock 33",
+   "2026-11-27 m2r13 yachi lock 88",
+   "2026-11-27 m3r1 pinglamb lock 22",
+   "2026-11-27 m3r1 yachi lock 22",
+   "2026-11-27 m3r10 yachi lock 24",
+   "2026-11-27 m4r9 pinglamb lock 27",
+   "2026-11-27 m4r10 yachi lock 213",
+   "2026-11-27 m5r2 yachi lock 23",
+   "2026-11-27 m5r8 yachi lock 34"
   ],
   "basicdonating_in_opener": [
    "2026-07-22 m1r1 pinglamb lock 19",
@@ -3719,7 +3807,14 @@
    "2026-11-26 m5r9 pinglamb lock 19",
    "2026-11-26 m7r1 pinglamb lock 20",
    "2026-11-26 m7r4 pinglamb lock 19",
-   "2026-11-26 m7r5 pinglamb lock 19"
+   "2026-11-26 m7r5 pinglamb lock 19",
+   "2026-11-27 m1r10 yachi lock 6",
+   "2026-11-27 m1r10 yachi lock 13",
+   "2026-11-27 m2r3 yachi lock 19",
+   "2026-11-27 m3r4 pinglamb lock 20",
+   "2026-11-27 m3r6 pinglamb lock 20",
+   "2026-11-27 m3r10 pinglamb lock 19",
+   "2026-11-27 m4r11 yachi lock 20"
   ],
   "qualified_hits": [
    "2026-07-22 m1r7 pinglamb lock 9",
@@ -4240,7 +4335,18 @@
    "2026-11-26 m4r9 pinglamb lock 40",
    "2026-11-26 m5r4 yachi lock 61",
    "2026-11-26 m5r4 yachi lock 102",
-   "2026-11-26 m7r6 yachi lock 29"
+   "2026-11-26 m7r6 yachi lock 29",
+   "2026-11-27 m1r2 yachi lock 31",
+   "2026-11-27 m1r2 yachi lock 111",
+   "2026-11-27 m1r5 pinglamb lock 28",
+   "2026-11-27 m1r5 yachi lock 32",
+   "2026-11-27 m2r7 yachi lock 88",
+   "2026-11-27 m2r13 yachi lock 88",
+   "2026-11-27 m3r1 yachi lock 22",
+   "2026-11-27 m3r2 yachi lock 121",
+   "2026-11-27 m4r9 pinglamb lock 27",
+   "2026-11-27 m4r10 yachi lock 213",
+   "2026-11-27 m4r11 yachi lock 20"
   ],
   "not_qualified": [
    "2026-07-22 m1r1 pinglamb lock 19 (opener_route)",
@@ -4953,7 +5059,28 @@
    "2026-11-26 m7r3 pinglamb lock 27 (other_page)",
    "2026-11-26 m7r4 pinglamb lock 19 (opener_route)",
    "2026-11-26 m7r5 pinglamb lock 19 (opener_route)",
-   "2026-11-26 m7r10 yachi lock 293 (other_page)"
+   "2026-11-26 m7r10 yachi lock 293 (other_page)",
+   "2026-11-27 m1r2 pinglamb lock 104 (other_page)",
+   "2026-11-27 m1r10 yachi lock 6 (other_page, opener_spin)",
+   "2026-11-27 m1r10 yachi lock 13 (other_page, opener_route)",
+   "2026-11-27 m1r10 yachi lock 25 (opener_route)",
+   "2026-11-27 m1r11 yachi lock 42 (other_page)",
+   "2026-11-27 m2r1 pinglamb lock 38 (other_page)",
+   "2026-11-27 m2r3 yachi lock 19 (opener_route)",
+   "2026-11-27 m2r3 yachi lock 75 (other_page)",
+   "2026-11-27 m2r4 pinglamb lock 23 (opener_route)",
+   "2026-11-27 m2r5 yachi lock 32 (other_page)",
+   "2026-11-27 m2r10 yachi lock 33 (other_page)",
+   "2026-11-27 m3r1 pinglamb lock 22 (opener_route)",
+   "2026-11-27 m3r4 pinglamb lock 20 (opener_route)",
+   "2026-11-27 m3r6 pinglamb lock 20 (opener_route)",
+   "2026-11-27 m3r7 yachi lock 56 (other_page)",
+   "2026-11-27 m3r10 pinglamb lock 19 (opener_route)",
+   "2026-11-27 m3r10 yachi lock 24 (opener_route)",
+   "2026-11-27 m4r2 pinglamb lock 24 (opener_route)",
+   "2026-11-27 m4r4 yachi lock 191 (other_page)",
+   "2026-11-27 m5r2 yachi lock 23 (opener_route)",
+   "2026-11-27 m5r8 yachi lock 34 (other_page)"
   ],
   "window_off_board": [],
   "recon_dropped_tsd": [],
@@ -6189,6 +6316,38 @@
   {"session":"2026-11-26","file":"replay-2026-11-26-07.ttrm","round_index0":3,"match":7,"round":4,"player":"pinglamb","variant":"rule","lock":19,"in_opener":true,"mirrored":false,"garbage_in_window":false,"window_letters":["..S","...","L.O","..O","..."],"verified_to":283,"followup":{"lock":24,"fired":false,"reason":"well_filled_not_i"},"well_depth":2,"donation":{"columns":[{"col":4,"hole_row":37,"depth":2,"cover":"kept"}],"box":{"rows":[34,38],"cols":[4,6]},"t_cells":[[36,5],[35,6],[35,5],[35,4]]},"qualifies":false,"not_qualified":["opener_route"]},
   {"session":"2026-11-26","file":"replay-2026-11-26-07.ttrm","round_index0":4,"match":7,"round":5,"player":"pinglamb","variant":"rule","lock":19,"in_opener":true,"mirrored":false,"garbage_in_window":false,"window_letters":["..S","...","L.O","..O","..."],"verified_to":222,"followup":{"lock":24,"fired":false,"reason":"well_filled_not_i"},"well_depth":2,"donation":{"columns":[{"col":4,"hole_row":37,"depth":2,"cover":"kept"}],"box":{"rows":[34,38],"cols":[4,6]},"t_cells":[[36,5],[35,6],[35,5],[35,4]]},"qualifies":false,"not_qualified":["opener_route"]},
   {"session":"2026-11-26","file":"replay-2026-11-26-07.ttrm","round_index0":5,"match":7,"round":6,"player":"yachi","variant":"rule","lock":29,"in_opener":false,"mirrored":false,"garbage_in_window":true,"window_letters":["..L","...","L.S","..S","G.G"],"verified_to":55,"followup":{"lock":31,"fired":false,"reason":"well_filled_not_i"},"well_depth":1,"donation":{"columns":[{"col":2,"hole_row":32,"depth":1,"cover":"kept"}],"box":{"rows":[29,33],"cols":[2,4]},"t_cells":[[31,3],[30,4],[30,3],[30,2]]},"qualifies":true,"not_qualified":[]},
-  {"session":"2026-11-26","file":"replay-2026-11-26-07.ttrm","round_index0":9,"match":7,"round":10,"player":"yachi","variant":"rule","lock":293,"in_opener":false,"mirrored":false,"garbage_in_window":true,"window_letters":["T..","...","J.S","L..","GGG"],"verified_to":359,"followup":{"lock":294,"fired":false,"reason":"well_filled_not_i"},"well_depth":1,"donation":{"columns":[{"col":7,"hole_row":33,"depth":1,"cover":"cleared"},{"col":8,"hole_row":33,"depth":3,"cover":"cleared"}],"box":{"rows":[30,34],"cols":[5,7]},"t_cells":[[32,6],[31,7],[31,6],[31,5]]},"qualifies":false,"not_qualified":["other_page"]}
+  {"session":"2026-11-26","file":"replay-2026-11-26-07.ttrm","round_index0":9,"match":7,"round":10,"player":"yachi","variant":"rule","lock":293,"in_opener":false,"mirrored":false,"garbage_in_window":true,"window_letters":["T..","...","J.S","L..","GGG"],"verified_to":359,"followup":{"lock":294,"fired":false,"reason":"well_filled_not_i"},"well_depth":1,"donation":{"columns":[{"col":7,"hole_row":33,"depth":1,"cover":"cleared"},{"col":8,"hole_row":33,"depth":3,"cover":"cleared"}],"box":{"rows":[30,34],"cols":[5,7]},"t_cells":[[32,6],[31,7],[31,6],[31,5]]},"qualifies":false,"not_qualified":["other_page"]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-01.ttrm","round_index0":1,"match":1,"round":2,"player":"pinglamb","variant":"rule","lock":104,"in_opener":false,"mirrored":false,"garbage_in_window":false,"window_letters":["...J","S...","SS.Z",".SZZ",".ZZS"],"verified_to":246,"followup":{"lock":110,"fired":true,"reason":null},"well_depth":4,"donation":{"columns":[{"col":0,"hole_row":36,"depth":4,"cover":"kept"}],"box":{"rows":[33,37],"cols":[0,3]},"t_cells":[[35,2],[34,3],[34,2],[34,1]]},"qualifies":false,"not_qualified":["other_page"]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-01.ttrm","round_index0":1,"match":1,"round":2,"player":"yachi","variant":"rule","lock":31,"in_opener":false,"mirrored":false,"garbage_in_window":false,"window_letters":["...S","S...","SS.J",".S.J","II.J"],"verified_to":238,"followup":{"lock":32,"fired":false,"reason":"well_filled_not_i"},"well_depth":1,"donation":{"columns":[{"col":2,"hole_row":35,"depth":1,"cover":"kept"}],"box":{"rows":[32,36],"cols":[2,5]},"t_cells":[[34,4],[33,5],[33,4],[33,3]]},"qualifies":true,"not_qualified":[]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-01.ttrm","round_index0":1,"match":1,"round":2,"player":"yachi","variant":"rule","lock":111,"in_opener":false,"mirrored":false,"garbage_in_window":true,"window_letters":["Z..","...","J.S","JI.","GGG"],"verified_to":238,"followup":{"lock":113,"fired":false,"reason":"well_filled_not_i"},"well_depth":1,"donation":{"columns":[{"col":6,"hole_row":34,"depth":1,"cover":"cleared"}],"box":{"rows":[31,35],"cols":[4,6]},"t_cells":[[33,5],[32,6],[32,5],[32,4]]},"qualifies":true,"not_qualified":[]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-01.ttrm","round_index0":4,"match":1,"round":5,"player":"pinglamb","variant":"rule","lock":28,"in_opener":false,"mirrored":false,"garbage_in_window":true,"window_letters":["..SS...","...SJJJ","Z.OOOOJ","ZZOOOO.","GGGGGGG"],"verified_to":102,"followup":{"lock":33,"fired":false,"reason":"i_in_well_not_quad"},"well_depth":1,"donation":{"columns":[{"col":9,"hole_row":33,"depth":1,"cover":"cleared"}],"box":{"rows":[30,34],"cols":[3,9]},"t_cells":[[32,4],[31,5],[31,4],[31,3]]},"qualifies":true,"not_qualified":[]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-01.ttrm","round_index0":4,"match":1,"round":5,"player":"yachi","variant":"rule","lock":32,"in_opener":false,"mirrored":false,"garbage_in_window":true,"window_letters":["S...","...Z","L.LZ","J.L.","GGGG"],"verified_to":104,"followup":{"lock":34,"fired":false,"reason":"well_filled_not_i"},"well_depth":1,"donation":{"columns":[{"col":4,"hole_row":30,"depth":1,"cover":"kept"}],"box":{"rows":[27,31],"cols":[1,4]},"t_cells":[[29,2],[28,3],[28,2],[28,1]]},"qualifies":true,"not_qualified":[]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-01.ttrm","round_index0":9,"match":1,"round":10,"player":"yachi","variant":"rule_tss","lock":6,"in_opener":true,"mirrored":false,"garbage_in_window":false,"window_letters":["Z...","....","O.SS","OSS."],"verified_to":71,"followup":{"lock":7,"fired":false,"reason":"well_filled_not_i"},"well_depth":1,"donation":{"columns":[{"col":4,"hole_row":39,"depth":1,"cover":"kept"},{"col":5,"hole_row":39,"depth":1,"cover":"kept"},{"col":6,"hole_row":39,"depth":1,"cover":"kept"}],"box":{"rows":[36,39],"cols":[1,4]},"t_cells":[[38,2],[37,3],[37,2],[37,1]]},"qualifies":false,"not_qualified":["other_page","opener_spin"]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-01.ttrm","round_index0":9,"match":1,"round":10,"player":"yachi","variant":"rule","lock":13,"in_opener":true,"mirrored":false,"garbage_in_window":false,"window_letters":["Z...","...L","T.SS","SSS."],"verified_to":71,"followup":{"lock":18,"fired":false,"reason":"well_filled_not_i"},"well_depth":1,"donation":{"columns":[{"col":6,"hole_row":39,"depth":1,"cover":"kept"}],"box":{"rows":[36,39],"cols":[3,6]},"t_cells":[[38,4],[37,5],[37,4],[37,3]]},"qualifies":false,"not_qualified":["other_page","opener_route"]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-01.ttrm","round_index0":9,"match":1,"round":10,"player":"yachi","variant":"rule","lock":25,"in_opener":false,"mirrored":false,"garbage_in_window":true,"window_letters":["...Z","S...","SS.J",".SJJ","GGGG"],"verified_to":71,"followup":{"lock":34,"fired":false,"reason":"well_covered"},"well_depth":1,"donation":{"columns":[{"col":5,"hole_row":37,"depth":1,"cover":"kept"}],"box":{"rows":[34,38],"cols":[5,8]},"t_cells":[[36,7],[35,8],[35,7],[35,6]]},"qualifies":false,"not_qualified":["opener_route"]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-01.ttrm","round_index0":10,"match":1,"round":11,"player":"yachi","variant":"rule","lock":42,"in_opener":false,"mirrored":false,"garbage_in_window":false,"window_letters":["..S","...","Z.O","..O","IJO"],"verified_to":59,"followup":{"lock":44,"fired":false,"reason":"well_filled_not_i"},"well_depth":1,"donation":{"columns":[{"col":5,"hole_row":36,"depth":3,"cover":"cleared"},{"col":6,"hole_row":36,"depth":1,"cover":"cleared"}],"box":{"rows":[33,37],"cols":[6,8]},"t_cells":[[35,7],[34,8],[34,7],[34,6]]},"qualifies":false,"not_qualified":["other_page"]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-02.ttrm","round_index0":0,"match":2,"round":1,"player":"pinglamb","variant":"rule","lock":38,"in_opener":false,"mirrored":false,"garbage_in_window":true,"window_letters":["..J","...","Z.J","..J","G.G"],"verified_to":136,"followup":{"lock":40,"fired":false,"reason":"well_filled_not_i"},"well_depth":1,"donation":{"columns":[{"col":1,"hole_row":30,"depth":1,"cover":"cleared"},{"col":2,"hole_row":30,"depth":1,"cover":"cleared"}],"box":{"rows":[27,31],"cols":[2,4]},"t_cells":[[29,3],[28,4],[28,3],[28,2]]},"qualifies":false,"not_qualified":["other_page"]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-02.ttrm","round_index0":2,"match":2,"round":3,"player":"yachi","variant":"rule","lock":19,"in_opener":true,"mirrored":false,"garbage_in_window":false,"window_letters":["S..","...","O.J","O..","..."],"verified_to":160,"followup":{"lock":26,"fired":false,"reason":"well_filled_not_i"},"well_depth":2,"donation":{"columns":[{"col":5,"hole_row":37,"depth":2,"cover":"kept"}],"box":{"rows":[34,38],"cols":[3,5]},"t_cells":[[36,4],[35,5],[35,4],[35,3]]},"qualifies":false,"not_qualified":["opener_route"]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-02.ttrm","round_index0":2,"match":2,"round":3,"player":"yachi","variant":"rule_tss","lock":75,"in_opener":false,"mirrored":false,"garbage_in_window":true,"window_letters":["J...","....","O.SS","OSS.","GGG."],"verified_to":160,"followup":{"lock":76,"fired":true,"reason":null},"well_depth":4,"donation":{"columns":[{"col":9,"hole_row":36,"depth":4,"cover":"kept"}],"box":{"rows":[33,37],"cols":[6,9]},"t_cells":[[35,7],[34,8],[34,7],[34,6]]},"qualifies":false,"not_qualified":["other_page"]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-02.ttrm","round_index0":3,"match":2,"round":4,"player":"pinglamb","variant":"rule","lock":23,"in_opener":false,"mirrored":false,"garbage_in_window":false,"window_letters":["..S","...","L.O","..O","..."],"verified_to":38,"followup":{"lock":24,"fired":false,"reason":"well_filled_not_i"},"well_depth":2,"donation":{"columns":[{"col":4,"hole_row":28,"depth":2,"cover":"kept"}],"box":{"rows":[25,29],"cols":[4,6]},"t_cells":[[27,5],[26,6],[26,5],[26,4]]},"qualifies":false,"not_qualified":["opener_route"]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-02.ttrm","round_index0":4,"match":2,"round":5,"player":"yachi","variant":"rule","lock":32,"in_opener":false,"mirrored":false,"garbage_in_window":false,"window_letters":["..L","...","Z.S","..S","S.O"],"verified_to":35,"followup":{"lock":35,"fired":false,"reason":"well_filled_not_i"},"well_depth":1,"donation":{"columns":[{"col":4,"hole_row":32,"depth":1,"cover":"cleared"}],"box":{"rows":[29,33],"cols":[4,6]},"t_cells":[[31,5],[30,6],[30,5],[30,4]]},"qualifies":false,"not_qualified":["other_page"]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-02.ttrm","round_index0":6,"match":2,"round":7,"player":"yachi","variant":"rule","lock":88,"in_opener":false,"mirrored":false,"garbage_in_window":false,"window_letters":["...Z","S...","SS.O",".S.O",".ZJJ"],"verified_to":185,"followup":{"lock":91,"fired":true,"reason":null},"well_depth":6,"donation":{"columns":[{"col":0,"hole_row":31,"depth":6,"cover":"kept"}],"box":{"rows":[28,32],"cols":[0,3]},"t_cells":[[30,2],[29,3],[29,2],[29,1]]},"qualifies":true,"not_qualified":[]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-02.ttrm","round_index0":9,"match":2,"round":10,"player":"yachi","variant":"rule","lock":33,"in_opener":false,"mirrored":false,"garbage_in_window":true,"window_letters":["L..","...","S.S","S..","GGG"],"verified_to":37,"followup":{"lock":34,"fired":false,"reason":"well_filled_not_i"},"well_depth":1,"donation":{"columns":[{"col":7,"hole_row":36,"depth":1,"cover":"cleared"},{"col":8,"hole_row":36,"depth":2,"cover":"cleared"}],"box":{"rows":[33,37],"cols":[5,7]},"t_cells":[[35,6],[34,7],[34,6],[34,5]]},"qualifies":false,"not_qualified":["other_page"]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-02.ttrm","round_index0":12,"match":2,"round":13,"player":"yachi","variant":"rule","lock":88,"in_opener":false,"mirrored":false,"garbage_in_window":true,"window_letters":["L...","...Z","Z.ZZ","ZTZ.","GGGG"],"verified_to":94,"followup":{"lock":93,"fired":false,"reason":"well_covered"},"well_depth":1,"donation":{"columns":[{"col":7,"hole_row":35,"depth":1,"cover":"kept"}],"box":{"rows":[32,36],"cols":[4,7]},"t_cells":[[34,5],[33,6],[33,5],[33,4]]},"qualifies":true,"not_qualified":[]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-03.ttrm","round_index0":0,"match":3,"round":1,"player":"pinglamb","variant":"rule","lock":22,"in_opener":false,"mirrored":false,"garbage_in_window":true,"window_letters":["..S","...","L.O","..O","GGG"],"verified_to":153,"followup":{"lock":25,"fired":false,"reason":"well_filled_not_i"},"well_depth":1,"donation":{"columns":[{"col":4,"hole_row":34,"depth":1,"cover":"kept"}],"box":{"rows":[31,35],"cols":[4,6]},"t_cells":[[33,5],[32,6],[32,5],[32,4]]},"qualifies":false,"not_qualified":["opener_route"]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-03.ttrm","round_index0":0,"match":3,"round":1,"player":"yachi","variant":"rule","lock":22,"in_opener":false,"mirrored":false,"garbage_in_window":true,"window_letters":["Z...","...Z","S.ZZ","OOZ.","GGGG"],"verified_to":153,"followup":{"lock":23,"fired":false,"reason":"i_in_well_not_quad"},"well_depth":1,"donation":{"columns":[{"col":5,"hole_row":34,"depth":1,"cover":"kept"}],"box":{"rows":[31,35],"cols":[2,5]},"t_cells":[[33,3],[32,4],[32,3],[32,2]]},"qualifies":true,"not_qualified":[]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-03.ttrm","round_index0":1,"match":3,"round":2,"player":"yachi","variant":"rule","lock":121,"in_opener":false,"mirrored":false,"garbage_in_window":false,"window_letters":["...J","S...","SS.Z",".SSZ"],"verified_to":121,"followup":{"lock":null,"fired":false,"reason":"round_ended"},"well_depth":1,"donation":{"columns":[{"col":3,"hole_row":39,"depth":1,"cover":"kept"}],"box":{"rows":[36,39],"cols":[3,6]},"t_cells":[[38,5],[37,6],[37,5],[37,4]]},"qualifies":true,"not_qualified":[]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-03.ttrm","round_index0":3,"match":3,"round":4,"player":"pinglamb","variant":"rule","lock":20,"in_opener":true,"mirrored":false,"garbage_in_window":false,"window_letters":["..S","...","L.O","..O","..."],"verified_to":116,"followup":{"lock":21,"fired":false,"reason":"well_filled_not_i"},"well_depth":2,"donation":{"columns":[{"col":4,"hole_row":37,"depth":2,"cover":"kept"}],"box":{"rows":[34,38],"cols":[4,6]},"t_cells":[[36,5],[35,6],[35,5],[35,4]]},"qualifies":false,"not_qualified":["opener_route"]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-03.ttrm","round_index0":5,"match":3,"round":6,"player":"pinglamb","variant":"rule","lock":20,"in_opener":true,"mirrored":false,"garbage_in_window":false,"window_letters":["....",".SS.","SS..","ZZZ.","..ZZ",".JJO"],"verified_to":31,"followup":{"lock":21,"fired":false,"reason":"well_filled_not_i"},"well_depth":8,"donation":{"columns":[{"col":4,"hole_row":32,"depth":1,"cover":"cleared"},{"col":5,"hole_row":32,"depth":8,"cover":"kept"}],"box":{"rows":[28,33],"cols":[5,8]},"t_cells":[[30,7],[31,8],[30,8],[29,8]]},"qualifies":false,"not_qualified":["opener_route"]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-03.ttrm","round_index0":6,"match":3,"round":7,"player":"yachi","variant":"rule","lock":56,"in_opener":false,"mirrored":false,"garbage_in_window":false,"window_letters":["...S","Z...","ZZ.L",".LLL",".JJJ"],"verified_to":69,"followup":{"lock":60,"fired":false,"reason":"well_filled_not_i"},"well_depth":2,"donation":{"columns":[{"col":5,"hole_row":38,"depth":2,"cover":"cleared"}],"box":{"rows":[35,39],"cols":[5,8]},"t_cells":[[37,7],[36,8],[36,7],[36,6]]},"qualifies":false,"not_qualified":["other_page"]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-03.ttrm","round_index0":9,"match":3,"round":10,"player":"pinglamb","variant":"rule","lock":19,"in_opener":true,"mirrored":false,"garbage_in_window":false,"window_letters":["..Z","...","L.O","..O","..."],"verified_to":255,"followup":{"lock":21,"fired":false,"reason":"well_filled_not_i"},"well_depth":2,"donation":{"columns":[{"col":4,"hole_row":37,"depth":2,"cover":"kept"}],"box":{"rows":[34,38],"cols":[4,6]},"t_cells":[[36,5],[35,6],[35,5],[35,4]]},"qualifies":false,"not_qualified":["opener_route"]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-03.ttrm","round_index0":9,"match":3,"round":10,"player":"yachi","variant":"rule","lock":24,"in_opener":false,"mirrored":false,"garbage_in_window":true,"window_letters":["T..","...","O.S","SS.","GGG"],"verified_to":283,"followup":{"lock":32,"fired":false,"reason":"well_filled_not_i"},"well_depth":1,"donation":{"columns":[{"col":5,"hole_row":34,"depth":1,"cover":"cleared"}],"box":{"rows":[31,35],"cols":[3,5]},"t_cells":[[33,4],[32,5],[32,4],[32,3]]},"qualifies":false,"not_qualified":["opener_route"]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-04.ttrm","round_index0":1,"match":4,"round":2,"player":"pinglamb","variant":"rule","lock":24,"in_opener":false,"mirrored":false,"garbage_in_window":false,"window_letters":["..Z","...","L.O","..O","..."],"verified_to":57,"followup":{"lock":26,"fired":false,"reason":"well_filled_not_i"},"well_depth":2,"donation":{"columns":[{"col":4,"hole_row":32,"depth":2,"cover":"kept"}],"box":{"rows":[29,33],"cols":[4,6]},"t_cells":[[31,5],[30,6],[30,5],[30,4]]},"qualifies":false,"not_qualified":["opener_route"]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-04.ttrm","round_index0":3,"match":4,"round":4,"player":"yachi","variant":"rule","lock":191,"in_opener":false,"mirrored":false,"garbage_in_window":false,"window_letters":["...L","Z...","ZZ.T",".STT",".SST"],"verified_to":192,"followup":{"lock":192,"fired":true,"reason":null},"well_depth":4,"donation":{"columns":[{"col":1,"hole_row":31,"depth":4,"cover":"cleared"}],"box":{"rows":[28,32],"cols":[1,4]},"t_cells":[[30,3],[29,4],[29,3],[29,2]]},"qualifies":false,"not_qualified":["other_page"]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-04.ttrm","round_index0":8,"match":4,"round":9,"player":"pinglamb","variant":"rule","lock":27,"in_opener":false,"mirrored":false,"garbage_in_window":true,"window_letters":["..SS..","...SLL","J.ZZLZ","JJJZZ.","GGGGGG"],"verified_to":39,"followup":{"lock":30,"fired":false,"reason":"well_filled_not_i"},"well_depth":1,"donation":{"columns":[{"col":6,"hole_row":38,"depth":1,"cover":"kept"},{"col":9,"hole_row":38,"depth":1,"cover":"cleared"}],"box":{"rows":[35,39],"cols":[1,6]},"t_cells":[[37,2],[36,3],[36,2],[36,1]]},"qualifies":true,"not_qualified":[]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-04.ttrm","round_index0":9,"match":4,"round":10,"player":"yachi","variant":"rule","lock":213,"in_opener":false,"mirrored":false,"garbage_in_window":true,"window_letters":["I....","...ZO","Z.ZZO","OOZZ.","GGGGG"],"verified_to":213,"followup":{"lock":214,"fired":false,"reason":"past_verified"},"well_depth":1,"donation":{"columns":[{"col":8,"hole_row":34,"depth":1,"cover":"cleared"}],"box":{"rows":[31,35],"cols":[4,8]},"t_cells":[[33,5],[32,6],[32,5],[32,4]]},"qualifies":true,"not_qualified":[]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-04.ttrm","round_index0":10,"match":4,"round":11,"player":"yachi","variant":"rule","lock":20,"in_opener":true,"mirrored":false,"garbage_in_window":false,"window_letters":["....S","OO...","OOZ.S",".ZZSS",".ZOOZ"],"verified_to":40,"followup":{"lock":21,"fired":false,"reason":"i_in_well_not_quad"},"well_depth":2,"donation":{"columns":[{"col":4,"hole_row":26,"depth":2,"cover":"cleared"}],"box":{"rows":[23,27],"cols":[4,8]},"t_cells":[[25,7],[24,8],[24,7],[24,6]]},"qualifies":true,"not_qualified":[]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-05.ttrm","round_index0":1,"match":5,"round":2,"player":"yachi","variant":"rule","lock":23,"in_opener":false,"mirrored":false,"garbage_in_window":true,"window_letters":["S..","...","O.J","O..","GG."],"verified_to":80,"followup":{"lock":28,"fired":true,"reason":null},"well_depth":2,"donation":{"columns":[{"col":5,"hole_row":28,"depth":2,"cover":"kept"}],"box":{"rows":[25,29],"cols":[3,5]},"t_cells":[[27,4],[26,5],[26,4],[26,3]]},"qualifies":false,"not_qualified":["opener_route"]},
+  {"session":"2026-11-27","file":"replay-2026-11-27-05.ttrm","round_index0":7,"match":5,"round":8,"player":"yachi","variant":"rule","lock":34,"in_opener":false,"mirrored":false,"garbage_in_window":true,"window_letters":["J...","...Z","S.ZZ","SJZ.","GGG."],"verified_to":34,"followup":{"lock":null,"fired":false,"reason":"round_ended"},"well_depth":3,"donation":{"columns":[{"col":9,"hole_row":30,"depth":3,"cover":"kept"}],"box":{"rows":[27,31],"cols":[6,9]},"t_cells":[[29,7],[28,8],[28,7],[28,6]]},"qualifies":false,"not_qualified":["other_page"]}
  ]
 }

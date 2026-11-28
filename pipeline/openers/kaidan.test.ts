@@ -58,7 +58,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26', '2026-11-27']);
 const ART_PATH = `${import.meta.dir}/../../analysis/kaidan-facts.json`;
 const TR = JSON.parse(readFileSync(KAIDAN.transcriptionPath, 'utf8'));
 const V = TR.variants.find((v: any) => v.id === 'kaidan');
@@ -197,6 +197,14 @@ const KAIDAN_HITS: string[] = [
   "2026-11-26 m5r11 yachi lock 137 (mirrored)",
   "2026-11-26 m7r2 yachi lock 68",
   "2026-11-26 m7r7 yachi lock 94",
+  "2026-11-27 m1r2 pinglamb lock 104 (mirrored)",
+  "2026-11-27 m1r5 yachi lock 91 (mirrored)",
+  "2026-11-27 m2r10 yachi lock 26",
+  "2026-11-27 m3r7 yachi lock 56 (mirrored)",
+  "2026-11-27 m4r3 yachi lock 144 (mirrored)",
+  "2026-11-27 m4r4 yachi lock 191 (mirrored)",
+  "2026-11-27 m4r10 yachi lock 183 (mirrored)",
+  "2026-11-27 m5r8 yachi lock 34",
 ];
 
 const PAYOFF_NOT_FIRED: string[] = [
@@ -325,6 +333,9 @@ const PAYOFF_NOT_FIRED: string[] = [
   "2026-11-26 m2r2 pinglamb lock 50 (well_filled_not_i at lock 51)",
   "2026-11-26 m5r11 yachi lock 137 (well_filled_not_i at lock 138)",
   "2026-11-26 m7r7 yachi lock 94 (past_verified at lock 95)",
+  "2026-11-27 m3r7 yachi lock 56 (well_filled_not_i at lock 60)",
+  "2026-11-27 m4r10 yachi lock 183 (i_in_well_not_quad at lock 184)",
+  "2026-11-27 m5r8 yachi lock 34 (round_ended)",
 ];
 
 const GARBAGE_IN_WINDOW: string[] = [
@@ -407,6 +418,11 @@ const GARBAGE_IN_WINDOW: string[] = [
   "2026-11-26 m3r8 yachi lock 30",
   "2026-11-26 m5r11 yachi lock 137",
   "2026-11-26 m7r7 yachi lock 94",
+  "2026-11-27 m1r5 yachi lock 91",
+  "2026-11-27 m2r10 yachi lock 26",
+  "2026-11-27 m4r3 yachi lock 144",
+  "2026-11-27 m4r10 yachi lock 183",
+  "2026-11-27 m5r8 yachi lock 34",
 ];
 
 const KAIDAN_IN_OPENER: string[] = [
@@ -490,6 +506,10 @@ const WELL_DEPTH_LT4: string[] = [
   "2026-11-26 m1r7 yachi lock 89 (3 deep)",
   "2026-11-26 m2r2 pinglamb lock 50 (2 deep)",
   "2026-11-26 m7r2 yachi lock 68 (2 deep)",
+  "2026-11-27 m3r7 yachi lock 56 (2 deep)",
+  "2026-11-27 m4r3 yachi lock 144 (3 deep)",
+  "2026-11-27 m4r10 yachi lock 183 (3 deep)",
+  "2026-11-27 m5r8 yachi lock 34 (3 deep)",
 ];
 
 const RECON_DROPPED_TSD: string[] = [];
@@ -732,6 +752,13 @@ const HIT_NOT_DONATION: string[] = [
   "2026-11-26 m4r8 pinglamb lock 131 (filled_above_window)",
   "2026-11-26 m5r11 yachi lock 137 (filled_above_window)",
   "2026-11-26 m7r2 yachi lock 68 (filled_above_window)",
+  "2026-11-27 m1r5 yachi lock 91 (filled_above_window)",
+  "2026-11-27 m2r10 yachi lock 26 (incomplete)",
+  "2026-11-27 m3r7 yachi lock 56 (cavity_lt4)",
+  "2026-11-27 m4r10 yachi lock 183 (filled_above_window)",
+  "2026-11-27 m4r3 yachi lock 144 (filled_above_window)",
+  "2026-11-27 m4r4 yachi lock 191 (filled_above_window)",
+  "2026-11-27 m5r8 yachi lock 34 (filled_above_window)",
 ];
 
 /** 社畜トレイン's window and this one agree, anchored on the same flat T in the same hand, on every cell they share:
@@ -784,42 +811,44 @@ const SHACHIKUTRAIN_ALSO_KAIDAN: string[] = [
   "2026-11-26 m1r9 pinglamb lock 40",
   "2026-11-26 m2r2 pinglamb lock 50",
   "2026-11-26 m3r8 yachi lock 30",
+  "2026-11-27 m3r7 yachi lock 56",
+  "2026-11-27 m4r4 yachi lock 191",
 ];
 
 /** window_off_board, per player: a count with a property check, not a list (see the header). */
-const WINDOW_OFF_BOARD = { pinglamb: 1187, yachi: 893 };
+const WINDOW_OFF_BOARD = { pinglamb: 1222, yachi: 933 };
 /** Per player: the opportunities (scored full TSDs), split at the 0-based opener window. */
 const DENOM = {
-  pinglamb: { all: 8041, in_opener: 1557, mid_game: 6484 },
-  yachi: { all: 7279, in_opener: 1830, mid_game: 5449 },
+  pinglamb: { all: 8249, in_opener: 1601, mid_game: 6648 },
+  yachi: { all: 7520, in_opener: 1880, mid_game: 5640 },
 };
 /** Per player: hits, their split, mirrored, garbage in the window. */
 const HITS = {
-  pinglamb: { all: 95, in_opener: 1, mid_game: 94, mirrored: 52, garbage_in_window: 70 },
-  yachi: { all: 153, in_opener: 7, mid_game: 146, mirrored: 80, garbage_in_window: 92 },
+  pinglamb: { all: 96, in_opener: 1, mid_game: 95, mirrored: 53, garbage_in_window: 70 },
+  yachi: { all: 160, in_opener: 7, mid_game: 153, mirrored: 85, garbage_in_window: 97 },
 };
 /** Per player: the payoff (stored under `followup_by_player`, the shared artefact key). */
 const PAYOFF = {
-  pinglamb: { fired: 56, not_fired: { i_in_well_not_quad: 10, past_verified: 1, round_ended: 3, well_covered: 11, well_filled_not_i: 14 } },
-  yachi: { fired: 58, not_fired: { i_in_well_not_quad: 10, past_verified: 4, round_ended: 3, well_covered: 36, well_filled_not_i: 42 } },
+  pinglamb: { fired: 57, not_fired: { i_in_well_not_quad: 10, past_verified: 1, round_ended: 3, well_covered: 11, well_filled_not_i: 14 } },
+  yachi: { fired: 62, not_fired: { i_in_well_not_quad: 11, past_verified: 4, round_ended: 4, well_covered: 36, well_filled_not_i: 43 } },
 };
 const CONTROLS = {
-  under: { TSS: { pinglamb: 5, yachi: 11 }, TST: { pinglamb: 0, yachi: 0 }, mini_TSS: { pinglamb: 0, yachi: 0 }, mini_TSD: { pinglamb: 0, yachi: 0 } },
-  ablation: { no_must_empty: { pinglamb: 1480, yachi: 1194 }, no_roof: { pinglamb: 395, yachi: 363 }, t_overlap: { pinglamb: 391, yachi: 459 } },
-  orientation_baseline: { pinglamb: 71, yachi: 105 },
+  under: { TSS: { pinglamb: 5, yachi: 12 }, TST: { pinglamb: 0, yachi: 0 }, mini_TSS: { pinglamb: 0, yachi: 0 }, mini_TSD: { pinglamb: 0, yachi: 0 } },
+  ablation: { no_must_empty: { pinglamb: 1526, yachi: 1233 }, no_roof: { pinglamb: 406, yachi: 376 }, t_overlap: { pinglamb: 398, yachi: 476 } },
+  orientation_baseline: { pinglamb: 72, yachi: 108 },
 };
 /** What discriminates, measured: full TSDs (not only hits) whose anchored flat T meets ONE part of the window — the
  *  roof row above the cleared rows, the cleared rows, the well rows under them. The cleared rows are entailed by the
  *  clear (NaiveClauseForced) and do the least work; the well rows do the most, and are exactly the `no_roof`
  *  ablation (the cleared rows add nothing to them at a full TSD). */
-const PART_ONLY = { above: 4657, cleared: 13325, below: 758 };
+const PART_ONLY = { above: 4788, cleared: 13704, below: 782 };
 /** THE OTHER TWO MAXIMAL AGREEMENT BOXES (the window's note): measured as controls, never asserted against. In
  *  basic.spin's frame: the cleared rows alone (every cell entailed), and the cleared rows with the two well rows, one
  *  column wider to the left and with no roof row. `n` the full TSDs each admits, `hits` how many of this window's hits
  *  are among them. */
 const OTHER_MAXIMAL_BOXES = {
-  cleared_only: { window: { rows: [2, 3], cols: [3, 9] }, n: 13325, hits: 248 },
-  no_roof: { window: { rows: [2, 5], cols: [4, 9] }, n: 683, hits: 216 },
+  cleared_only: { window: { rows: [2, 3], cols: [3, 9] }, n: 13704, hits: 256 },
+  no_roof: { window: { rows: [2, 5], cols: [4, 9] }, n: 703, hits: 223 },
 };
 
 /** Measured byte-identical on this corpus, each for its reason; asserted to STAY identical. */
@@ -881,7 +910,7 @@ test('quarantined: report_eligible false, no claim ids, one variant measured at 
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
   const n = checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT);
-  expect(n).toBe(21764);
+  expect(n).toBe(22438);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 
@@ -1099,7 +1128,7 @@ test('donation: the shipped predicate reproduced per session and player, and eve
 test('the payoff row map is verified against the engine at every step it uses', () => {
   const c = art().check;
   expect(c.rowmap_unverified).toBe(35);
-  expect(c.rowmap_steps).toBe(386541);
+  expect(c.rowmap_steps).toBe(398979);
   expect(art().hits.every((h: any) => h.followup.reason !== 'rowmap_unverified')).toBe(true);
 });
 

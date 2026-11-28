@@ -39,7 +39,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26', '2026-11-27']);
 const ART_PATH = `${import.meta.dir}/../../analysis/dtcannon-facts.json`;
 const TR = JSON.parse(readFileSync(DTCANNON.transcriptionPath, 'utf8'));
 const H = 40;
@@ -120,21 +120,21 @@ const NOT_QUALIFIED: string[] = [
   '2026-09-11 m4r5 yachi lock 107 (ownership_unverified)',
 ];
 /** window_off_board, per player: a count with a property check, not a list (see the header). */
-const WINDOW_OFF_BOARD = { pinglamb: 1057, yachi: 762 };
+const WINDOW_OFF_BOARD = { pinglamb: 1091, yachi: 794 };
 
 /** Per player: the opportunity (scored full TSDs), split at the 0-based opener window. */
-const TSD_DENOM = { pinglamb: { all: 8041, in_opener: 1557, mid_game: 6484 },
-                    yachi: { all: 7279, in_opener: 1830, mid_game: 5449 } };
+const TSD_DENOM = { pinglamb: { all: 8249, in_opener: 1601, mid_game: 6648 },
+                    yachi: { all: 7520, in_opener: 1880, mid_game: 5640 } };
 const HITS = {pinglamb: {all: 0, in_opener: 0, mid_game: 0, mirrored: 0, garbage_in_window: 0}, yachi: {all: 35, in_opener: 5, mid_game: 30, mirrored: 12, garbage_in_window: 17}};
 const FOLLOWUP_FIRED = { pinglamb: 0, yachi: 31 };
 const QUALIFIED = { pinglamb: 0, yachi: 34 };
 /** The controls (the same window at other spins; the ablations; the orientation baseline). */
-const CONTROLS = {under: {TSS: {pinglamb: 0, yachi: 0}, TST: {pinglamb: 0, yachi: 0}, mini_TSS: {pinglamb: 0, yachi: 0}, mini_TSD: {pinglamb: 0, yachi: 0}}, ablation: {no_must_empty: {pinglamb: 0, yachi: 36}, no_roof: {pinglamb: 3374, yachi: 3151}, t_overlap: {pinglamb: 0, yachi: 35}}, orientation_baseline: {pinglamb: 71, yachi: 105}};
+const CONTROLS = {under: {TSS: {pinglamb: 0, yachi: 0}, TST: {pinglamb: 0, yachi: 0}, mini_TSS: {pinglamb: 0, yachi: 0}, mini_TSD: {pinglamb: 0, yachi: 0}}, ablation: {no_must_empty: {pinglamb: 0, yachi: 36}, no_roof: {pinglamb: 3454, yachi: 3252}, t_overlap: {pinglamb: 0, yachi: 35}}, orientation_baseline: {pinglamb: 72, yachi: 108}};
 /** What discriminates, measured: full TSDs whose anchored T meets ONE part of the window. `above` is the four
  *  rows over the T (the overhang over the TST stem, its second cell, the stem walled both sides, the nub row of
  *  the TST slot), of which `overhang` is the top two and `tst_side` the next two; `cleared` the two rows the TSD
  *  clears; `below` the stem's bottom cell under the nub and its two walls. */
-const PART_ONLY = { above: 36, overhang: 38, tst_side: 36, cleared: 15144, below: 6525 };
+const PART_ONLY = { above: 36, overhang: 38, tst_side: 36, cleared: 15589, below: 6706 };
 
 /** Measured byte-identical on this corpus, each for its reason; asserted to STAY identical. */
 const EQUIVALENT: Record<string, string> = {
@@ -211,7 +211,7 @@ test('quarantined: report_eligible false, no claim ids', () => {
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
   const n = checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT);
-  expect(n).toBe(21764);
+  expect(n).toBe(22438);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 

@@ -62,6 +62,42 @@ export function anySpinLines(board: AnyBoard): number | null {
   return null;
 }
 
+/**
+ * The T-spin cold-clear's height pattern can name on a board that is NOT near-topout: a rotation
+ * puts the T into a spin position (three corners filled, a line completed) where it does not REST —
+ * the cell under it is open, so it falls on, and a piece that moved after its last rotation is no
+ * T-spin. cold-clear's `cutout_tslot` reads column heights and never asks whether the T is
+ * supported. Returns the lines that unsupported spin position would complete, or `null` when none
+ * is reachable. Found on 2026-11-27 `replay-2026-11-27-01.ttrm` r3 pinglamb board 36 (stackTop 27):
+ * a kicked CW rotation lands the T at c3 r31-33 with its nose at c4 r32, completing r32 — but r33's
+ * c4 is open, so it drops a row and the rotation is lost; the full BFS reaches no T-spin at all.
+ */
+export function floatingSpinLines(board: AnyBoard): number | null {
+  const spawn: ActivePiece = { type: 'T', rotation: 0, col: 3, row: 18 };
+  const seen = new Set(['0:3:18']);
+  const q: { p: ActivePiece; rot: boolean; kick: boolean }[] = [{ p: spawn, rot: false, kick: false }];
+  let best: number | null = null;
+  for (let h = 0; h < q.length && h < 40000; h++) {
+    const { p: cur, rot, kick } = q[h]!;
+    const d = hardDrop(board as never, cur);
+    if (d.row !== cur.row && rot && detectTSpin(board as never, cur, true, kick) !== 'none') {
+      const after = board.map(r => [...r]);
+      for (const c of getPieceCells(cur)) if (c.row >= 0 && c.row < H) after[c.row]![c.col] = 'T';
+      const lines = after.filter(r => r.every(x => x !== null)).length;
+      if (lines > 0 && (best === null || lines > best)) best = lines;
+    }
+    for (const [n, isRot] of [[tryMove(board as never, cur, -1, 0), false], [tryMove(board as never, cur, 1, 0), false],
+        [tryMove(board as never, cur, 0, 1), false], [tryRotate(board as never, cur, 1), true],
+        [tryRotate(board as never, cur, -1), true]] as [ActivePiece | null, boolean][]) {
+      if (!n) continue;
+      const k = `${n.rotation}:${n.col}:${n.row}`;
+      if (seen.has(k)) continue; seen.add(k);
+      q.push({ p: n, rot: isRot, kick: isRot && (n.col !== cur.col || n.row !== cur.row) });
+    }
+  }
+  return best;
+}
+
 /** Highest filled row (lowest index) — a near-spawn value means a near-topout, low-manoeuvre board. */
 export function stackTop(board: AnyBoard): number {
   for (let r = 0; r < H; r++) if (board[r]!.some(x => x !== null)) return r;
@@ -90,11 +126,15 @@ export interface TslotSanction {
 export function classify(board: AnyBoard): TslotSanction {
   const spin = anySpinLines(board);
   const top = stackTop(board);
-  const sanctioned = !(spin === null && top > NEAR_TOPOUT_ROW);
+  // Only asked when the first two explanations fail, so it can never widen what they decide.
+  const floating = spin === null && top > NEAR_TOPOUT_ROW ? floatingSpinLines(board) : null;
+  const sanctioned = !(spin === null && top > NEAR_TOPOUT_ROW && floating === null);
   const reason = spin !== null
     ? `a T-spin IS reachable (clears ${spin}) — cold-clear counts slots that clear nothing`
-    : top > NEAR_TOPOUT_ROW
-      ? `no T-spin reachable and stackTop ${top} > ${NEAR_TOPOUT_ROW} — NOT near-topout, a real false negative`
-      : `no T-spin reachable, stackTop ${top} <= ${NEAR_TOPOUT_ROW} — near-topout, cold-clear's height pattern over-counts`;
+    : top <= NEAR_TOPOUT_ROW
+      ? `no T-spin reachable, stackTop ${top} <= ${NEAR_TOPOUT_ROW} — near-topout, cold-clear's height pattern over-counts`
+      : floating !== null
+        ? `no T-spin reachable; the only spin position (completing ${floating}) is unsupported — the T falls on and loses the rotation, cold-clear's height pattern over-counts`
+        : `no T-spin reachable and stackTop ${top} > ${NEAR_TOPOUT_ROW} — NOT near-topout, a real false negative`;
   return { sanctioned, stackTop: top, anySpinLines: spin, reason };
 }

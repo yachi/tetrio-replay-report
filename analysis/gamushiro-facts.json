@@ -175,6 +175,11 @@
     "session": "2026-11-26",
     "replays_md5": "d01f24b6610227c64eac1035f203b334",
     "replay_facts_md5": "2cb4ae5af4da74208db58d34d101ad67"
+   },
+   {
+    "session": "2026-11-27",
+    "replays_md5": "f57553058f05ceecbaa81262cda01321",
+    "replay_facts_md5": "00fceb533e90f820afd4ddfde3c63c23"
    }
   ],
   "routes_md5": "95375173a999fabf59b30cd86b9bfe1b",
@@ -208,7 +213,8 @@
   "2026-11-23",
   "2026-11-24",
   "2026-11-25",
-  "2026-11-26"
+  "2026-11-26",
+  "2026-11-27"
  ],
  "outcomes": [
   "bag1.l_placed_elsewhere"
@@ -223,10 +229,10 @@
     "pinglamb": 0,
     "yachi": 0
    },
-   "opportunities": 3831,
+   "opportunities": 3948,
    "opportunities_by_player": {
-    "pinglamb": 1941,
-    "yachi": 1890
+    "pinglamb": 2000,
+    "yachi": 1948
    },
    "pc_off_page": 0,
    "pc_off_page_by_player": {
@@ -248,10 +254,10 @@
     "pinglamb": 0,
     "yachi": 1
    },
-   "opportunities": 3368,
+   "opportunities": 3482,
    "opportunities_by_player": {
-    "pinglamb": 1862,
-    "yachi": 1506
+    "pinglamb": 1920,
+    "yachi": 1562
    },
    "pc_off_page": 0,
    "pc_off_page_by_player": {
@@ -578,10 +584,10 @@
     "pinglamb": 0,
     "yachi": 0
    },
-   "opportunities": 3831,
+   "opportunities": 3948,
    "opportunities_by_player": {
-    "pinglamb": 1941,
-    "yachi": 1890
+    "pinglamb": 2000,
+    "yachi": 1948
    },
    "pc_off_page": 0,
    "pc_off_page_by_player": {

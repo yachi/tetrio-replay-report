@@ -40,7 +40,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26', '2026-11-27']);
 const ART_PATH = `${import.meta.dir}/../../analysis/doubledagger-facts.json`;
 const TR = JSON.parse(readFileSync(DOUBLEDAGGER.transcriptionPath, 'utf8'));
 const H = 40;
@@ -95,7 +95,7 @@ const GARBAGE_IN_WINDOW: string[] = [
 const DOUBLEDAGGER_IN_OPENER: string[] = [];
 const RECON_DROPPED_TSD: string[] = [];
 /** window_off_board, per player: a count with a property check, not a list (see the header). */
-const WINDOW_OFF_BOARD = { pinglamb: 2018, yachi: 1985 };
+const WINDOW_OFF_BOARD = { pinglamb: 2087, yachi: 2053 };
 
 /** The one SDPC Spin round that reached the second C-Spin build (`3.second`), measured over the bag harddrop
  *  draws the Double Dagger boards in. */
@@ -104,8 +104,8 @@ const SDPC_SECOND_ROUNDS: string[] = [
 ];
 
 /** Per player: the opportunity (scored full TSDs), split at the 0-based opener window. */
-const TSD_DENOM = { pinglamb: { all: 8041, in_opener: 1557, mid_game: 6484 },
-                    yachi: { all: 7279, in_opener: 1830, mid_game: 5449 } };
+const TSD_DENOM = { pinglamb: { all: 8249, in_opener: 1601, mid_game: 6648 },
+                    yachi: { all: 7520, in_opener: 1880, mid_game: 5640 } };
 /** Per player: hits, their split, the mirrored ones, the follow-ups that fired. */
 const HITS = { pinglamb: { all: 34, in_opener: 0, mid_game: 34, mirrored: 21, garbage_in_window: 7 },
                yachi: { all: 20, in_opener: 0, mid_game: 20, mirrored: 14, garbage_in_window: 5 } };
@@ -114,16 +114,16 @@ const FOLLOWUP_FIRED = { pinglamb: 30, yachi: 13 };
 const CONTROLS = {
   under: { TSS: { pinglamb: 3, yachi: 2 }, TST: { pinglamb: 0, yachi: 0 },
            mini_TSS: { pinglamb: 0, yachi: 0 }, mini_TSD: { pinglamb: 0, yachi: 0 } },
-  ablation: { no_must_empty: { pinglamb: 4867, yachi: 4229 }, no_roof: { pinglamb: 34, yachi: 20 },
-              t_overlap: { pinglamb: 47, yachi: 22 } },
-  orientation_baseline: { pinglamb: 71, yachi: 105 },
+  ablation: { no_must_empty: { pinglamb: 4987, yachi: 4368 }, no_roof: { pinglamb: 34, yachi: 20 },
+              t_overlap: { pinglamb: 48, yachi: 22 } },
+  orientation_baseline: { pinglamb: 72, yachi: 108 },
 };
 /** What discriminates, measured: full TSDs (not only hits) whose anchored T meets ONE part of the window —
  *  the two cleared rows, the overhang row above them, or the lower slot under them. The lower slot alone gives
  *  exactly the headline's hits; the cleared rows (entailed by the clear) and the overhang row (which a TSD slot
  *  nearly always has) admit almost every full TSD. The overhang still has work to do: it is what tells the two
  *  hands apart (the `noRoof` mutant makes a lock match both, and the matcher refuses it). */
-const PART_ONLY = { cleared: 15144, overhang: 15140, lower: 54 };
+const PART_ONLY = { cleared: 15589, overhang: 15585, lower: 54 };
 
 /** Measured byte-identical on this corpus, each for its reason; asserted to STAY identical. */
 const EQUIVALENT: Record<string, string> = {
@@ -182,7 +182,7 @@ test('quarantined: report_eligible false, no claim ids', () => {
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
   const n = checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT);
-  expect(n).toBe(21764);
+  expect(n).toBe(22438);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 
@@ -346,7 +346,7 @@ test('cross-check: the SDPC Spin round that reached the second C-Spin build, ove
 test('the follow-up row map is verified against the engine at every step it uses', () => {
   const c = art().check;
   expect(c.rowmap_unverified).toBe(35);
-  expect(c.rowmap_steps).toBe(386541);
+  expect(c.rowmap_steps).toBe(398979);
   expect(art().hits.every((h: any) => h.followup.reason !== 'rowmap_unverified')).toBe(true);
 });
 

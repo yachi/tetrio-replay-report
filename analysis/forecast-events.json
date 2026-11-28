@@ -483,6 +483,36 @@
    "separation": 3,
    "mechanism": "line-clear",
    "mechanism_step": 129
+  },
+  {
+   "session": "2026-11-27",
+   "file": "replay-2026-11-27-01.ttrm",
+   "round_index0": 12,
+   "match": 1,
+   "round": 13,
+   "player": "pinglamb",
+   "lock": 109,
+   "roof_lock": 105,
+   "lines": 2,
+   "kind": "forecast_lineclear",
+   "separation": 4,
+   "mechanism": "line-clear",
+   "mechanism_step": 108
+  },
+  {
+   "session": "2026-11-27",
+   "file": "replay-2026-11-27-02.ttrm",
+   "round_index0": 5,
+   "match": 2,
+   "round": 6,
+   "player": "yachi",
+   "lock": 85,
+   "roof_lock": 83,
+   "lines": 2,
+   "kind": "forecast_lineclear",
+   "separation": 2,
+   "mechanism": "line-clear",
+   "mechanism_step": 84
   }
  ]
 }

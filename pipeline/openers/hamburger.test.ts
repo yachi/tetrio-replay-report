@@ -34,7 +34,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26', '2026-11-27']);
 const ART_PATH = `${import.meta.dir}/../../analysis/hamburger-facts.json`;
 const TR = JSON.parse(readFileSync(HAMBURGER.transcriptionPath, 'utf8'));
 const H = 40;
@@ -144,6 +144,7 @@ const OPENER_ROUTE_HITS: string[] = [
   '2026-11-24 m1r4 yachi lock 6 (sdpcspin+stickspin)',
   '2026-11-24 m1r13 yachi lock 6 (sdpcspin+stickspin)',
   '2026-11-25 m3r6 yachi lock 6 (sdpcspin+stickspin)',
+  '2026-11-27 m1r10 yachi lock 6 (sdpcspin+stickspin)',
 ];
 const OPENER_OTHER_HITS: string[] = [
   '2026-08-09 m6r7 yachi lock 19',
@@ -165,6 +166,7 @@ const QUALIFIED_MID_GAME: string[] = [
   '2026-11-01 m14r4 pinglamb lock 91',
   '2026-11-23 m4r3 yachi lock 87',
   '2026-11-25 m2r1 yachi lock 259',
+  '2026-11-27 m2r3 yachi lock 75',
 ];
 const COVER_NOT_ONE_SZ_OR_NULL: string[] = [
   '2026-08-19 m9r4 yachi lock 35 (null)',
@@ -193,27 +195,28 @@ const AT_VERIFIED_EDGE: string[] = [
 const QUALIFIED_PAYOFF_FIRED: string[] = [
   '2026-11-01 m14r4 pinglamb lock 91',
   '2026-11-23 m4r3 yachi lock 87',
+  '2026-11-27 m2r3 yachi lock 75',
 ];
 
-const OPP_DENOM = { pinglamb: { all: 906, in_opener: 126, mid_game: 780 }, yachi: { all: 1528, in_opener: 356, mid_game: 1172 } };
-const HITS = { pinglamb: { all: 47, in_opener: 5, mid_game: 42, mirrored: 16, garbage_in_window: 37 },
-               yachi: { all: 201, in_opener: 104, mid_game: 97, mirrored: 152, garbage_in_window: 77 } };
+const OPP_DENOM = { pinglamb: { all: 933, in_opener: 130, mid_game: 803 }, yachi: { all: 1586, in_opener: 365, mid_game: 1221 } };
+const HITS = { pinglamb: { all: 49, in_opener: 5, mid_game: 44, mirrored: 17, garbage_in_window: 39 },
+               yachi: { all: 207, in_opener: 105, mid_game: 102, mirrored: 156, garbage_in_window: 81 } };
 /** the payoff: `well_covered` / `well_filled_not_i` are another layer of the stacking (the page's Repeat) */
-const PAYOFF = { pinglamb: { fired: 25, not_fired: { i_in_well_not_quad: 5, well_covered: 5, well_filled_not_i: 12 } },
-                 yachi: { fired: 39, not_fired: { i_in_well_not_quad: 17, past_verified: 8, round_ended: 1, well_covered: 19, well_filled_not_i: 117 } } };
-const QUALIFY = { pinglamb: { qualified: 3, not_qualified: { dpc: 1, fragment: 31, garbage_in_shape: 8, in_opener: 5 } },
-                  yachi: { qualified: 7, not_qualified: { dpc: 2, fragment: 79, garbage_in_shape: 12, in_opener: 104, ownership_unverified: 2 } } };
+const PAYOFF = { pinglamb: { fired: 26, not_fired: { i_in_well_not_quad: 5, well_covered: 6, well_filled_not_i: 12 } },
+                 yachi: { fired: 41, not_fired: { i_in_well_not_quad: 17, past_verified: 8, round_ended: 1, well_covered: 20, well_filled_not_i: 120 } } };
+const QUALIFY = { pinglamb: { qualified: 3, not_qualified: { dpc: 1, fragment: 33, garbage_in_shape: 8, in_opener: 5 } },
+                  yachi: { qualified: 8, not_qualified: { dpc: 2, fragment: 82, garbage_in_shape: 13, in_opener: 105, ownership_unverified: 2 } } };
 /** cover kind per player, over every hit and over the qualifying ones */
 const COVER: Record<string, any> = {
-  pinglamb: { all: { complete_pieces: 2, not_complete: 38, one_sz: 7 }, qualified: { complete_pieces: 2, one_sz: 1 } },
-  yachi: { all: { complete_pieces: 2, not_complete: 91, null: 2, one_sz: 106 }, qualified: { complete_pieces: 2, one_sz: 5 } },
+  pinglamb: { all: { complete_pieces: 2, not_complete: 40, one_sz: 7 }, qualified: { complete_pieces: 2, one_sz: 1 } },
+  yachi: { all: { complete_pieces: 2, not_complete: 95, null: 2, one_sz: 108 }, qualified: { complete_pieces: 2, one_sz: 6 } },
 };
-const CONTROLS = {under: {TSD: {pinglamb: 0, yachi: 0}, TST: {pinglamb: 0, yachi: 0}, mini_TSS: {pinglamb: 0, yachi: 0}, mini_TSD: {pinglamb: 0, yachi: 0}}, ablation: {no_must_empty: {pinglamb: 381, yachi: 562}, no_roof: {pinglamb: 47, yachi: 202}, t_overlap: {pinglamb: 51, yachi: 205}}, orientation_baseline: {pinglamb: 208, yachi: 624}};
+const CONTROLS = {under: {TSD: {pinglamb: 0, yachi: 0}, TST: {pinglamb: 0, yachi: 0}, mini_TSS: {pinglamb: 0, yachi: 0}, mini_TSD: {pinglamb: 0, yachi: 0}}, ablation: {no_must_empty: {pinglamb: 393, yachi: 583}, no_roof: {pinglamb: 49, yachi: 208}, t_overlap: {pinglamb: 53, yachi: 212}}, orientation_baseline: {pinglamb: 212, yachi: 647}};
 /** full TSSs whose anchored T meets ONE row of the window: `above` the row over the arms, `arms` the T's arm row,
  *  `cleared` the row the TSS clears (the cover and the nub), `below` the hole row under it */
-const PART_ONLY: Record<string, number> = { above: 976, arms: 587, cleared: 1422, below: 319 };
+const PART_ONLY: Record<string, number> = { above: 1008, arms: 605, cleared: 1474, below: 331 };
 /** [this page's hits that are hits there, this page's hits], per other technique artefact that shares any */
-const COMMON: Record<string, number> = { basicdonating: 116 };
+const COMMON: Record<string, number> = { basicdonating: 118 };
 
 const EQUIVALENT: Record<string, string> = {
   noRecon: 'the corpus has no reconstruction disagreement (check.reconstruction_disagreed is 0)',
@@ -280,7 +283,7 @@ test('quarantined: report_eligible false, no claim ids, one variant, a payoff an
 });
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
-  expect(checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT)).toBe(21764);
+  expect(checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT)).toBe(22438);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 

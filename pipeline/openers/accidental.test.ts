@@ -12,7 +12,7 @@
  * filled cell above the T before j belongs to a piece placed after i (ROOF; any number of roof pieces). Tightened
  * the same day (yachi: 「影片食完tst ,擺完頂就食得，唔洗點砌，啲examples 要砌好多，唔算」; chose 「收緊版(0 個)」): the
  * slot box (the T rows and the row under them, the T's columns and one each side) must be complete right after i's
- * clear, so only the roof is built between the two spins (SLOT BUILT). The corpus then holds NO hit; the fourteen the
+ * clear, so only the roof is built between the two spins (SLOT BUILT). The corpus then holds NO hit; the fifteen the
  * relaxed rule found all had slot walls built after i, and are pinned here as `SLOT_BUILT_AFTER`, re-derived under the
  * `no_slot_built` ablation and run through the qualify hook as the LOOSE profile, so the rules stay exercised.
  *
@@ -42,7 +42,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05', '2026-11-17', '2026-11-19', '2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26', '2026-11-27']);
 const ART_PATH = `${import.meta.dir}/../../analysis/accidental-facts.json`;
 const OPENERS = import.meta.dir;
 const ANALYSIS = `${import.meta.dir}/../../analysis`;
@@ -69,9 +69,10 @@ const SLOT_BUILT_AFTER: string[] = [
   '2026-11-17 m3r2 pinglamb lock 308 tst',
   '2026-11-24 m5r1 yachi lock 42 tst',
   '2026-11-25 m5r6 yachi lock 162 tst',
+  '2026-11-27 m1r6 pinglamb lock 21 tst',
 ];
-/** Of the LOOSE hits, the two that are some opener route's own continuation (`opener_route`). */
-const LOOSE_NOT_QUALIFIED = ['2026-10-09 m4r4 pinglamb lock 24 tst', '2026-10-12 m1r2 pinglamb lock 24 tst'];
+/** Of the LOOSE hits, the three that are some opener route's own continuation (`opener_route`). */
+const LOOSE_NOT_QUALIFIED = ['2026-10-09 m4r4 pinglamb lock 24 tst', '2026-10-12 m1r2 pinglamb lock 24 tst', '2026-11-27 m1r6 pinglamb lock 21 tst'];
 const LOOSE_QUALIFIED = SLOT_BUILT_AFTER.filter(n => !LOOSE_NOT_QUALIFIED.includes(n));
 const QUALIFIED: string[] = [];
 /** each LOOSE hit's previous T-spin and roof pieces, by lock */
@@ -90,20 +91,21 @@ const RULE: Record<string, [number, number[]]> = {
   '2026-11-17 m3r2 pinglamb lock 308 tst': [303, [304, 307]],
   '2026-11-24 m5r1 yachi lock 42 tst': [30, [37, 38]],
   '2026-11-25 m5r6 yachi lock 162 tst': [157, [160, 161]],
+  '2026-11-27 m1r6 pinglamb lock 21 tst': [16, [19]],
 };
 
 const DENOM = {
-  pinglamb: { TST: { all: 2083, in_opener: 2034, mid_game: 49 } },
-  yachi: { TST: { all: 1293, in_opener: 1221, mid_game: 72 } },
+  pinglamb: { TST: { all: 2153, in_opener: 2102, mid_game: 51 } },
+  yachi: { TST: { all: 1343, in_opener: 1268, mid_game: 75 } },
 };
 const HITS = { pinglamb: { all: 0, in_opener: 0, mid_game: 0, garbage_in_window: 0 },
                yachi: { all: 0, in_opener: 0, mid_game: 0, garbage_in_window: 0 } };
 const QUALIFY = { pinglamb: { qualified: 0, not_qualified: {} }, yachi: { qualified: 0, not_qualified: {} } };
-/** each clause dropped, at the opportunity. Only no_slot_built admits anything (the fourteen SLOT_BUILT_AFTER); the
+/** each clause dropped, at the opportunity. Only no_slot_built admits anything (the fifteen SLOT_BUILT_AFTER); the
  *  others equal the headline, 0, on this corpus, because every candidate they admit still fails slot-built */
 const ABLATION = { no_next_t: { pinglamb: 0, yachi: 0 }, no_exposed: { pinglamb: 0, yachi: 0 },
                    no_access: { pinglamb: 0, yachi: 0 }, no_new_roof: { pinglamb: 0, yachi: 0 },
-                   no_slot_built: { pinglamb: 5, yachi: 9 } };
+                   no_slot_built: { pinglamb: 6, yachi: 9 } };
 type Abl = '' | keyof typeof ABLATION;
 
 let DIGESTS: TechDigest[] | null = null;
@@ -234,7 +236,7 @@ test('quarantined: report_eligible false, no claim ids, one spin_rule variant wi
 });
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
-  expect(checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT)).toBe(21764);
+  expect(checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT)).toBe(22438);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 
@@ -288,7 +290,7 @@ test('each LOOSE hit: its previous T-spin cleared lines, no T between, roof piec
   }
 }, 600_000);
 
-test('the qualify verdicts on the LOOSE hits, re-derived; two are an opener route\'s own, and only that rule turned off adds them', () => {
+test('the qualify verdicts on the LOOSE hits, re-derived; three are an opener route\'s own, and only that rule turned off adds them', () => {
   const byKey = new Map(digests().map(d => [`${d.file}|${d.round}|${d.user}`, d]));
   const L = looseArt().hits;
   const verdicts = (m: AccidentalQualifyMutants) => {
@@ -303,10 +305,11 @@ test('the qualify verdicts on the LOOSE hits, re-derived; two are an opener rout
   const nq = L.filter((h: any) => !h.qualifies);
   expect(nq.map(qName)).toEqual(LOOSE_NOT_QUALIFIED);
   expect(L.filter((h: any) => h.qualifies).map(qName)).toEqual(LOOSE_QUALIFIED);
-  for (const h of nq) expect(h.not_qualified, qName(h)).toEqual(['opener_route']);
+  // 2026-11-27 m1r6 is the first of them inside the opener window (lock 21), so it also fails in_opener
+  for (const h of nq) expect(h.not_qualified, qName(h)).toEqual(h.in_opener ? ['in_opener', 'opener_route'] : ['opener_route']);
   for (const m of ['noOpener', 'noOtherPage', 'noOpenerRoute', 'noOpenerSpin'] as (keyof AccidentalQualifyMutants)[])
     expect(verdicts({ [m]: true }).filter(x => x.qualifies).length, m)
-      .toBe(m === 'noOpenerRoute' ? L.length : LOOSE_QUALIFIED.length);
+      .toBe(m === 'noOpenerRoute' ? L.filter((h: any) => !h.in_opener).length : LOOSE_QUALIFIED.length);
 }, 600_000);
 
 test('mid-game only: in_opener is exactly the opener window', () => {

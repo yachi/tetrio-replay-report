@@ -3,7 +3,7 @@
 Public repo: <https://github.com/yachi/tetrio-replay-report> · Site: <https://yachi.github.io/tetrio-replay-report/>
 
 Turns a batch of TETR.IO `.ttrm` replays into a Cantonese match report where every
-factual sentence is badge-linked to a Dafny-verified lemma. Twenty-eight sessions so far
+factual sentence is badge-linked to a Dafny-verified lemma. Twenty-nine sessions so far
 (2026-07-22: yachi 6:4 · 2026-07-24: pinglamb 4:3 · 2026-07-28: pinglamb 6:2 ·
 2026-08-01: yachi 4:3 · 2026-08-09: pinglamb 6:0 · 2026-08-14: pinglamb 7:4 ·
 2026-08-19: pinglamb 7:3 · 2026-08-25: pinglamb 5:4 · 2026-09-03: pinglamb 5:1 ·
@@ -11,14 +11,14 @@ factual sentence is badge-linked to a Dafny-verified lemma. Twenty-eight session
 2026-09-18: pinglamb 11:7 · 2026-09-19: pinglamb 15:5 · 2026-10-03: pinglamb 14:6 ·
 2026-10-09: pinglamb 7:5 · 2026-10-12: pinglamb 5:3 · 2026-10-20: **drawn 2:2** ·
 2026-10-22: pinglamb 6:3 · 2026-10-29: pinglamb 6:3 · 2026-11-01: pinglamb 11:7 ·
-2026-11-05: pinglamb 6:2, replayed matches only · 2026-11-17: pinglamb 3:0 · 2026-11-19: pinglamb 3:1 · 2026-11-23: pinglamb 5:2 · 2026-11-24: pinglamb 5:1 · 2026-11-25: **yachi 3:2** · 2026-11-26: pinglamb 5:2), 2031 rounds,
-2479 generated claims
+2026-11-05: pinglamb 6:2, replayed matches only · 2026-11-17: pinglamb 3:0 · 2026-11-19: pinglamb 3:1 · 2026-11-23: pinglamb 5:2 · 2026-11-24: pinglamb 5:1 · 2026-11-25: **yachi 3:2** · 2026-11-26: pinglamb 5:2 · 2026-11-27: **yachi 4:1**), 2092 rounds,
+2562 generated claims
 plus the hand ledgers — count those from `sessions/*/report/claims-narrative.json` and
 `claims-coaching.json` rather than from a total typed here, because hand prose lands after
 the session does. **The three largest sessions are 09-19 (20 matches, 150 rounds), 10-03 (20, 146) and 11-01
 (18, 130)**, against the 11 and 84 that were the records before any of them landed; 11-01 pushes
-09-18 (18, 127) to fourth by rounds and ties it for third by matches. Together the three are 21.0%
-of every round the corpus holds (21.8% of the twenty-seven-session corpus, 25.1% of the twenty-three-session corpus, 25.4% of the twenty-two-session corpus, 26.5% of the twenty-one-session one; the previous three, 09-19, 10-03 and 09-18, were 28.7% of the
+09-18 (18, 127) to fourth by rounds and ties it for third by matches. Together the three are 20.4%
+of every round the corpus holds (21.0% of the twenty-eight-session corpus, 21.8% of the twenty-seven-session corpus, 25.1% of the twenty-three-session corpus, 25.4% of the twenty-two-session corpus, 26.5% of the twenty-one-session one; the previous three, 09-19, 10-03 and 09-18, were 28.7% of the
 twenty-session corpus; 30.1% before 10-29 landed, 31.5% before 10-22, 32.2% before 10-20, 33.6% before 10-12 and 36.6% before 10-09 —
 re-derive it, the share moves every session, and at twenty-one the set it is taken over moved too), which is the single most important thing to know before
 reading any pooled figure below. Ranked over all twenty-three: **2026-11-01 is third by rounds (130)
@@ -190,15 +190,31 @@ per-match ordering interleaves (two yachi wins among seven, 1 in 21 by chance, n
 topouts, six yachi's and seven pinglamb's [C006]. The matched stream is `5EaYQ3zemvo`; YouTube
 blocked the VOD download from this machine, so there is no `video/video.json` yet.
 
-**2026-11-19, 2026-11-23, 2026-11-24, 2026-11-25 AND 2026-11-26 HAVE NOT BEEN FOLDED INTO THE HAND-MEASURED CORPUS PROSE BELOW, and every sentence that
+**2026-11-27 is yachi 4:1 in matches and 34:27 in rounds [C001][C010] — his second series win
+in three nights, and the largest match margin he has had in the corpus.** All five matches were played to
+SEVEN, the fifth night running. It is the twenty-ninth session in date order AND in arrival, 61
+rounds. pinglamb took m1 7-6 in the thirteenth round [C011]; yachi then won four straight, m2 7-6
+from 5-6 down [C012], m3 7-6 in the thirteenth round from 1-3 down [C013], m4 7-5 [C014] and m5 7-3
+with the last six rounds [C015]. **Its C010 is the night's shape**: m1-m2 went 13-13 and m3-m5 21-14,
+so the whole round margin is the last three matches. Both regime gaps are pinglamb's (won +3.86, lost
++2.92 [C002]), both below their column medians and both carrying a round-level leave-one-out
+annotation (the regime paragraph). **The volume route more than covered the gap a fifth time**, after
+07-22, 10-09, 10-20 and 11-25: +160 pieces, 2.60% [C005][C009], against a 2.15% gap [C004], a
+shortfall of −0.45 pp, and yachi landed 17 MORE lines of attack, +0.44%, and cleared 100 more lines
+[C018]. yachi's APP is the higher in m1 and m2 only, so three of his four wins came with the lower APP
+[C016], and the attack total decided only m2 and m5 [C017]: m1 he lost with more attack, m3 and m4 he
+won with less. 11 topouts, six yachi's and five pinglamb's [C006], and 20 All Clears (pinglamb 15). The
+night has a stream video (`sessions/2026-11-27/video/video.json`, stream `_Ss3Jl1oPB0`).
+
+**2026-11-19, 2026-11-23, 2026-11-24, 2026-11-25, 2026-11-26 AND 2026-11-27 HAVE NOT BEEN FOLDED INTO THE HAND-MEASURED CORPUS PROSE BELOW, and every sentence that
 says otherwise is wrong.** The marked fragments (`stat:`, `rate:`, `don:`, `dual:`, `app:`,
-`equiv:`, `round:`) are rendered over all twenty-eight sessions. Everything typed by hand — the
+`equiv:`, `round:`) are rendered over all twenty-nine sessions. Everything typed by hand — the
 per-session AUC rows and the pooled sign-test table, the KPP/COMBO/PC leave-one-out bullets, the
 regime and separation series and their ranks, the topout series, the shortfall table and its ρ/p
 rows, the per-match separation count (11-19 interleaves trivially: yachi's one win, m2, is the one
 match his APP leads, so 1/C(4,1) = 1 in 4, degenerate, no C007), the opener/donation/cave counts in
 prose, and every 「N of twenty-three」 — is still the twenty-three-session record. Re-measure it on
-the next pass; do not cite a hand-typed corpus figure from this file as including 11-19, 11-23, 11-24, 11-25 or 11-26 until then.
+the next pass; do not cite a hand-typed corpus figure from this file as including 11-19, 11-23, 11-24, 11-25, 11-26 or 11-27 until then.
 (The 24-session shortfall permutation p's were measured once, unpasted: 5.3e-21 two-sided on the
 rate axis, 1.1e-06 on the raw axis.)
 
@@ -1213,57 +1229,57 @@ standing alone just as much as to the N in front of it.
   `garbage_cleared` / `finaltime_ms` come from the final snapshot, so a rate and its own counters
   can be one tick apart — the whole of the VS-identity residual. **Every count in the rest of this
   bullet and the next is re-derived by `analysis/stat_sources.py` over all
-  <!--stat:corpus-->4062 player-rounds<!--/stat:corpus--> and gated by `pipeline/check_stat_sources.py`, so
+  <!--stat:corpus-->4184 player-rounds<!--/stat:corpus--> and gated by `pipeline/check_stat_sources.py`, so
   none of them is typed.** (They were, until 2026-08-23: six-session numbers in a
   seven-session document, each honestly captioned 「not re-run at 900」 — which is why none of
   them ever went red. A caveat is not a measurement.) The live tick is
-  stale in <!--stat:tick-stale-->921 of 4062<!--/stat:tick-stale--> player-rounds and
-  **<!--stat:tick-stale-survivor-->911<!--/stat:tick-stale-survivor--> of those are the round's SURVIVOR**: the survivor keeps playing frames after
+  stale in <!--stat:tick-stale-->955 of 4184<!--/stat:tick-stale--> player-rounds and
+  **<!--stat:tick-stale-survivor-->945<!--/stat:tick-stale-survivor--> of those are the round's SURVIVOR**: the survivor keeps playing frames after
   the opponent tops out and `player.stats` freezes before those frames fold in, so a per-player skew
   in the residual is a fact about whose round ran longer, never about how someone plays.
   `aggregatestats` reproduces every rate to ≤<!--stat:resid-worst-->4.2e-16<!--/stat:resid-worst--> over
-  <!--stat:corpus-agg-->4062 player-rounds<!--/stat:corpus-agg--> as
+  <!--stat:corpus-agg-->4184 player-rounds<!--/stat:corpus-agg--> as
   `100·(attack+cleared)/T`, `60·attack/T`, `pieces/T` — where **T is the integer FRAME count, and
   `finaltime_ms` does not yield it.** `⌊finaltime_ms·60/1000⌋/60` gives the wrong frame count on
-  **<!--stat:floor-wrong-->1408 of the 4062<!--/stat:floor-wrong-->** and leaves up to <!--stat:floor-worst-->1.6e-3<!--/stat:floor-worst-->, because `finaltime_ms` is `results.stats.finaltime`
+  **<!--stat:floor-wrong-->1448 of the 4184<!--/stat:floor-wrong-->** and leaves up to <!--stat:floor-worst-->1.6e-3<!--/stat:floor-worst-->, because `finaltime_ms` is `results.stats.finaltime`
   rounded to the millisecond (`extract.py`'s `x1`) while the clock ticks every 1/60 s — the rounding
   destroys the frame the flooring is trying to recover. Recover it from `pps` instead:
   `round(60·pieces/pps)` is an integer to <!--stat:frames-integer-->1.9e-12<!--/stat:frames-integer--> on all
-  <!--stat:corpus-frames-->4062<!--/stat:corpus-frames-->, and under **T = round(60·pieces/pps)/60**
+  <!--stat:corpus-frames-->4184<!--/stat:corpus-frames-->, and under **T = round(60·pieces/pps)/60**
   the residual is <!--stat:resid-pair-->2.9e-16 for APM and 4.2e-16 for VS<!--/stat:resid-pair-->, which is where the ≤ above came from. PPS is
   exact by construction on that route, so the **checkable** statement is the T-free identity
   `vs·60·attack == apm·100·(attack+cleared)`: worst relative residual
-  **<!--stat:identity-->6.2e-16<!--/stat:identity-->** over the <!--stat:identity-rounds-->4030<!--/stat:identity-rounds--> rounds
+  **<!--stat:identity-->6.2e-16<!--/stat:identity-->** over the <!--stat:identity-rounds-->4150<!--/stat:identity-rounds--> rounds
   with a nonzero APM and VS. A probe that uses `finaltime_ms/1000` reports a discrepancy the data
   does not have — up to <!--stat:secs-worst-->1.4e-3<!--/stat:secs-worst-->, and above 1e-4 on
-  <!--stat:secs-over-->1218 of the 4062<!--/stat:secs-over-->. (That last count is over all THREE rates: VS and
+  <!--stat:secs-over-->1248 of the 4184<!--/stat:secs-over-->. (That last count is over all THREE rates: VS and
   APM alone give two fewer. `aggregatestats` is a triple, so a route claiming to reconstruct
   it has to reconstruct the triple.)
 - **`kills` runs the OTHER way, so do not "finish the job" by moving the rest of `player.stats`.**
   The 2026-08-16 re-source moved `apm`/`pps`/`vs` off the live tick because the tick predates the end
   of the round. `kills` has the opposite problem: `results.stats.kills` disagrees with
-  `player.stats.kills` in **<!--stat:kills-->1124 of 4062<!--/stat:kills-->** player-rounds, and every one is the live tick reading 1
+  `player.stats.kills` in **<!--stat:kills-->1151 of 4184<!--/stat:kills-->** player-rounds, and every one is the live tick reading 1
   against the results snapshot reading 0 for a player who SURVIVED — because the results snapshot is
   taken when that player's own game ends, while the kill is credited later, when the opponent tops
   out. For `kills` the live tick is the correct source and the final snapshot is the stale one.
   `aggregatestats` carries only `apm`/`pps`/`vsscore`, so the re-source is complete as scoped rather
   than truncated; and the match-level rollup stays on the live tick because
-  **<!--stat:leaderboard-agg-->0 of 508<!--/stat:leaderboard-agg--> leaderboard entries carry
+  **<!--stat:leaderboard-agg-->0 of 518<!--/stat:leaderboard-agg--> leaderboard entries carry
   `aggregatestats` at all** — so round figures will not reconcile against the leaderboard's, and
   there is no better source for it. `garbagesent`/`garbagereceived` differ from their
   `results.stats` counterparts in
-  <!--stat:garbage-differ-->25 and 25 of 4062<!--/stat:garbage-differ--> and are a different measure anyway (both sides are already extracted, as
+  <!--stat:garbage-differ-->28 and 26 of 4184<!--/stat:garbage-differ--> and are a different measure anyway (both sides are already extracted, as
   `garbage_sent_raw` / `garbage_received_raw`). Moving any of these for consistency would introduce
   the bug the rate change removed.
 - **The finesse counters are on two different units, so any finesse rate must name its denominator.**
   `perfectpieces` counts **pieces**; `faults` counts **fault events**, and one piece can register
-  several — pooled, <!--stat:finesse-pool-->63 558 faults over 38 344 non-perfect pieces<!--/stat:finesse-pool--> =
-  **<!--stat:finesse-per-piece-->1.658<!--/stat:finesse-per-piece--> per faulty piece**. Four
+  several — pooled, <!--stat:finesse-pool-->65 668 faults over 39 546 non-perfect pieces<!--/stat:finesse-pool--> =
+  **<!--stat:finesse-per-piece-->1.661<!--/stat:finesse-per-piece--> per faulty piece**. Four
   defensible rates, four different numbers, and only one is what TETR.IO displays:
-  `faults/pieces` = **<!--stat:finesse-fault-rate-->16.44%<!--/stat:finesse-fault-rate-->** is fault events per piece; the share of pieces that were faulty is
-  `1 − perfect/pieces` = **<!--stat:finesse-share-->9.92%<!--/stat:finesse-share-->**; TETR.IO's own figure is
-  `perfect/pieces` = **<!--stat:finesse-tetrio-->90.08%<!--/stat:finesse-tetrio-->**; and
-  `faults/(faults+perfect)` = **<!--stat:finesse-meaningless-->15.44%<!--/stat:finesse-meaningless-->** is on no meaningful denominator and must not be used. A
+  `faults/pieces` = **<!--stat:finesse-fault-rate-->16.46%<!--/stat:finesse-fault-rate-->** is fault events per piece; the share of pieces that were faulty is
+  `1 − perfect/pieces` = **<!--stat:finesse-share-->9.91%<!--/stat:finesse-share-->**; TETR.IO's own figure is
+  `perfect/pieces` = **<!--stat:finesse-tetrio-->90.09%<!--/stat:finesse-tetrio-->**; and
+  `faults/(faults+perfect)` = **<!--stat:finesse-meaningless-->15.45%<!--/stat:finesse-meaningless-->** is on no meaningful denominator and must not be used. A
   bare「失誤率」 reads as the share and is usually the event rate. osk publishes no definition for any
   of the three fields, so the per-excess-input granularity is inferred, not specified. The four
   rates are definitions and keep their meaning at any n; the four *numbers* are re-derived over
@@ -1276,7 +1292,7 @@ standing alone just as much as to the N in front of it.
   now, matching 每粒攻擊 beside it, because **a percentage rendering asserts a share** and a label
   alone does not undo one: an event rate reads as a share however the row is titled. `hold 使用率` keeps its
   percentage — a hold IS at most one per piece, which is what the gate's `SHARE` kind records. The
-  data refutes the share reading outright: in **<!--stat:finesse-exceed-->3494 of 3942<!--/stat:finesse-exceed-->** player-rounds the faults outnumber the
+  data refutes the share reading outright: in **<!--stat:finesse-exceed-->3601 of 4059<!--/stat:finesse-exceed-->** player-rounds the faults outnumber the
   non-perfect pieces, and **<!--stat:finesse-worst-->11-01 m11r1 puts 37 faults on 3 non-perfect pieces<!--/stat:finesse-worst-->**.
 
   Two things this cost that are worth keeping. **The defect lived where no gate looked** — the chart's
@@ -1831,7 +1847,9 @@ won-gap 收窄、lost-gap 擴闊，24 局嘅一晚兩個尺寸都係一局話事
 （留一局：抽走 m1r7，數字變 +3.43%，即係郁 1.62 pp），
 抽走之後更闊，正負號唔變，而第二大嗰局 m6r13 郁得差唔多一樣遠。11-25 個 won-gap 都要 annotation
 （留一局：抽走 m3r2，數字變 +0.56%，即係郁 2.17 pp），
-抽走之後更窄，正負號唔變：m3r2 係嗰晚最長嗰局，yachi 用 335 粒、.5433 每粒贏落嚟。Two consequences worth
+抽走之後更窄，正負號唔變：m3r2 係嗰晚最長嗰局，yachi 用 335 粒、.5433 每粒贏落嚟。11-27 兩個數都要 annotation：
+won-gap（留一局：抽走 m3r10，數字變 +1.66%，即係郁 2.19 pp），
+lost-gap（留一局：抽走 m4r10，數字變 +0.83%，即係郁 2.08 pp）——兩個抽走之後都更窄，正負號唔變：m3r10 係 yachi 用 288 粒、.5000 每粒贏落嚟嘅長局，m4r10 係 pinglamb 用 211 粒、.7393 每粒輸嗰局。Two consequences worth
 knowing before writing another report:
 
 - **The volume route is not a law.** 08-01's headline was that 326 extra pieces bought back a
@@ -2259,15 +2277,15 @@ Three consequences:
 ### 每粒攻擊點解爭 — where the APP gap comes from, and the two halves of it
 
 **pinglamb's attack per piece is higher than yachi's in every session, and the gap is attack PER
-LINE, not lines per piece.** Pooled: APP <!--app:app-->yachi 0.589 against pinglamb 0.650<!--/app:app-->, lines per piece <!--app:lpp-->yachi 0.546 against pinglamb 0.558<!--/app:lpp-->, attack
-per line <!--app:apl-->yachi 1.078 against pinglamb 1.165<!--/app:apl-->. Every figure in this section is a marked fragment rendered by
+LINE, not lines per piece.** Pooled: APP <!--app:app-->yachi 0.590 against pinglamb 0.649<!--/app:app-->, lines per piece <!--app:lpp-->yachi 0.547 against pinglamb 0.558<!--/app:lpp-->, attack
+per line <!--app:apl-->yachi 1.079 against pinglamb 1.163<!--/app:apl-->. Every figure in this section is a marked fragment rendered by
 `pipeline/check_app_decomposition.py` from `analysis/app_decomposition.py`, which rolls up each
 session's `sim/attack-facts.json` (`pipeline/sim/emit-attack-facts.ts`) — paste from `--render`,
 never type. Each session's report carries the same split for that night in 攻擊由邊度嚟, the
 fourth quarantined section.
 
 **What is anchored and what is not.** The engine re-runs every round and reads `res.rawGarbage`,
-the attack BEFORE cancellation; it agrees with the replay's own counters in <!--app:anchor-->4062 of 4062 player-rounds for the attack total and 4062 of 4062 for the clear-type counts<!--/app:anchor-->
+the attack BEFORE cancellation; it agrees with the replay's own counters in <!--app:anchor-->4184 of 4184 player-rounds for the attack total and 4184 of 4184 for the clear-type counts<!--/app:anchor-->
 (the exception lists in `attack-facts.test.ts` are empty since 2026-10-31's clutch fix). So the clear-type COUNTS below are as good as
 facts.json; attack per clear and the base/B2B/combo split are one engine's. **Do not use
 `oracle-source.ts`'s `records[].attack` for this** — it is post-cancel; measured once on 2026-10-11 and not re-derived, it summed to about 80% of
@@ -2285,22 +2303,22 @@ match head carry no badge and say 「模擬器數出嚟，未經證明」. `buil
 `<report_dir>/../sim/attack-facts.json` and prints 「–」 without it (check_rounding's temp-dir copy).
 Counts are the artefacts', never typed here.
 
-The engine gap is <!--app:gap-->+6.05<!--/app:gap--> attack per 100 pieces, split two ways that each sum to it exactly:
+The engine gap is <!--app:gap-->+5.90<!--/app:gap--> attack per 100 pieces, split two ways that each sum to it exactly:
 
-* **by window** — <!--app:windows-->+2.62 from the first 21 locks and +3.42 after them<!--/app:windows-->.
-* **by clear type (Kitagawa 1955)** — <!--app:kitagawa-->+3.82 of mix and +2.23 of value<!--/app:kitagawa-->: the MIX of clears (how many per piece of
+* **by window** — <!--app:windows-->+2.64 from the first 21 locks and +3.26 after them<!--/app:windows-->.
+* **by clear type (Kitagawa 1955)** — <!--app:kitagawa-->+3.65 of mix and +2.24 of value<!--/app:kitagawa-->: the MIX of clears (how many per piece of
   each type) and the VALUE of each clear (B2B, combo, Perfect Clear riding on it). The largest mix
-  terms are <!--app:terms-->T-spin Doubles +3.73, T-spin Triples +2.86, quads -2.23, T-spin Singles -0.69<!--/app:terms-->.
+  terms are <!--app:terms-->T-spin Doubles +3.60, T-spin Triples +2.84, quads -2.25, T-spin Singles -0.70<!--/app:terms-->.
 
 **The two windows are two different mechanisms, and pooling hides one of them.** T-spin Triples
-are an OPENER phenomenon: <!--app:tst-window-->2023 against 1239 inside the window and 84 against 75 after it<!--/app:tst-window-->. That is the repertoire split — pinglamb's Honey
+are an OPENER phenomenon: <!--app:tst-window-->2090 against 1286 inside the window and 88 against 78 after it<!--/app:tst-window-->. That is the repertoire split — pinglamb's Honey
 Cup and Stray Cannon fire a Triple first, yachi's TKI-3 does not (see 六個具名定式). T-spin Doubles
-run the OTHER way inside the window and the expected way after it: <!--app:tsd-window-->1506 against 1812 inside the window and 7306 against 6000 after it<!--/app:tsd-window-->. So
+run the OTHER way inside the window and the expected way after it: <!--app:tsd-window-->1547 against 1860 inside the window and 7503 against 6201 after it<!--/app:tsd-window-->. So
 「pinglamb does more T-spin Doubles」 is a mid-game statement; in the opener yachi does more, and a
 sentence that pools the two says the opposite of what happens in the first three bags.
 
 It is a property of the pair rather than of a few nights: pinglamb's per-piece rate is the higher
-in <!--app:signs-->T-spin Doubles in 27 of 28, T-spin Triples in 28 of 28, quads in 3 of 28<!--/app:signs-->, and the <!--app:jackknife-->254 single-match drops leave it between 5.99 and 6.12<!--/app:jackknife--> attack per 100 pieces. Two things it is not.
+in <!--app:signs-->T-spin Doubles in 27 of 29, T-spin Triples in 29 of 29, quads in 3 of 29<!--/app:signs-->, and the <!--app:jackknife-->259 single-match drops leave it between 5.84 and 5.97<!--/app:jackknife--> attack per 100 pieces. Two things it is not.
 It is not who won — APP decides rounds and not nights (08-01, 10-09) — and it is not a mechanism
 for WHY each player chose his openers; the data shows what they played, nothing more.
 
@@ -2954,15 +2972,15 @@ as 60%.** A windowed claim shares its rounds with the session total meant to imp
 pieces from a match-3 round to a match-1 round keeps `total_pieces`, `total_garbage_attack`
 and C008 true while flipping C005 false. The second family does exactly that, and the four
 claims that drop out (C002, C004, C005, C006) are precisely 07-28's windowed ones.
-Measured with `--two-site round`. Per-session: 07-22 81% → **79%**, 07-24 96% → **94%**, 07-28 100% → **60%**, 08-01 100% → **92%**, 08-09 82% → **73%**, 08-14 84% → **68%**, 08-19 82% → **76%**, 08-25 82% → **76%**, 09-03 81% → **69%**, 09-10 81% → **81%**, 09-11 80% → **80%**, 09-17 81% → **75%**, 09-18 89% → **89%**, 09-19 89% → **89%**, 10-03 87% → **83%**, 10-09 83% → **74%**, 10-12 79% → **68%**, 10-20 71% → **64%**, 10-22 84% → **74%**, 10-29 84% → **74%**, 11-01 86% → **83%**, 11-05 83% → **72%**, 11-17 77% → **62%**, 11-19 73% → **60%**, 11-23 78% → **67%**, 11-24 76% → **65%**, 11-25 75% → **62%**, 11-26 78% → **67%**.
+Measured with `--two-site round`. Per-session: 07-22 81% → **79%**, 07-24 96% → **94%**, 07-28 100% → **60%**, 08-01 100% → **92%**, 08-09 82% → **73%**, 08-14 84% → **68%**, 08-19 82% → **76%**, 08-25 82% → **76%**, 09-03 81% → **69%**, 09-10 81% → **81%**, 09-11 80% → **80%**, 09-17 81% → **75%**, 09-18 89% → **89%**, 09-19 89% → **89%**, 10-03 87% → **83%**, 10-09 83% → **74%**, 10-12 79% → **68%**, 10-20 71% → **64%**, 10-22 84% → **74%**, 10-29 84% → **74%**, 11-01 86% → **83%**, 11-05 83% → **72%**, 11-17 77% → **62%**, 11-19 73% → **60%**, 11-23 78% → **67%**, 11-24 76% → **65%**, 11-25 75% → **62%**, 11-26 78% → **67%**, 11-27 75% → **62%**.
 
-**07-28 is not the exception — <!--equiv:sf-match-->23 of the 28<!--/equiv:sf-match--> measured sessions lose coverage
+**07-28 is not the exception — <!--equiv:sf-match-->24 of the 29<!--/equiv:sf-match--> measured sessions lose coverage
 to the second family**, and
 every claim that drops is windowed or per-match (08-01 C002, 08-09 C005, 08-14 C007/C019/C020,
 08-19 C007, **09-17 C007**, **10-03 C007**, **10-09 C024/C025**, **10-12 C007/C020**, **10-20 C016**, **10-22 C020/C021**, **10-29 C020/C021**, **11-01 C030**, **11-05 C019/C020**). **That count used to be at `match` granularity only, and `match` used
 to be the only reading on which any session was exempt**: 07-24 loses nothing there (48 → 48) but
 loses R018 at `round`, so for nine sessions the `round` count was every session measured. At eighteen
-it is **<!--equiv:sf-round-->24 of the 28<!--/equiv:sf-round-->**, because 2026-09-10,
+it is **<!--equiv:sf-round-->25 of the 29<!--/equiv:sf-round-->**, because 2026-09-10,
 2026-09-11, 2026-09-18 and 2026-09-19 are the four that lose nothing at EITHER
 granularity — 13 of 16, 12 of 15, 24 of 27 and 25 of 28 at all three, the same covered
 set each time.
@@ -3153,13 +3171,13 @@ The visible cost of the volume route is in the death tally: 6 of the 8 topouts a
 For three sessions the APM/VS records were the plain argmax and were **all** short-round
 artifacts. A rate has the round's length in its denominator, so over a short round it is a
 sample mean over a small n. Measured in `analysis/rate_records.R` over all
-<!--rate:corpus-->4062 player-rounds<!--/rate:corpus--> (<!--rate:sessions-->twenty-eight sessions<!--/rate:sessions-->):
-regressing log SD on log t gives **<!--rate:slopes-->−0.676 for VS and −0.754 for APM<!--/rate:slopes-->**,
-slope 0 rejected for both (p <!--rate:slope-p-->2.0e-07 / 5.3e-06<!--/rate:slope-p-->).
-**<!--rate:records-->78<!--/rate:records-->** of the
-<!--rate:records-denom-->84<!--/rate:records-denom--> unqualified records
-(<!--rate:records-basis-->3 metrics × 28 sessions<!--/rate:records-basis-->) came from the shortest
-quartile — p = <!--rate:records-p-->8.2e-40<!--/rate:records-p--> — and 07-22's headline
+<!--rate:corpus-->4184 player-rounds<!--/rate:corpus--> (<!--rate:sessions-->twenty-nine sessions<!--/rate:sessions-->):
+regressing log SD on log t gives **<!--rate:slopes-->−0.675 for VS and −0.752 for APM<!--/rate:slopes-->**,
+slope 0 rejected for both (p <!--rate:slope-p-->3.0e-07 / 5.9e-06<!--/rate:slope-p-->).
+**<!--rate:records-->81<!--/rate:records-->** of the
+<!--rate:records-denom-->87<!--/rate:records-denom--> unqualified records
+(<!--rate:records-basis-->3 metrics × 29 sessions<!--/rate:records-basis-->) came from the shortest
+quartile — p = <!--rate:records-p-->1.6e-41<!--/rate:records-p--> — and 07-22's headline
 約<!--rate:headline-vs-->262.5<!--/rate:headline-vs--> was a <!--rate:headline-t-->15.6 s<!--/rate:headline-t--> round,
 <!--rate:headline-pct-->46%<!--/rate:headline-pct--> above that session's qualified peak.
 
@@ -3196,10 +3214,10 @@ outside this section entirely: twenty-six lines of FOUR-session statistics in a 
 
 **Two things in that paragraph changed when the sixth session was added, and the honest version
 is weaker than the five-session one. Both still hold.** (a) APM's −0.5 is **outside**
-its CI — [−0.918, −0.525] at six, <!--rate:apm-ci-->[−0.876, −0.632]<!--/rate:apm-ci--> now — so
+its CI — [−0.918, −0.525] at six, <!--rate:apm-ci-->[−0.877, −0.628]<!--/rate:apm-ci--> now — so
 the decay is *steeper* than a pure sample mean and the conclusion holds a fortiori, but "both with
 −0.5 inside the CI" is no longer true; (b) the mean is **no longer flat for VS**
-(<!--rate:vs-mean-->96.8 → 120.4<!--/rate:vs-mean--> across the bins, p = <!--rate:vs-mean-p-->8.6e-04<!--/rate:vs-mean-p-->)
+(<!--rate:vs-mean-->96.6 → 120.4<!--/rate:vs-mean--> across the bins, p = <!--rate:vs-mean-p-->7.1e-04<!--/rate:vs-mean-p-->)
 — longer rounds do carry a mildly higher mean VS. The SD still falls several times over the same
 span, so the variance effect dominates and the qualifier stands, but the control is now "the mean
 moves a little, the spread moves a lot", not "the mean is flat". **PPS's mean is NOT flat
@@ -3207,11 +3225,11 @@ again, and only just**: it read flat for sixteen sessions (p = 0.06 at sixteen),
 seventeen (0.048, ceiled to 0.049), read flat at eighteen (0.0505, floored to 0.050), and at
 nineteen it was 0.048 (ceiled; unrounded 0.0470), at twenty 0.047 (ceiled; unrounded 0.0466), and
 at twenty-one 0.030 (ceiled; unrounded 0.0299), at twenty-two 0.036 (ceiled; unrounded 0.0354), and at
-twenty-three it is p = <!--rate:pps-mean-p-->0.045<!--/rate:pps-mean-p--> (ceiled; unrounded 0.0365),
+twenty-three it is p = <!--rate:pps-mean-p-->0.042<!--/rate:pps-mean-p--> (ceiled; unrounded 0.0365),
 i.e. under 0.05 by about a hundredth and a third — still
 the 0.048 / 0.059 kind of margin and not a finding, and under the line at nineteen, twenty,
 twenty-one, twenty-two and twenty-three, the last five sessions. It moves the
-OTHER way from VS, <!--rate:pps-mean-->1.480 → 1.422<!--/rate:pps-mean-->
+OTHER way from VS, <!--rate:pps-mean-->1.478 → 1.422<!--/rate:pps-mean-->
 across the bins, so shorter rounds carry the higher mean PPS; the SD still falls about three
 times over the same span, so the control for PPS reads as VS's — the mean moves a little, the
 spread a lot — and PPS carries no record qualifier for it to bear on.
@@ -3607,7 +3625,7 @@ ordering metric's Double-first rounds both ways and against stick spin's bag-1 c
 基本形, not a harddrop field, and the corpus does not play it (`gasshotsd.test.ts` pins an empty
 case list).
 
-The repertoires split, reproduced independently in all twenty-three sessions (pinned in `openers.test.ts`):
+The repertoires split, reproduced independently in each of the first twenty-eight sessions and broken on two of its claims by 2026-11-27, which `openers.test.ts` names in `ORDINAL_BROKEN` (yachi 14 Honey Cup boards against pinglamb's 13; yachi no TKI-3 at all):
 **pinglamb opens Honey Cup** more than yachi does, **yachi opens Mountainous Stacking** more than
 pinglamb does **and opens TKI-3 far more** (219 against 9 over the corpus; pinglamb's nine are the
 named exceptions below, and 「the only one who plays it at all」 is a sentence this file used to
@@ -3837,7 +3855,7 @@ in-game tick sampled before the round ended, so a survivor's mid-round VS was be
 end-of-round attack count — the asymmetry was in the timestamp, which is exactly why it fell on
 survivors. Re-sourced from `results.aggregatestats` the identity holds to floating point, and the guard
 that fired on **13 of the 760 player-rounds then in the corpus** now fires on
-**<!--stat:vs-guard-->0 of 4062<!--/stat:vs-guard-->**. Do not read that as a reason to
+**<!--stat:vs-guard-->0 of 4184<!--/stat:vs-guard-->**. Do not read that as a reason to
 delete it: the residual does not go to zero, it goes to a quantization floor. The `13` stays a
 six-session figure on purpose — it is a measurement of the data BEFORE the 2026-08-16 re-source
 and there is nothing at 900 for it to be re-derived from; the `0` beside it is re-derived by
@@ -3874,7 +3892,7 @@ on partial stacks, so a 24- or 28-cell opening board can never equal one. Puttin
 "The well column is filled through the rows the spin cleared" cannot fail: a full row *requires*
 every column filled, so that clause counts line clears. That is not a measurement any more — it is
 `NaiveClauseForced` in `spec/DonationCave.dfy`, and the corpus agrees at exactly
-<!--don:naive-->100.00%<!--/don:naive--> of all <!--don:scored-->21764<!--/don:scored--> scored
+<!--don:naive-->100.00%<!--/don:naive--> of all <!--don:scored-->22438<!--/don:scored--> scored
 clears. As a *predicate* — the shipped thresholds (cavity ≥ 4, walled) with the re-opening clause
 deleted — it fires on <!--don:noreopen-band-->1.32-3.92%<!--/don:noreopen-band-->. Until 2026-10-25 all the
 discriminating power was in the **re-opening** clause (every filled cell of the column must lie
@@ -3886,20 +3904,20 @@ on its own tick (`wellAtPlug`). A plug laid on the floor with garbage rising und
 that column, covered nothing. The two clauses now overlap almost entirely, which is why the band above
 sits just over the shipped one. With both, the rate is
 <!--don:shipped-band-->0.88-3.36%<!--/don:shipped-band--> per session
-(<!--don:donations-->451<!--/don:donations--> donations across
-<!--don:sessions-->twenty-eight<!--/don:sessions--> sessions).
+(<!--don:donations-->465<!--/don:donations--> donations across
+<!--don:sessions-->twenty-nine<!--/don:sessions--> sessions).
 
 **Every band above is RENDERED from the seven artefacts, and until 2026-08-24 none of them was.**
 `pipeline/check_donation_bands.py --render` prints each marked fragment; `donation.ablation` in
 every `sessions/*/sim/opener-facts.json` carries that session's own counts. The per-session series
-read <!--don:noreopen-series-->2.77 · 2.94 · 2.88 · 2.61 · 2.12 · 1.79 · 2.75 · 1.78 · 2.12 · 1.63 · 2.65 · 2.70 · 2.50 · 2.07 · 1.80 · 1.75 · 2.02 · 2.21 · 2.65 · 2.02 · 3.65 · 2.42 · 1.32 · 2.47 · 2.27 · 1.87 · 2.44 · 3.92<!--/don:noreopen-series-->
+read <!--don:noreopen-series-->2.77 · 2.94 · 2.88 · 2.61 · 2.12 · 1.79 · 2.75 · 1.78 · 2.12 · 1.63 · 2.65 · 2.70 · 2.50 · 2.07 · 1.80 · 1.75 · 2.02 · 2.21 · 2.65 · 2.02 · 3.65 · 2.42 · 1.32 · 2.47 · 2.27 · 1.87 · 2.44 · 3.92 · 2.67<!--/don:noreopen-series-->
 for shipped-minus-re-opening (<!--don:noreopen-ceiling-->2026-11-26<!--/don:noreopen-ceiling--> is
 the ceiling) and
-<!--don:cav1-series-->19.75 · 18.20 · 21.41 · 18.79 · 18.76 · 16.80 · 18.54 · 17.04 · 15.83 · 18.30 · 17.74 · 16.18 · 18.08 · 17.71 · 16.71 · 17.46 · 17.37 · 16.57 · 20.40 · 18.04 · 19.77 · 18.82 · 22.37 · 18.39 · 18.26 · 18.56 · 18.05 · 19.34<!--/don:cav1-series-->
+<!--don:cav1-series-->19.75 · 18.20 · 21.41 · 18.79 · 18.76 · 16.80 · 18.54 · 17.04 · 15.83 · 18.30 · 17.74 · 16.18 · 18.08 · 17.71 · 16.71 · 17.46 · 17.37 · 16.57 · 20.40 · 18.04 · 19.77 · 18.82 · 22.37 · 18.39 · 18.26 · 18.56 · 18.05 · 19.34 · 21.07<!--/don:cav1-series-->
 for the `cavity ≥ 1` composite, whose band is
 <!--don:cav1-band-->15.83-22.37%<!--/don:cav1-band-->. Pooled, neither says anything: noReopen
 <!--don:pooled-noreopen-->2.38<!--/don:pooled-noreopen-->, cav1
-<!--don:pooled-cav1-->18.20<!--/don:pooled-cav1--> — a per-session band can break while no pooled
+<!--don:pooled-cav1-->18.29<!--/don:pooled-cav1--> — a per-session band can break while no pooled
 number moves, which is why the series is published beside them. A session above
 <!--don:cav1-ceiling-->22.37<!--/don:cav1-ceiling--> moves that band and the fix is a paste.
 
@@ -3959,8 +3977,8 @@ keep the clause (only `naive` drops it, being the whole naive reading), so every
 
 **Nearly every donation in this corpus sits on a garbage-derived well, and 2026-09-10 is the
 session that ended the absolute**
-(<!--don:latest-garbage-->11-26 adds 27 of 27<!--/don:latest-garbage-->;
-**<!--don:self-built-->26 of 451<!--/don:self-built-->** self-built corpus-wide).
+(<!--don:latest-garbage-->11-27 adds 14 of 14<!--/don:latest-garbage-->;
+**<!--don:self-built-->26 of 465<!--/don:self-built-->** self-built corpus-wide).
 This sentence read 「every donation … 0 self-built, every session」 for nine sessions; 09-10 and 09-11
 held the first three, all yachi's mid-game `natural` plugs (`replay-2026-09-10-01.ttrm` r6 plugs a
 4-cell cavity at lock 40 of a prefix verified to 64, `replay-2026-09-10-07.ttrm` r7 a 5-cell cavity
@@ -4116,20 +4134,20 @@ verified.
 
 **What is published is the confusion matrix, never the agreement rate**, and that distinction is the
 whole finding. Both verdicts are rare —
-<!--dual:rare-->230 caves and 451 donations in 21764 scored clears<!--/dual:rare--> — so an
+<!--dual:rare-->234 caves and 465 donations in 22438 scored clears<!--/dual:rare--> — so an
 overall rate is negatives agreeing with negatives. Split by the oracle's own verdict:
 
 | | overall | **on the positives** |
 |---|---|---|
-| cave | <!--dual:cave-overall-->9007/9007 (100%)<!--/dual:cave-overall--> | **<!--dual:cave-pos-->92 / 92<!--/dual:cave-pos-->** |
-| donation | <!--dual:don-overall-->8716/9007 (96.8%)<!--/dual:don-overall--> | **<!--dual:don-pos-->33 / 118<!--/dual:don-pos-->** (<!--dual:don-pos-pct-->28.0%<!--/dual:don-pos-pct-->) |
+| cave | <!--dual:cave-overall-->9281/9281 (100%)<!--/dual:cave-overall--> | **<!--dual:cave-pos-->94 / 94<!--/dual:cave-pos-->** |
+| donation | <!--dual:don-overall-->8980/9281 (96.8%)<!--/dual:don-overall--> | **<!--dual:don-pos-->33 / 119<!--/dual:don-pos-->** (<!--dual:don-pos-pct-->27.8%<!--/dual:don-pos-pct-->) |
 
-The donation's overall rate is **<!--dual:don-bothno-->8683 of 8716<!--/dual:don-bothno-->**
+The donation's overall rate is **<!--dual:don-bothno-->8947 of 8980<!--/dual:don-bothno-->**
 agreements being both engines saying "no". On the thing the
 table actually counts the two engines disagree about **seven donations in ten** — the opposite
 reading from the one the rate gives, and the same failure mode as a detector clause entailed by its
 siblings. `openers.test.ts` asserts `both_no / overall_agreements > 0.99` (it is
-<!--dual:bothno-share-->0.9962<!--/dual:bothno-share--> over the whole corpus, as rendered) so a future change cannot
+<!--dual:bothno-share-->0.9963<!--/dual:bothno-share--> over the whole corpus, as rendered) so a future change cannot
 quietly make the rate look meaningful, and `DUAL_ENGINE_MARKER`
 fails the build if the section prints a rate without the sentence saying what is in its denominator.
 `pipeline/check_dual_engine.py` asserts the same bound a second way — **it fails if `both_no` stops
@@ -4137,17 +4155,17 @@ dominating while the section still prints the rate**, because the bound is what 
 beside the table true and not merely what the number happens to be.
 
 **Neither metric leaves quarantine on this.** The hand-port verifies a far shorter prefix
-(<!--dual:prefix-->25.4 locks against 82.8<!--/dual:prefix--> on average), so the comparison reaches
-**<!--dual:coverage-->9007 of 21764<!--/dual:coverage-->** scored clears — cave's
-<!--dual:cave-of-corpus-->92 of the corpus's 230<!--/dual:cave-of-corpus-->. It is a check on the
+(<!--dual:prefix-->25.4 locks against 82.9<!--/dual:prefix--> on average), so the comparison reaches
+**<!--dual:coverage-->9281 of 22438<!--/dual:coverage-->** scored clears — cave's
+<!--dual:cave-of-corpus-->94 of the corpus's 234<!--/dual:cave-of-corpus-->. It is a check on the
 verdicts, not a re-scoping of the tables,
 exactly as the counter anchor licenses a denominator without redefining it. What it buys the
 donation table is a *caveat it did not have*: the one metric here with no second implementation
 backing it, stated as a measurement.
 
 **The disagreement is the BOARD, not the predicate, and that is what `board_split` says.** Only
-**<!--dual:same-board-->5117 of the 9007<!--/dual:same-board-->** comparison points put the two
-engines on the same board, so at **<!--dual:diff-share-->43.1%<!--/dual:diff-share-->** of
+**<!--dual:same-board-->5291 of the 9281<!--/dual:same-board-->** comparison points put the two
+engines on the same board, so at **<!--dual:diff-share-->42.9%<!--/dual:diff-share-->** of
 them they are judging boards that differ cell for cell (median
 <!--dual:diff-median-->12<!--/dual:diff-median--> cells), and every figure in the
 table above is read inside that. Split the positives by board equality and the donation resolves
@@ -4155,8 +4173,8 @@ completely:
 
 | | positives | on identical boards | agree | **agree · identical** | **agree · differing** |
 |---|---|---|---|---|---|
-| cave | <!--dual:row-cave-->92 | 14 | 92/92 | 14/14 | 78/78<!--/dual:row-cave--> |
-| donation | <!--dual:row-don-->118 | 33 | 33/118 | 33/33 | 0/85<!--/dual:row-don--> |
+| cave | <!--dual:row-cave-->94 | 15 | 94/94 | 15/15 | 79/79<!--/dual:row-cave--> |
+| donation | <!--dual:row-don-->119 | 33 | 33/119 | 33/33 | 0/86<!--/dual:row-don--> |
 
 So the two engines do not disagree about what a donation *is* — they disagree about the board, which
 is `oracle-source.ts`'s garbage-hole problem showing through. **The cave's row is a different claim
@@ -4192,7 +4210,7 @@ engines, "the hand-port leaves it empty on most clearing locks". Measured: **0 e
 `sim.ts` pushes a record only inside the clear branch, and twice on an all-clear bonus, so the
 alignment holds **0 of 5472** times there and `records[i]` reads an unrelated record. Looked up by
 the lock's own **frame**, the hand-port passes the strong check at that call site on every
-comparable lock — **<!--dual:strong-licence-->9007 of 9007<!--/dual:strong-licence-->** over the whole
+comparable lock — **<!--dual:strong-licence-->9281 of 9281<!--/dual:strong-licence-->** over the whole
 corpus (the per-session figures are each session's
 `locks_comparable`, so the artefacts cross-check it and this number tracks them), so
 `dualVerdict` now uses the same reconstruction
@@ -5040,16 +5058,20 @@ artefact bytes.
 The same deliverable for `stickspin.php` (「2022-08-06更新」): `pipeline/openers/stickspin-routes.json`
 (gated by `extract_stickspin_routes.py` through the shared gate), `analysis/stickspin-facts.json`
 (`stickspin.test.ts`), `analysis/stickspin-demos.json` (`stickspin-demos.test.ts`), and
-`docs/stickspin.html` plus `stickspin-bag1-only.html` and `stickspin-demos.html`, rendered by
+`docs/stickspin.html` plus `stickspin-sd.html`, `stickspin-bag1-only.html` and `stickspin-demos.html`, rendered by
 `bin/build-docs` from `ROUTE_SITES` and linked as the fourth card under 定式路線. Its snapshot is raw
 HTML, fetched the way 山岳積み2号's was (YE2 intermediate, TLS verification on). It is the page for
 the Double-first opener yachi repeats from 2026-09-17 on (see 「C-Spin 同 DT 砲」). Counts are read off
 the artefacts and tests, never typed here or in `stickspin_prose.json`.
 
-**Every corpus case stops at bag 1, and that is the page's main measurement.** The bag-2 boards are
-compared (they have opportunities) and none matches; the reasons are per round in the artefact's
-lists and the test's `STOPS_AT_BAG1`. So the page set has no per-branch node page: the shared
-renderer refuses a node page with no case, and `node_pages` holds `bag1-only` alone.
+**Nearly every corpus case stops at bag 1, and that is the page's main measurement.** The bag-2 boards
+are compared (they have opportunities) and through twenty-eight sessions none matched; the reasons are
+per round in the artefact's lists and the test's `STOPS_AT_BAG1`, so the page set had no per-branch node
+page (the shared renderer refuses a node page with no case). **2026-11-27 ends that absolute with one
+round**: yachi's m1r10 matches `2.sd` at lock 12, verified, and nothing past it matches. It is named in
+`REACHED_BAG2` rather than absorbed, and `node_pages` now holds `sd` (`stickspin-sd.html`) beside
+`bag1-only`. That a yachi round reaches stick spin's own bag 2 is new; his usual bag 2 is SDPC Spin's
+`2.tsd`, a few cells off `2.sd` (`BAG2_NONE_NEAR`).
 
 What this page needs that the other three did not:
 
@@ -6895,7 +6917,7 @@ report 重 render 全部照綠,因為佢出嘅嘢一個 byte 都冇變。`foreca
 被記錄、唔可以被 enforce:一條規則住喺六個地方就有六個 site,而佢哋一致與否冇嘢守住。全部
 consolidate 之後七份 artefact、七份 report 同 ledger **全部 byte-identical**,呢個就係 control。
 
-一次 sweep 行晒全部 session,行到 **<!--round:figures-->87619<!--/round:figures--> 個
+一次 sweep 行晒全部 session,行到 **<!--round:figures-->90376<!--/round:figures--> 個
 quantized figure、<!--round:sites-->90<!--/round:sites--> 對 (site, helper)**:
 <!--round:enforced-->66<!--/round:enforced--> 個有 corpus 撐住,
 <!--round:ontrust-->24<!--/round:ontrust--> 個至少有一對規則分唔開。四個 `_pct` 兩個方向都靠信,
@@ -6910,8 +6932,8 @@ quantized figure、<!--round:sites-->90<!--/round:sites--> 對 (site, helper)**:
 **但第六對會,而且已經變咗七次 —— 呢個先係「有冇數撐住」點解要度而唔係估。** `records._dp1`
 喺七個 session 之下分得開 floor 同 ceil(當時 14 個 call),分唔開 floor 同 round(0 個
 call)。冇人郁過一行 code,一路加 session 落去,兩欄都郁:ceil 嗰欄而家係
-<!--round:dp1-split-->28 個 call<!--/round:dp1-split-->,而 round 嗰欄行過
-0 → 10 → 24 → 0 → 14 → 15 → 0 → 19 → 0 → <!--round:dp1-round-->28 個 call<!--/round:dp1-round-->。
+<!--round:dp1-split-->29 個 call<!--/round:dp1-split-->,而 round 嗰欄行過
+0 → 10 → 24 → 0 → 14 → 15 → 0 → 19 → 0 → <!--round:dp1-round-->29 個 call<!--/round:dp1-round-->。
 
 **第十三個 session 將佢由 enforced 打返落「靠信」,第十四個又推返上去——同一個 site,兩個方向,
 三次。** 「真正 enforced,唔再係靠一欄撐住」嗰句喺十二個 session 之下係啱嘅:當時 round 嗰欄

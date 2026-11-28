@@ -51,7 +51,7 @@ STICKSPIN_SITE = RouteSiteProfile(
     facts_schema="stickspin-facts/1",
     demos_schema="stickspin-demos/1",
     page_schema="stickspin-page/1",
-    node_pages=(("bag1-only", None),),
+    node_pages=(("sd", "2.sd"), ("bag1-only", None)),
     bag1_order=("bag1.pc", "bag1.fire", "bag1.left", "bag1.right"),
     bag2_order=("2.sd", "2.mochi", "2.mochi.i_right", "2.fire#1", "2.fire#2"),
     bag2_extra=("bag1.pc.after", "bag1.fire.after", "2.fire.tsd"),
@@ -75,7 +75,7 @@ STICKSPIN_SITE = RouteSiteProfile(
                 ("moved", "bag2_none_moved_piece"), ("near", "bag2_none_near"),
                 ("unexplained", "bag2_none_unexplained"), ("stripped", "bag2_garbage_stripped")),
     selftest_targets={
-        "empty_node": "2.sd", "text_only": "2.fire.bag4",
+        "empty_node": "2.mochi", "text_only": "2.fire.bag4",
         "unmatchable": "2.fire.td#1", "node_page": "bag1-only", "node_page_node": "bag1.pc",
         "elsewhere_node": "bag1.left", "demo_built": "2.sd.pc#3",
         "demo_unbuilt": "2.sd.tst.spin", "demo_never_holds": "bag1.pc",
