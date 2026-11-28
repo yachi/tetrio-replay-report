@@ -36,6 +36,7 @@ source page's percentages appear only inside its quoted text. No rate is compute
 rounding rule is exercised.
 """
 import argparse
+import hashlib
 import html
 import json
 import os
@@ -1314,18 +1315,30 @@ class RouteSite:
                 bad.append(f"{slug}: case {r['case']} has no embedded replay")
         return bad
 
+    def _memo(self, tag, fn, page, *rest):
+        """`fn(page, *rest)`, memoised by `tag`, the page's bytes and the identity of `rest`. The selftest
+        audits the same pages many times with one page changed; a changed page hashes differently
+        and a changed artefact is a fresh copy, so neither hits. The arguments are kept alive with
+        the result so an id is never reused, and a copy of the list is returned."""
+        cache = self.__dict__.setdefault("_audit_memo", {})
+        key = (tag, hashlib.sha256(page.encode()).digest(), *map(id, rest))
+        if key not in cache:
+            cache[key] = (rest, fn(page, *rest))
+        return list(cache[key][1])
+
     def audit_all(self, pages, art, demos, routes):
-        bad = self.audit_overview(pages[self.OVERVIEW], art) + self.audit_demo_page(pages[self.DEMO_PAGE], demos, routes)
+        bad = (self._memo("overview", self.audit_overview, pages[self.OVERVIEW], art)
+               + self._memo("demo", self.audit_demo_page, pages[self.DEMO_PAGE], demos, routes))
         built = {demo_slug(d["node"]) for d in demos["demos"]}
         for name, page in pages.items():
-            for slug in self._DEMO_LINK.findall(page):
+            for slug in self._memo("demo_links", self._DEMO_LINK.findall, page):
                 if slug not in built:
                     bad.append(f"{name}: a link to {slug}, which is no demo")
         seen = []
         for slug, node in self.NODE_PAGES:
             page = pages[f"{self.p.prefix}-{slug}.html"]
-            bad += self.audit_node_page(page, slug, node, art)
-            seen += _CASE_ROW.findall(page)
+            bad += self._memo(("node", slug, node), self.audit_node_page, page, slug, node, art)
+            seen += self._memo("case_rows", _CASE_ROW.findall, page)
         keys = sorted(case_key(c) for c in art["cases"])
         if sorted(seen) != keys:
             bad.append(f"the node pages do not embed every case exactly once ({len(seen)} embedded, "
